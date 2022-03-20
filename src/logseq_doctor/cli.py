@@ -14,10 +14,21 @@ Why does this file exist, and why not put this in __main__?
 
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
+from typing import TextIO
 
 import click
+
+from logseq_doctor import flat_markdown_to_outline
 
 
 @click.group()
 def main():
+    """Logseq Doctor: heal your flat old Markdown files before importing them."""
     pass
+
+
+@main.command()
+@click.argument('file', type=click.File())
+def outline(file: TextIO):
+    """Convert flat Markdown to outline."""
+    print(flat_markdown_to_outline(file.read()))

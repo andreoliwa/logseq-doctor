@@ -15,7 +15,7 @@
       "repo_main_branch": "master",
       "package_name": "logseq_doctor",
       "distribution_name": "logseq-doctor",
-      "project_short_description": "Heal your old Markdown files to use them with Logseq",
+      "project_short_description": "Logseq Doctor: heal your flat old Markdown files before importing them",
       "release_date": "today",
       "year_from": "2022",
       "year_to": "2022",

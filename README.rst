@@ -51,7 +51,7 @@ Overview
 
 .. end-badges
 
-Heal your old Markdown files to use them with Logseq
+Logseq Doctor: heal your flat old Markdown files before importing them.
 
 * Free software: MIT license
 

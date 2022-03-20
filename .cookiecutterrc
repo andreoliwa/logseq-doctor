@@ -44,7 +44,7 @@ default_context:
     pre_commit:                'yes'
     pre_commit_formatter:      'black'
     project_name:              'logseq-doctor'
-    project_short_description: 'Heal your old Markdown files to use them with Logseq'
+    project_short_description: 'Logseq Doctor: heal your flat old Markdown files before importing them'
     pypi_badge:                'yes'
     pypi_disable_upload:       'no'
     release_date:              'today'
