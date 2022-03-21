@@ -6,12 +6,9 @@ labels: "enhancement"
 assignees: ""
 ---
 
-<!---
 Your feature may already be reported!
 Please search on the [issue tracker](https://github.com/andreoliwa/logseq-doctor/issues) before creating one.
 If you found an issue, write a comment or upvote it with a thumbs-up 👍🏻.
-
--->
 
 ## Problem
 
