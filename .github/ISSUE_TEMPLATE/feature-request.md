@@ -25,6 +25,6 @@ If you found an issue, write a comment or upvote it with a thumbs-up 👍🏻.
 <!--- If suggesting a change/improvement, explain the difference from current behaviour -->
 <!--- Not obligatory, but suggest a possible solution and/or ideas on how to implement the addition or change -->
 
-For more information, see the [CONTRIBUTING](../../CONTRIBUTING.rst) guide.
+For more information, see the [CONTRIBUTING](https://github.com/andreoliwa/logseq-doctor/blob/master/CONTRIBUTING.rst) guide.
 
 <!-- Thanks to https://github.com/stevemao/github-issue-templates/ for the original template -->
