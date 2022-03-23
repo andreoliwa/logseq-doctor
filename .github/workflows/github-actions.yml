@@ -91,47 +91,11 @@ jobs:
             python_arch: 'x64'
             tox_env: 'py310'
             os: 'macos-latest'
-          - name: 'pypy37 (ubuntu)'
-            python: 'pypy-3.7'
-            toxpython: 'pypy3.7'
-            python_arch: 'x64'
-            tox_env: 'pypy37'
-            os: 'ubuntu-latest'
-          - name: 'pypy37 (windows)'
-            python: 'pypy-3.7'
-            toxpython: 'pypy3.7'
-            python_arch: 'x64'
-            tox_env: 'pypy37'
-            os: 'windows-latest'
-          - name: 'pypy37 (macos)'
-            python: 'pypy-3.7'
-            toxpython: 'pypy3.7'
-            python_arch: 'x64'
-            tox_env: 'pypy37'
-            os: 'macos-latest'
-          - name: 'pypy38 (ubuntu)'
-            python: 'pypy-3.8'
-            toxpython: 'pypy3.8'
-            python_arch: 'x64'
-            tox_env: 'pypy38'
-            os: 'ubuntu-latest'
-          - name: 'pypy38 (windows)'
-            python: 'pypy-3.8'
-            toxpython: 'pypy3.8'
-            python_arch: 'x64'
-            tox_env: 'pypy38'
-            os: 'windows-latest'
-          - name: 'pypy38 (macos)'
-            python: 'pypy-3.8'
-            toxpython: 'pypy3.8'
-            python_arch: 'x64'
-            tox_env: 'pypy38'
-            os: 'macos-latest'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python }}
         architecture: ${{ matrix.python_arch }}
