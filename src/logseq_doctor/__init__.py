@@ -39,7 +39,7 @@ class LogseqRenderer(BaseRenderer):
         url = token.target
         return f"[{text}]({url})"
 
-    # TODO: The methods below are placeholders taken from BaseRenderer.render_map.
+    # TODO: refactor: the methods below are placeholders taken from BaseRenderer.render_map.
     #  - Uncomment them to use them during debugging.
     #  - Remove them when there will be enough test coverage for all the different elements below
     # def render_strong(self, token):
