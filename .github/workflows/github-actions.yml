@@ -9,11 +9,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'check'
-            python: '3.9'
-            toxpython: 'python3.9'
-            tox_env: 'check'
-            os: 'ubuntu-latest'
           - name: 'docs'
             python: '3.9'
             toxpython: 'python3.9'
