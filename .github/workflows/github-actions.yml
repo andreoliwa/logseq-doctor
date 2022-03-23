@@ -9,34 +9,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'check'
-            python: '3.9'
-            toxpython: 'python3.9'
-            tox_env: 'check'
-            os: 'ubuntu-latest'
           - name: 'docs'
             python: '3.9'
             toxpython: 'python3.9'
             tox_env: 'docs'
             os: 'ubuntu-latest'
-          - name: 'py36 (ubuntu)'
-            python: '3.6'
-            toxpython: 'python3.6'
-            python_arch: 'x64'
-            tox_env: 'py36'
-            os: 'ubuntu-latest'
-          - name: 'py36 (windows)'
-            python: '3.6'
-            toxpython: 'python3.6'
-            python_arch: 'x64'
-            tox_env: 'py36'
-            os: 'windows-latest'
-          - name: 'py36 (macos)'
-            python: '3.6'
-            toxpython: 'python3.6'
-            python_arch: 'x64'
-            tox_env: 'py36'
-            os: 'macos-latest'
           - name: 'py37 (ubuntu)'
             python: '3.7'
             toxpython: 'python3.7'
@@ -109,47 +86,11 @@ jobs:
             python_arch: 'x64'
             tox_env: 'py310'
             os: 'macos-latest'
-          - name: 'pypy37 (ubuntu)'
-            python: 'pypy-3.7'
-            toxpython: 'pypy3.7'
-            python_arch: 'x64'
-            tox_env: 'pypy37'
-            os: 'ubuntu-latest'
-          - name: 'pypy37 (windows)'
-            python: 'pypy-3.7'
-            toxpython: 'pypy3.7'
-            python_arch: 'x64'
-            tox_env: 'pypy37'
-            os: 'windows-latest'
-          - name: 'pypy37 (macos)'
-            python: 'pypy-3.7'
-            toxpython: 'pypy3.7'
-            python_arch: 'x64'
-            tox_env: 'pypy37'
-            os: 'macos-latest'
-          - name: 'pypy38 (ubuntu)'
-            python: 'pypy-3.8'
-            toxpython: 'pypy3.8'
-            python_arch: 'x64'
-            tox_env: 'pypy38'
-            os: 'ubuntu-latest'
-          - name: 'pypy38 (windows)'
-            python: 'pypy-3.8'
-            toxpython: 'pypy3.8'
-            python_arch: 'x64'
-            tox_env: 'pypy38'
-            os: 'windows-latest'
-          - name: 'pypy38 (macos)'
-            python: 'pypy-3.8'
-            toxpython: 'pypy3.8'
-            python_arch: 'x64'
-            tox_env: 'pypy38'
-            os: 'macos-latest'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python }}
         architecture: ${{ matrix.python_arch }}
@@ -160,6 +101,15 @@ jobs:
         pip --version
         tox --version
         pip list --format=freeze
+    # Thanks to https://github.com/lsst-sqre/safir/blob/master/.github/workflows/ci.yaml
+    - name: Cache tox environments
+      id: cache-tox
+      uses: actions/cache@v3
+      with:
+        path: .tox
+        # setup.cfg and pyproject.toml have versioning info that would
+        # impact the tox environment.
+        key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}
     - name: test
       env:
         TOXPYTHON: '${{ matrix.toxpython }}'
