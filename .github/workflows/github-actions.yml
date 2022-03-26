@@ -1,5 +1,10 @@
 name: build
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
 jobs:
   test:
     name: ${{ matrix.name }}
@@ -50,12 +55,13 @@ jobs:
             python_arch: 'x64'
             tox_env: 'py38'
             os: 'macos-latest'
-          - name: 'py39 (ubuntu)'
+          - name: 'py39 (ubuntu) + coverage'
             python: '3.9'
             toxpython: 'python3.9'
             python_arch: 'x64'
-            tox_env: 'py39'
+            tox_env: 'clean,py39,report,codecov'
             os: 'ubuntu-latest'
+            codecov: true
           - name: 'py39 (windows)'
             python: '3.9'
             toxpython: 'python3.9'
@@ -115,3 +121,9 @@ jobs:
         TOXPYTHON: '${{ matrix.toxpython }}'
       run: >
         tox -e ${{ matrix.tox_env }} -v
+    # https://github.com/codecov/example-python
+    - name: "Upload coverage to Codecov"
+      uses: codecov/codecov-action@v2
+      if: ${{ matrix.codecov }}
+      with:
+        fail_ci_if_error: true
