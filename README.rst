@@ -53,19 +53,48 @@ Overview
 
 Logseq Doctor: heal your flat old Markdown files before importing them.
 
-* Free software: MIT license
+.. note::
+
+    This project is still alpha, so it's a bit rough on the edges (documentation and features).
 
 Installation
 ============
 
-::
+The recommended way is to install ``logseq-doctor`` globally with `pipx <https://github.com/pypa/pipx>`_::
 
-    pip install logseq-doctor
+    pipx install logseq-doctor
 
-You can also install the in-development version with::
+You can also install the development version with::
 
-    pip install https://github.com/andreoliwa/logseq-doctor/archive/master.zip
+    pipx install git+https://github.com/andreoliwa/logseq-doctor
 
+You will then have the ``lsd`` command available globally in your system.
+
+Quick start
+===========
+
+Use ``--help`` to check the current commands and options.
+
+Example output::
+
+    $ lsd --help
+    Usage: lsd [OPTIONS] COMMAND [ARGS]...
+
+      Logseq Doctor: heal your flat old Markdown files before importing them.
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      outline  Convert flat Markdown to outline.
+
+    $ lsd outline --help
+    Usage: lsd outline [OPTIONS] FILE
+
+      Convert flat Markdown to outline.
+
+    Options:
+      --help  Show this message and exit.
 
 Documentation
 =============
