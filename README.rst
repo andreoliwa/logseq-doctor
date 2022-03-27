@@ -53,9 +53,7 @@ Overview
 
 Logseq Doctor: heal your flat old Markdown files before importing them.
 
-.. note::
-
-    This project is still alpha, so it's a bit rough on the edges (documentation and features).
+**Note:** *this project is still alpha, so it's a bit rough on the edges (documentation and feature-wise).*
 
 Installation
 ============
