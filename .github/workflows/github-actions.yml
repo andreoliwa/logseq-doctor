@@ -123,7 +123,7 @@ jobs:
         tox -e ${{ matrix.tox_env }} -v
     # https://github.com/codecov/example-python
     - name: "Upload coverage to Codecov"
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       if: ${{ matrix.codecov }}
       with:
         fail_ci_if_error: true
