@@ -1,0 +1,9 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+tag_format = "v$version"
+version_files = [
+    "src/__init__.py",
+    "README.rst:github",
+    "docs/conf.py:version = release",
+]
