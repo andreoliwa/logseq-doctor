@@ -1,7 +1,7 @@
-from mistletoe import BaseRenderer
+import mistletoe
 from mistletoe import block_token
-from mistletoe import markdown
 from mistletoe import span_token
+from mistletoe.base_renderer import BaseRenderer
 
 __version__ = '0.1.0'
 
@@ -25,8 +25,7 @@ class LogseqRenderer(BaseRenderer):
         inner = self.render_inner(token)
         return self.outline(token.level - 1, f"{hashes} {inner}")
 
-    @staticmethod
-    def render_line_break(token: span_token.LineBreak):
+    def render_line_break(self, token: span_token.LineBreak) -> str:
         return token.content + '\n'
 
     def render_paragraph(self, token):
@@ -96,4 +95,4 @@ class LogseqRenderer(BaseRenderer):
 
 def flat_markdown_to_outline(markdown_contents: str) -> str:
     """Convert flat Markdown to an outline."""
-    return markdown(markdown_contents, LogseqRenderer)
+    return mistletoe.markdown(markdown_contents, LogseqRenderer)
