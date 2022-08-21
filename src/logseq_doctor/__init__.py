@@ -3,7 +3,7 @@ from mistletoe import block_token
 from mistletoe import span_token
 from mistletoe.base_renderer import BaseRenderer
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 class LogseqRenderer(BaseRenderer):

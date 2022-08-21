@@ -1,9 +1,11 @@
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.1.0"
+version = "0.1.1"
 tag_format = "v$version"
+update_changelog_on_bump = true
 version_files = [
-    "src/__init__.py",
-    "README.rst:github",
     "docs/conf.py:version = release",
+    "pyproject.toml:version =",
+    "README.rst:github",
+    "src/logseq_doctor/__init__.py",
 ]

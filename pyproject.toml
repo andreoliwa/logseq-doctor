@@ -5,7 +5,7 @@ skip-string-normalization = true
 
 [tool.poetry]
 name = "logseq-doctor"
-version = "0.1.0"
+version = "0.1.1"
 description = "Logseq Doctor: heal your flat old Markdown files before importing them"
 authors = ["W. Augusto Andreoli <andreoliwa@gmail.com>"]
 license = "MIT"
