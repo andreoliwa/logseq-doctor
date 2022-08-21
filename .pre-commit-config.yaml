@@ -31,5 +31,3 @@ repos:
     rev: v2.32.1
     hooks:
     - id: commitizen
-    - id: commitizen-branch
-      stages: [push]
