@@ -145,3 +145,21 @@ def test_flat_paragraphs_with_deeper_headers():
             - Only text before, [link a the end](https://endlink.com).
         """,
     )
+
+
+def test_single_nested_lists():
+    assert_markdown(
+        """
+        # Header
+
+        - Parent
+          - Child 1
+          - Child 2
+        """,
+        """
+        - # Header
+          - Parent
+            - Child 1
+            - Child 2
+        """,
+    )

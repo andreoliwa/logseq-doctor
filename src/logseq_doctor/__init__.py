@@ -38,59 +38,69 @@ class LogseqRenderer(BaseRenderer):
         url = token.target
         return f"[{text}]({url})"
 
+    def render_list_item(self, token):
+        if len(token.children) <= 1:
+            return self.render_inner(token)
+
+        self.current_level += 1
+
+        inner = self.render_inner(token)
+        headless_parent_with_children = inner.lstrip(f"{self.bullet} ")
+        rv = self.outline(self.current_level - 1, headless_parent_with_children, nl=False)
+
+        self.current_level -= 1
+        return rv
+
     # TODO: refactor: the methods below are placeholders taken from BaseRenderer.render_map.
     #  - Uncomment them to use them during debugging.
     #  - Remove them when there will be enough test coverage for all the different elements below
     # def render_strong(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_emphasis(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_inline_code(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_raw_text(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_strikethrough(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_image(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_auto_link(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_escape_sequence(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_quote(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_block_code(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_list(self, token):
-    #     pass
-    #
-    # def render_list_item(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_table(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_table_row(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_table_cell(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_thematic_break(self, token):
-    #     pass
+    #     return self.render_inner(token)
     #
     # def render_document(self, token):
-    #     pass
+    #     return self.render_inner(token)
 
 
 def flat_markdown_to_outline(markdown_contents: str) -> str:
