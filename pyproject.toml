@@ -36,12 +36,13 @@ classifiers = [
 "Issue Tracker" = "https://github.com/andreoliwa/logseq-doctor/issues"
 
 [tool.poetry.scripts]
-lsd = "logseq_doctor.cli:main"
+lsd = "logseq_doctor.cli:app"
 
 [tool.poetry.dependencies]
 python = "^3.7"
 click = "*"
 mistletoe = "*"
+typer = {extras = ["all"], version = "^0.6.1"}
 
 [tool.poetry.dev-dependencies]
 pytest = "*"

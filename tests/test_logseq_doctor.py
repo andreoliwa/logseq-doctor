@@ -1,33 +1,21 @@
 from textwrap import dedent
 
-from click.testing import CliRunner
+from typer.testing import CliRunner
 
 from logseq_doctor import flat_markdown_to_outline
-from logseq_doctor.cli import main
+from logseq_doctor.cli import app
+from logseq_doctor.cli import callback
+from logseq_doctor.cli import outline
 
 NBSP = "\\u00A0"
 
 
-def test_main():
+def test_cli_help():
+    """The Typer output is a colourful rich text, so let's only assert the presence of commands."""
     runner = CliRunner()
-    result = runner.invoke(main, [])
-
-    assert (
-        result.output
-        == dedent(
-            """
-        Usage: main [OPTIONS] COMMAND [ARGS]...
-
-          Logseq Doctor: heal your flat old Markdown files before importing them.
-
-        Options:
-          --help  Show this message and exit.
-
-        Commands:
-          outline  Convert flat Markdown to outline.
-        """
-        ).lstrip()
-    )
+    result = runner.invoke(app, [])
+    for expected_text in (callback.__doc__, outline.__doc__):
+        assert expected_text in result.output
     assert result.exit_code == 0
 
 
