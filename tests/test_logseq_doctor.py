@@ -1,5 +1,7 @@
 from textwrap import dedent
 
+import mistletoe
+from mistletoe.ast_renderer import ASTRenderer
 from typer.testing import CliRunner
 
 from logseq_doctor import flat_markdown_to_outline
@@ -19,13 +21,19 @@ def test_cli_help():
     assert result.exit_code == 0
 
 
-def assert_markdown(flat_md: str, outlined_md: str):
+def assert_markdown(flat_md: str, outlined_md: str, *, ast=False):
     """Assert flat Markdown is converted to outline.
 
     Use non-breaking spaces to trick dedent() into keeping leading spaces on output.
     """
     output_without_nbsp = dedent(outlined_md).lstrip().replace(NBSP, " ")
-    assert flat_markdown_to_outline(dedent(flat_md).lstrip()) == output_without_nbsp
+    stripped_md = dedent(flat_md).lstrip()
+
+    # For debugging purposes
+    if ast:
+        print("\nASTRenderer:\n" + mistletoe.markdown(stripped_md, ASTRenderer))
+
+    assert flat_markdown_to_outline(stripped_md) == output_without_nbsp
 
 
 def test_header_hierarchy_preserved_and_whitespace_removed():
@@ -177,5 +185,30 @@ def test_nested_lists_multiple_levels():
             - Child 2
               - Grand child 2.1
                 - ABC
+        """,
+    )
+
+
+def test_thematic_break_setext_heading():
+    assert_markdown(
+        """
+        ---
+        date: 2021-10-29T09:41:12.490Z
+        dateCreated: 2021-10-14T20:48:58.837Z
+        ---
+
+        # Some title
+
+        Line1
+        Line2
+        """,
+        """
+        ---
+        date: 2021-10-29T09:41:12.490Z
+        dateCreated: 2021-10-14T20:48:58.837Z
+        ---
+        - # Some title
+          - Line1
+          - Line2
         """,
     )

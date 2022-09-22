@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import mistletoe
 from mistletoe import block_token
 from mistletoe import span_token
 from mistletoe.base_renderer import BaseRenderer
 
 __version__ = '0.1.1'
+
+DASH = "-"
 
 
 class LogseqRenderer(BaseRenderer):
@@ -19,7 +23,12 @@ class LogseqRenderer(BaseRenderer):
         new_line_at_the_end = "\n" if nl else ""
         return f"{leading_spaces}{self.bullet} {text}{new_line_at_the_end}"
 
-    def render_heading(self, token: block_token.Heading):
+    def render_heading(self, token: block_token.Heading | block_token.SetextHeading):
+        """Setext headings: https://spec.commonmark.org/0.30/#setext-headings."""
+        if isinstance(token, block_token.SetextHeading):
+            # For now, only dealing with level 2 setext headers (dashes)
+            return self.render_inner(token) + f"\n{DASH * 3}\n"
+
         self.current_level = token.level
         hashes = '#' * token.level
         inner = self.render_inner(token)
@@ -50,6 +59,9 @@ class LogseqRenderer(BaseRenderer):
 
         self.current_level -= 1
         return rv
+
+    def render_thematic_break(self, token: block_token.ThematicBreak) -> str:
+        return f'{DASH * 3}\n'
 
     # TODO: refactor: the methods below are placeholders taken from BaseRenderer.render_map.
     #  - Uncomment them to use them during debugging.
@@ -94,9 +106,6 @@ class LogseqRenderer(BaseRenderer):
     #     return self.render_inner(token)
     #
     # def render_table_cell(self, token):
-    #     return self.render_inner(token)
-    #
-    # def render_thematic_break(self, token):
     #     return self.render_inner(token)
     #
     # def render_document(self, token):
