@@ -71,35 +71,22 @@ You will then have the ``lsd`` command available globally in your system.
 Quick start
 ===========
 
-Use ``--help`` to check the current commands and options.
+Type ``lsd`` without arguments to check the current commands and options::
 
-Example output::
+     Usage: lsd [OPTIONS] COMMAND [ARGS]...
 
-    $ lsd --help
-    Usage: lsd [OPTIONS] COMMAND [ARGS]...
+     Logseq Doctor: heal your flat old Markdown files before importing them.
 
-      Logseq Doctor: heal your flat old Markdown files before importing them.
-
-    Options:
-      --help  Show this message and exit.
-
-    Commands:
-      outline  Convert flat Markdown to outline.
-
-    $ lsd outline --help
-    Usage: lsd outline [OPTIONS] FILE
-
-      Convert flat Markdown to outline.
-
-    Options:
-      --help  Show this message and exit.
-
-Documentation
-=============
-
-
-https://logseq-doctor.readthedocs.io/
-
+    ╭─ Options ────────────────────────────────────────────────────────────────────╮
+    │ --install-completion          Install completion for the current shell.      │
+    │ --show-completion             Show completion for the current shell, to copy │
+    │                               it or customize the installation.              │
+    │ --help                        Show this message and exit.                    │
+    ╰──────────────────────────────────────────────────────────────────────────────╯
+    ╭─ Commands ───────────────────────────────────────────────────────────────────╮
+    │ outline  Convert flat Markdown to outline.                                   │
+    │ tidy-up  Tidy up your Markdown files by removing empty bullets in any block. │
+    ╰──────────────────────────────────────────────────────────────────────────────╯
 
 Development
 ===========

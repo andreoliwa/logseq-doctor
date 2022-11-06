@@ -14,6 +14,10 @@ Why does this file exist, and why not put this in __main__?
 
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
+import re
+from pathlib import Path
+from typing import List
+
 import typer
 
 from logseq_doctor import flat_markdown_to_outline
@@ -22,7 +26,7 @@ app = typer.Typer(no_args_is_help=True)
 
 
 @app.callback()
-def callback():
+def lsd():
     """Logseq Doctor: heal your flat old Markdown files before importing them."""
 
 
@@ -30,3 +34,22 @@ def callback():
 def outline(text_file: typer.FileText):
     """Convert flat Markdown to outline."""
     print(flat_markdown_to_outline(text_file.read()))
+
+
+@app.command()
+def tidy_up(
+    markdown_file: List[Path] = typer.Argument(
+        ...,
+        help="Markdown files to tidy up",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=True,
+        resolve_path=True,
+    ),
+):
+    """Tidy up your Markdown files by removing empty bullets in any block."""
+    for each_file in markdown_file:
+        old_contents = each_file.read_text()
+        new_contents = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
+        each_file.write_text(new_contents)

@@ -1,10 +1,5 @@
 name: build
-on:
-  push:
-    branches:
-      - master
-      - develop
-  pull_request:
+on: [push]
 jobs:
   test:
     name: ${{ matrix.name }}

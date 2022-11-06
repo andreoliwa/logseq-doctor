@@ -42,10 +42,12 @@ lsd = "logseq_doctor.cli:app"
 python = "^3.7"
 click = "*"
 mistletoe = "*"
-typer = {extras = ["all"], version = "^0.6.1"}
+typer = {extras = ["all"], version = "*"}
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "*"
+pytest-cov = "*"
+pytest-datadir = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
