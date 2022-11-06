@@ -97,8 +97,12 @@ Example output::
 Documentation
 =============
 
+Run ``lsd`` to see available commands::
 
-https://logseq-doctor.readthedocs.io/
+    outline  Convert flat Markdown to outline.
+    tidy-up  Tidy up your Markdown files by removing empty bullets in any block.
+
+Documentation website (currently incomplete): https://logseq-doctor.readthedocs.io/
 
 
 Development
