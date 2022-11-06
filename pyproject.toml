@@ -44,8 +44,9 @@ click = "*"
 mistletoe = "*"
 typer = {extras = ["all"], version = "^0.6.1"}
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "*"
+pytest-datadir = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

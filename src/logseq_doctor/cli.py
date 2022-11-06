@@ -26,7 +26,7 @@ app = typer.Typer(no_args_is_help=True)
 
 
 @app.callback()
-def callback():
+def lsd():
     """Logseq Doctor: heal your flat old Markdown files before importing them."""
 
 
