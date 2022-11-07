@@ -39,17 +39,13 @@ def outline(text_file: typer.FileText):
 @app.command()
 def tidy_up(
     markdown_file: List[Path] = typer.Argument(
-        ...,
-        help="Markdown files to tidy up",
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        writable=True,
-        resolve_path=True,
+        ..., help="Markdown files to tidy up", exists=True, file_okay=True, dir_okay=False, writable=True
     ),
 ):
     """Tidy up your Markdown files by removing empty bullets in any block."""
     for each_file in markdown_file:
         old_contents = each_file.read_text()
         new_contents = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
-        each_file.write_text(new_contents)
+        if old_contents != new_contents:
+            typer.echo(f'removed empty bullets from {each_file}')
+            each_file.write_text(new_contents)
