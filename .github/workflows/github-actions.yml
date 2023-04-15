@@ -54,7 +54,7 @@ jobs:
             python: '3.9'
             toxpython: 'python3.9'
             python_arch: 'x64'
-            tox_env: 'clean,py39,report,codecov'
+            tox_env: 'clean,py39,report'
             os: 'ubuntu-latest'
             codecov: true
           - name: 'py39 (windows)'
@@ -117,8 +117,9 @@ jobs:
       run: >
         tox -e ${{ matrix.tox_env }} -v
     # https://github.com/codecov/example-python
-    - name: "Upload coverage to Codecov"
-      uses: codecov/codecov-action@v3
-      if: ${{ matrix.codecov }}
-      with:
-        fail_ci_if_error: true
+    # TODO: codecov is not working
+#    - name: "Upload coverage to Codecov"
+#      uses: codecov/codecov-action@v3
+#      if: ${{ matrix.codecov }}
+#      with:
+#        fail_ci_if_error: true
