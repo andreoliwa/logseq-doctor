@@ -103,14 +103,15 @@ jobs:
         tox --version
         pip list --format=freeze
     # Thanks to https://github.com/lsst-sqre/safir/blob/master/.github/workflows/ci.yaml
-    - name: Cache tox environments
-      id: cache-tox
-      uses: actions/cache@v3
-      with:
-        path: .tox
-        # setup.cfg and pyproject.toml have versioning info that would
-        # impact the tox environment.
-        key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}
+      # TODO: disable cache for now
+#    - name: Cache tox environments
+#      id: cache-tox
+#      uses: actions/cache@v3
+#      with:
+#        path: .tox
+#        # setup.cfg and pyproject.toml have versioning info that would
+#        # impact the tox environment.
+#        key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}
     - name: test
       env:
         TOXPYTHON: '${{ matrix.toxpython }}'
