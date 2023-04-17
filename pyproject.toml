@@ -42,6 +42,7 @@ lsd = "logseq_doctor.cli:app"
 python = "^3.7"
 click = "*"
 mistletoe = "*"
+requests = "*"
 typer = {extras = ["all"], version = "*"}
 
 [tool.poetry.group.dev.dependencies]
