@@ -15,15 +15,14 @@ Why does this file exist, and why not put this in __main__?
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
 import re
-from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import List
 
-import requests
 import typer
 
 from logseq_doctor import flat_markdown_to_outline
+from logseq_doctor.api import LogseqApi
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -60,19 +59,6 @@ class TaskFormat(str, Enum):
     text = 'text'
 
 
-@dataclass
-class OneLineRow:
-    journal: int
-    name: str
-    url: str
-    content: str
-
-    def __lt__(self, other: "OneLineRow") -> bool:
-        if not self.journal or not other.journal:
-            return False
-        return self.journal < other.journal and self.content < other.content
-
-
 @app.command()
 def tasks(
     tag_or_page: List[str] = typer.Argument(None, metavar="TAG", help="Tags or pages to query"),
@@ -90,30 +76,9 @@ def tasks(
         else:
             pages = " ".join([f"[[{tp}]]" for tp in tag_or_page])
             condition = f" (or {pages})"
-    req_query = f"(and{condition} (task TODO NOW DOING))"
-    # FIXME[AA]: move to class LogseqApi
-    session = requests.Session()
-    session.headers.update(
-        {
-            "Authorization": f"Bearer {logseq_api_token}",
-            "Content-Type": "application/json",
-        }
-    )
-    resp = session.post(f"{logseq_host_url}/api", json={"method": "logseq.db.q", "args": [req_query]})
-    resp.raise_for_status()
-
-    block_url = "logseq://graph/captains-log?block-id="
-    rows: List[OneLineRow] = []
-    for obj in resp.json():
-        uuid = obj.get("uuid")
-        content = obj.get("content").splitlines()[0]
-        page = obj.get("page", {})
-        journal = page.get("journalDay")
-        name = page.get("originalName")
-        if format == TaskFormat.text:
-            rows.append(OneLineRow(journal, name, f"{block_url}{uuid}", content))
-
-    for row in sorted(rows):
+    api = LogseqApi(logseq_host_url, logseq_api_token)
+    query = f"(and{condition} (task TODO DOING WAITING NOW LATER))"
+    for row in sorted(api.query(query), key=lambda row: (row.journal_iso_date, row.content)):
         typer.secho(f"{row.name}: ", fg=typer.colors.GREEN, nl=False)
         typer.secho(row.url, fg=typer.colors.BLUE, nl=False)
         typer.echo(f" {row.content}")
