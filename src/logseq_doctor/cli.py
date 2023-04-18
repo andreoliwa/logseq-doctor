@@ -25,7 +25,7 @@ from typing import List
 import typer
 
 from logseq_doctor import flat_markdown_to_outline
-from logseq_doctor.api import LogseqApi
+from logseq_doctor.api import Logseq
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -81,23 +81,26 @@ def tasks(
         else:
             pages = " ".join([f"[[{tp}]]" for tp in tag_or_page])
             condition = f" (or {pages})"
-    api = LogseqApi(logseq_host_url, logseq_api_token, logseq_graph)
+    api = Logseq(logseq_host_url, logseq_api_token, logseq_graph)
     query = f"(and{condition} (task TODO DOING WAITING NOW LATER))"
-    rows = sorted(api.query(query), key=lambda row: (row.journal_iso_date, row.content))
-    if format == TaskFormat.text:
-        _output_text(rows)
-    elif format == TaskFormat.kanban:
-        _output_kanban(rows)
+
+    blocks = sorted(api.query(query), key=lambda row: (row.journal_iso_date, row.content))
+
+    which_function = {
+        TaskFormat.text: _output_text,
+        TaskFormat.kanban: _output_kanban,
+    }.get(format, _output_text)
+    which_function(blocks)
 
 
-def _output_text(rows):
-    for row in rows:
-        typer.secho(f"{row.name}: ", fg=typer.colors.GREEN, nl=False)
-        typer.secho(row.url, fg=typer.colors.BLUE, nl=False)
-        typer.echo(f" {row.content}")
+def _output_text(blocks):
+    for block in blocks:
+        typer.secho(f"{block.name}: ", fg=typer.colors.GREEN, nl=False)
+        typer.secho(block.url, fg=typer.colors.BLUE, nl=False)
+        typer.echo(f" {block.content}")
 
 
-def _output_kanban(rows):
+def _output_kanban(blocks):
     block_id = uuid.uuid4()
     renderer = "{{renderer :kboard, %s, kanban-list}}" % block_id
     title = "My board"
@@ -106,21 +109,38 @@ def _output_kanban(rows):
     - {title}
       id:: {block_id}
       collapsed:: true
-      - placeholder #.kboard-placeholder
-        kanban-list:: Triage
-      - placeholder #.kboard-placeholder
-        kanban-list:: TODO
-      - placeholder #.kboard-placeholder
-        kanban-list:: DOING
-      - placeholder #.kboard-placeholder
-        kanban-list:: DONE
     """
+    columns = set()
     typer.echo(dedent(header).strip())
-    for row in rows:
-        list_item = f"""
-        - {row.content}
-          kanban-list:: Triage
-          collapsed:: true
-          - (({row.block_id}))
-        """
-        typer.echo(indent(dedent(list_item).strip(), " " * 2))
+    for block in blocks:
+        column = block.marker
+        if not column:
+            column = "Unknown"
+
+        if block.marker not in columns:
+            columns.add(column)
+            _print_markdown(
+                f"""
+                - placeholder #.kboard-placeholder
+                  kanban-list:: {column}
+                """,
+                level=1,
+            )
+
+        if block.journal_iso_date:
+            content = block.content
+        else:
+            content = f"{block.name}: {block.content} #[[{block.name}]]"
+        _print_markdown(
+            f"""
+            - {content}
+              kanban-list:: {column}
+              collapsed:: true
+              - (({block.id}))
+            """,
+            level=1,
+        )
+
+
+def _print_markdown(text: str, *, level: int = 0):
+    typer.echo(indent(dedent(text).strip(), " " * (level * 2)))

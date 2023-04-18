@@ -1,25 +1,30 @@
 from dataclasses import dataclass
 from typing import List
+from uuid import UUID
 
 import requests
 
 
-@dataclass
-class QueryResult:
-    block_id: str
+@dataclass(frozen=True)
+class Block:
+    id: UUID
     journal_iso_date: int
     name: str
     url: str
     content: str
+    marker: str
 
 
-@dataclass
-class LogseqApi:
+@dataclass(frozen=True)
+class Logseq:
     url: str
     token: str
     graph: str
 
-    def query(self, query: str) -> List[QueryResult]:
+    def build_block_url(self, block_id: UUID) -> str:
+        return f"logseq://graph/{self.graph}?block-id={block_id}"
+
+    def query(self, query: str) -> List[Block]:
         """Query Logseq API."""
         session = requests.Session()
         session.headers.update(
@@ -31,18 +36,18 @@ class LogseqApi:
         resp = session.post(f"{self.url}/api", json={"method": "logseq.db.q", "args": [query]})
         resp.raise_for_status()
 
-        block_url = f"logseq://graph/{self.graph}?block-id="
-        rows: List[QueryResult] = []
+        rows: List[Block] = []
         for obj in resp.json():
             page = obj.get("page", {})
             block_id = obj.get("uuid")
             rows.append(
-                QueryResult(
-                    block_id=block_id,
+                Block(
+                    id=block_id,
                     journal_iso_date=page.get("journalDay", 0),
                     name=page.get("originalName"),
-                    url=f"{block_url}{block_id}",
+                    url=self.build_block_url(block_id),
                     content=obj.get("content").splitlines()[0],
+                    marker=obj.get("marker"),
                 )
             )
         return rows
