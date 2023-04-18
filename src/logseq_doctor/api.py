@@ -17,6 +17,7 @@ class QueryResult:
 class LogseqApi:
     url: str
     token: str
+    graph: str
 
     def query(self, query: str) -> List[QueryResult]:
         """Query Logseq API."""
@@ -30,7 +31,7 @@ class LogseqApi:
         resp = session.post(f"{self.url}/api", json={"method": "logseq.db.q", "args": [query]})
         resp.raise_for_status()
 
-        block_url = "logseq://graph/captains-log?block-id="
+        block_url = f"logseq://graph/{self.graph}?block-id="
         rows: List[QueryResult] = []
         for obj in resp.json():
             page = obj.get("page", {})

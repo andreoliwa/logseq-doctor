@@ -15,8 +15,11 @@ Why does this file exist, and why not put this in __main__?
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
 import re
+import uuid
 from enum import Enum
 from pathlib import Path
+from textwrap import dedent
+from textwrap import indent
 from typing import List
 
 import typer
@@ -57,6 +60,7 @@ class TaskFormat(str, Enum):
     """Task format."""
 
     text = 'text'
+    kanban = 'kanban'
 
 
 @app.command()
@@ -67,6 +71,7 @@ def tasks(
     ),
     logseq_host_url=typer.Option(..., '--host', '-h', help="Logseq host", envvar="LOGSEQ_HOST_URL"),
     logseq_api_token=typer.Option(..., '--token', '-t', help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
+    logseq_graph=typer.Option(..., '--graph', '-g', help="Logseq graph", envvar="LOGSEQ_GRAPH"),
 ):
     """List tasks in Logseq."""
     condition = ""
@@ -76,9 +81,46 @@ def tasks(
         else:
             pages = " ".join([f"[[{tp}]]" for tp in tag_or_page])
             condition = f" (or {pages})"
-    api = LogseqApi(logseq_host_url, logseq_api_token)
+    api = LogseqApi(logseq_host_url, logseq_api_token, logseq_graph)
     query = f"(and{condition} (task TODO DOING WAITING NOW LATER))"
-    for row in sorted(api.query(query), key=lambda row: (row.journal_iso_date, row.content)):
+    rows = sorted(api.query(query), key=lambda row: (row.journal_iso_date, row.content))
+    if format == TaskFormat.text:
+        _output_text(rows)
+    elif format == TaskFormat.kanban:
+        _output_kanban(rows)
+
+
+def _output_text(rows):
+    for row in rows:
         typer.secho(f"{row.name}: ", fg=typer.colors.GREEN, nl=False)
         typer.secho(row.url, fg=typer.colors.BLUE, nl=False)
         typer.echo(f" {row.content}")
+
+
+def _output_kanban(rows):
+    block_id = uuid.uuid4()
+    renderer = "{{renderer :kboard, %s, kanban-list}}" % block_id
+    title = "My board"
+    header = f"""
+    - {renderer}
+    - {title}
+      id:: {block_id}
+      collapsed:: true
+      - placeholder #.kboard-placeholder
+        kanban-list:: Triage
+      - placeholder #.kboard-placeholder
+        kanban-list:: TODO
+      - placeholder #.kboard-placeholder
+        kanban-list:: DOING
+      - placeholder #.kboard-placeholder
+        kanban-list:: DONE
+    """
+    typer.echo(dedent(header).strip())
+    for row in rows:
+        list_item = f"""
+        - {row.content}
+          kanban-list:: Triage
+          collapsed:: true
+          - (({row.block_id}))
+        """
+        typer.echo(indent(dedent(list_item).strip(), " " * 2))
