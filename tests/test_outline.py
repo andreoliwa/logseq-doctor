@@ -5,9 +5,7 @@ from mistletoe.ast_renderer import ASTRenderer
 from typer.testing import CliRunner
 
 from logseq_doctor import flat_markdown_to_outline
-from logseq_doctor.cli import app
-from logseq_doctor.cli import lsd
-from logseq_doctor.cli import outline
+from logseq_doctor.cli import app, lsd, outline
 from logseq_doctor.constants import NBSP
 
 
