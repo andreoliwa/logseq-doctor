@@ -1,3 +1,4 @@
+"""Logseq API client."""
 from dataclasses import dataclass
 from typing import List
 from uuid import UUID
@@ -7,7 +8,9 @@ import requests
 
 @dataclass(frozen=True)
 class Block:
-    id: UUID
+    """Logseq block."""
+
+    block_id: UUID
     journal_iso_date: int
     name: str
     url: str
@@ -17,11 +20,14 @@ class Block:
 
 @dataclass(frozen=True)
 class Logseq:
+    """Logseq API client."""
+
     url: str
     token: str
     graph: str
 
     def build_block_url(self, block_id: UUID) -> str:
+        """Build a Logseq block URL."""
         return f"logseq://graph/{self.graph}?block-id={block_id}"
 
     def query(self, query: str) -> List[Block]:
@@ -42,7 +48,7 @@ class Logseq:
             block_id = obj.get("uuid")
             rows.append(
                 Block(
-                    id=block_id,
+                    block_id=block_id,
                     journal_iso_date=page.get("journalDay", 0),
                     name=page.get("originalName"),
                     url=self.build_block_url(block_id),

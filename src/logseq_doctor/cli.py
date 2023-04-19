@@ -17,14 +17,13 @@ import re
 import uuid
 from enum import Enum
 from pathlib import Path
-from textwrap import dedent
-from textwrap import indent
+from textwrap import dedent, indent
 from typing import List
 
 import typer
 
 from logseq_doctor import flat_markdown_to_outline
-from logseq_doctor.api import Logseq
+from logseq_doctor.api import Block, Logseq
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -42,7 +41,7 @@ def outline(text_file: typer.FileText) -> None:
 
 @app.command()
 def tidy_up(
-    markdown_file: List[Path] = typer.Argument(  # noqa: B008
+    markdown_file: List[Path] = typer.Argument(
         ..., help="Markdown files to tidy up", exists=True, file_okay=True, dir_okay=False, writable=True
     ),
 ) -> None:
@@ -58,20 +57,20 @@ def tidy_up(
 class TaskFormat(str, Enum):
     """Task format."""
 
-    text = 'text'
-    kanban = 'kanban'
+    text = "text"
+    kanban = "kanban"
 
 
 @app.command()
 def tasks(
     tag_or_page: List[str] = typer.Argument(None, metavar="TAG", help="Tags or pages to query"),
-    format: TaskFormat = typer.Option(
-        TaskFormat.text, '--format', '--pretty', '-f', help="Output format", case_sensitive=False
+    format_: TaskFormat = typer.Option(
+        TaskFormat.text, "--format", "--pretty", "-f", help="Output format", case_sensitive=False
     ),
-    logseq_host_url=typer.Option(..., '--host', '-h', help="Logseq host", envvar="LOGSEQ_HOST_URL"),
-    logseq_api_token=typer.Option(..., '--token', '-t', help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
-    logseq_graph=typer.Option(..., '--graph', '-g', help="Logseq graph", envvar="LOGSEQ_GRAPH"),
-):
+    logseq_host_url: str = typer.Option(..., "--host", "-h", help="Logseq host", envvar="LOGSEQ_HOST_URL"),
+    logseq_api_token: str = typer.Option(..., "--token", "-t", help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
+    logseq_graph: str = typer.Option(..., "--graph", "-g", help="Logseq graph", envvar="LOGSEQ_GRAPH"),
+) -> None:
     """List tasks in Logseq."""
     condition = ""
     if tag_or_page:
@@ -88,18 +87,18 @@ def tasks(
     which_function = {
         TaskFormat.text: _output_text,
         TaskFormat.kanban: _output_kanban,
-    }.get(format, _output_text)
+    }.get(format_, _output_text)
     which_function(blocks)
 
 
-def _output_text(blocks):
+def _output_text(blocks: List[Block]) -> None:
     for block in blocks:
         typer.secho(f"{block.name}: ", fg=typer.colors.GREEN, nl=False)
         typer.secho(block.url, fg=typer.colors.BLUE, nl=False)
         typer.echo(f" {block.content}")
 
 
-def _output_kanban(blocks):
+def _output_kanban(blocks: List[Block]) -> None:
     block_id = uuid.uuid4()
     renderer = "{{renderer :kboard, %s, kanban-list}}" % block_id
     title = "My board"
@@ -126,20 +125,17 @@ def _output_kanban(blocks):
                 level=1,
             )
 
-        if block.journal_iso_date:
-            content = block.content
-        else:
-            content = f"{block.name}: {block.content} #[[{block.name}]]"
+        content = block.content if block.journal_iso_date else f"{block.name}: {block.content} #[[{block.name}]]"
         _print_markdown(
             f"""
             - {content}
               kanban-list:: {column}
               collapsed:: true
-              - (({block.id}))
+              - (({block.block_id}))
             """,
             level=1,
         )
 
 
-def _print_markdown(text: str, *, level: int = 0):
+def _print_markdown(text: str, *, level: int = 0) -> None:
     typer.echo(indent(dedent(text).strip(), " " * (level * 2)))
