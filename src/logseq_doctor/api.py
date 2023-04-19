@@ -48,7 +48,7 @@ class Logseq:
             block_id = obj.get("uuid")
             rows.append(
                 Block(
-                    block_id=block_id,
+                    block_id=UUID(block_id),
                     journal_iso_date=page.get("journalDay", 0),
                     name=page.get("originalName"),
                     url=self.build_block_url(block_id),

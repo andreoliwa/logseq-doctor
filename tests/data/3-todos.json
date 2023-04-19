@@ -1,0 +1,125 @@
+[
+  {
+    "parent": {
+      "id": 36038
+    },
+    "id": 35998,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 1331
+      },
+      {
+        "id": 9406
+      },
+      {
+        "id": 34749
+      }
+    ],
+    "uuid": "644069fc-ecd3-4ac0-9363-4fd63cdb18b3",
+    "content": "TODO Write a [[CLI]] script to parse #Logseq tasks: [some link](https://example.com/path/to/file.html)",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20230419,
+      "name": "wednesday, 19.04.2023",
+      "originalName": "Wednesday, 19.04.2023",
+      "id": 34749
+    },
+    "left": {
+      "id": 36034
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 1331
+      }
+    ]
+  },
+  {
+    "parent": {
+      "id": 36038
+    },
+    "id": 36004,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 9406
+      },
+      {
+        "id": 34749
+      }
+    ],
+    "uuid": "644069fc-022a-4d64-af27-c62d92fba9e6",
+    "content": "TODO Complete this tutorial: [Getting started](https://tutorials.net/index.html)",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20230419,
+      "name": "wednesday, 19.04.2023",
+      "originalName": "Wednesday, 19.04.2023",
+      "id": 34749
+    },
+    "left": {
+      "id": 36038
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      }
+    ]
+  },
+  {
+    "parent": {
+      "id": 36038
+    },
+    "id": 36034,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 100
+      },
+      {
+        "id": 3310
+      },
+      {
+        "id": 9406
+      },
+      {
+        "id": 34749
+      }
+    ],
+    "uuid": "644069fc-6f99-49f5-8499-fc795d1209b4",
+    "content": "TODO Parse the CSV file",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20230420,
+      "name": "thursday, 20.04.2023",
+      "originalName": "Thursday, 20.04.2023",
+      "id": 34749
+    },
+    "left": {
+      "id": 36004
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 100
+      },
+      {
+        "id": 3310
+      }
+    ]
+  }
+]

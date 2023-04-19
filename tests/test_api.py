@@ -1,0 +1,51 @@
+import json
+from pathlib import Path
+from uuid import UUID
+
+import pytest
+import responses
+
+from logseq_doctor.api import Block, Logseq
+
+
+@pytest.fixture()
+def logseq():
+    return Logseq("http://localhost:1234", "token", "my-data")
+
+
+def test_build_block_url(logseq):
+    assert (
+        logseq.build_block_url(UUID("d5cfa844-82d7-439b-b512-fbdea5564cff"))
+        == "logseq://graph/my-data?block-id=d5cfa844-82d7-439b-b512-fbdea5564cff"
+    )
+
+
+@responses.activate
+def test_query(logseq, shared_datadir: Path):
+    responses.post("http://localhost:1234/api", json=json.loads((shared_datadir / "3-todos.json").read_text()))
+    assert logseq.query("doesn't matter, the response is mocked anyway") == [
+        Block(
+            block_id=UUID("644069fc-ecd3-4ac0-9363-4fd63cdb18b3"),
+            journal_iso_date=20230419,
+            name="Wednesday, 19.04.2023",
+            url="logseq://graph/my-data?block-id=644069fc-ecd3-4ac0-9363-4fd63cdb18b3",
+            content="TODO Write a [[CLI]] script to parse #Logseq tasks: [some link](https://example.com/path/to/file.html)",
+            marker="TODO",
+        ),
+        Block(
+            block_id=UUID("644069fc-022a-4d64-af27-c62d92fba9e6"),
+            journal_iso_date=20230419,
+            name="Wednesday, 19.04.2023",
+            url="logseq://graph/my-data?block-id=644069fc-022a-4d64-af27-c62d92fba9e6",
+            content="TODO Complete this tutorial: [Getting started](https://tutorials.net/index.html)",
+            marker="TODO",
+        ),
+        Block(
+            block_id=UUID("644069fc-6f99-49f5-8499-fc795d1209b4"),
+            journal_iso_date=20230420,
+            name="Thursday, 20.04.2023",
+            url="logseq://graph/my-data?block-id=644069fc-6f99-49f5-8499-fc795d1209b4",
+            content="TODO Parse the CSV file",
+            marker="TODO",
+        ),
+    ]
