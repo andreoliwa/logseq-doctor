@@ -18,7 +18,7 @@ import uuid
 from enum import Enum
 from pathlib import Path
 from textwrap import dedent, indent
-from typing import List
+from typing import IO, List, Optional
 
 import typer
 
@@ -64,12 +64,22 @@ class TaskFormat(str, Enum):
 @app.command()
 def tasks(
     tag_or_page: List[str] = typer.Argument(None, metavar="TAG", help="Tags or pages to query"),
-    format_: TaskFormat = typer.Option(
-        TaskFormat.text, "--format", "--pretty", "-f", help="Output format", case_sensitive=False
-    ),
     logseq_host_url: str = typer.Option(..., "--host", "-h", help="Logseq host", envvar="LOGSEQ_HOST_URL"),
     logseq_api_token: str = typer.Option(..., "--token", "-t", help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
     logseq_graph: str = typer.Option(..., "--graph", "-g", help="Logseq graph", envvar="LOGSEQ_GRAPH"),
+    format_: TaskFormat = typer.Option(
+        TaskFormat.text, "--format", "--pretty", "-f", help="Output format", case_sensitive=False
+    ),
+    output_path: Path = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output path for the Kanban",
+        file_okay=True,
+        dir_okay=False,
+        writable=True,
+        resolve_path=True,
+    ),
 ) -> None:
     """List tasks in Logseq."""
     condition = ""
@@ -84,11 +94,10 @@ def tasks(
 
     blocks = sorted(api.query(query), key=lambda row: (row.journal_iso_date, row.content))
 
-    which_function = {
-        TaskFormat.text: _output_text,
-        TaskFormat.kanban: _output_kanban,
-    }.get(format_, _output_text)
-    which_function(blocks)
+    if format_ == TaskFormat.text:
+        _output_text(blocks)
+    elif format_ == TaskFormat.kanban:
+        _output_kanban(blocks, output_path)
 
 
 def _output_text(blocks: List[Block]) -> None:
@@ -98,7 +107,7 @@ def _output_text(blocks: List[Block]) -> None:
         typer.echo(f" {block.content}")
 
 
-def _output_kanban(blocks: List[Block]) -> None:
+def _output_kanban(blocks: List[Block], output_path: Optional[Path]) -> None:
     block_id = uuid.uuid4()
     renderer = "{{renderer :kboard, %s, kanban-list}}" % block_id
     title = "My board"
@@ -109,7 +118,13 @@ def _output_kanban(blocks: List[Block]) -> None:
       collapsed:: true
     """
     columns = set()
-    typer.echo(dedent(header).strip())
+
+    handle = None
+    if output_path:
+        typer.echo(f"Overriding {output_path} with Kanban board")
+        handle = output_path.open("w")
+
+    _print_markdown(header, file=handle)
     for block in blocks:
         column = block.marker
         if not column:
@@ -123,9 +138,10 @@ def _output_kanban(blocks: List[Block]) -> None:
                   kanban-list:: {column}
                 """,
                 level=1,
+                file=handle,
             )
 
-        content = block.content if block.journal_iso_date else f"{block.name}: {block.content} #[[{block.name}]]"
+        content = f"{block.name}: {block.content} #[[{block.name}]]"
         _print_markdown(
             f"""
             - {content}
@@ -134,8 +150,13 @@ def _output_kanban(blocks: List[Block]) -> None:
               - (({block.block_id}))
             """,
             level=1,
+            file=handle,
         )
 
+    if output_path:
+        typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
+        handle.close()
 
-def _print_markdown(text: str, *, level: int = 0) -> None:
-    typer.echo(indent(dedent(text).strip(), " " * (level * 2)))
+
+def _print_markdown(text: str, *, level: int = 0, file: Optional[IO]) -> None:
+    typer.echo(indent(dedent(text).strip(), " " * (level * 2)), file)
