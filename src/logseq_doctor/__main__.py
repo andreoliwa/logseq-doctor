@@ -1,6 +1,4 @@
-"""
-Entrypoint module, in case you use `python -mlogseq_doctor`.
-
+"""Entrypoint module, in case you use `python -mlogseq_doctor`.
 
 Why does this file exist, and why __main__? For more info, read:
 

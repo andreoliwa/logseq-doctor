@@ -1,5 +1,4 @@
-"""
-Module that contains the command line app.
+"""Module that contains the command line app.
 
 Why does this file exist, and why not put this in __main__?
 
@@ -31,28 +30,28 @@ app = typer.Typer(no_args_is_help=True)
 
 
 @app.callback()
-def lsd():
+def lsd() -> None:
     """Logseq Doctor: heal your flat old Markdown files before importing them."""
 
 
 @app.command(no_args_is_help=True)
-def outline(text_file: typer.FileText):
+def outline(text_file: typer.FileText) -> None:
     """Convert flat Markdown to outline."""
-    print(flat_markdown_to_outline(text_file.read()))
+    typer.echo(flat_markdown_to_outline(text_file.read()))
 
 
 @app.command()
 def tidy_up(
-    markdown_file: List[Path] = typer.Argument(
+    markdown_file: List[Path] = typer.Argument(  # noqa: B008
         ..., help="Markdown files to tidy up", exists=True, file_okay=True, dir_okay=False, writable=True
     ),
-):
+) -> None:
     """Tidy up your Markdown files by removing empty bullets in any block."""
     for each_file in markdown_file:
         old_contents = each_file.read_text()
         new_contents = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
         if old_contents != new_contents:
-            typer.echo(f'removed empty bullets from {each_file}')
+            typer.echo(f"removed empty bullets from {each_file}")
             each_file.write_text(new_contents)
 
 
