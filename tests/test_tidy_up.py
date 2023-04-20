@@ -16,3 +16,12 @@ def test_remove_empty_bullets_from_multiple_files(datadir):
     assert result.exit_code == 0
     assert actual1.read_text() == expected1.read_text().strip()
     assert actual2.read_text() == expected2.read_text().strip()
+
+
+def test_nothing_to_remove(datadir):
+    file: Path = datadir / "empty-bullets-1-clean.md"
+    content_before = file.read_text()
+    result = CliRunner().invoke(app, ["tidy-up", str(file)])
+    assert not result.output
+    assert result.exit_code == 0
+    assert file.read_text() == content_before
