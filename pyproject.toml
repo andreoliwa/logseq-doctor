@@ -61,6 +61,7 @@ show-fixes = true
 
 # https://beta.ruff.rs/docs/settings/#ignore
 ignore = [
+    "ANN101", # Missing type annotation for `self` in method
     "COM", # https://beta.ruff.rs/docs/rules/#flake8-commas-com
     "D107", # Missing docstring in `__init__`
     "D202", # No blank lines allowed after function docstring
@@ -69,8 +70,8 @@ ignore = [
     "D401", # First line of docstring should be in imperative mood
     "E402", # Module level import not at top of file
     "E501", # Line too long
+    "ERA", # https://beta.ruff.rs/docs/rules/#eradicate-era
     "FBT", # https://beta.ruff.rs/docs/rules/#flake8-boolean-trap-fbt
-    "ANN101", # Missing type annotation for `self` in method
 ]
 
 # https://beta.ruff.rs/docs/settings/#line-length
@@ -98,7 +99,6 @@ max-complexity = 10
 # B008 Do not perform function call in argument defaults
 # D100 Missing docstring in public module
 # D103 Missing docstring in public function
-# ERA https://beta.ruff.rs/docs/rules/#eradicate-era
 # F401 imported but unused
 # INP001 File `xxx.py` is part of an implicit namespace package. Add an `__init__.py`.
 # PLR0913 Too many arguments to function call
@@ -110,7 +110,6 @@ max-complexity = 10
 "ci/bootstrap.py" = ["ALL"]
 "docs/**" = ["ANN", "INP001", "T201", "T203"]
 "docs/conf.py" = ["A001"]
-"src/logseq_doctor/__init__.py" = ["ERA"]
 "src/logseq_doctor/cli.py" = ["B008", "PLR0913"]
 "tests/**" = ["ANN", "PLR0913", "S101", "S105", "T201", "T203", "D103", "D100", "INP001", "TCH003"]
 "tests/data/**" = ["INP001"]

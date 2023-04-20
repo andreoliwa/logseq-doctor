@@ -17,7 +17,7 @@ import re
 import uuid
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 import typer
 
@@ -96,6 +96,9 @@ def tasks(
     if format_ == TaskFormat.text:
         _output_text(blocks)
     elif format_ == TaskFormat.kanban:
+        if not output_path:
+            typer.secho("Kanban format requires an output path", fg=typer.colors.RED)
+            raise typer.Exit(1)
         _output_kanban(blocks, output_path)
 
 
@@ -106,7 +109,7 @@ def _output_text(blocks: List[Block]) -> None:
         typer.echo(f" {block.content}")
 
 
-def _output_kanban(blocks: List[Block], output_path: Optional[Path]) -> None:
+def _output_kanban(blocks: List[Block], output_path: Path) -> None:
     block_id = uuid.uuid4()
     renderer = "{{renderer :kboard, %s, kanban-list}}" % block_id
     title = "My board"

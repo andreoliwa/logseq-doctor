@@ -6,7 +6,6 @@ from typing import IO, List, Optional
 from uuid import UUID
 
 import requests
-import typer
 
 
 @dataclass(frozen=True)
@@ -71,14 +70,12 @@ class Page:
 
     def __post_init__(self) -> None:
         """Open file handle if path is provided."""
-        if self.path:
-            self._handle = self.path.open("w")
+        self._handle = self.path.open("w")
 
     def append(self, markdown: str, *, level: int = 0) -> None:
         """Append markdown to page."""
         content = indent(dedent(markdown).strip(), " " * (level * 2))
-        typer.echo(content, self._handle)
-        # TODO: if the path is empty, store in string stream and print to stdout at the end
+        self._handle.write(content + "\n")
 
     def close(self) -> None:
         """Close file handle."""
