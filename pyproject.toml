@@ -49,8 +49,10 @@ typer = {extras = ["all"], version = "*"}
 pytest = "*"
 pytest-cov = "*"
 pytest-datadir = "*"
-responses = "^0.23.1"
-pytest-env = "^0.8.1"
+responses = "*"
+pytest-env = "*"
+pytest-watch = "*"
+pytest-testmon = "*"
 
 [tool.ruff]
 # https://beta.ruff.rs/docs/settings/#select

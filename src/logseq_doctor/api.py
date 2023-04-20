@@ -66,11 +66,13 @@ class Page:
     """Logseq page."""
 
     path: Path
+    overwrite: bool = False
+
     _handle: Optional[IO] = None
 
     def __post_init__(self) -> None:
         """Open file handle if path is provided."""
-        self._handle = self.path.open("w")
+        self._handle = self.path.open("w" if self.overwrite else "a")
 
     def append(self, markdown: str, *, level: int = 0) -> None:
         """Append markdown to page."""
@@ -79,5 +81,4 @@ class Page:
 
     def close(self) -> None:
         """Close file handle."""
-        if self._handle:
-            self._handle.close()
+        self._handle.close()

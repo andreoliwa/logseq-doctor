@@ -5,7 +5,7 @@ from uuid import UUID
 import pytest
 import responses
 
-from logseq_doctor.api import Block, Logseq
+from logseq_doctor.api import Block, Logseq, Page
 
 
 @pytest.fixture()
@@ -21,8 +21,8 @@ def test_build_block_url(logseq):
 
 
 @responses.activate
-def test_query(logseq, shared_datadir: Path):
-    responses.post("http://localhost:1234/api", json=json.loads((shared_datadir / "valid-todo-tasks.json").read_text()))
+def test_query(logseq, datadir: Path):
+    responses.post("http://localhost:1234/api", json=json.loads((datadir / "valid-todo-tasks.json").read_text()))
     assert logseq.query("doesn't matter, the response is mocked anyway") == [
         Block(
             block_id=UUID("644069fc-ecd3-4ac0-9363-4fd63cdb18b3"),
@@ -49,3 +49,23 @@ def test_query(logseq, shared_datadir: Path):
             marker="TODO",
         ),
     ]
+
+
+def test_append_to_non_existing_page(datadir: Path):
+    path = datadir / "non-existing-page.md"
+    assert not path.exists()
+    page = Page(path, overwrite=True)
+    page.append("- new item")
+    page.close()
+    assert path.read_text() == "- new item\n"
+
+
+def test_append_to_existing_page(datadir: Path):
+    before = datadir / "page-before.md"
+    assert before.exists()
+    page = Page(before)
+    page.append("- new item")
+    page.close()
+
+    after = datadir / "page-after.md"
+    assert before.read_text() == after.read_text()
