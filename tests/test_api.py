@@ -22,7 +22,7 @@ def test_build_block_url(logseq):
 
 @responses.activate
 def test_query(logseq, shared_datadir: Path):
-    responses.post("http://localhost:1234/api", json=json.loads((shared_datadir / "3-todos.json").read_text()))
+    responses.post("http://localhost:1234/api", json=json.loads((shared_datadir / "valid-todo-tasks.json").read_text()))
     assert logseq.query("doesn't matter, the response is mocked anyway") == [
         Block(
             block_id=UUID("644069fc-ecd3-4ac0-9363-4fd63cdb18b3"),
