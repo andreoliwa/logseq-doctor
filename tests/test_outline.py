@@ -28,7 +28,7 @@ def assert_markdown(flat_md: str, outlined_md: str, *, ast=False):
     stripped_md = dedent(flat_md).lstrip()
 
     # For debugging purposes
-    if ast:
+    if ast:  # pragma: no cover
         print("\nASTRenderer:\n" + mistletoe.markdown(stripped_md, ASTRenderer))
 
     assert flat_markdown_to_outline(stripped_md) == output_without_nbsp

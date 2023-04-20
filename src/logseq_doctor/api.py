@@ -1,9 +1,12 @@
 """Logseq API client."""
 from dataclasses import dataclass
-from typing import List
+from pathlib import Path
+from textwrap import dedent, indent
+from typing import IO, List, Optional
 from uuid import UUID
 
 import requests
+import typer
 
 
 @dataclass(frozen=True)
@@ -57,3 +60,27 @@ class Logseq:
                 )
             )
         return rows
+
+
+@dataclass
+class Page:
+    """Logseq page."""
+
+    path: Path
+    _handle: Optional[IO] = None
+
+    def __post_init__(self) -> None:
+        """Open file handle if path is provided."""
+        if self.path:
+            self._handle = self.path.open("w")
+
+    def append(self, markdown: str, *, level: int = 0) -> None:
+        """Append markdown to page."""
+        content = indent(dedent(markdown).strip(), " " * (level * 2))
+        typer.echo(content, self._handle)
+        # TODO: if the path is empty, store in string stream and print to stdout at the end
+
+    def close(self) -> None:
+        """Close file handle."""
+        if self._handle:
+            self._handle.close()

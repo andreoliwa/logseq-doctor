@@ -17,13 +17,12 @@ import re
 import uuid
 from enum import Enum
 from pathlib import Path
-from textwrap import dedent, indent
-from typing import IO, List, Optional
+from typing import List, Optional
 
 import typer
 
 from logseq_doctor import flat_markdown_to_outline
-from logseq_doctor.api import Block, Logseq
+from logseq_doctor.api import Block, Logseq, Page
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -111,20 +110,19 @@ def _output_kanban(blocks: List[Block], output_path: Optional[Path]) -> None:
     block_id = uuid.uuid4()
     renderer = "{{renderer :kboard, %s, kanban-list}}" % block_id
     title = "My board"
+    columns = set()
+
+    page = Page(output_path)
+    if output_path:
+        typer.echo(f"Overriding {output_path} with Kanban board")
+
     header = f"""
     - {renderer}
     - {title}
       id:: {block_id}
       collapsed:: true
     """
-    columns = set()
-
-    handle = None
-    if output_path:
-        typer.echo(f"Overriding {output_path} with Kanban board")
-        handle = output_path.open("w")
-
-    _print_markdown(header, file=handle)
+    page.append(header)
     for block in blocks:
         column = block.marker
         if not column:
@@ -132,17 +130,16 @@ def _output_kanban(blocks: List[Block], output_path: Optional[Path]) -> None:
 
         if block.marker not in columns:
             columns.add(column)
-            _print_markdown(
+            page.append(
                 f"""
                 - placeholder #.kboard-placeholder
                   kanban-list:: {column}
                 """,
                 level=1,
-                file=handle,
             )
 
         content = f"{block.name}: {block.content} #[[{block.name}]]"
-        _print_markdown(
+        page.append(
             f"""
             - {content}
               kanban-list:: {column}
@@ -150,13 +147,8 @@ def _output_kanban(blocks: List[Block], output_path: Optional[Path]) -> None:
               - (({block.block_id}))
             """,
             level=1,
-            file=handle,
         )
 
     if output_path:
         typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
-        handle.close()
-
-
-def _print_markdown(text: str, *, level: int = 0, file: Optional[IO]) -> None:
-    typer.echo(indent(dedent(text).strip(), " " * (level * 2)), file)
+        page.close()
