@@ -93,13 +93,13 @@ def tasks(
 
     blocks = sorted(api.query(query), key=lambda row: (row.journal_iso_date, row.content))
 
-    if format_ == TaskFormat.text:
-        _output_text(blocks)
-    elif format_ == TaskFormat.kanban:
+    if format_ == TaskFormat.kanban:
         if not output_path:
             typer.secho("Kanban format requires an output path", fg=typer.colors.RED)
             raise typer.Exit(1)
         _output_kanban(blocks, output_path)
+    else:
+        _output_text(blocks)
 
 
 def _output_text(blocks: List[Block]) -> None:
@@ -109,20 +109,24 @@ def _output_text(blocks: List[Block]) -> None:
         typer.echo(f" {block.content}")
 
 
+def _get_kanban_id() -> uuid.UUID:  # pragma: no cover
+    """Generate a random UUID for the Kanban board. Mocked on tests."""
+    return uuid.uuid4()
+
+
 def _output_kanban(blocks: List[Block], output_path: Path) -> None:
-    block_id = uuid.uuid4()
-    renderer = "{{renderer :kboard, %s, kanban-list}}" % block_id
+    kanban_id = _get_kanban_id()
+    renderer = "{{renderer :kboard, %s, kanban-list}}" % kanban_id
     title = "My board"
     columns = set()
 
-    page = Page(output_path)
-    if output_path:
-        typer.echo(f"Overriding {output_path} with Kanban board")
+    page = Page(output_path, overwrite=True)
+    typer.echo(f"Overriding {output_path} with Kanban board")
 
     header = f"""
     - {renderer}
     - {title}
-      id:: {block_id}
+      id:: {kanban_id}
       collapsed:: true
     """
     page.append(header)
@@ -152,6 +156,5 @@ def _output_kanban(blocks: List[Block], output_path: Path) -> None:
             level=1,
         )
 
-    if output_path:
-        typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
-        page.close()
+    typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
+    page.close()
