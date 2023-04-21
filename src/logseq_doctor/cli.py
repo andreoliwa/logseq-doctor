@@ -104,7 +104,7 @@ def tasks(
 
 def _output_text(blocks: List[Block]) -> None:
     for block in blocks:
-        typer.secho(f"{block.name}: ", fg=typer.colors.GREEN, nl=False)
+        typer.secho(f"{block.page_title}: ", fg=typer.colors.GREEN, nl=False)
         typer.secho(block.url, fg=typer.colors.BLUE, nl=False)
         typer.echo(f" {block.content}")
 
@@ -145,7 +145,7 @@ def _output_kanban(blocks: List[Block], output_path: Path) -> None:
                 level=1,
             )
 
-        content = f"{block.name}: {block.content} #[[{block.name}]]"
+        content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
         page.append(
             f"""
             - {content}

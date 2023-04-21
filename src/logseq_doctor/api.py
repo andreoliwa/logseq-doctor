@@ -14,10 +14,13 @@ class Block:
 
     block_id: UUID
     journal_iso_date: int
-    name: str
-    url: str
+    page_title: str
     content: str
     marker: str
+
+    def url(self, graph: str) -> str:
+        """Build a Logseq block URL."""
+        return f"logseq://graph/{graph}?block-id={self.block_id}"
 
 
 @dataclass(frozen=True)
@@ -27,10 +30,6 @@ class Logseq:
     url: str
     token: str
     graph: str
-
-    def build_block_url(self, block_id: UUID) -> str:
-        """Build a Logseq block URL."""
-        return f"logseq://graph/{self.graph}?block-id={block_id}"
 
     def query(self, query: str) -> List[Block]:
         """Query Logseq API."""
@@ -52,8 +51,7 @@ class Logseq:
                 Block(
                     block_id=UUID(block_id),
                     journal_iso_date=page.get("journalDay", 0),
-                    name=page.get("originalName"),
-                    url=self.build_block_url(block_id),
+                    page_title=page.get("originalName"),
                     content=obj.get("content").splitlines()[0],
                     marker=obj.get("marker"),
                 )

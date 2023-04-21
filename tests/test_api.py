@@ -13,10 +13,17 @@ def logseq():
     return Logseq("http://localhost:1234", "token", "my-notes")
 
 
-def test_build_block_url(logseq):
+def test_block_url():
+    block = Block(
+        block_id=UUID("d5cfa844-82d7-439b-b512-fbdea5564cff"),
+        journal_iso_date=20230419,
+        page_title="Wednesday, 19.04.2023",
+        content="Bla bla",
+        marker="",
+    )
     assert (
-        logseq.build_block_url(UUID("d5cfa844-82d7-439b-b512-fbdea5564cff"))
-        == "logseq://graph/my-notes?block-id=d5cfa844-82d7-439b-b512-fbdea5564cff"
+        block.url("my-personal-notes")
+        == "logseq://graph/my-personal-notes?block-id=d5cfa844-82d7-439b-b512-fbdea5564cff"
     )
 
 
@@ -27,24 +34,21 @@ def test_query(logseq, datadir: Path):
         Block(
             block_id=UUID("644069fc-ecd3-4ac0-9363-4fd63cdb18b3"),
             journal_iso_date=20230419,
-            name="Wednesday, 19.04.2023",
-            url="logseq://graph/my-notes?block-id=644069fc-ecd3-4ac0-9363-4fd63cdb18b3",
+            page_title="Wednesday, 19.04.2023",
             content="TODO Write a [[CLI]] script to parse #Logseq tasks: [some link](https://example.com/path/to/file.html)",
             marker="TODO",
         ),
         Block(
             block_id=UUID("644069fc-022a-4d64-af27-c62d92fba9e6"),
             journal_iso_date=20230419,
-            name="Wednesday, 19.04.2023",
-            url="logseq://graph/my-notes?block-id=644069fc-022a-4d64-af27-c62d92fba9e6",
+            page_title="Wednesday, 19.04.2023",
             content="TODO Complete this tutorial: [Getting started](https://tutorials.net/index.html)",
             marker="TODO",
         ),
         Block(
             block_id=UUID("644069fc-6f99-49f5-8499-fc795d1209b4"),
             journal_iso_date=20230420,
-            name="Thursday, 20.04.2023",
-            url="logseq://graph/my-notes?block-id=644069fc-6f99-49f5-8499-fc795d1209b4",
+            page_title="Thursday, 20.04.2023",
             content="TODO Parse the CSV file",
             marker="TODO",
         ),
