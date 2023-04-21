@@ -81,6 +81,10 @@ def tasks(
     ),
 ) -> None:
     """List tasks in Logseq."""
+    if format_ == TaskFormat.kanban and not output_path:
+        typer.secho("Kanban format requires an output path", fg=typer.colors.RED)
+        raise typer.Exit(1)
+
     condition = ""
     if tag_or_page:
         if len(tag_or_page) == 1:
@@ -93,13 +97,7 @@ def tasks(
 
     blocks = sorted(logseq.query(query), key=lambda row: (row.journal_iso_date, row.content))
 
-    if format_ == TaskFormat.kanban:
-        if not output_path:
-            typer.secho("Kanban format requires an output path", fg=typer.colors.RED)
-            raise typer.Exit(1)
-        _output_kanban(blocks, output_path)
-    else:
-        _output_text(logseq, blocks)
+    _output_kanban(blocks, output_path) if format_ == TaskFormat.kanban else _output_text(logseq, blocks)
 
 
 def _output_text(logseq: Logseq, blocks: List[Block]) -> None:

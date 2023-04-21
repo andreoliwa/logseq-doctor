@@ -2,8 +2,10 @@ from textwrap import dedent
 
 import mistletoe
 from mistletoe.ast_renderer import ASTRenderer
+from typer.testing import CliRunner
 
 from logseq_doctor import flat_markdown_to_outline
+from logseq_doctor.cli import app
 from logseq_doctor.constants import NBSP
 
 
@@ -22,32 +24,10 @@ def assert_markdown(flat_md: str, outlined_md: str, *, ast=False):
     assert flat_markdown_to_outline(stripped_md) == output_without_nbsp
 
 
-def test_header_hierarchy_preserved_and_whitespace_removed():
-    assert_markdown(
-        """
-        #  Header 1
-
-
-        -  Item 1
-
-        -  Item 2
-
-        ## Header 2
-
-        - Item 3
-        ###  Header 3
-        -  Item 4
-        """,
-        """
-        - # Header 1
-          - Item 1
-          - Item 2
-          - ## Header 2
-            - Item 3
-            - ### Header 3
-              - Item 4
-        """,
-    )
+def test_header_hierarchy_preserved_and_whitespace_removed(datadir):
+    result = CliRunner().invoke(app, ["outline", str(datadir / "dirty.md")])
+    assert result.exit_code == 0
+    assert result.stdout == (datadir / "clean.md").read_text() + "\n"
 
 
 def test_links():
