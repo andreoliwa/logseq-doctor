@@ -88,10 +88,10 @@ def tasks(
         else:
             pages = " ".join([f"[[{tp}]]" for tp in tag_or_page])
             condition = f" (or {pages})"
-    api = Logseq(logseq_host_url, logseq_api_token, logseq_graph)
+    logseq = Logseq(logseq_host_url, logseq_api_token, logseq_graph)
     query = f"(and{condition} (task TODO DOING WAITING NOW LATER))"
 
-    blocks = sorted(api.query(query), key=lambda row: (row.journal_iso_date, row.content))
+    blocks = sorted(logseq.query(query), key=lambda row: (row.journal_iso_date, row.content))
 
     if format_ == TaskFormat.kanban:
         if not output_path:
@@ -99,13 +99,13 @@ def tasks(
             raise typer.Exit(1)
         _output_kanban(blocks, output_path)
     else:
-        _output_text(blocks)
+        _output_text(logseq, blocks)
 
 
-def _output_text(blocks: List[Block]) -> None:
+def _output_text(logseq: Logseq, blocks: List[Block]) -> None:
     for block in blocks:
         typer.secho(f"{block.page_title}: ", fg=typer.colors.GREEN, nl=False)
-        typer.secho(block.url, fg=typer.colors.BLUE, nl=False)
+        typer.secho(block.url(logseq.graph), fg=typer.colors.BLUE, nl=False)
         typer.echo(f" {block.content}")
 
 
