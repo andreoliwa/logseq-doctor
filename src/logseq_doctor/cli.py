@@ -14,17 +14,17 @@ Why does this file exist, and why not put this in __main__?
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
 import re
-import uuid
 from enum import Enum
 from pathlib import Path
 from typing import List
+from uuid import UUID, uuid4
 
 import typer
 
 from logseq_doctor import flat_markdown_to_outline
 from logseq_doctor.api import Block, Logseq, Page
 
-KANBAN_BOARD_SEARCH_STRING = "{{renderer :kboard,"
+KANBAN_BOARD_SEARCH_STRING = "renderer :kboard,"
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -109,49 +109,51 @@ def _output_text(logseq: Logseq, blocks: List[Block]) -> None:
         typer.echo(f" {block.content}")
 
 
-def _get_kanban_id() -> uuid.UUID:  # pragma: no cover
+def _get_kanban_id() -> UUID:  # pragma: no cover
     """Generate a random UUID for the Kanban board. Mocked on tests."""
-    return uuid.uuid4()
+    return uuid4()
 
 
 def _output_kanban(blocks: List[Block], output_path: Path) -> None:
-    kanban_id = _get_kanban_id()
-    renderer = f"{KANBAN_BOARD_SEARCH_STRING} {kanban_id}, kanban-list}}}}"
-    title = "My board"
+    page = Page(output_path)
     columns = set()
+    kanban = page.find_slice(KANBAN_BOARD_SEARCH_STRING)
+    pos_insert = 0
+    if kanban:
+        typer.echo(f"Kanban board being updated at {output_path}")
+        kanban_id = UUID(kanban.content.split(",")[1].strip())
+        board_slice = page.find_slice(f"id:: {kanban_id}", kanban.end_index)
+        pos_insert = board_slice.end_index
+    else:
+        typer.echo(f"Kanban board being added to {output_path}")
+        kanban_id = _get_kanban_id()
+        title = "My board"
+        page.write_line(
+            f"""
+            - {{{{{KANBAN_BOARD_SEARCH_STRING} {kanban_id}, kanban-list}}}}
+            - {title}
+              id:: {kanban_id}
+              collapsed:: true
+            """
+        )
 
-    page = Page(output_path, overwrite=True)
-    typer.echo(f"Overriding {output_path} with Kanban board")
-    # FIXME[AA]:
-    # typer.echo(f"Overriding {output_path} with Kanban board")
-    # slice = None
-    # if output_path.exists():
-    #     page.find_slice(KANBAN_BOARD_SEARCH_STRING)
-
-    header = f"""
-    - {renderer}
-    - {title}
-      id:: {kanban_id}
-      collapsed:: true
-    """
-    page.append(header)
     for block in blocks:
         column = block.marker
         if not column:
             column = "Unknown"
 
         if block.marker not in columns:
-            columns.add(column)
-            page.append(
-                f"""
+            card = f"""
                 - placeholder #.kboard-placeholder
                   kanban-list:: {column}
-                """,
-                level=1,
-            )
+            """
+            if kanban:
+                page.write_line(card, start=pos_insert)
+            columns.add(column)
+            page.write_line(card, level=1)
 
         content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
-        page.append(
+        page.write_line(
             f"""
             - {content}
               kanban-list:: {column}
@@ -162,4 +164,3 @@ def _output_kanban(blocks: List[Block], output_path: Path) -> None:
         )
 
     typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
-    page.close()

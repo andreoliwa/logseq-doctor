@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 from textwrap import dedent, indent
-from typing import IO, List, Optional
+from typing import List, Optional
 from uuid import UUID
 
 import requests
@@ -75,29 +75,34 @@ class Page:
     """Logseq page."""
 
     path: Path
-    overwrite: bool = False
 
-    _handle: Optional[IO] = None
+    def write_line(self, markdown: str, *, level: int = 0, start: Optional[int] = None) -> None:
+        """Write Markdown to the end of page or optionally at the desired seek offset."""
+        # FIXME[AA]: split into explicit insert(), append(), replace() methods?
+        content = indent(dedent(markdown).strip(), " " * (level * 2)) + "\n"
+        mode = "r+" if self.path.exists() else "w"
+        with self.path.open(mode) as file:
+            if start is None:
+                file.seek(0, 2)
+                file.write(content)
+                return
 
-    def __post_init__(self) -> None:
-        """Open file handle if path is provided."""
-        self._handle = self.path.open("w" if self.overwrite else "a")
+            file.seek(start)
+            remaining_content = file.read()
+            file.seek(start)
+            file.write(content)
+            file.write(remaining_content)
 
-    def append(self, markdown: str, *, level: int = 0) -> None:
-        """Append markdown to page."""
-        content = indent(dedent(markdown).strip(), " " * (level * 2))
-        self._handle.write(content + "\n")
-
-    def close(self) -> None:
-        """Close file handle."""
-        self._handle.close()
-
-    def find_slice(self, search_string: str) -> Optional[Slice]:
+    # FIXME[AA]: test start parameter
+    def find_slice(self, search_string: str, start: int = 0) -> Optional[Slice]:
         """Find a slice of Markdown blocks in a Logseq page."""
+        if not self.path.exists():
+            return None
+
         # TODO: The right way would be to navigate the Markdown AST.
         #  This is a hacky/buggy solution that works for now, for most cases.
         content = self.path.read_text()
-        pos_search_string = content.find(search_string)
+        pos_search_string = content[start:].find(search_string)
         if pos_search_string == -1:
             return None
 

@@ -60,9 +60,8 @@ def test_query(logseq, datadir: Path):
 def test_append_to_non_existing_page(datadir: Path):
     path = datadir / "non-existing-page.md"
     assert not path.exists()
-    page = Page(path, overwrite=True)
-    page.append("- new item")
-    page.close()
+    page = Page(path)
+    page.write_line("- new item")
     assert path.read_text() == "- new item\n"
 
 
@@ -70,11 +69,25 @@ def test_append_to_existing_page(datadir: Path):
     before = datadir / "page-before.md"
     assert before.exists()
     page = Page(before)
-    page.append("- new item")
-    page.close()
+    page.write_line("- new item")
+    assert before.read_text() == (datadir / "page-append.md").read_text()
 
-    after = datadir / "page-after.md"
-    assert before.read_text() == after.read_text()
+
+def test_insert_text_into_existing_page(datadir: Path):
+    before = datadir / "page-before.md"
+    assert before.exists()
+    page = Page(before)
+    page.write_line("- a new line after position 18", start=18)
+    assert before.read_text() == (datadir / "page-insert.md").read_text()
+
+
+# FIXME[AA]:
+# def test_replace_slice_from_existing_page(datadir: Path):
+#     before = datadir / "page-before.md"
+#     assert before.exists()
+#     page = Page(before)
+#     page.write_line("- a new line after position 18", seek=18)
+#     assert before.read_text() == (datadir / "page-insert.md").read_text()
 
 
 @pytest.fixture()
