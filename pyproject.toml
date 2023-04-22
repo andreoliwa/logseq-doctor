@@ -112,7 +112,7 @@ max-complexity = 10
 "docs/**" = ["ANN", "INP001", "T201", "T203"]
 "docs/conf.py" = ["A001"]
 "src/logseq_doctor/cli.py" = ["B008", "PLR0913"]
-"tests/**" = ["ANN", "PLR0913", "S101", "S105", "T201", "T203", "D103", "D100", "INP001", "TCH003"]
+"tests/**" = ["PLR0913", "S101", "S105", "T201", "T203", "D103", "D100", "INP001", "TCH003"]
 "tests/data/**" = ["INP001"]
 
 [build-system]

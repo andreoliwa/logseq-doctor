@@ -5,7 +5,7 @@ from typer.testing import CliRunner
 from logseq_doctor.cli import app
 
 
-def test_remove_empty_bullets_from_multiple_files(datadir):
+def test_remove_empty_bullets_from_multiple_files(datadir: Path) -> None:
     actual1: Path = datadir / "empty-bullets-1.md"
     expected1: Path = datadir / "empty-bullets-1-clean.md"
     actual2: Path = datadir / "empty-bullets-2.md"
@@ -18,7 +18,7 @@ def test_remove_empty_bullets_from_multiple_files(datadir):
     assert actual2.read_text() == expected2.read_text().strip()
 
 
-def test_nothing_to_remove(datadir):
+def test_nothing_to_remove(datadir: Path) -> None:
     file: Path = datadir / "empty-bullets-1-clean.md"
     content_before = file.read_text()
     result = CliRunner().invoke(app, ["tidy-up", str(file)])

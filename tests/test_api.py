@@ -11,11 +11,11 @@ from logseq_doctor.cli import KANBAN_BOARD_SEARCH_STRING
 
 
 @pytest.fixture()
-def logseq():
+def logseq() -> Logseq:
     return Logseq("http://localhost:1234", "token", "my-notes")
 
 
-def test_block_url():
+def test_block_url() -> None:
     block = Block(
         block_id=UUID("d5cfa844-82d7-439b-b512-fbdea5564cff"),
         journal_iso_date=20230419,
@@ -30,7 +30,7 @@ def test_block_url():
 
 
 @responses.activate
-def test_query(logseq, datadir: Path):
+def test_query(logseq: Logseq, datadir: Path) -> None:
     responses.post("http://localhost:1234/api", json=json.loads((datadir / "valid-todo-tasks.json").read_text()))
     assert logseq.query("doesn't matter, the response is mocked anyway") == [
         Block(
@@ -57,7 +57,7 @@ def test_query(logseq, datadir: Path):
     ]
 
 
-def test_append_to_non_existing_page(datadir: Path):
+def test_append_to_non_existing_page(datadir: Path) -> None:
     path = datadir / "non-existing-page.md"
     assert not path.exists()
     page = Page(path)
@@ -65,7 +65,7 @@ def test_append_to_non_existing_page(datadir: Path):
     assert path.read_text() == "- new item\n"
 
 
-def test_append_to_existing_page(datadir: Path):
+def test_append_to_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
     assert before.exists()
     page = Page(before)
@@ -73,7 +73,7 @@ def test_append_to_existing_page(datadir: Path):
     assert before.read_text() == (datadir / "page-append.md").read_text()
 
 
-def test_insert_text_into_existing_page(datadir: Path):
+def test_insert_text_into_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
     assert before.exists()
     page = Page(before)
@@ -82,7 +82,7 @@ def test_insert_text_into_existing_page(datadir: Path):
 
 
 # FIXME[AA]:
-# def test_replace_slice_from_existing_page(datadir: Path):
+# def test_replace_slice_from_existing_page(datadir: Path)->None:
 #     before = datadir / "page-before.md"
 #     assert before.exists()
 #     page = Page(before)
@@ -91,15 +91,15 @@ def test_insert_text_into_existing_page(datadir: Path):
 
 
 @pytest.fixture()
-def existing_kanban(shared_datadir: Path):
+def existing_kanban(shared_datadir: Path) -> Page:
     return Page(shared_datadir / "existing-kanban.md")
 
 
-def test_non_existing_text(existing_kanban: Page):
+def test_non_existing_text(existing_kanban: Page) -> None:
     assert existing_kanban.find_slice("doesn't exist") is None
 
 
-def test_find_by_outline_content(existing_kanban: Page):
+def test_find_by_outline_content(existing_kanban: Page) -> None:
     expected = """
       - Second page: Another card in the same column
         kanban-list:: Preparing
@@ -114,11 +114,11 @@ def test_find_by_outline_content(existing_kanban: Page):
 
 
 @pytest.fixture()
-def nested_kanban(datadir):
+def nested_kanban(datadir: Path) -> Page:
     return Page(datadir / "nested-kanban.md")
 
 
-def test_find_kanban_header(nested_kanban):
+def test_find_kanban_header(nested_kanban: Page) -> None:
     assert nested_kanban.find_slice(KANBAN_BOARD_SEARCH_STRING) == Slice(
         content="        - {{renderer :kboard, be7f0de9-4e88-42f9-911d-9b7fc51a654e, kanban-list}}\n",
         start_index=104,
@@ -126,7 +126,7 @@ def test_find_kanban_header(nested_kanban):
     )
 
 
-def test_find_first_line(nested_kanban):
+def test_find_first_line(nested_kanban: Page) -> None:
     assert nested_kanban.find_slice("first line") == Slice(
         content="- Item on the first line of the file\n",
         start_index=0,
@@ -134,7 +134,7 @@ def test_find_first_line(nested_kanban):
     )
 
 
-def test_find_last_line(nested_kanban):
+def test_find_last_line(nested_kanban: Page) -> None:
     assert nested_kanban.find_slice("The last in line") == Slice(
         content="  - Sub-item c - The last in line\n",
         start_index=708,
@@ -142,7 +142,7 @@ def test_find_last_line(nested_kanban):
     )
 
 
-def test_find_block_by_property(nested_kanban):
+def test_find_block_by_property(nested_kanban: Page) -> None:
     expected = """
         - My board
           id:: be7f0de9-4e88-42f9-911d-9b7fc51a654e
