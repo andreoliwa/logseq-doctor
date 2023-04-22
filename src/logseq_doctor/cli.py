@@ -128,7 +128,7 @@ def _output_kanban(blocks: List[Block], output_path: Path) -> None:
         typer.echo(f"Kanban board being added to {output_path}")
         kanban_id = _get_kanban_id()
         title = "My board"
-        page.write_line(
+        page.append(
             f"""
             - {{{{{KANBAN_BOARD_SEARCH_STRING} {kanban_id}, kanban-list}}}}
             - {title}
@@ -148,12 +148,12 @@ def _output_kanban(blocks: List[Block], output_path: Path) -> None:
                   kanban-list:: {column}
             """
             if kanban:
-                page.write_line(card, start=pos_insert)
+                page.insert(card, start=pos_insert)
             columns.add(column)
-            page.write_line(card, level=1)
+            page.append(card, level=1)
 
         content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
-        page.write_line(
+        page.append(
             f"""
             - {content}
               kanban-list:: {column}

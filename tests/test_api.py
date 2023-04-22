@@ -61,7 +61,7 @@ def test_append_to_non_existing_page(datadir: Path) -> None:
     path = datadir / "non-existing-page.md"
     assert not path.exists()
     page = Page(path)
-    page.write_line("- new item")
+    page.append("- new item")
     assert path.read_text() == "- new item\n"
 
 
@@ -69,7 +69,7 @@ def test_append_to_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
     assert before.exists()
     page = Page(before)
-    page.write_line("- new item")
+    page.append("- new item")
     assert before.read_text() == (datadir / "page-append.md").read_text()
 
 
@@ -77,17 +77,24 @@ def test_insert_text_into_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
     assert before.exists()
     page = Page(before)
-    page.write_line("- a new line after position 18", start=18)
+    page.insert("- a new line after position 18", start=18)
     assert before.read_text() == (datadir / "page-insert.md").read_text()
 
 
-# FIXME[AA]:
-# def test_replace_slice_from_existing_page(datadir: Path)->None:
-#     before = datadir / "page-before.md"
-#     assert before.exists()
-#     page = Page(before)
-#     page.write_line("- a new line after position 18", seek=18)
-#     assert before.read_text() == (datadir / "page-insert.md").read_text()
+def test_replace_slice_from_existing_page(datadir: Path) -> None:
+    before = datadir / "page-before.md"
+    assert before.exists()
+    page = Page(before)
+    new_item = dedent(
+        """
+        - removed text from positions 9 to 18, add this new item
+          id: 123
+          - nested
+            key:: value
+        """
+    ).strip()
+    page.replace(new_item, 9, 18, level=1)
+    assert before.read_text() == (datadir / "page-replace.md").read_text()
 
 
 @pytest.fixture()

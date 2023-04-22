@@ -2,12 +2,14 @@
 from dataclasses import dataclass
 from pathlib import Path
 from textwrap import dedent, indent
-from typing import List, Optional
+from typing import List, Optional, TextIO
 from uuid import UUID
 
 import requests
 
 OUTLINE_DASH = "-"
+LINE_BREAK = "\n"
+SPACE = " "
 
 
 @dataclass(frozen=True)
@@ -23,6 +25,12 @@ class Block:
     def url(self, graph: str) -> str:
         """Build a Logseq block URL."""
         return f"logseq://graph/{graph}?block-id={self.block_id}"
+
+    @staticmethod
+    def indent(text: str, level: int = 0) -> str:
+        """Indent text by the desired level."""
+        spaces = SPACE * (level * 2)
+        return indent(dedent(text).strip(), spaces)
 
 
 @dataclass(frozen=True)
@@ -76,21 +84,33 @@ class Page:
 
     path: Path
 
-    def write_line(self, markdown: str, *, level: int = 0, start: Optional[int] = None) -> None:
-        """Write Markdown to the end of page or optionally at the desired seek offset."""
-        # FIXME[AA]: split into explicit insert(), append(), replace() methods?
-        content = indent(dedent(markdown).strip(), " " * (level * 2)) + "\n"
+    def _open(self) -> TextIO:
         mode = "r+" if self.path.exists() else "w"
-        with self.path.open(mode) as file:
-            if start is None:
-                file.seek(0, 2)
-                file.write(content)
-                return
+        return self.path.open(mode)
 
+    def append(self, text: str, *, level: int = 0) -> None:
+        """Append text to the end of page."""
+        with self._open() as file:
+            file.seek(0, 2)
+            file.write(Block.indent(text, level) + LINE_BREAK)
+
+    def insert(self, text: str, start: int, *, level: int = 0) -> None:
+        """Insert text at the desired offset."""
+        with self._open() as file:
             file.seek(start)
             remaining_content = file.read()
             file.seek(start)
-            file.write(content)
+            file.write(Block.indent(text, level) + LINE_BREAK)
+            file.write(remaining_content)
+
+    def replace(self, new_text: str, start: int, end: int, *, level: int = 0) -> None:
+        """Replace text at the desired offset."""
+        with self._open() as file:
+            file.seek(end)
+            remaining_content = file.read()
+
+            file.seek(start)
+            file.write(Block.indent(new_text, level) + LINE_BREAK)
             file.write(remaining_content)
 
     # FIXME[AA]: test start parameter
@@ -106,22 +126,11 @@ class Page:
         if pos_search_string == -1:
             return None
 
-        # FIXME[AA]: try with a regex
-        # import re
-        # pattern = r"\s*- "
-        # matches = re.findall(pattern, content[:pos_search_string])
-        #
-        # if matches:
-        #     last_match = matches[-1]
-        #     print("Last match found:", last_match)
-        # else:
-        #     print("No match found.")
-
         previous_dash = content[:pos_search_string].rfind(f"{OUTLINE_DASH} ")
         if previous_dash == -1:
             return None  # TODO: test: no outline before search string
 
-        previous_line_break = content[:previous_dash].rfind("\n")
+        previous_line_break = content[:previous_dash].rfind(LINE_BREAK)
         # There are no line breaks before on the first line of the file
         pos_start = 0 if previous_line_break == -1 else previous_line_break + 1
 
@@ -129,7 +138,7 @@ class Page:
         if column == -1:
             column = 0  # TODO: test this case
 
-        spaces = "\n" + (" " * column)
+        spaces = LINE_BREAK + (SPACE * column)
         spaces_with_dash = spaces + OUTLINE_DASH
 
         pos_last_line = content[pos_start:].find(spaces_with_dash)
@@ -141,7 +150,7 @@ class Page:
                     break
                 pos_last_line += pos_next + 1
 
-        pos_next_line_break = content[pos_start + pos_last_line :].find("\n")
+        pos_next_line_break = content[pos_start + pos_last_line :].find(LINE_BREAK)
         # TODO: test: file without line break at the end
         pos_end = len(content) if pos_next_line_break == -1 else pos_start + pos_last_line + pos_next_line_break + 1
 
