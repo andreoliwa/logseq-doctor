@@ -94,3 +94,15 @@ def test_override_kanban_file(mock_get_kanban_id, mock_logseq_query, datadir, so
     assert result.exit_code == 0
     assert result.stdout == f"Overriding {file} with Kanban board\n✨ Done.\n"
     assert file.read_text() == (datadir / "expected-kanban.md").read_text()
+
+
+# FIXME[AA]:
+# @patch("logseq_doctor.cli._get_kanban_id")
+# def test_add_kanban_to_existing_file(mock_get_kanban_id, mock_logseq_query, shared_datadir, some_blocks):
+#     mock_get_kanban_id.return_value = UUID("7991f73d-628a-4f98-af7a-901e2f51caa6")
+#     mock_logseq_query.return_value = some_blocks
+#     before: Path = shared_datadir / "without-kanban.md"
+#     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
+#     assert result.exit_code == 0
+#     # FIXME[AA]:     # assert result.stdout == f"Overriding {before} with Kanban board\n✨ Done.\n"
+#     assert before.read_text() == (shared_datadir / "with-kanban.md").read_text()

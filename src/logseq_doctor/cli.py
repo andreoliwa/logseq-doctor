@@ -24,6 +24,8 @@ import typer
 from logseq_doctor import flat_markdown_to_outline
 from logseq_doctor.api import Block, Logseq, Page
 
+KANBAN_BOARD_SEARCH_STRING = "{{renderer :kboard,"
+
 app = typer.Typer(no_args_is_help=True)
 
 
@@ -114,12 +116,17 @@ def _get_kanban_id() -> uuid.UUID:  # pragma: no cover
 
 def _output_kanban(blocks: List[Block], output_path: Path) -> None:
     kanban_id = _get_kanban_id()
-    renderer = "{{renderer :kboard, %s, kanban-list}}" % kanban_id
+    renderer = f"{KANBAN_BOARD_SEARCH_STRING} {kanban_id}, kanban-list}}}}"
     title = "My board"
     columns = set()
 
     page = Page(output_path, overwrite=True)
     typer.echo(f"Overriding {output_path} with Kanban board")
+    # FIXME[AA]:
+    # typer.echo(f"Overriding {output_path} with Kanban board")
+    # slice = None
+    # if output_path.exists():
+    #     page.find_slice(KANBAN_BOARD_SEARCH_STRING)
 
     header = f"""
     - {renderer}

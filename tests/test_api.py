@@ -1,11 +1,13 @@
 import json
 from pathlib import Path
+from textwrap import dedent, indent
 from uuid import UUID
 
 import pytest
 import responses
 
-from logseq_doctor.api import Block, Logseq, Page
+from logseq_doctor.api import Block, Logseq, Page, Slice
+from logseq_doctor.cli import KANBAN_BOARD_SEARCH_STRING
 
 
 @pytest.fixture()
@@ -73,3 +75,78 @@ def test_append_to_existing_page(datadir: Path):
 
     after = datadir / "page-after.md"
     assert before.read_text() == after.read_text()
+
+
+@pytest.fixture()
+def existing_kanban(shared_datadir: Path):
+    return Page(shared_datadir / "existing-kanban.md")
+
+
+def test_non_existing_text(existing_kanban: Page):
+    assert existing_kanban.find_slice("doesn't exist") is None
+
+
+def test_find_by_outline_content(existing_kanban: Page):
+    expected = """
+      - Second page: Another card in the same column
+        kanban-list:: Preparing
+        collapsed:: true
+        - ((b9f4b406-2033-4f0a-996d-16a5537cc8b8))
+    """
+    assert existing_kanban.find_slice("Another card in the same column") == Slice(
+        content=indent(dedent(expected).strip() + "\n", " " * 2),
+        start_index=503,
+        end_index=648,
+    )
+
+
+@pytest.fixture()
+def nested_kanban(datadir):
+    return Page(datadir / "nested-kanban.md")
+
+
+def test_find_kanban_header(nested_kanban):
+    assert nested_kanban.find_slice(KANBAN_BOARD_SEARCH_STRING) == Slice(
+        content="        - {{renderer :kboard, be7f0de9-4e88-42f9-911d-9b7fc51a654e, kanban-list}}\n",
+        start_index=104,
+        end_index=186,
+    )
+
+
+def test_find_first_line(nested_kanban):
+    assert nested_kanban.find_slice("first line") == Slice(
+        content="- Item on the first line of the file\n",
+        start_index=0,
+        end_index=37,
+    )
+
+
+def test_find_last_line(nested_kanban):
+    assert nested_kanban.find_slice("The last in line") == Slice(
+        content="  - Sub-item c - The last in line\n",
+        start_index=708,
+        end_index=742,
+    )
+
+
+def test_find_block_by_property(nested_kanban):
+    expected = """
+        - My board
+          id:: be7f0de9-4e88-42f9-911d-9b7fc51a654e
+          collapsed:: true
+          - placeholder #.kboard-placeholder
+            kanban-list:: TODO
+          - Card 1
+            kanban-list:: TODO
+            collapsed:: true
+            - ((c7d26a17-f430-47b7-ad3b-f1b43099a1d5))
+          - Card 2
+            kanban-list:: TODO
+            collapsed:: true
+            - ((b9f4b406-2033-4f0a-996d-16a5537cc8b8))
+    """
+    assert nested_kanban.find_slice("id:: be7f0de9-4e88-42f9-911d-9b7fc51a654e") == Slice(
+        content=indent(dedent(expected).strip() + "\n", " " * 8),
+        start_index=186,
+        end_index=628,
+    )
