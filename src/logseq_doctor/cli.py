@@ -122,7 +122,8 @@ def tasks(
                 typer.secho(page.url(logseq.graph), fg=typer.colors.BLUE)
                 raise typer.Exit(1) from err
 
-        typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
+        typer.secho("✨ Done: ", fg=typer.colors.BRIGHT_WHITE, bold=True, nl=False)
+        typer.secho(page.url(logseq.graph), fg=typer.colors.BRIGHT_BLUE, bold=True)
         return
 
     for block in blocks_by_date:

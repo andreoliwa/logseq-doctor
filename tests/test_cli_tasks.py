@@ -126,7 +126,10 @@ def test_add_new_kanban_to_existing_file(
     before: Path = shared_datadir / "without-kanban.md"
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
     assert result.exit_code == 0
-    assert result.stdout == f"Kanban board being added to {before}\n✨ Done.\n"
+    assert (
+        result.stdout == f"Kanban board being added to {before}\n"
+        f"✨ Done: logseq://graph/my-notes?page=without-kanban\n"
+    )
     assert before.read_text() == (shared_datadir / "with-kanban.md").read_text()
 
 
@@ -149,5 +152,8 @@ def test_update_existing_kanban(
     before: Path = shared_datadir / "existing-kanban.md"
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
     assert result.exit_code == 0
-    assert result.stdout == f"Kanban board being updated at {before}\n✨ Done.\n"
+    assert (
+        result.stdout == f"Kanban board being updated at {before}\n"
+        f"✨ Done: logseq://graph/my-notes?page=existing-kanban\n"
+    )
     assert before.read_text() == (shared_datadir / "modified-kanban.md").read_text()
