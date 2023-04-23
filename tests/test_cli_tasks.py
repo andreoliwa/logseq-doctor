@@ -102,12 +102,16 @@ def test_add_new_kanban_to_non_existing_file(
 ) -> None:
     mock_generate_kanban_id.return_value = UUID("d15eb569-5de7-41f0-bef8-d0dbef87260f")
     mock_logseq_query.return_value = unsorted_blocks
-    before: Path = shared_datadir / "non-existing-file.md"
-    assert not before.exists()
-    result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
-    assert result.exit_code == 0
-    assert result.stdout == f"Kanban board being added to {before}\n✨ Done.\n"
-    assert before.read_text() == (shared_datadir / "new-file.md").read_text()
+    file: Path = shared_datadir / "non-existing-file.md"
+    assert not file.exists()
+    result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(file)])
+    assert result.exit_code == 1
+    assert (
+        result.stdout == f"Kanban board being added to {file}\n"
+        f"Page {file} does not exist\n"
+        f"Add some content to the page and try again: logseq://graph/my-notes?page=non-existing-file\n"
+    )
+    assert not file.exists()
 
 
 @patch.object(Kanban, "_generate_kanban_id")

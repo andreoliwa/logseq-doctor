@@ -103,6 +103,10 @@ class Page:
 
     path: Path
 
+    def url(self, graph: str) -> str:
+        """Build a Logseq page URL."""
+        return f"logseq://graph/{graph}?page={self.path.stem}"
+
     def _open(self) -> TextIO:
         mode = "r+" if self.path.exists() else "w"
         return self.path.open(mode)
@@ -267,6 +271,10 @@ class Kanban:
 
     def add(self) -> None:
         """Add a Kanban board to the page."""
+        if not self.page.path.exists():
+            msg = f"Page {self.page.path} does not exist"
+            raise FileNotFoundError(msg)
+
         self.page.append(self.render_header(self._generate_kanban_id(), KANBAN_BOARD_TITLE))
 
         columns = set()

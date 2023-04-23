@@ -91,7 +91,7 @@ def tasks(
 ) -> None:
     """List tasks in Logseq."""
     if format_ == TaskFormat.kanban and not output_path:
-        typer.secho("Kanban format requires an output path", fg=typer.colors.RED)
+        typer.secho("Kanban format requires an output path", fg=typer.colors.BRIGHT_RED)
         raise typer.Exit(1)
 
     condition = ""
@@ -107,13 +107,20 @@ def tasks(
     blocks_by_date = Block.sort_by_date(logseq.query(query))
 
     if format_ == TaskFormat.kanban:
-        kanban = Kanban(Page(output_path), blocks_by_date)
+        page = Page(output_path)
+        kanban = Kanban(page, blocks_by_date)
         if kanban.find():
             typer.echo(f"Kanban board being updated at {output_path}")
             kanban.update()
         else:
             typer.echo(f"Kanban board being added to {output_path}")
-            kanban.add()
+            try:
+                kanban.add()
+            except FileNotFoundError as err:
+                typer.secho(str(err), fg=typer.colors.BRIGHT_RED)
+                typer.secho("Add some content to the page and try again: ", fg=typer.colors.BRIGHT_RED, nl=False)
+                typer.secho(page.url(logseq.graph), fg=typer.colors.BLUE)
+                raise typer.Exit(1) from err
 
         typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
         return
