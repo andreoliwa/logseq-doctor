@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from textwrap import dedent, indent
+from typing import Optional
 from uuid import UUID
 
 import pytest
@@ -77,7 +77,18 @@ def test_insert_text_into_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
     assert before.exists()
     page = Page(before)
-    page.insert("- a new line after position 18", start=18)
+    assert page.insert("- a new line after position 18", start=18) == 49  # noqa: PLR2004
+    assert (
+        page.insert(
+            """
+            - nested item
+              with:: property
+            """,
+            level=1,
+            start=49,
+        )
+        == 85  # noqa: PLR2004
+    )
     assert before.read_text() == (datadir / "page-insert.md").read_text()
 
 
@@ -85,14 +96,12 @@ def test_replace_slice_from_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
     assert before.exists()
     page = Page(before)
-    new_item = dedent(
-        """
+    new_item = """
         - removed text from positions 9 to 18, add this new item
           id: 123
           - nested
             key:: value
-        """
-    ).strip()
+    """
     page.replace(new_item, 9, 18, level=1)
     assert before.read_text() == (datadir / "page-replace.md").read_text()
 
@@ -102,22 +111,54 @@ def existing_kanban(shared_datadir: Path) -> Page:
     return Page(shared_datadir / "existing-kanban.md")
 
 
-def test_non_existing_text(existing_kanban: Page) -> None:
+def test_find_non_existing_block(existing_kanban: Page) -> None:
     assert existing_kanban.find_slice("doesn't exist") is None
 
 
-def test_find_by_outline_content(existing_kanban: Page) -> None:
-    expected = """
-      - Second page: Another card in the same column
-        kanban-list:: Preparing
-        collapsed:: true
-        - ((b9f4b406-2033-4f0a-996d-16a5537cc8b8))
-    """
+def test_find_block_by_outline_content(existing_kanban: Page) -> None:
     assert existing_kanban.find_slice("Another card in the same column") == Slice(
-        content=indent(dedent(expected).strip() + "\n", " " * 2),
+        content=Block.indent(
+            """
+              - Second page: Another card in the same column
+                kanban-list:: Preparing
+                collapsed:: true
+                - ((b9f4b406-2033-4f0a-996d-16a5537cc8b8))
+            """,
+            1,
+            nl=True,
+        ),
         start_index=503,
         end_index=648,
     )
+
+
+@pytest.mark.parametrize(
+    ("search_string", "expected"),
+    [
+        (
+            "key:: value",
+            Slice(
+                content=Block.indent(
+                    """
+            - Item 3
+              key:: value
+            """,
+                    nl=True,
+                ),
+                start_index=78,
+                end_index=101,
+            ),
+        ),
+        ("outside search area", None),
+    ],
+)
+def test_find_block_within_start_end_offsets(
+    datadir: Path,
+    search_string: str,
+    expected: Optional[Slice],
+) -> None:
+    page = Page(datadir / "within-start-end.md")
+    assert page.find_slice(search_string, start=43, end=161) == expected
 
 
 @pytest.fixture()
@@ -150,23 +191,38 @@ def test_find_last_line(nested_kanban: Page) -> None:
 
 
 def test_find_block_by_property(nested_kanban: Page) -> None:
-    expected = """
-        - My board
-          id:: be7f0de9-4e88-42f9-911d-9b7fc51a654e
-          collapsed:: true
-          - placeholder #.kboard-placeholder
-            kanban-list:: TODO
-          - Card 1
-            kanban-list:: TODO
-            collapsed:: true
-            - ((c7d26a17-f430-47b7-ad3b-f1b43099a1d5))
-          - Card 2
-            kanban-list:: TODO
-            collapsed:: true
-            - ((b9f4b406-2033-4f0a-996d-16a5537cc8b8))
-    """
     assert nested_kanban.find_slice("id:: be7f0de9-4e88-42f9-911d-9b7fc51a654e") == Slice(
-        content=indent(dedent(expected).strip() + "\n", " " * 8),
+        content=Block.indent(
+            """
+            - My board
+              id:: be7f0de9-4e88-42f9-911d-9b7fc51a654e
+              collapsed:: true
+              - placeholder #.kboard-placeholder
+                kanban-list:: TODO
+              - Card 1
+                kanban-list:: TODO
+                collapsed:: true
+                - ((c7d26a17-f430-47b7-ad3b-f1b43099a1d5))
+              - Card 2
+                kanban-list:: TODO
+                collapsed:: true
+                - ((b9f4b406-2033-4f0a-996d-16a5537cc8b8))
+            """,
+            4,
+            nl=True,
+        ),
         start_index=186,
         end_index=628,
+    )
+    assert nested_kanban.find_slice("kanban-list:: TODO") == Slice(
+        content=Block.indent(
+            """
+            - placeholder #.kboard-placeholder
+              kanban-list:: TODO
+            """,
+            5,
+            nl=True,
+        ),
+        start_index=284,
+        end_index=360,
     )

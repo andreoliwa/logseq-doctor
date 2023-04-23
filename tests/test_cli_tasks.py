@@ -1,7 +1,7 @@
 from pathlib import Path
 from textwrap import dedent
 from typing import List
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 from uuid import UUID
 
 import pytest
@@ -18,7 +18,7 @@ def mock_logseq_query() -> Mock:
 
 
 @pytest.fixture()
-def some_blocks() -> List[Block]:
+def unsorted_blocks() -> List[Block]:
     return [
         Block(
             block_id=UUID("6bcebf82-c557-4f58-84d0-3b91c7e59e93"),
@@ -51,6 +51,11 @@ def some_blocks() -> List[Block]:
     ]
 
 
+@pytest.fixture()
+def blocks_sorted_by_date_content(unsorted_blocks: List[Block]) -> List[Block]:
+    return [unsorted_blocks[3], unsorted_blocks[2], unsorted_blocks[0], unsorted_blocks[1]]
+
+
 @pytest.mark.parametrize(
     ("tags", "expected_query"),
     [
@@ -66,8 +71,11 @@ def test_search_with_tags(mock_logseq_query: Mock, tags: List[str], expected_que
     mock_logseq_query.assert_called_once_with(expected_query)
 
 
-def test_simple_text_output(mock_logseq_query: Mock, some_blocks: List[Block]) -> None:
-    mock_logseq_query.return_value = some_blocks
+def test_simple_text_output(
+    mock_logseq_query: Mock,
+    unsorted_blocks: List[Block],
+) -> None:
+    mock_logseq_query.return_value = unsorted_blocks
     result = CliRunner().invoke(app, ["tasks"])
     assert result.exit_code == 0
     expected = """
@@ -87,10 +95,13 @@ def test_kanban_needs_output_path() -> None:
 
 @patch("logseq_doctor.cli._get_kanban_id")
 def test_add_new_kanban_to_non_existing_file(
-    mock_get_kanban_id: Mock, mock_logseq_query: Mock, shared_datadir: Path, some_blocks: List[Block]
+    mock_get_kanban_id: Mock,
+    mock_logseq_query: Mock,
+    shared_datadir: Path,
+    unsorted_blocks: List[Block],
 ) -> None:
     mock_get_kanban_id.return_value = UUID("d15eb569-5de7-41f0-bef8-d0dbef87260f")
-    mock_logseq_query.return_value = some_blocks
+    mock_logseq_query.return_value = unsorted_blocks
     before: Path = shared_datadir / "non-existing-file.md"
     assert not before.exists()
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
@@ -101,10 +112,10 @@ def test_add_new_kanban_to_non_existing_file(
 
 @patch("logseq_doctor.cli._get_kanban_id")
 def test_add_new_kanban_to_existing_file(
-    mock_get_kanban_id: Mock, mock_logseq_query: Mock, shared_datadir: Path, some_blocks: List[Block]
+    mock_get_kanban_id: Mock, mock_logseq_query: Mock, shared_datadir: Path, unsorted_blocks: List[Block]
 ) -> None:
     mock_get_kanban_id.return_value = UUID("7991f73d-628a-4f98-af7a-901e2f51caa6")
-    mock_logseq_query.return_value = some_blocks
+    mock_logseq_query.return_value = unsorted_blocks
     before: Path = shared_datadir / "without-kanban.md"
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
     assert result.exit_code == 0
@@ -112,13 +123,31 @@ def test_add_new_kanban_to_existing_file(
     assert before.read_text() == (shared_datadir / "with-kanban.md").read_text()
 
 
-# FIXME[AA]:
-# @patch("logseq_doctor.cli._get_kanban_id")
-# def test_update_existing_kanban(mock_get_kanban_id: Mock, mock_logseq_query: Mock, shared_datadir: Path, some_blocks)->None:
-#     mock_get_kanban_id.return_value = UUID("dafe4e19-0e06-44ce-8113-f1a5c84f6286")
-#     mock_logseq_query.return_value = some_blocks
-#     before: Path = shared_datadir / "existing-kanban.md"
-#     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
-#     assert result.exit_code == 0
-#     # assert result.stdout == f"Kanban board being updated at {before}\n✨ Done.\n"
-#     assert before.read_text() == (shared_datadir / "modified-kanban.md").read_text()
+@patch("logseq_doctor.cli._output_kanban", autospec=True)
+def test_blocks_sorted_as_expected(
+    mock_output_kanban: MagicMock,
+    mock_logseq_query: Mock,
+    shared_datadir: Path,
+    unsorted_blocks: List[Block],
+    blocks_sorted_by_date_content: List[Block],
+) -> None:
+    mock_logseq_query.return_value = unsorted_blocks
+    before: Path = shared_datadir / "existing-kanban.md"
+    CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
+    mock_output_kanban.assert_called_once_with(blocks_sorted_by_date_content, before)
+
+
+@patch("logseq_doctor.cli._get_kanban_id")
+def test_update_existing_kanban(
+    mock_get_kanban_id: Mock,
+    mock_logseq_query: Mock,
+    shared_datadir: Path,
+    unsorted_blocks: List[Block],
+) -> None:
+    mock_get_kanban_id.return_value = UUID("dafe4e19-0e06-44ce-8113-f1a5c84f6286")
+    mock_logseq_query.return_value = unsorted_blocks
+    before: Path = shared_datadir / "existing-kanban.md"
+    result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
+    assert result.exit_code == 0
+    assert result.stdout == f"Kanban board being updated at {before}\n✨ Done.\n"
+    assert before.read_text() == (shared_datadir / "modified-kanban.md").read_text()

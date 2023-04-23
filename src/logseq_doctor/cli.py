@@ -22,9 +22,10 @@ from uuid import UUID, uuid4
 import typer
 
 from logseq_doctor import flat_markdown_to_outline
-from logseq_doctor.api import Block, Logseq, Page
+from logseq_doctor.api import Block, Logseq, Page, Slice
 
 KANBAN_BOARD_SEARCH_STRING = "renderer :kboard,"
+KANBAN_LIST = "kanban-list"
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -116,51 +117,89 @@ def _get_kanban_id() -> UUID:  # pragma: no cover
 
 def _output_kanban(blocks: List[Block], output_path: Path) -> None:
     page = Page(output_path)
-    columns = set()
     kanban = page.find_slice(KANBAN_BOARD_SEARCH_STRING)
-    pos_insert = 0
+    # FIXME[AA]: refactor: Kanban class
     if kanban:
-        typer.echo(f"Kanban board being updated at {output_path}")
-        kanban_id = UUID(kanban.content.split(",")[1].strip())
-        board_slice = page.find_slice(f"id:: {kanban_id}", kanban.end_index)
-        pos_insert = board_slice.end_index
+        typer.echo(f"Kanban board being updated at {page.path}")
+        _update_existing_kanban(page, blocks, kanban)
     else:
-        typer.echo(f"Kanban board being added to {output_path}")
-        kanban_id = _get_kanban_id()
-        title = "My board"
-        page.append(
-            f"""
-            - {{{{{KANBAN_BOARD_SEARCH_STRING} {kanban_id}, kanban-list}}}}
-            - {title}
-              id:: {kanban_id}
-              collapsed:: true
-            """
-        )
+        typer.echo(f"Kanban board being added to {page.path}")
+        _add_new_kanban(page, blocks)
 
+    typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
+
+
+def _add_new_kanban(page: Page, blocks: List[Block]) -> None:
+    kanban_id = _get_kanban_id()
+    title = "My board"
+    page.append(
+        f"""
+        - {{{{{KANBAN_BOARD_SEARCH_STRING} {kanban_id}, {KANBAN_LIST}}}}}
+        - {title}
+          id:: {kanban_id}
+          collapsed:: true
+        """
+    )
+
+    columns = set()
     for block in blocks:
         column = block.marker
         if not column:
             column = "Unknown"
-
-        if block.marker not in columns:
-            card = f"""
-                - placeholder #.kboard-placeholder
-                  kanban-list:: {column}
-            """
-            if kanban:
-                page.insert(card, start=pos_insert)
+        if column not in columns:
             columns.add(column)
-            page.append(card, level=1)
+
+            column_id = f"{KANBAN_LIST}:: {column}"
+            column_card = f"""
+                - placeholder #.kboard-placeholder
+                  {column_id}
+            """
+            page.append(column_card, level=1)
 
         content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
-        page.append(
-            f"""
+        item_card = f"""
             - {content}
-              kanban-list:: {column}
+              {KANBAN_LIST}:: {column}
               collapsed:: true
               - (({block.block_id}))
-            """,
-            level=1,
-        )
+        """
+        page.append(item_card, level=1)
 
-    typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
+
+def _update_existing_kanban(page: Page, blocks: List[Block], kanban: Slice) -> None:
+    kanban_id = UUID(kanban.content.split(",")[1].strip())
+    board_slice = page.find_slice(f"id:: {kanban_id}", start=kanban.end_index)
+    board_start = board_slice.start_index
+    pos_next_insert = board_end = board_slice.end_index
+
+    columns = set()
+    for block in blocks:
+        column = block.marker
+        if not column:
+            column = "Unknown"
+        if column not in columns:
+            columns.add(column)
+
+            column_id = f"{KANBAN_LIST}:: {column}"
+            column_card = f"""
+                - placeholder #.kboard-placeholder
+                  {column_id}
+            """
+            if not page.find_slice(column_id, start=board_start, end=board_end):
+                pos = page.insert(column_card, start=pos_next_insert, level=1)
+                if pos_next_insert < pos:
+                    pos_next_insert = pos
+
+        if page.find_slice(str(block.block_id), start=board_start, end=board_end):
+            continue
+
+        content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
+        item_card = f"""
+            - {content}
+              {KANBAN_LIST}:: {column}
+              collapsed:: true
+              - (({block.block_id}))
+        """
+        pos = page.insert(item_card, start=pos_next_insert, level=1)
+        if pos_next_insert < pos:
+            pos_next_insert = pos
