@@ -127,8 +127,8 @@ def test_find_block_by_outline_content(existing_kanban: Page) -> None:
             1,
             nl=True,
         ),
-        start_index=503,
-        end_index=648,
+        start_index=500,
+        end_index=645,
     )
 
 
@@ -185,8 +185,8 @@ def test_find_first_line(nested_kanban: Page) -> None:
 def test_find_last_line(nested_kanban: Page) -> None:
     assert nested_kanban.find_slice("The last in line") == Slice(
         content="  - Sub-item c - The last in line\n",
-        start_index=708,
-        end_index=742,
+        start_index=705,
+        end_index=739,
     )
 
 
@@ -194,7 +194,7 @@ def test_find_block_by_property(nested_kanban: Page) -> None:
     assert nested_kanban.find_slice("id:: be7f0de9-4e88-42f9-911d-9b7fc51a654e") == Slice(
         content=Block.indent(
             """
-            - My board
+            - Tasks
               id:: be7f0de9-4e88-42f9-911d-9b7fc51a654e
               collapsed:: true
               - placeholder #.kboard-placeholder
@@ -212,7 +212,7 @@ def test_find_block_by_property(nested_kanban: Page) -> None:
             nl=True,
         ),
         start_index=186,
-        end_index=628,
+        end_index=625,
     )
     assert nested_kanban.find_slice("kanban-list:: TODO") == Slice(
         content=Block.indent(
@@ -223,6 +223,6 @@ def test_find_block_by_property(nested_kanban: Page) -> None:
             5,
             nl=True,
         ),
-        start_index=284,
-        end_index=360,
+        start_index=281,
+        end_index=357,
     )

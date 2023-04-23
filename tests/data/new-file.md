@@ -1,5 +1,5 @@
 - {{renderer :kboard, d15eb569-5de7-41f0-bef8-d0dbef87260f, kanban-list}}
-- My board
+- Tasks
   id:: d15eb569-5de7-41f0-bef8-d0dbef87260f
   collapsed:: true
   - placeholder #.kboard-placeholder

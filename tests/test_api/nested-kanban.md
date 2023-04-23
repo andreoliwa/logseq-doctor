@@ -4,7 +4,7 @@
     - Child
       - Grandchild with board
         - {{renderer :kboard, be7f0de9-4e88-42f9-911d-9b7fc51a654e, kanban-list}}
-        - My board
+        - Tasks
           id:: be7f0de9-4e88-42f9-911d-9b7fc51a654e
           collapsed:: true
           - placeholder #.kboard-placeholder

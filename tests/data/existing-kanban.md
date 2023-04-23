@@ -4,7 +4,7 @@
 - Item 2
   - Subitem a with an ID that will be added to the board: ((0d62459e-8a6b-4635-8c2e-41fbef6da6f8))
 - {{renderer :kboard, dafe4e19-0e06-44ce-8113-f1a5c84f6286, kanban-list}}
-- My board
+- Tasks
   id:: dafe4e19-0e06-44ce-8113-f1a5c84f6286
   collapsed:: true
   - placeholder #.kboard-placeholder

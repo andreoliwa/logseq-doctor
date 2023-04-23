@@ -10,6 +10,7 @@ import requests
 from logseq_doctor.constants import (
     DASH,
     KANBAN_BOARD_SEARCH_STRING,
+    KANBAN_BOARD_TITLE,
     KANBAN_LIST,
     KANBAN_UNKNOWN_COLUMN,
     LINE_BREAK,
@@ -266,7 +267,7 @@ class Kanban:
 
     def add(self) -> None:
         """Add a Kanban board to the page."""
-        self.page.append(self.render_header(self._generate_kanban_id(), "My board"))
+        self.page.append(self.render_header(self._generate_kanban_id(), KANBAN_BOARD_TITLE))
 
         columns = set()
         for block in self.blocks:
