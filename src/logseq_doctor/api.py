@@ -48,7 +48,7 @@ class Logseq:
             {
                 "Authorization": f"Bearer {self.token}",
                 "Content-Type": "application/json",
-            }
+            },
         )
         resp = session.post(f"{self.url}/api", json={"method": "logseq.db.q", "args": [query]})
         resp.raise_for_status()
@@ -64,7 +64,7 @@ class Logseq:
                     page_title=page.get("originalName"),
                     content=obj.get("content").splitlines()[0],
                     marker=obj.get("marker"),
-                )
+                ),
             )
         return rows
 

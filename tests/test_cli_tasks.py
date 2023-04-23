@@ -112,7 +112,10 @@ def test_add_new_kanban_to_non_existing_file(
 
 @patch("logseq_doctor.cli._get_kanban_id")
 def test_add_new_kanban_to_existing_file(
-    mock_get_kanban_id: Mock, mock_logseq_query: Mock, shared_datadir: Path, unsorted_blocks: List[Block]
+    mock_get_kanban_id: Mock,
+    mock_logseq_query: Mock,
+    shared_datadir: Path,
+    unsorted_blocks: List[Block],
 ) -> None:
     mock_get_kanban_id.return_value = UUID("7991f73d-628a-4f98-af7a-901e2f51caa6")
     mock_logseq_query.return_value = unsorted_blocks

@@ -44,7 +44,12 @@ def outline(text_file: typer.FileText) -> None:
 @app.command()
 def tidy_up(
     markdown_file: List[Path] = typer.Argument(
-        ..., help="Markdown files to tidy up", exists=True, file_okay=True, dir_okay=False, writable=True
+        ...,
+        help="Markdown files to tidy up",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=True,
     ),
 ) -> None:
     """Tidy up your Markdown files by removing empty bullets in any block."""
@@ -70,7 +75,12 @@ def tasks(
     logseq_api_token: str = typer.Option(..., "--token", "-t", help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
     logseq_graph: str = typer.Option(..., "--graph", "-g", help="Logseq graph", envvar="LOGSEQ_GRAPH"),
     format_: TaskFormat = typer.Option(
-        TaskFormat.text, "--format", "--pretty", "-f", help="Output format", case_sensitive=False
+        TaskFormat.text,
+        "--format",
+        "--pretty",
+        "-f",
+        help="Output format",
+        case_sensitive=False,
     ),
     output_path: Path = typer.Option(
         None,
@@ -138,7 +148,7 @@ def _add_new_kanban(page: Page, blocks: List[Block]) -> None:
         - {title}
           id:: {kanban_id}
           collapsed:: true
-        """
+        """,
     )
 
     columns = set()
