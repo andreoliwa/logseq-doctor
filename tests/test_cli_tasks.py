@@ -43,7 +43,7 @@ def unsorted_blocks() -> List[Block]:
         ),
         Block(
             block_id=UUID("be4116f7-2c74-42af-af62-f38352631d11"),
-            journal_iso_date=20230417,
+            journal_iso_date=0,
             page_title="Third page",
             content="Item without marker",
             marker="",

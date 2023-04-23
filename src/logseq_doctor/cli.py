@@ -156,7 +156,10 @@ def _add_new_kanban(page: Page, blocks: List[Block]) -> None:
             """
             page.append(column_card, level=1)
 
-        content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
+        if block.journal_iso_date:
+            content = block.content
+        else:
+            content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
         item_card = f"""
             - {content}
               {KANBAN_LIST}:: {column}
@@ -193,7 +196,10 @@ def _update_existing_kanban(page: Page, blocks: List[Block], kanban: Slice) -> N
         if page.find_slice(str(block.block_id), start=board_start, end=board_end):
             continue
 
-        content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
+        if block.journal_iso_date:
+            content = block.content
+        else:
+            content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
         item_card = f"""
             - {content}
               {KANBAN_LIST}:: {column}
