@@ -36,6 +36,11 @@ class Block:
             return self.raw_content[len_marker:].strip()
         return self.raw_content
 
+    @property
+    def embed(self) -> str:
+        """Return the block content as an embed."""
+        return f"{{{{embed (({self.block_id}))}}}}"
+
     def url(self, graph: str) -> str:
         """Build a Logseq block URL."""
         return f"logseq://graph/{graph}?block-id={self.block_id}"
@@ -265,7 +270,7 @@ class Kanban:
             - {content}
               {KANBAN_LIST}:: {column}
               collapsed:: true
-              - (({block.block_id}))
+              - {block.embed}
             """,
         )
 

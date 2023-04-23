@@ -94,7 +94,7 @@ def test_kanban_needs_output_path() -> None:
 
 
 @patch.object(Kanban, "_generate_kanban_id")
-def test_add_new_kanban_to_non_existing_file(
+def test_doesnt_add_kanban_when_pages_doesnt_exist(
     mock_generate_kanban_id: Mock,
     mock_logseq_query: Mock,
     shared_datadir: Path,
