@@ -24,8 +24,16 @@ class Block:
     block_id: UUID
     journal_iso_date: int
     page_title: str
-    content: str
+    raw_content: str
     marker: str
+
+    @property
+    def pretty_content(self) -> str:
+        """Return the block content without the marker."""
+        if self.raw_content.startswith(self.marker):
+            len_marker = len(self.marker)
+            return self.raw_content[len_marker:].strip()
+        return self.raw_content
 
     def url(self, graph: str) -> str:
         """Build a Logseq block URL."""
@@ -40,7 +48,7 @@ class Block:
     @staticmethod
     def sort_by_date(blocks: List) -> List:
         """Sort a list blocks by date."""
-        return sorted(blocks, key=lambda row: (row.journal_iso_date, row.content))
+        return sorted(blocks, key=lambda row: (row.journal_iso_date, row.raw_content))
 
 
 @dataclass(frozen=True)
@@ -72,7 +80,7 @@ class Logseq:
                     block_id=UUID(block_id),
                     journal_iso_date=page.get("journalDay", 0),
                     page_title=page.get("originalName"),
-                    content=obj.get("content").splitlines()[0],
+                    raw_content=obj.get("content").splitlines()[0],
                     marker=obj.get("marker"),
                 ),
             )
@@ -243,9 +251,9 @@ class Kanban:
     def render_card(cls, column: str, block: Block) -> str:
         """Render a card for the Kanban board."""
         if block.journal_iso_date:
-            content = block.content
+            content = block.pretty_content
         else:
-            content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
+            content = f"{block.page_title}: {block.pretty_content} #[[{block.page_title}]]"
         key, _ = cls.render_column(column)
         return Block.indent(
             f"""

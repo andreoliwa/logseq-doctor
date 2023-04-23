@@ -121,4 +121,4 @@ def tasks(
     for block in blocks_by_date:
         typer.secho(f"{block.page_title}: ", fg=typer.colors.GREEN, nl=False)
         typer.secho(block.url(logseq.graph), fg=typer.colors.BLUE, nl=False)
-        typer.echo(f" {block.content}")
+        typer.echo(f" {block.raw_content}")
