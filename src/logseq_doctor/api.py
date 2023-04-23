@@ -37,6 +37,11 @@ class Block:
         spaces = SPACE * (level * 2)
         return indent(dedent(text).strip(), spaces) + (LINE_BREAK if nl else "")
 
+    @staticmethod
+    def sort_by_date(blocks: List) -> List:
+        """Sort a list blocks by date."""
+        return sorted(blocks, key=lambda row: (row.journal_iso_date, row.content))
+
 
 @dataclass(frozen=True)
 class Logseq:

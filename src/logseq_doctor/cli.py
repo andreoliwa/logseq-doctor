@@ -104,26 +104,21 @@ def tasks(
     logseq = Logseq(logseq_host_url, logseq_api_token, logseq_graph)
     query = f"(and{condition} (task TODO DOING WAITING NOW LATER))"
 
-    # FIXME[AA]: add "sort_by_date" to method: query(sort_by_date=True); remove _output_kanban
-    blocks = sorted(logseq.query(query), key=lambda row: (row.journal_iso_date, row.content))
+    blocks_by_date = Block.sort_by_date(logseq.query(query))
 
     if format_ == TaskFormat.kanban:
-        _output_kanban(output_path, blocks)
+        kanban = Kanban(Page(output_path), blocks_by_date)
+        if kanban.find():
+            typer.echo(f"Kanban board being updated at {output_path}")
+            kanban.update()
+        else:
+            typer.echo(f"Kanban board being added to {output_path}")
+            kanban.add()
+
+        typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
         return
 
-    for block in blocks:
+    for block in blocks_by_date:
         typer.secho(f"{block.page_title}: ", fg=typer.colors.GREEN, nl=False)
         typer.secho(block.url(logseq.graph), fg=typer.colors.BLUE, nl=False)
         typer.echo(f" {block.content}")
-
-
-def _output_kanban(output_path: Path, blocks: List[Block]) -> None:
-    kanban = Kanban(Page(output_path), blocks)
-    if kanban.find():
-        typer.echo(f"Kanban board being updated at {output_path}")
-        kanban.update()
-    else:
-        typer.echo(f"Kanban board being added to {output_path}")
-        kanban.add()
-
-    typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)

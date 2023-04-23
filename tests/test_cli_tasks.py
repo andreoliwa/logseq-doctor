@@ -1,7 +1,7 @@
 from pathlib import Path
 from textwrap import dedent
 from typing import List
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 from uuid import UUID
 
 import pytest
@@ -126,18 +126,11 @@ def test_add_new_kanban_to_existing_file(
     assert before.read_text() == (shared_datadir / "with-kanban.md").read_text()
 
 
-@patch("logseq_doctor.cli._output_kanban", autospec=True)
-def test_blocks_sorted_as_expected(
-    mock_output_kanban: MagicMock,
-    mock_logseq_query: Mock,
-    shared_datadir: Path,
+def test_blocks_sorted_by_date(
     unsorted_blocks: List[Block],
     blocks_sorted_by_date_content: List[Block],
 ) -> None:
-    mock_logseq_query.return_value = unsorted_blocks
-    before: Path = shared_datadir / "existing-kanban.md"
-    CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
-    mock_output_kanban.assert_called_once_with(before, blocks_sorted_by_date_content)
+    assert Block.sort_by_date(unsorted_blocks) == blocks_sorted_by_date_content
 
 
 @patch.object(Kanban, "_generate_kanban_id")
