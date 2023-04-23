@@ -17,15 +17,11 @@ import re
 from enum import Enum
 from pathlib import Path
 from typing import List
-from uuid import UUID, uuid4
 
 import typer
 
 from logseq_doctor import flat_markdown_to_outline
-from logseq_doctor.api import Block, Logseq, Page, Slice
-
-KANBAN_BOARD_SEARCH_STRING = "renderer :kboard,"
-KANBAN_LIST = "kanban-list"
+from logseq_doctor.api import Block, Kanban, Logseq, Page
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -108,114 +104,26 @@ def tasks(
     logseq = Logseq(logseq_host_url, logseq_api_token, logseq_graph)
     query = f"(and{condition} (task TODO DOING WAITING NOW LATER))"
 
+    # FIXME[AA]: add "sort_by_date" to method: query(sort_by_date=True); remove _output_kanban
     blocks = sorted(logseq.query(query), key=lambda row: (row.journal_iso_date, row.content))
 
-    _output_kanban(blocks, output_path) if format_ == TaskFormat.kanban else _output_text(logseq, blocks)
+    if format_ == TaskFormat.kanban:
+        _output_kanban(output_path, blocks)
+        return
 
-
-def _output_text(logseq: Logseq, blocks: List[Block]) -> None:
     for block in blocks:
         typer.secho(f"{block.page_title}: ", fg=typer.colors.GREEN, nl=False)
         typer.secho(block.url(logseq.graph), fg=typer.colors.BLUE, nl=False)
         typer.echo(f" {block.content}")
 
 
-def _get_kanban_id() -> UUID:  # pragma: no cover
-    """Generate a random UUID for the Kanban board. Mocked on tests."""
-    return uuid4()
-
-
-def _output_kanban(blocks: List[Block], output_path: Path) -> None:
-    page = Page(output_path)
-    kanban = page.find_slice(KANBAN_BOARD_SEARCH_STRING)
-    # FIXME[AA]: refactor: Kanban class
-    if kanban:
-        typer.echo(f"Kanban board being updated at {page.path}")
-        _update_existing_kanban(page, blocks, kanban)
+def _output_kanban(output_path: Path, blocks: List[Block]) -> None:
+    kanban = Kanban(Page(output_path), blocks)
+    if kanban.find():
+        typer.echo(f"Kanban board being updated at {output_path}")
+        kanban.update()
     else:
-        typer.echo(f"Kanban board being added to {page.path}")
-        _add_new_kanban(page, blocks)
+        typer.echo(f"Kanban board being added to {output_path}")
+        kanban.add()
 
     typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
-
-
-def _add_new_kanban(page: Page, blocks: List[Block]) -> None:
-    kanban_id = _get_kanban_id()
-    title = "My board"
-    page.append(
-        f"""
-        - {{{{{KANBAN_BOARD_SEARCH_STRING} {kanban_id}, {KANBAN_LIST}}}}}
-        - {title}
-          id:: {kanban_id}
-          collapsed:: true
-        """,
-    )
-
-    columns = set()
-    for block in blocks:
-        column = block.marker
-        if not column:
-            column = "Unknown"
-        if column not in columns:
-            columns.add(column)
-
-            column_id = f"{KANBAN_LIST}:: {column}"
-            column_card = f"""
-                - placeholder #.kboard-placeholder
-                  {column_id}
-            """
-            page.append(column_card, level=1)
-
-        if block.journal_iso_date:
-            content = block.content
-        else:
-            content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
-        item_card = f"""
-            - {content}
-              {KANBAN_LIST}:: {column}
-              collapsed:: true
-              - (({block.block_id}))
-        """
-        page.append(item_card, level=1)
-
-
-def _update_existing_kanban(page: Page, blocks: List[Block], kanban: Slice) -> None:
-    kanban_id = UUID(kanban.content.split(",")[1].strip())
-    board_slice = page.find_slice(f"id:: {kanban_id}", start=kanban.end_index)
-    board_start = board_slice.start_index
-    pos_next_insert = board_end = board_slice.end_index
-
-    columns = set()
-    for block in blocks:
-        column = block.marker
-        if not column:
-            column = "Unknown"
-        if column not in columns:
-            columns.add(column)
-
-            column_id = f"{KANBAN_LIST}:: {column}"
-            column_card = f"""
-                - placeholder #.kboard-placeholder
-                  {column_id}
-            """
-            if not page.find_slice(column_id, start=board_start, end=board_end):
-                pos = page.insert(column_card, start=pos_next_insert, level=1)
-                if pos_next_insert < pos:
-                    pos_next_insert = pos
-
-        if page.find_slice(str(block.block_id), start=board_start, end=board_end):
-            continue
-
-        if block.journal_iso_date:
-            content = block.content
-        else:
-            content = f"{block.page_title}: {block.content} #[[{block.page_title}]]"
-        item_card = f"""
-            - {content}
-              {KANBAN_LIST}:: {column}
-              collapsed:: true
-              - (({block.block_id}))
-        """
-        pos = page.insert(item_card, start=pos_next_insert, level=1)
-        if pos_next_insert < pos:
-            pos_next_insert = pos

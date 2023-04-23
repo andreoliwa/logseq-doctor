@@ -7,7 +7,7 @@ import pytest
 import responses
 
 from logseq_doctor.api import Block, Logseq, Page, Slice
-from logseq_doctor.cli import KANBAN_BOARD_SEARCH_STRING
+from logseq_doctor.constants import KANBAN_BOARD_SEARCH_STRING
 
 
 @pytest.fixture()
