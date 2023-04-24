@@ -61,6 +61,7 @@ def test_append_to_non_existing_page(datadir: Path) -> None:
     path = datadir / "non-existing-page.md"
     assert not path.exists()
     page = Page(path)
+    assert not page.needs_line_break()
     page.append("- new item")
     assert path.read_text() == "- new item\n"
 
@@ -69,6 +70,20 @@ def test_append_to_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
     assert before.exists()
     page = Page(before)
+    assert not page.needs_line_break()
+    page.append("- new item")
+    assert before.read_text() == (datadir / "page-append.md").read_text()
+
+
+def test_append_to_existing_page_without_line_break(datadir: Path) -> None:
+    before = datadir / "page-before.md"
+    assert before.exists()
+    content = before.read_text()
+    before.write_text(content[:-1])
+
+    page = Page(before)
+    assert page.needs_line_break()
+
     page.append("- new item")
     assert before.read_text() == (datadir / "page-append.md").read_text()
 
