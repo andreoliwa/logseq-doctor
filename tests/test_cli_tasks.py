@@ -87,10 +87,23 @@ def test_simple_text_output(
     assert result.stdout == dedent(expected).lstrip()
 
 
-def test_kanban_needs_output_path() -> None:
-    result = CliRunner().invoke(app, ["tasks", "--format", "kanban"])
+@pytest.mark.parametrize("tags", [[], ["tag1", "tag2"]])
+def test_kanban_with_multiple_tags_needs_output_path(tags: List[str]) -> None:
+    result = CliRunner().invoke(app, ["tasks", *tags, "--format", "kanban"])
     assert result.exit_code == 1
-    assert "Kanban format requires an output path" in result.stdout
+    assert result.stdout == "Kanban format requires an output path when multiple (or no) tags or pages are provided\n"
+
+
+def test_guess_kanban_file_from_provided_tag(mock_logseq_query: Logseq) -> None:
+    assert mock_logseq_query
+    result = CliRunner().invoke(app, ["tasks", "my-tag", "--format", "kanban"])
+    assert result.exit_code == 1
+    assert result.stdout.startswith(
+        "Assuming Kanban file from tag/page name ('my-tag')\n"
+        "Page URL: logseq://graph/my-notes?page=my-tag\n"
+        "Kanban board being added to ",
+    )
+    assert "my-notes/pages/my-tag.md" in result.stdout
 
 
 @patch.object(Kanban, "_generate_kanban_id")
@@ -107,7 +120,8 @@ def test_doesnt_add_kanban_when_pages_doesnt_exist(
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(file)])
     assert result.exit_code == 1
     assert (
-        result.stdout == f"Kanban board being added to {file}\n"
+        result.stdout == "Page URL: logseq://graph/my-notes?page=non-existing-file\n"
+        f"Kanban board being added to {file}\n"
         f"Page {file} does not exist\n"
         f"Add some content to the page and try again: logseq://graph/my-notes?page=non-existing-file\n"
     )
@@ -127,8 +141,9 @@ def test_add_new_kanban_to_existing_file(
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
     assert result.exit_code == 0
     assert (
-        result.stdout == f"Kanban board being added to {before}\n"
-        f"✨ Done: logseq://graph/my-notes?page=without-kanban\n"
+        result.stdout == "Page URL: logseq://graph/my-notes?page=without-kanban\n"
+        f"Kanban board being added to {before}\n"
+        f"✨ Done.\n"
     )
     assert before.read_text() == (shared_datadir / "with-kanban.md").read_text()
 
@@ -153,7 +168,8 @@ def test_update_existing_kanban(
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
     assert result.exit_code == 0
     assert (
-        result.stdout == f"Kanban board being updated at {before}\n"
-        f"✨ Done: logseq://graph/my-notes?page=existing-kanban\n"
+        result.stdout == "Page URL: logseq://graph/my-notes?page=existing-kanban\n"
+        f"Kanban board being updated at {before}\n"
+        f"✨ Done.\n"
     )
     assert before.read_text() == (shared_datadir / "modified-kanban.md").read_text()

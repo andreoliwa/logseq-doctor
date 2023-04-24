@@ -69,7 +69,15 @@ def tasks(
     tag_or_page: List[str] = typer.Argument(None, metavar="TAG", help="Tags or pages to query"),
     logseq_host_url: str = typer.Option(..., "--host", "-h", help="Logseq host", envvar="LOGSEQ_HOST_URL"),
     logseq_api_token: str = typer.Option(..., "--token", "-t", help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
-    logseq_graph: str = typer.Option(..., "--graph", "-g", help="Logseq graph", envvar="LOGSEQ_GRAPH"),
+    logseq_graph_path: Path = typer.Option(
+        ...,
+        "--graph",
+        "-g",
+        help="Logseq graph",
+        envvar="LOGSEQ_GRAPH_PATH",
+        dir_okay=True,
+        file_okay=False,
+    ),
     format_: TaskFormat = typer.Option(
         TaskFormat.text,
         "--format",
@@ -82,17 +90,27 @@ def tasks(
         None,
         "--output",
         "-o",
-        help="Output path for the Kanban",
+        help="Output path (used only on the Kanban output format)",
         file_okay=True,
         dir_okay=False,
         writable=True,
-        resolve_path=True,
     ),
 ) -> None:
     """List tasks in Logseq."""
-    if format_ == TaskFormat.kanban and not output_path:
-        typer.secho("Kanban format requires an output path", fg=typer.colors.BRIGHT_RED)
-        raise typer.Exit(1)
+    logseq = Logseq(logseq_host_url, logseq_api_token, logseq_graph_path)
+    if format_ == TaskFormat.kanban:
+        if not output_path and len(tag_or_page) == 1:
+            first_tag = tag_or_page[0]
+            page = logseq.page_from_name(first_tag)
+            output_path = page.path
+            typer.echo(f"Assuming Kanban file from tag/page name ({first_tag!r})")
+
+        if not output_path:
+            typer.secho(
+                "Kanban format requires an output path when multiple (or no) tags or pages are provided",
+                fg=typer.colors.BRIGHT_RED,
+            )
+            raise typer.Exit(1)
 
     condition = ""
     if tag_or_page:
@@ -101,14 +119,15 @@ def tasks(
         else:
             pages = " ".join([f"[[{tp}]]" for tp in tag_or_page])
             condition = f" (or {pages})"
-    logseq = Logseq(logseq_host_url, logseq_api_token, logseq_graph)
     query = f"(and{condition} (task TODO DOING WAITING NOW LATER))"
 
-    blocks_by_date = Block.sort_by_date(logseq.query(query))
+    blocks_sorted_by_date = Block.sort_by_date(logseq.query(query))
 
     if format_ == TaskFormat.kanban:
         page = Page(output_path)
-        kanban = Kanban(page, blocks_by_date)
+        kanban = Kanban(page, blocks_sorted_by_date)
+        typer.echo("Page URL: ", nl=False)
+        typer.secho(page.url(logseq.graph_name), fg=typer.colors.BLUE, bold=True)
         if kanban.find():
             typer.echo(f"Kanban board being updated at {output_path}")
             kanban.update()
@@ -119,14 +138,13 @@ def tasks(
             except FileNotFoundError as err:
                 typer.secho(str(err), fg=typer.colors.BRIGHT_RED)
                 typer.secho("Add some content to the page and try again: ", fg=typer.colors.BRIGHT_RED, nl=False)
-                typer.secho(page.url(logseq.graph), fg=typer.colors.BLUE)
+                typer.secho(page.url(logseq.graph_name), fg=typer.colors.BLUE, bold=True)
                 raise typer.Exit(1) from err
 
-        typer.secho("✨ Done: ", fg=typer.colors.BRIGHT_WHITE, bold=True, nl=False)
-        typer.secho(page.url(logseq.graph), fg=typer.colors.BRIGHT_BLUE, bold=True)
+        typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
         return
 
-    for block in blocks_by_date:
+    for block in blocks_sorted_by_date:
         typer.secho(f"{block.page_title}: ", fg=typer.colors.GREEN, nl=False)
-        typer.secho(block.url(logseq.graph), fg=typer.colors.BLUE, nl=False)
+        typer.secho(block.url(logseq.graph_name), fg=typer.colors.BLUE, bold=True, nl=False)
         typer.echo(f" {block.raw_content}")

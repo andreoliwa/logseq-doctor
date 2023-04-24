@@ -41,9 +41,9 @@ class Block:
         """Return the block content as an embed."""
         return f"{{{{embed (({self.block_id}))}}}}"
 
-    def url(self, graph: str) -> str:
+    def url(self, graph_name: str) -> str:
         """Build a Logseq block URL."""
-        return f"logseq://graph/{graph}?block-id={self.block_id}"
+        return f"logseq://graph/{graph_name}?block-id={self.block_id}"
 
     @staticmethod
     def indent(text: str, level: int = 0, *, nl: bool = False) -> str:
@@ -63,7 +63,12 @@ class Logseq:
 
     url: str
     token: str
-    graph: str
+    graph_path: Path
+
+    @property
+    def graph_name(self) -> str:
+        """Return the graph name from the path."""
+        return self.graph_path.stem
 
     def query(self, query: str) -> List[Block]:
         """Query Logseq API."""
@@ -92,6 +97,10 @@ class Logseq:
             )
         return rows
 
+    def page_from_name(self, name: str) -> "Page":
+        """Return a Page object from a page name."""
+        return Page(self.graph_path.expanduser() / "pages" / f"{name}.md")
+
 
 @dataclass(frozen=True)
 class Slice:
@@ -108,9 +117,9 @@ class Page:
 
     path: Path
 
-    def url(self, graph: str) -> str:
+    def url(self, graph_name: str) -> str:
         """Build a Logseq page URL."""
-        return f"logseq://graph/{graph}?page={self.path.stem}"
+        return f"logseq://graph/{graph_name}?page={self.path.stem}"
 
     def _open(self) -> TextIO:
         mode = "r+" if self.path.exists() else "w"
