@@ -5,6 +5,7 @@ from unittest.mock import Mock, patch
 from uuid import UUID
 
 import pytest
+from helpers import remove_last_char
 from typer.testing import CliRunner
 
 from logseq_doctor.api import Block, Kanban, Logseq
@@ -138,6 +139,7 @@ def test_add_new_kanban_to_existing_file(
     mock_generate_kanban_id.return_value = UUID("7991f73d-628a-4f98-af7a-901e2f51caa6")
     mock_logseq_query.return_value = unsorted_blocks
     before: Path = shared_datadir / "without-kanban.md"
+    remove_last_char(before)
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
     assert result.exit_code == 0
     assert (
@@ -165,6 +167,7 @@ def test_update_existing_kanban(
     mock_generate_kanban_id.return_value = UUID("dafe4e19-0e06-44ce-8113-f1a5c84f6286")
     mock_logseq_query.return_value = unsorted_blocks
     before: Path = shared_datadir / "existing-kanban.md"
+    remove_last_char(before)
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
     assert result.exit_code == 0
     assert (

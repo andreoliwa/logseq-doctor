@@ -126,21 +126,23 @@ class Page:
     def _open(self, mode: str = "") -> TextIO:
         return self.path.open(mode or ("r+" if self.path.exists() else "w"))
 
-    def needs_line_break(self) -> bool:
-        """Return True if the page needs a line break at the end."""
+    def fix_line_break(self) -> bool:
+        """Return True if a line break was added to the end of the file."""
         if not self.path.exists():
             return False
-        with self._open("rb") as file:
+        with self._open("rb+") as file:
             file.seek(-1, 2)
             last_char = file.read(1)
-        return last_char != LINE_BREAK.encode()
+            if last_char != LINE_BREAK.encode():
+                file.write(LINE_BREAK.encode())
+                return True
+        return False
 
     def append(self, text: str, *, level: int = 0) -> None:
         """Append text to the end of page."""
-        add_break = LINE_BREAK if self.needs_line_break() else ""
         with self._open() as file:
             file.seek(0, 2)
-            file.write(add_break + Block.indent(text, level) + LINE_BREAK)
+            file.write(Block.indent(text, level) + LINE_BREAK)
 
     def insert(self, text: str, start: int, *, level: int = 0) -> int:
         """Insert text at the desired offset. Return the next insert position."""

@@ -5,6 +5,7 @@ from uuid import UUID
 
 import pytest
 import responses
+from helpers import remove_last_char
 
 from logseq_doctor.api import Block, Logseq, Page, Slice
 from logseq_doctor.constants import KANBAN_BOARD_SEARCH_STRING
@@ -61,7 +62,7 @@ def test_append_to_non_existing_page(datadir: Path) -> None:
     path = datadir / "non-existing-page.md"
     assert not path.exists()
     page = Page(path)
-    assert not page.needs_line_break()
+    assert not page.fix_line_break()
     page.append("- new item")
     assert path.read_text() == "- new item\n"
 
@@ -70,19 +71,17 @@ def test_append_to_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
     assert before.exists()
     page = Page(before)
-    assert not page.needs_line_break()
+    assert not page.fix_line_break()
     page.append("- new item")
     assert before.read_text() == (datadir / "page-append.md").read_text()
 
 
 def test_append_to_existing_page_without_line_break(datadir: Path) -> None:
     before = datadir / "page-before.md"
-    assert before.exists()
-    content = before.read_text()
-    before.write_text(content[:-1])
+    remove_last_char(before)
 
     page = Page(before)
-    assert page.needs_line_break()
+    assert page.fix_line_break()
 
     page.append("- new item")
     assert before.read_text() == (datadir / "page-append.md").read_text()
@@ -90,8 +89,11 @@ def test_append_to_existing_page_without_line_break(datadir: Path) -> None:
 
 def test_insert_text_into_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
-    assert before.exists()
+    remove_last_char(before)
+
     page = Page(before)
+    assert page.fix_line_break()
+
     assert page.insert("- a new line after position 18", start=18) == 49  # noqa: PLR2004
     assert (
         page.insert(
