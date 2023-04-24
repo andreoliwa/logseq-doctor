@@ -1,4 +1,5 @@
 """Logseq API client."""
+import urllib.parse
 from dataclasses import dataclass, field
 from pathlib import Path
 from textwrap import dedent, indent
@@ -119,7 +120,8 @@ class Page:
 
     def url(self, graph_name: str) -> str:
         """Build a Logseq page URL."""
-        return f"logseq://graph/{graph_name}?page={self.path.stem}"
+        page = urllib.parse.quote(self.path.stem)
+        return f"logseq://graph/{graph_name}?page={page}"
 
     def _open(self, mode: str = "") -> TextIO:
         return self.path.open(mode or ("r+" if self.path.exists() else "w"))

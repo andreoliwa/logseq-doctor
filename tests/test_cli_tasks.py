@@ -115,15 +115,15 @@ def test_doesnt_add_kanban_when_pages_doesnt_exist(
 ) -> None:
     mock_generate_kanban_id.return_value = UUID("d15eb569-5de7-41f0-bef8-d0dbef87260f")
     mock_logseq_query.return_value = unsorted_blocks
-    file: Path = shared_datadir / "non-existing-file.md"
+    file: Path = shared_datadir / "non existing file.md"
     assert not file.exists()
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(file)])
     assert result.exit_code == 1
     assert (
-        result.stdout == "Page URL: logseq://graph/my-notes?page=non-existing-file\n"
+        result.stdout == "Page URL: logseq://graph/my-notes?page=non%20existing%20file\n"
         f"Kanban board being added to {file}\n"
         f"Page {file} does not exist\n"
-        f"Add some content to the page and try again: logseq://graph/my-notes?page=non-existing-file\n"
+        f"Add some content to the page and try again: logseq://graph/my-notes?page=non%20existing%20file\n"
     )
     assert not file.exists()
 
