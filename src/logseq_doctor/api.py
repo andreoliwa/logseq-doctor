@@ -291,10 +291,8 @@ class Kanban:
             f"""
             - {content}
               {KANBAN_LIST}:: {column}
-              collapsed:: true
               - {block.embed}
             """,
-            # FIXME[AA]: don't render collapsed = True on cards, see if the renderer breaks
         )
 
     def add(self) -> None:
