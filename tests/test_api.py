@@ -5,7 +5,7 @@ from uuid import UUID
 
 import pytest
 import responses
-from helpers import remove_last_char
+from helpers import remove_last_chars
 
 from logseq_doctor.api import Block, Logseq, Page, Slice
 from logseq_doctor.constants import KANBAN_BOARD_SEARCH_STRING
@@ -78,7 +78,7 @@ def test_append_to_existing_page(datadir: Path) -> None:
 
 def test_append_to_existing_page_without_line_break(datadir: Path) -> None:
     before = datadir / "page-before.md"
-    remove_last_char(before)
+    remove_last_chars(before)
 
     page = Page(before)
     assert page.fix_line_break()
@@ -89,7 +89,7 @@ def test_append_to_existing_page_without_line_break(datadir: Path) -> None:
 
 def test_insert_text_into_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
-    remove_last_char(before)
+    remove_last_chars(before)
 
     page = Page(before)
     assert page.fix_line_break()
