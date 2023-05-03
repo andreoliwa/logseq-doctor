@@ -16,7 +16,7 @@ repos:
       - id: end-of-file-fixer
       - id: debug-statements
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.262
+    rev: v0.0.264
     hooks:
       - id: ruff
         args: [--fix]
@@ -25,6 +25,6 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v2.42.1
+    rev: v3.2.1
     hooks:
     - id: commitizen
