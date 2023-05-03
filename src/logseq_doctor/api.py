@@ -1,4 +1,5 @@
 """Logseq API client."""
+import os
 import urllib.parse
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -14,7 +15,6 @@ from logseq_doctor.constants import (
     KANBAN_BOARD_TITLE,
     KANBAN_LIST,
     KANBAN_UNKNOWN_COLUMN,
-    LINE_BREAK,
     SPACE,
 )
 
@@ -50,11 +50,11 @@ class Block:
     def indent(text: str, level: int = 0, *, nl: bool = False) -> str:
         """Indent text by the desired level."""
         spaces = SPACE * (level * 2)
-        return indent(dedent(text).strip(), spaces) + (LINE_BREAK if nl else "")
+        return indent(dedent(text).strip(), spaces) + (os.linesep if nl else "")
 
     @staticmethod
     def sort_by_date(blocks: List) -> List:
-        """Sort a list blocks by date."""
+        """Sort a list of blocks by date."""
         return sorted(blocks, key=lambda row: (row.journal_iso_date, row.raw_content))
 
 
@@ -130,11 +130,12 @@ class Page:
         """Return True if a line break was added to the end of the file."""
         if not self.path.exists():
             return False
+        len_line_break = len(os.linesep)
         with self._open("rb+") as file:
-            file.seek(-1, 2)
-            last_char = file.read(1)
-            if last_char != LINE_BREAK.encode():
-                file.write(LINE_BREAK.encode())
+            file.seek(-1 * len_line_break, 2)
+            last_chars = file.read(len_line_break)
+            if last_chars != os.linesep.encode():
+                file.write(os.linesep.encode())
                 return True
         return False
 
@@ -142,7 +143,7 @@ class Page:
         """Append text to the end of page."""
         with self._open() as file:
             file.seek(0, 2)
-            file.write(Block.indent(text, level) + LINE_BREAK)
+            file.write(Block.indent(text, level) + os.linesep)
 
     def insert(self, text: str, start: int, *, level: int = 0) -> int:
         """Insert text at the desired offset. Return the next insert position."""
@@ -150,7 +151,7 @@ class Page:
             file.seek(start)
             remaining_content = file.read()
             file.seek(start)
-            new_text = Block.indent(text, level) + LINE_BREAK
+            new_text = Block.indent(text, level) + os.linesep
             file.write(new_text)
             file.write(remaining_content)
             return start + len(new_text)
@@ -162,7 +163,7 @@ class Page:
             remaining_content = file.read()
 
             file.seek(start)
-            file.write(Block.indent(new_text, level) + LINE_BREAK)
+            file.write(Block.indent(new_text, level) + os.linesep)
             file.write(remaining_content)
 
     def find_slice(
@@ -190,7 +191,7 @@ class Page:
             if column == -1:
                 column = 0  # TODO: test this case
 
-            spaces = LINE_BREAK + (SPACE * column)
+            spaces = os.linesep + (SPACE * column)
             spaces_with_dash = spaces + DASH
 
             pos_last_line = relative_content[slice_start:].find(spaces_with_dash)
@@ -202,7 +203,7 @@ class Page:
                         break
                     pos_last_line += pos_next + 1
 
-            pos_next_line_break = relative_content[slice_start + pos_last_line :].find(LINE_BREAK)
+            pos_next_line_break = relative_content[slice_start + pos_last_line :].find(os.linesep)
             # TODO: test: file without line break at the end
             slice_end = (
                 len(relative_content)
@@ -230,9 +231,9 @@ class Page:
                 msg = "No bullet found before search string"
                 raise ValueError(msg)
 
-            return relative_content[:previous_dash].rfind(LINE_BREAK)
+            return relative_content[:previous_dash].rfind(os.linesep)
             # There are no line breaks before on the first line of the file
-        bullet = LINE_BREAK + (SPACE * (level * 2)) + DASH + SPACE
+        bullet = os.linesep + (SPACE * (level * 2)) + DASH + SPACE
         return relative_content[:pos_search_string].rfind(bullet)
 
 

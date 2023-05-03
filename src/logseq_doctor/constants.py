@@ -2,7 +2,6 @@
 
 NBSP = "\\u00A0"
 DASH = "-"
-LINE_BREAK = "\n"
 SPACE = " "
 
 KANBAN_BOARD_SEARCH_STRING = "renderer :kboard,"
