@@ -294,6 +294,7 @@ class Kanban:
               collapsed:: true
               - {block.embed}
             """,
+            # FIXME[AA]: don't render collapsed = True on cards, see if the renderer breaks
         )
 
     def add(self) -> None:
@@ -319,7 +320,13 @@ class Kanban:
         kanban_id = UUID(self._renderer.content.split(",")[1].strip())
         board_slice = self.page.find_slice(f"id:: {kanban_id}", start=self._renderer.end_index)
         board_start = board_slice.start_index
-        pos_next_insert = board_end = board_slice.end_index
+        board_end = board_slice.end_index
+
+        # Insert the next card at the beginning of the board
+        first_child = self.page.find_slice(f"{KANBAN_LIST}:: ", start=board_start, end=board_end)
+        if not first_child:
+            return
+        pos_next_insert = first_child.start_index
 
         columns = set()
         for block in self.blocks:
