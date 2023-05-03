@@ -85,6 +85,7 @@ Type ``lsd`` without arguments to check the current commands and options::
     ╰──────────────────────────────────────────────────────────────────────────────╯
     ╭─ Commands ───────────────────────────────────────────────────────────────────╮
     │ outline  Convert flat Markdown to outline.                                   │
+    │ tasks    List tasks in Logseq.                                               │
     │ tidy-up  Tidy up your Markdown files by removing empty bullets in any block. │
     ╰──────────────────────────────────────────────────────────────────────────────╯
 
