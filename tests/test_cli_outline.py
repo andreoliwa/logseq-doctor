@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from textwrap import dedent
 
@@ -20,7 +21,7 @@ def assert_markdown(flat_md: str, outlined_md: str, *, ast: bool = False) -> Non
 
     # For debugging purposes
     if ast:  # pragma: no cover
-        print("\nASTRenderer:\n" + mistletoe.markdown(stripped_md, ASTRenderer))
+        print(f"{os.linesep}ASTRenderer:{os.linesep}" + mistletoe.markdown(stripped_md, ASTRenderer))
 
     assert flat_markdown_to_outline(stripped_md) == output_without_nbsp
 
@@ -28,7 +29,7 @@ def assert_markdown(flat_md: str, outlined_md: str, *, ast: bool = False) -> Non
 def test_header_hierarchy_preserved_and_whitespace_removed(datadir: Path) -> None:
     result = CliRunner().invoke(app, ["outline", str(datadir / "dirty.md")])
     assert result.exit_code == 0
-    assert result.stdout == (datadir / "clean.md").read_text() + "\n"
+    assert result.stdout == (datadir / "clean.md").read_text() + os.linesep
 
 
 def test_links() -> None:

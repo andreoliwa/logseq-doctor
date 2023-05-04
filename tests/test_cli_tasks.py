@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from textwrap import dedent
 from typing import List
@@ -5,7 +6,6 @@ from unittest.mock import Mock, patch
 from uuid import UUID
 
 import pytest
-from helpers import remove_last_chars
 from typer.testing import CliRunner
 
 from logseq_doctor.api import Block, Kanban, Logseq, Page
@@ -92,7 +92,10 @@ def test_simple_text_output(
 def test_kanban_with_multiple_tags_needs_output_path(tags: List[str]) -> None:
     result = CliRunner().invoke(app, ["tasks", *tags, "--format", "kanban"])
     assert result.exit_code == 1
-    assert result.stdout == "Kanban format requires an output path when multiple (or no) tags or pages are provided\n"
+    assert (
+        result.stdout
+        == f"Kanban format requires an output path when multiple (or no) tags or pages are provided{os.linesep}"
+    )
 
 
 def test_guess_kanban_file_from_provided_tag(mock_logseq_query: Logseq) -> None:
@@ -100,8 +103,8 @@ def test_guess_kanban_file_from_provided_tag(mock_logseq_query: Logseq) -> None:
     result = CliRunner().invoke(app, ["tasks", "my-tag", "--format", "kanban"])
     assert result.exit_code == 1
     assert result.stdout.startswith(
-        "Assuming Kanban file from tag/page name ('my-tag')\n"
-        "Page URL: logseq://graph/my-notes?page=my-tag\n"
+        f"Assuming Kanban file from tag/page name ('my-tag'){os.linesep}"
+        f"Page URL: logseq://graph/my-notes?page=my-tag{os.linesep}"
         "Kanban board being added to ",
     )
     assert "my-notes/pages/my-tag.md" in result.stdout
@@ -121,10 +124,10 @@ def test_doesnt_add_kanban_when_pages_doesnt_exist(
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(file)])
     assert result.exit_code == 1
     assert (
-        result.stdout == "Page URL: logseq://graph/my-notes?page=non%20existing%20file\n"
-        f"Kanban board being added to {file}\n"
-        f"Page {file} does not exist\n"
-        f"Add some content to the page and try again: logseq://graph/my-notes?page=non%20existing%20file\n"
+        result.stdout == f"Page URL: logseq://graph/my-notes?page=non%20existing%20file{os.linesep}"
+        f"Kanban board being added to {file}{os.linesep}"
+        f"Page {file} does not exist{os.linesep}"
+        f"Add some content to the page and try again: logseq://graph/my-notes?page=non%20existing%20file{os.linesep}"
     )
     assert not file.exists()
 
@@ -139,15 +142,15 @@ def test_add_new_kanban_to_existing_file(
     mock_generate_kanban_id.return_value = UUID("7991f73d-628a-4f98-af7a-901e2f51caa6")
     mock_logseq_query.return_value = unsorted_blocks
     before: Path = shared_datadir / "without-kanban.md"
-    remove_last_chars(before)
+    assert Page(before).remove_line_break()
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
     assert result.exit_code == 0
     assert (
-        result.stdout == "Page URL: logseq://graph/my-notes?page=without-kanban\n"
-        f"Kanban board being added to {before}\n"
-        f"✨ Done.\n"
+        result.stdout == f"Page URL: logseq://graph/my-notes?page=without-kanban{os.linesep}"
+        f"Kanban board being added to {before}{os.linesep}"
+        f"✨ Done.{os.linesep}"
     )
-    assert before.read_text() == (shared_datadir / "with-kanban.md").read_text()
+    assert before.read_text() == (shared_datadir / "with-kanban.md").read_text().rstrip(os.linesep)
 
 
 def test_blocks_sorted_by_date(
@@ -157,27 +160,25 @@ def test_blocks_sorted_by_date(
     assert Block.sort_by_date(unsorted_blocks) == blocks_sorted_by_date_content
 
 
-@pytest.mark.parametrize("filename", ["existing-kanban.md", "existing-kanban-with-tabs.md"])
+@pytest.mark.parametrize("suffix", ["", "-with-tabs"])
 @patch.object(Kanban, "_generate_kanban_id")
 def test_update_existing_kanban(
     mock_generate_kanban_id: Mock,
-    filename: str,
+    suffix: str,
     mock_logseq_query: Mock,
     shared_datadir: Path,
     unsorted_blocks: List[Block],
 ) -> None:
     mock_generate_kanban_id.return_value = UUID("dafe4e19-0e06-44ce-8113-f1a5c84f6286")
     mock_logseq_query.return_value = unsorted_blocks
-    before: Path = shared_datadir / filename
-    remove_last_chars(before)
+    before: Path = shared_datadir / f"existing-kanban{suffix}.md"
+    assert Page(before).remove_line_break()
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
     assert result.exit_code == 0
     assert (
-        result.stdout == f"Page URL: logseq://graph/my-notes?page={before.stem}\n"
-        f"Kanban board being updated at {before}\n"
-        f"✨ Done.\n"
+        result.stdout == f"Page URL: logseq://graph/my-notes?page={before.stem}{os.linesep}"
+        f"Kanban board being updated at {before}{os.linesep}"
+        f"✨ Done.{os.linesep}"
     )
 
-    page_with_fixed_tabs = Page(before)
-    page_with_fixed_tabs.fix_tabs()
-    assert before.read_text() == (shared_datadir / "modified-kanban.md").read_text()
+    assert before.read_text() == (shared_datadir / f"modified-kanban{suffix}.md").read_text().rstrip(os.linesep)

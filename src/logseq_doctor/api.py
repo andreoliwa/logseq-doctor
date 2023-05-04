@@ -17,7 +17,9 @@ from logseq_doctor.constants import (
     KANBAN_BOARD_TITLE,
     KANBAN_LIST,
     KANBAN_UNKNOWN_COLUMN,
+    NBSP,
     SPACE,
+    TAB,
 )
 
 
@@ -49,10 +51,10 @@ class Block:
         return f"logseq://graph/{graph_name}?block-id={self.block_id}"
 
     @staticmethod
-    def indent(text: str, level: int = 0, *, nl: bool = False) -> str:
-        """Indent text by the desired level."""
+    def indent(text: str, *, level: int = 0, nl: bool = False) -> str:
+        """Indent text by the desired level, preserving tabs."""
         spaces = SPACE * (level * 2)
-        return indent(dedent(text).strip(), spaces) + (os.linesep if nl else "")
+        return indent(dedent(text.replace(TAB, NBSP)).strip().replace(NBSP, TAB), spaces) + (os.linesep if nl else "")
 
     @staticmethod
     def sort_by_date(blocks: List) -> List:
@@ -128,7 +130,7 @@ class Page:
     def _open(self, mode: str = "") -> TextIO:
         return self.path.open(mode or ("r+" if self.path.exists() else "w"))
 
-    def fix_line_break(self) -> bool:
+    def add_line_break(self) -> bool:
         """Return True if a line break was added to the end of the file."""
         if not self.path.exists():
             return False
@@ -141,23 +143,20 @@ class Page:
                 return True
         return False
 
-    def fix_tabs(self) -> bool:
-        """Replace tabs with 2 spaces. The Kanban plugin or Logseq might be adding tabs to the file."""
+    def remove_line_break(self) -> bool:
+        """Return True if a line break was removed from the end of the file."""
         if not self.path.exists():
             return False
-        with self._open() as file:
-            content = file.read()
-        if "\t" not in content:
-            return False
-        with self._open("w") as file:
-            file.write(content.replace("\t", SPACE * 2))
-            return None
+        content = self.path.read_text()
+        len_line_break = len(os.linesep)
+        self.path.write_text(content[: -1 * len_line_break])
+        return True
 
     def append(self, text: str, *, level: int = 0) -> None:
         """Append text to the end of page."""
         with self._open() as file:
             file.seek(0, SEEK_END)
-            file.write(Block.indent(text, level) + os.linesep)
+            file.write(Block.indent(text, level=level) + os.linesep)
 
     def insert(self, text: str, start: int, *, level: int = 0) -> int:
         """Insert text at the desired offset. Return the next insert position."""
@@ -176,7 +175,7 @@ class Page:
                 remaining_content = remaining_content[pos_nearest_new_line + 1 :]
 
             file.seek(start)
-            new_text = Block.indent(text, level) + os.linesep
+            new_text = Block.indent(text, level=level) + os.linesep
             file.write(new_text)
             pos_after_writing = file.tell()
             file.write(remaining_content)
@@ -189,7 +188,7 @@ class Page:
             remaining_content = file.read()
 
             file.seek(start)
-            file.write(Block.indent(new_text, level) + os.linesep)
+            file.write(Block.indent(new_text, level=level) + os.linesep)
             file.write(remaining_content)
 
     def find_slice(
@@ -300,10 +299,9 @@ class Kanban:
         key = f"{KANBAN_LIST}:: {column}"
         card = Block.indent(
             f"""
-            - placeholder #.kboard-placeholder
-              {key}
+            {TAB}- placeholder #.kboard-placeholder
+            {TAB}  {key}
             """,
-            1,
         )
         return key, card
 
@@ -314,15 +312,13 @@ class Kanban:
             content = block.pretty_content
         else:
             content = f"{block.page_title}: {block.pretty_content} #[[{block.page_title}]]"
-        key, _ = cls.render_column(column)
         return Block.indent(
             f"""
-            - {content}
-              {KANBAN_LIST}:: {column}
-              collapsed:: true
-              - {block.embed}
+            {TAB}- {content}
+            {TAB}  {KANBAN_LIST}:: {column}
+            {TAB}  collapsed:: true
+            {TAB}{TAB}- {block.embed}
             """,
-            1,
         )
 
     def add(self) -> None:
@@ -339,9 +335,9 @@ class Kanban:
             if column not in columns:
                 columns.add(column)
                 _, card = self.render_column(column)
-                self.page.append(card, level=1)
+                self.page.append(card)
 
-            self.page.append(self.render_card(column, block), level=1)
+            self.page.append(self.render_card(column, block))
 
     def update(self) -> None:
         """Update an existing Kanban board."""
@@ -366,13 +362,13 @@ class Kanban:
                 columns.add(column)
                 key, card = self.render_column(column)
                 if not self.page.find_slice(key, start=board_start, end=board_end):
-                    pos = self.page.insert(card, start=pos_next_insert, level=1)
+                    pos = self.page.insert(card, start=pos_next_insert)
                     if pos_next_insert < pos:
                         pos_next_insert = pos
                     board_end += len(card) + len(os.linesep)
 
             card = self.render_card(column, block)
-            pos = self.page.insert(card, start=pos_next_insert, level=1)
+            pos = self.page.insert(card, start=pos_next_insert)
             if pos_next_insert < pos:
                 pos_next_insert = pos
             board_end += len(card) + len(os.linesep)

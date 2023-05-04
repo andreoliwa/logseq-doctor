@@ -125,8 +125,7 @@ def tasks(
 
     if format_ == TaskFormat.kanban:
         page = Page(output_path)
-        page.fix_line_break()
-        page.fix_tabs()
+        page.add_line_break()
 
         kanban = Kanban(page, blocks_sorted_by_date)
         typer.echo("Page URL: ", nl=False)
@@ -144,6 +143,7 @@ def tasks(
                 typer.secho(page.url(logseq.graph_name), fg=typer.colors.BLUE, bold=True)
                 raise typer.Exit(1) from err
 
+        page.remove_line_break()
         typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
         return
 

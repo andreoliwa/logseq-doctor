@@ -1,11 +1,11 @@
 import json
+import os
 from pathlib import Path
 from typing import Optional
 from uuid import UUID
 
 import pytest
 import responses
-from helpers import remove_last_chars
 
 from logseq_doctor.api import Block, Logseq, Page, Slice
 from logseq_doctor.constants import KANBAN_BOARD_SEARCH_STRING
@@ -62,26 +62,26 @@ def test_append_to_non_existing_page(datadir: Path) -> None:
     path = datadir / "non-existing-page.md"
     assert not path.exists()
     page = Page(path)
-    assert not page.fix_line_break()
+    assert not page.add_line_break()
     page.append("- new item")
-    assert path.read_text() == "- new item\n"
+    assert path.read_text() == f"- new item{os.linesep}"
 
 
 def test_append_to_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
     assert before.exists()
     page = Page(before)
-    assert not page.fix_line_break()
+    assert not page.add_line_break()
     page.append("- new item")
     assert before.read_text() == (datadir / "page-append.md").read_text()
 
 
 def test_append_to_existing_page_without_line_break(datadir: Path) -> None:
     before = datadir / "page-before.md"
-    remove_last_chars(before)
 
     page = Page(before)
-    assert page.fix_line_break()
+    assert page.remove_line_break()
+    assert page.add_line_break()
 
     page.append("- new item")
     assert before.read_text() == (datadir / "page-append.md").read_text()
@@ -89,10 +89,10 @@ def test_append_to_existing_page_without_line_break(datadir: Path) -> None:
 
 def test_insert_text_into_existing_page(datadir: Path) -> None:
     before = datadir / "page-before.md"
-    remove_last_chars(before)
 
     page = Page(before)
-    assert page.fix_line_break()
+    assert page.remove_line_break()
+    assert page.add_line_break()
 
     assert page.insert("- a new line after position 18", start=18) == 49  # noqa: PLR2004
     assert (
@@ -141,7 +141,7 @@ def test_find_block_by_outline_content(existing_kanban: Page) -> None:
                 collapsed:: true
                 - ((b9f4b406-2033-4f0a-996d-16a5537cc8b8))
             """,
-            1,
+            level=1,
             nl=True,
         ),
         start_index=500,
@@ -157,9 +157,9 @@ def test_find_block_by_outline_content(existing_kanban: Page) -> None:
             Slice(
                 content=Block.indent(
                     """
-            - Item 3
-              key:: value
-            """,
+                    - Item 3
+                      key:: value
+                    """,
                     nl=True,
                 ),
                 start_index=78,
@@ -185,7 +185,7 @@ def nested_kanban(datadir: Path) -> Page:
 
 def test_find_kanban_header(nested_kanban: Page) -> None:
     assert nested_kanban.find_slice(KANBAN_BOARD_SEARCH_STRING) == Slice(
-        content="        - {{renderer :kboard, be7f0de9-4e88-42f9-911d-9b7fc51a654e, kanban-list}}\n",
+        content="        - {{renderer :kboard, be7f0de9-4e88-42f9-911d-9b7fc51a654e, kanban-list}}" + os.linesep,
         start_index=104,
         end_index=186,
     )
@@ -193,7 +193,7 @@ def test_find_kanban_header(nested_kanban: Page) -> None:
 
 def test_find_first_line(nested_kanban: Page) -> None:
     assert nested_kanban.find_slice("first line") == Slice(
-        content="- Item on the first line of the file\n",
+        content=f"- Item on the first line of the file{os.linesep}",
         start_index=0,
         end_index=37,
     )
@@ -201,7 +201,7 @@ def test_find_first_line(nested_kanban: Page) -> None:
 
 def test_find_last_line(nested_kanban: Page) -> None:
     assert nested_kanban.find_slice("The last in line") == Slice(
-        content="  - Sub-item c - The last in line\n",
+        content=f"  - Sub-item c - The last in line{os.linesep}",
         start_index=705,
         end_index=739,
     )
@@ -225,7 +225,7 @@ def test_find_block_by_property(nested_kanban: Page) -> None:
                 collapsed:: true
                 - ((b9f4b406-2033-4f0a-996d-16a5537cc8b8))
             """,
-            4,
+            level=4,
             nl=True,
         ),
         start_index=186,
@@ -237,7 +237,7 @@ def test_find_block_by_property(nested_kanban: Page) -> None:
             - placeholder #.kboard-placeholder
               kanban-list:: TODO
             """,
-            5,
+            level=5,
             nl=True,
         ),
         start_index=281,

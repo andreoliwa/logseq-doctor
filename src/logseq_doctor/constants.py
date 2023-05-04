@@ -3,6 +3,7 @@
 NBSP = "\\u00A0"
 DASH = "-"
 SPACE = " "
+TAB = "\t"
 
 KANBAN_BOARD_SEARCH_STRING = "renderer :kboard,"
 KANBAN_LIST = "kanban-list"
