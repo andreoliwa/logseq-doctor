@@ -11,14 +11,17 @@
     kanban-list:: TODO
   - Do something
     kanban-list:: TODO
+    collapsed:: true
     - {{embed ((c3824880-7527-4ba6-a465-719f01f327de))}}
   - placeholder #.kboard-placeholder
     kanban-list:: DOING
   - Focus on tasks
     kanban-list:: DOING
+    collapsed:: true
     - {{embed ((6bcebf82-c557-4f58-84d0-3b91c7e59e93))}}
   - Do yet another thing
     kanban-list:: TODO
+    collapsed:: true
     - {{embed ((0d62459e-8a6b-4635-8c2e-41fbef6da6f8))}}
   - placeholder #.kboard-placeholder
     kanban-list:: Preparing

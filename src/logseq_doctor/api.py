@@ -282,7 +282,7 @@ class Kanban:
 
     @classmethod
     def render_card(cls, column: str, block: Block) -> str:
-        """Render a card for the Kanban board."""
+        """Render a collapsed card for the Kanban board."""
         if block.journal_iso_date:
             content = block.pretty_content
         else:
@@ -292,6 +292,7 @@ class Kanban:
             f"""
             - {content}
               {KANBAN_LIST}:: {column}
+              collapsed:: true
               - {block.embed}
             """,
         )
