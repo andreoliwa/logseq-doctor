@@ -126,6 +126,7 @@ def tasks(
     if format_ == TaskFormat.kanban:
         page = Page(output_path)
         page.fix_line_break()
+        page.fix_tabs()
 
         kanban = Kanban(page, blocks_sorted_by_date)
         typer.echo("Page URL: ", nl=False)

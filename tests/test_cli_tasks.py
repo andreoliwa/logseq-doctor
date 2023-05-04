@@ -8,7 +8,7 @@ import pytest
 from helpers import remove_last_chars
 from typer.testing import CliRunner
 
-from logseq_doctor.api import Block, Kanban, Logseq
+from logseq_doctor.api import Block, Kanban, Logseq, Page
 from logseq_doctor.cli import app
 
 
@@ -157,22 +157,27 @@ def test_blocks_sorted_by_date(
     assert Block.sort_by_date(unsorted_blocks) == blocks_sorted_by_date_content
 
 
+@pytest.mark.parametrize("filename", ["existing-kanban.md", "existing-kanban-with-tabs.md"])
 @patch.object(Kanban, "_generate_kanban_id")
 def test_update_existing_kanban(
     mock_generate_kanban_id: Mock,
+    filename: str,
     mock_logseq_query: Mock,
     shared_datadir: Path,
     unsorted_blocks: List[Block],
 ) -> None:
     mock_generate_kanban_id.return_value = UUID("dafe4e19-0e06-44ce-8113-f1a5c84f6286")
     mock_logseq_query.return_value = unsorted_blocks
-    before: Path = shared_datadir / "existing-kanban.md"
+    before: Path = shared_datadir / filename
     remove_last_chars(before)
     result = CliRunner().invoke(app, ["tasks", "--format", "kanban", "--output", str(before)])
     assert result.exit_code == 0
     assert (
-        result.stdout == "Page URL: logseq://graph/my-notes?page=existing-kanban\n"
+        result.stdout == f"Page URL: logseq://graph/my-notes?page={before.stem}\n"
         f"Kanban board being updated at {before}\n"
         f"✨ Done.\n"
     )
+
+    page_with_fixed_tabs = Page(before)
+    page_with_fixed_tabs.fix_tabs()
     assert before.read_text() == (shared_datadir / "modified-kanban.md").read_text()

@@ -2,6 +2,7 @@
 import os
 import urllib.parse
 from dataclasses import dataclass, field
+from io import SEEK_END
 from pathlib import Path
 from textwrap import dedent, indent
 from typing import List, Optional, TextIO, Tuple
@@ -10,6 +11,7 @@ from uuid import UUID, uuid4
 import requests
 
 from logseq_doctor.constants import (
+    BEGINNING,
     DASH,
     KANBAN_BOARD_SEARCH_STRING,
     KANBAN_BOARD_TITLE,
@@ -139,10 +141,22 @@ class Page:
                 return True
         return False
 
+    def fix_tabs(self) -> bool:
+        """Replace tabs with 2 spaces. The Kanban plugin or Logseq might be adding tabs to the file."""
+        if not self.path.exists():
+            return False
+        with self._open() as file:
+            content = file.read()
+        if "\t" not in content:
+            return False
+        with self._open("w") as file:
+            file.write(content.replace("\t", SPACE * 2))
+            return None
+
     def append(self, text: str, *, level: int = 0) -> None:
         """Append text to the end of page."""
         with self._open() as file:
-            file.seek(0, 2)
+            file.seek(0, SEEK_END)
             file.write(Block.indent(text, level) + os.linesep)
 
     def insert(self, text: str, start: int, *, level: int = 0) -> int:
@@ -150,11 +164,23 @@ class Page:
         with self._open() as file:
             file.seek(start)
             remaining_content = file.read()
+
+            # A dirty hack to adjust the start position of a file:
+            # search for the nearest new line and move the pointer if found.
+            # For some reasons, in one file the start was off by 2;
+            # maybe it's the BOM in the beginning of the file?
+            # TODO: this whole logic of manipulating blocks should be done with Markdown AST...
+            pos_nearest_new_line = remaining_content[:BEGINNING].find(os.linesep)
+            if pos_nearest_new_line != -1:
+                start += pos_nearest_new_line + 1
+                remaining_content = remaining_content[pos_nearest_new_line + 1 :]
+
             file.seek(start)
             new_text = Block.indent(text, level) + os.linesep
             file.write(new_text)
+            pos_after_writing = file.tell()
             file.write(remaining_content)
-            return start + len(new_text)
+            return pos_after_writing
 
     def replace(self, new_text: str, start: int, end: int, *, level: int = 0) -> None:
         """Replace text at the desired offset."""
@@ -277,6 +303,7 @@ class Kanban:
             - placeholder #.kboard-placeholder
               {key}
             """,
+            1,
         )
         return key, card
 
@@ -295,6 +322,7 @@ class Kanban:
               collapsed:: true
               - {block.embed}
             """,
+            1,
         )
 
     def add(self) -> None:
@@ -341,7 +369,10 @@ class Kanban:
                     pos = self.page.insert(card, start=pos_next_insert, level=1)
                     if pos_next_insert < pos:
                         pos_next_insert = pos
+                    board_end += len(card) + len(os.linesep)
 
-            pos = self.page.insert(self.render_card(column, block), start=pos_next_insert, level=1)
+            card = self.render_card(column, block)
+            pos = self.page.insert(card, start=pos_next_insert, level=1)
             if pos_next_insert < pos:
                 pos_next_insert = pos
+            board_end += len(card) + len(os.linesep)
