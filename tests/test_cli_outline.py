@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from textwrap import dedent
 
 import mistletoe
@@ -5,21 +7,11 @@ from mistletoe.ast_renderer import ASTRenderer
 from typer.testing import CliRunner
 
 from logseq_doctor import flat_markdown_to_outline
-from logseq_doctor.cli import app, lsd, outline
+from logseq_doctor.cli import app
 from logseq_doctor.constants import NBSP
 
 
-def test_cli_help():
-    """The Typer output is a colourful rich text, so let's only assert the presence of commands."""
-    # FIXME: this test is useless, it's testing Typer actually
-    runner = CliRunner()
-    result = runner.invoke(app, [])
-    for expected_text in (lsd.__doc__, outline.__doc__):
-        assert expected_text in result.output
-    assert result.exit_code == 0
-
-
-def assert_markdown(flat_md: str, outlined_md: str, *, ast=False):
+def assert_markdown(flat_md: str, outlined_md: str, *, ast: bool = False) -> None:
     """Assert flat Markdown is converted to outline.
 
     Use non-breaking spaces to trick dedent() into keeping leading spaces on output.
@@ -28,41 +20,19 @@ def assert_markdown(flat_md: str, outlined_md: str, *, ast=False):
     stripped_md = dedent(flat_md).lstrip()
 
     # For debugging purposes
-    if ast:
-        print("\nASTRenderer:\n" + mistletoe.markdown(stripped_md, ASTRenderer))
+    if ast:  # pragma: no cover
+        print(f"{os.linesep}ASTRenderer:{os.linesep}" + mistletoe.markdown(stripped_md, ASTRenderer))
 
     assert flat_markdown_to_outline(stripped_md) == output_without_nbsp
 
 
-def test_header_hierarchy_preserved_and_whitespace_removed():
-    assert_markdown(
-        """
-        #  Header 1
+def test_header_hierarchy_preserved_and_whitespace_removed(datadir: Path) -> None:
+    result = CliRunner().invoke(app, ["outline", str(datadir / "dirty.md")])
+    assert result.exit_code == 0
+    assert result.stdout == (datadir / "clean.md").read_text() + os.linesep
 
 
-        -  Item 1
-
-        -  Item 2
-
-        ## Header 2
-
-        - Item 3
-        ###  Header 3
-        -  Item 4
-        """,
-        """
-        - # Header 1
-          - Item 1
-          - Item 2
-          - ## Header 2
-            - Item 3
-            - ### Header 3
-              - Item 4
-        """,
-    )
-
-
-def test_links():
+def test_links() -> None:
     assert_markdown(
         """
         #  Header
@@ -80,7 +50,7 @@ def test_links():
     )
 
 
-def test_flat_paragraphs_without_header():
+def test_flat_paragraphs_without_header() -> None:
     assert_markdown(
         """
         Some flat paragraph.
@@ -99,7 +69,7 @@ def test_flat_paragraphs_without_header():
     )
 
 
-def test_flat_paragraphs_with_header():
+def test_flat_paragraphs_with_header() -> None:
     assert_markdown(
         """
         # Some sneaky header
@@ -120,7 +90,7 @@ def test_flat_paragraphs_with_header():
     )
 
 
-def test_flat_paragraphs_with_deeper_headers():
+def test_flat_paragraphs_with_deeper_headers() -> None:
     assert_markdown(
         """
         ## Some sneaky h2 without h1
@@ -141,7 +111,7 @@ def test_flat_paragraphs_with_deeper_headers():
     )
 
 
-def test_nested_lists_single_level():
+def test_nested_lists_single_level() -> None:
     assert_markdown(
         """
         # Header
@@ -159,7 +129,7 @@ def test_nested_lists_single_level():
     )
 
 
-def test_nested_lists_multiple_levels():
+def test_nested_lists_multiple_levels() -> None:
     assert_markdown(
         """
         # Header
@@ -187,7 +157,7 @@ def test_nested_lists_multiple_levels():
     )
 
 
-def test_thematic_break_setext_heading():
+def test_thematic_break_setext_heading() -> None:
     assert_markdown(
         """
         ---
