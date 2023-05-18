@@ -414,14 +414,14 @@ test = ["coverage (>=6.5)", "pytest-mock (>=3.10)"]
 
 [[package]]
 name = "pytest-testmon"
-version = "2.0.7"
+version = "2.0.8"
 description = "selects tests affected by changed files and methods"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pytest-testmon-2.0.7.tar.gz", hash = "sha256:4f8b20655d38b7e0169fce8cc3185b1c0a879d3a055dc3d3b009f0e89db47b77"},
-    {file = "pytest_testmon-2.0.7-py3-none-any.whl", hash = "sha256:cc13510dba9e9e7502f8eea9136a4360d6b5a43792306843e583c070be2ff7d9"},
+    {file = "pytest-testmon-2.0.8.tar.gz", hash = "sha256:4f7044460a0bea118a3fbbcb4f177c316f665d1701f9200434d61ba641d858e7"},
+    {file = "pytest_testmon-2.0.8-py3-none-any.whl", hash = "sha256:57052bf4ce0f8a70b629e58a2c7b8eebdce09f102920a92f7653e7ebe74ae4a2"},
 ]
 
 [package.dependencies]
