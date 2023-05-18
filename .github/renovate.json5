@@ -1,0 +1,11 @@
+{
+  extends: ["config:base"],
+  // https://docs.renovatebot.com/configuration-options/#automerge
+  automerge: true,
+  // https://docs.renovatebot.com/configuration-options/#automergetype
+  automergeType: "branch",
+  // https://docs.renovatebot.com/modules/manager/pre-commit/
+  "pre-commit": {
+    enabled: true,
+  },
+}
