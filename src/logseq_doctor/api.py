@@ -196,8 +196,8 @@ class Page:
         search_string: str,
         *,
         start: int = 0,
-        end: int = None,
-        level: int = None,
+        end: Optional[int] = None,
+        level: Optional[int] = None,
     ) -> Optional[Slice]:
         """Find a slice of Markdown blocks in a Logseq page."""
         try:
@@ -248,7 +248,7 @@ class Page:
             return None
 
     @staticmethod
-    def _find_previous_line_break(relative_content: str, pos_search_string: int, level: int = None) -> int:
+    def _find_previous_line_break(relative_content: str, pos_search_string: int, level: Optional[int] = None) -> int:
         if level is None:
             bullet = DASH + SPACE
             previous_dash = relative_content[:pos_search_string].rfind(bullet)
