@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import os
 from pathlib import Path
 from textwrap import dedent
-from typing import List
 from unittest.mock import Mock, patch
 from uuid import UUID
 
@@ -19,7 +20,7 @@ def mock_logseq_query() -> Mock:
 
 
 @pytest.fixture()
-def unsorted_blocks() -> List[Block]:
+def unsorted_blocks() -> list[Block]:
     return [
         Block(
             block_id=UUID("6bcebf82-c557-4f58-84d0-3b91c7e59e93"),
@@ -53,7 +54,7 @@ def unsorted_blocks() -> List[Block]:
 
 
 @pytest.fixture()
-def blocks_sorted_by_date_content(unsorted_blocks: List[Block]) -> List[Block]:
+def blocks_sorted_by_date_content(unsorted_blocks: list[Block]) -> list[Block]:
     return [unsorted_blocks[3], unsorted_blocks[2], unsorted_blocks[0], unsorted_blocks[1]]
 
 
@@ -65,7 +66,7 @@ def blocks_sorted_by_date_content(unsorted_blocks: List[Block]) -> List[Block]:
         (["tag1", "page2"], "(and (or [[tag1]] [[page2]]) (task TODO DOING WAITING NOW LATER))"),
     ],
 )
-def test_search_with_tags(mock_logseq_query: Mock, tags: List[str], expected_query: str) -> None:
+def test_search_with_tags(mock_logseq_query: Mock, tags: list[str], expected_query: str) -> None:
     result = CliRunner().invoke(app, ["tasks", *tags])
     assert result.exit_code == 0
     assert mock_logseq_query.call_count == 1
@@ -74,7 +75,7 @@ def test_search_with_tags(mock_logseq_query: Mock, tags: List[str], expected_que
 
 def test_simple_text_output(
     mock_logseq_query: Mock,
-    unsorted_blocks: List[Block],
+    unsorted_blocks: list[Block],
 ) -> None:
     mock_logseq_query.return_value = unsorted_blocks
     result = CliRunner().invoke(app, ["tasks"])
@@ -89,7 +90,7 @@ def test_simple_text_output(
 
 
 @pytest.mark.parametrize("tags", [[], ["tag1", "tag2"]])
-def test_kanban_with_multiple_tags_needs_output_path(tags: List[str]) -> None:
+def test_kanban_with_multiple_tags_needs_output_path(tags: list[str]) -> None:
     result = CliRunner().invoke(app, ["tasks", *tags, "--format", "kanban"])
     assert result.exit_code == 1
     assert (
@@ -115,7 +116,7 @@ def test_doesnt_add_kanban_when_pages_doesnt_exist(
     mock_generate_kanban_id: Mock,
     mock_logseq_query: Mock,
     shared_datadir: Path,
-    unsorted_blocks: List[Block],
+    unsorted_blocks: list[Block],
 ) -> None:
     mock_generate_kanban_id.return_value = UUID("d15eb569-5de7-41f0-bef8-d0dbef87260f")
     mock_logseq_query.return_value = unsorted_blocks
@@ -137,7 +138,7 @@ def test_add_new_kanban_to_existing_file(
     mock_generate_kanban_id: Mock,
     mock_logseq_query: Mock,
     shared_datadir: Path,
-    unsorted_blocks: List[Block],
+    unsorted_blocks: list[Block],
 ) -> None:
     mock_generate_kanban_id.return_value = UUID("7991f73d-628a-4f98-af7a-901e2f51caa6")
     mock_logseq_query.return_value = unsorted_blocks
@@ -148,14 +149,13 @@ def test_add_new_kanban_to_existing_file(
     assert (
         result.stdout == f"Page URL: logseq://graph/my-notes?page=without-kanban{os.linesep}"
         f"Kanban board being added to {before}{os.linesep}"
-        f"✨ Done.{os.linesep}"
     )
     assert before.read_text() == (shared_datadir / "with-kanban.md").read_text().rstrip(os.linesep)
 
 
 def test_blocks_sorted_by_date(
-    unsorted_blocks: List[Block],
-    blocks_sorted_by_date_content: List[Block],
+    unsorted_blocks: list[Block],
+    blocks_sorted_by_date_content: list[Block],
 ) -> None:
     assert Block.sort_by_date(unsorted_blocks) == blocks_sorted_by_date_content
 
@@ -167,7 +167,7 @@ def test_update_existing_kanban(
     suffix: str,
     mock_logseq_query: Mock,
     shared_datadir: Path,
-    unsorted_blocks: List[Block],
+    unsorted_blocks: list[Block],
 ) -> None:
     mock_generate_kanban_id.return_value = UUID("dafe4e19-0e06-44ce-8113-f1a5c84f6286")
     mock_logseq_query.return_value = unsorted_blocks
@@ -178,7 +178,6 @@ def test_update_existing_kanban(
     assert (
         result.stdout == f"Page URL: logseq://graph/my-notes?page={before.stem}{os.linesep}"
         f"Kanban board being updated at {before}{os.linesep}"
-        f"✨ Done.{os.linesep}"
     )
 
     assert before.read_text() == (shared_datadir / f"modified-kanban{suffix}.md").read_text().rstrip(os.linesep)

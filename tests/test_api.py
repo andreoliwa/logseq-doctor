@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import json
 import os
 from pathlib import Path
-from typing import Optional
 from uuid import UUID
 
 import pytest
@@ -172,7 +173,7 @@ def test_find_block_by_outline_content(existing_kanban: Page) -> None:
 def test_find_block_within_start_end_offsets(
     datadir: Path,
     search_string: str,
-    expected: Optional[Slice],
+    expected: Slice | None,
 ) -> None:
     page = Page(datadir / "within-start-end.md")
     assert page.find_slice(search_string, start=43, end=161) == expected

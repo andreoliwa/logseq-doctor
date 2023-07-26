@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 120
-target-version = ['py37']
+target-version = ['py38']
 
 [tool.poetry]
 name = "logseq-doctor"
@@ -38,7 +38,7 @@ classifiers = [
 lsd = "logseq_doctor.cli:app"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 click = "*"
 mistletoe = "*"
 requests = "*"
@@ -73,13 +73,16 @@ ignore = [
     "E501", # Line too long
     "ERA", # https://beta.ruff.rs/docs/rules/#eradicate-era
     "FBT", # https://beta.ruff.rs/docs/rules/#flake8-boolean-trap-fbt
+    "FIX002", # Line contains TO DO, consider resolving the issue
+    "TD002", # Missing author in TO DO; try: ? or ?
+    "TD003", # Missing issue link on the line following this TO DO
 ]
 
 # https://beta.ruff.rs/docs/settings/#line-length
 line-length = 120
 
 # https://beta.ruff.rs/docs/settings/#target-version
-target-version = "py37"
+target-version = "py38"
 
 # https://beta.ruff.rs/docs/settings/#src
 src = ["src"]
@@ -108,10 +111,12 @@ max-complexity = 10
 # T201 `print` found
 # T203 `pprint` found
 # TCH003 Move standard library import into a type-checking block
+# UP006 non-pep585-annotation: it seems like a bug in Ruff because target-version is set to py38
 "ci/bootstrap.py" = ["ALL"]
 "docs/**" = ["ANN", "INP001", "T201", "T203"]
 "docs/conf.py" = ["A001"]
-"src/logseq_doctor/cli.py" = ["B008", "PLR0913"]
+"src/logseq_doctor/api.py" = ["UP006"]
+"src/logseq_doctor/cli.py" = ["B008", "PLR0913", "UP006"]
 "tests/**" = ["PLR0913", "S101", "S105", "T201", "T203", "D103", "D100", "INP001", "TCH003"]
 "tests/data/**" = ["INP001"]
 
