@@ -5,8 +5,9 @@ import os
 import urllib.parse
 from dataclasses import dataclass, field
 from io import SEEK_END
+from pathlib import Path  # noqa: TCH003 Typer needs this import to infer the type of the argument
 from textwrap import dedent, indent
-from typing import TYPE_CHECKING, TextIO
+from typing import List, TextIO
 from uuid import UUID, uuid4
 
 import requests
@@ -22,9 +23,6 @@ from logseq_doctor.constants import (
     SPACE,
     TAB,
 )
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -79,7 +77,7 @@ class Logseq:
         """Return the graph name from the path."""
         return self.graph_path.stem
 
-    def query(self, query: str) -> list[Block]:
+    def query(self, query: str) -> List[Block]:
         """Query Logseq API."""
         session = requests.Session()
         session.headers.update(
@@ -91,7 +89,7 @@ class Logseq:
         resp = session.post(f"{self.url}/api", json={"method": "logseq.db.q", "args": [query]})
         resp.raise_for_status()
 
-        rows: list[Block] = []
+        rows: List[Block] = []
         for obj in resp.json():
             page = obj.get("page", {})
             block_id = obj.get("uuid")

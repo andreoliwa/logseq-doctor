@@ -111,10 +111,12 @@ max-complexity = 10
 # T201 `print` found
 # T203 `pprint` found
 # TCH003 Move standard library import into a type-checking block
+# UP006 non-pep585-annotation: it seems like a bug in Ruff because target-version is set to py38
 "ci/bootstrap.py" = ["ALL"]
 "docs/**" = ["ANN", "INP001", "T201", "T203"]
 "docs/conf.py" = ["A001"]
-"src/logseq_doctor/cli.py" = ["B008", "PLR0913"]
+"src/logseq_doctor/api.py" = ["UP006"]
+"src/logseq_doctor/cli.py" = ["B008", "PLR0913", "UP006"]
 "tests/**" = ["PLR0913", "S101", "S105", "T201", "T203", "D103", "D100", "INP001", "TCH003"]
 "tests/data/**" = ["INP001"]
 
