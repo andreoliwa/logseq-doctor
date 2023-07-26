@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 120
-target-version = ['py37']
+target-version = ['py38']
 
 [tool.poetry]
 name = "logseq-doctor"
@@ -38,7 +38,7 @@ classifiers = [
 lsd = "logseq_doctor.cli:app"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 click = "*"
 mistletoe = "*"
 requests = "*"
@@ -79,7 +79,7 @@ ignore = [
 line-length = 120
 
 # https://beta.ruff.rs/docs/settings/#target-version
-target-version = "py37"
+target-version = "py38"
 
 # https://beta.ruff.rs/docs/settings/#src
 src = ["src"]
