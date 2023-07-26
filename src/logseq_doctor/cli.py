@@ -13,9 +13,11 @@ Why does this file exist, and why not put this in __main__?
 
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
+from __future__ import annotations
+
 import re
 from enum import Enum
-from pathlib import Path
+from pathlib import Path  # noqa: TCH003 Typer needs this import to infer the type of the argument
 from typing import List
 
 import typer
@@ -144,7 +146,6 @@ def tasks(
                 raise typer.Exit(1) from err
 
         page.remove_line_break()
-        typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
         return
 
     for block in blocks_sorted_by_date:
