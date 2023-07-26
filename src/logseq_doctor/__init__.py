@@ -65,7 +65,7 @@ class LogseqRenderer(BaseRenderer):
         value_before_changing_level = self.outline(self.current_level - 1, headless_parent_with_children, nl=False)
 
         self.current_level -= 1
-        return value_before_changing_level  # noqa: RET504
+        return value_before_changing_level
 
     def render_thematic_break(self, token: block_token.ThematicBreak) -> str:  # noqa: ARG002
         """Render a horizontal rule as a line of dashes."""

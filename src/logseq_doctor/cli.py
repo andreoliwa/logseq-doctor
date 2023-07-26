@@ -13,15 +13,19 @@ Why does this file exist, and why not put this in __main__?
 
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
+from __future__ import annotations
+
 import re
 from enum import Enum
-from pathlib import Path
-from typing import List
+from typing import TYPE_CHECKING
 
 import typer
 
 from logseq_doctor import flat_markdown_to_outline
 from logseq_doctor.api import Block, Kanban, Logseq, Page
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -39,7 +43,7 @@ def outline(text_file: typer.FileText) -> None:
 
 @app.command()
 def tidy_up(
-    markdown_file: List[Path] = typer.Argument(
+    markdown_file: list[Path] = typer.Argument(
         ...,
         help="Markdown files to tidy up",
         exists=True,
@@ -66,7 +70,7 @@ class TaskFormat(str, Enum):
 
 @app.command()
 def tasks(
-    tag_or_page: List[str] = typer.Argument(None, metavar="TAG", help="Tags or pages to query"),
+    tag_or_page: list[str] = typer.Argument(None, metavar="TAG", help="Tags or pages to query"),
     logseq_host_url: str = typer.Option(..., "--host", "-h", help="Logseq host", envvar="LOGSEQ_HOST_URL"),
     logseq_api_token: str = typer.Option(..., "--token", "-t", help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
     logseq_graph_path: Path = typer.Option(
@@ -144,7 +148,6 @@ def tasks(
                 raise typer.Exit(1) from err
 
         page.remove_line_break()
-        typer.secho("✨ Done.", fg=typer.colors.BRIGHT_WHITE, bold=True)
         return
 
     for block in blocks_sorted_by_date:

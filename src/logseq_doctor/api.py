@@ -1,11 +1,12 @@
 """Logseq API client."""
+from __future__ import annotations
+
 import os
 import urllib.parse
 from dataclasses import dataclass, field
 from io import SEEK_END
-from pathlib import Path
 from textwrap import dedent, indent
-from typing import List, Optional, TextIO, Tuple
+from typing import TYPE_CHECKING, TextIO
 from uuid import UUID, uuid4
 
 import requests
@@ -21,6 +22,9 @@ from logseq_doctor.constants import (
     SPACE,
     TAB,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -57,7 +61,7 @@ class Block:
         return indent(dedent(text.replace(TAB, NBSP)).strip().replace(NBSP, TAB), spaces) + (os.linesep if nl else "")
 
     @staticmethod
-    def sort_by_date(blocks: List) -> List:
+    def sort_by_date(blocks: list) -> list:
         """Sort a list of blocks by date."""
         return sorted(blocks, key=lambda row: (row.journal_iso_date, row.raw_content))
 
@@ -75,7 +79,7 @@ class Logseq:
         """Return the graph name from the path."""
         return self.graph_path.stem
 
-    def query(self, query: str) -> List[Block]:
+    def query(self, query: str) -> list[Block]:
         """Query Logseq API."""
         session = requests.Session()
         session.headers.update(
@@ -87,7 +91,7 @@ class Logseq:
         resp = session.post(f"{self.url}/api", json={"method": "logseq.db.q", "args": [query]})
         resp.raise_for_status()
 
-        rows: List[Block] = []
+        rows: list[Block] = []
         for obj in resp.json():
             page = obj.get("page", {})
             block_id = obj.get("uuid")
@@ -102,7 +106,7 @@ class Logseq:
             )
         return rows
 
-    def page_from_name(self, name: str) -> "Page":
+    def page_from_name(self, name: str) -> Page:
         """Return a Page object from a page name."""
         return Page(self.graph_path.expanduser() / "pages" / f"{name}.md")
 
@@ -196,9 +200,9 @@ class Page:
         search_string: str,
         *,
         start: int = 0,
-        end: int = None,
-        level: int = None,
-    ) -> Optional[Slice]:
+        end: int | None = None,
+        level: int | None = None,
+    ) -> Slice | None:
         """Find a slice of Markdown blocks in a Logseq page."""
         try:
             # TODO: The right way would be to navigate the Markdown AST.
@@ -248,7 +252,7 @@ class Page:
             return None
 
     @staticmethod
-    def _find_previous_line_break(relative_content: str, pos_search_string: int, level: int = None) -> int:
+    def _find_previous_line_break(relative_content: str, pos_search_string: int, level: int | None = None) -> int:
         if level is None:
             bullet = DASH + SPACE
             previous_dash = relative_content[:pos_search_string].rfind(bullet)
@@ -267,7 +271,7 @@ class Kanban:
     """Create/update the Kanban board used by the https://github.com/sethyuan/logseq-plugin-kanban-board plugin."""
 
     page: Page
-    blocks: List[Block]
+    blocks: list[Block]
 
     _renderer: Slice = field(init=False)
 
@@ -294,7 +298,7 @@ class Kanban:
         )
 
     @staticmethod
-    def render_column(column: str) -> Tuple[str, str]:
+    def render_column(column: str) -> tuple[str, str]:
         """Render a column for the Kanban board."""
         key = f"{KANBAN_LIST}:: {column}"
         card = Block.indent(

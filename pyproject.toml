@@ -73,6 +73,9 @@ ignore = [
     "E501", # Line too long
     "ERA", # https://beta.ruff.rs/docs/rules/#eradicate-era
     "FBT", # https://beta.ruff.rs/docs/rules/#flake8-boolean-trap-fbt
+    "FIX002", # Line contains TO DO, consider resolving the issue
+    "TD002", # Missing author in TO DO; try: ? or ?
+    "TD003", # Missing issue link on the line following this TO DO
 ]
 
 # https://beta.ruff.rs/docs/settings/#line-length
