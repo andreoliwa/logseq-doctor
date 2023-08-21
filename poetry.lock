@@ -278,13 +278,13 @@ files = [
 
 [[package]]
 name = "mistletoe"
-version = "1.1.0"
+version = "1.2.0"
 description = "A fast, extensible Markdown parser in pure Python."
 optional = false
 python-versions = "~=3.5"
 files = [
-    {file = "mistletoe-1.1.0-py3-none-any.whl", hash = "sha256:6a72aebf783bf546cb7c7a85835d1492e3a0be01584aafe021f46118c27f882d"},
-    {file = "mistletoe-1.1.0.tar.gz", hash = "sha256:c17464a4a20d030524123a9c9ebd6a70e41c5ad96b6e6b54ac48cf07ca3add72"},
+    {file = "mistletoe-1.2.0-py3-none-any.whl", hash = "sha256:637a87afacb5eb033b4e47faa059f6c45386e911c7f3defff4e854e061759294"},
+    {file = "mistletoe-1.2.0.tar.gz", hash = "sha256:3ad979a94207792456573604f57df36a22fb1a4c81d7f9d1b9f3eca88608a0ab"},
 ]
 
 [[package]]
