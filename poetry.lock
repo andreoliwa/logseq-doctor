@@ -383,13 +383,13 @@ pytest = ">=5.0"
 
 [[package]]
 name = "pytest-env"
-version = "0.8.2"
+version = "1.0.0"
 description = "py.test plugin that allows you to add environment variables."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pytest_env-0.8.2-py3-none-any.whl", hash = "sha256:5e533273f4d9e6a41c3a3120e0c7944aae5674fa773b329f00a5eb1f23c53a38"},
-    {file = "pytest_env-0.8.2.tar.gz", hash = "sha256:baed9b3b6bae77bd75b9238e0ed1ee6903a42806ae9d6aeffb8754cd5584d4ff"},
+    {file = "pytest_env-1.0.0-py3-none-any.whl", hash = "sha256:c5ec593abf2430e21aec5b62ef50a0d894de634e84c935a44f3fe9663c5868c6"},
+    {file = "pytest_env-1.0.0.tar.gz", hash = "sha256:3265fe88f570337635689bacd9dafbe6e227c524abdb2b0f46454d6b6011a51c"},
 ]
 
 [package.dependencies]
