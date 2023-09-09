@@ -25,6 +25,6 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.8.1
+    rev: v3.8.2
     hooks:
     - id: commitizen
