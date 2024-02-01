@@ -10,14 +10,14 @@ insert_final_newline = true
 indent_size = 4
 charset = utf-8
 
-[*.{js,json,json5}]
+[*.{js,json,json5,yml,yaml,md,rb}]
 indent_size = 2
 
 [*.{bat,cmd,ps1}]
 end_of_line = crlf
 
-[*.{yml,yaml,md}]
-indent_size = 2
-
 [*.tsv]
+indent_style = tab
+
+[Makefile]
 indent_style = tab

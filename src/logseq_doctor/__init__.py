@@ -1,4 +1,5 @@
 """Logseq Doctor: heal your Markdown files."""
+
 from __future__ import annotations
 
 import os

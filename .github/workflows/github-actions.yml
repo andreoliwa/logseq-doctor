@@ -9,100 +9,101 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'docs'
-            python: '3.9'
-            toxpython: 'python3.9'
-            tox_env: 'docs'
-            os: 'ubuntu-latest'
-          - name: 'py38 (ubuntu)'
-            python: '3.8'
-            toxpython: 'python3.8'
-            python_arch: 'x64'
-            tox_env: 'py38'
-            os: 'ubuntu-latest'
-#          - name: 'py38 (windows)'
-#            python: '3.8'
-#            toxpython: 'python3.8'
-#            python_arch: 'x64'
-#            tox_env: 'py38'
-#            os: 'windows-latest'
-          - name: 'py38 (macos)'
-            python: '3.8'
-            toxpython: 'python3.8'
-            python_arch: 'x64'
-            tox_env: 'py38'
-            os: 'macos-latest'
-          - name: 'py39 (ubuntu) + coverage'
-            python: '3.9'
-            toxpython: 'python3.9'
-            python_arch: 'x64'
-            tox_env: 'clean,py39,report'
-            os: 'ubuntu-latest'
+          - name: "docs"
+            python: "3.9"
+            toxpython: "python3.9"
+            tox_env: "docs"
+            os: "ubuntu-latest"
+          - name: "py38 (ubuntu)"
+            python: "3.8"
+            toxpython: "python3.8"
+            python_arch: "x64"
+            tox_env: "py38"
+            os: "ubuntu-latest"
+          #          - name: 'py38 (windows)'
+          #            python: '3.8'
+          #            toxpython: 'python3.8'
+          #            python_arch: 'x64'
+          #            tox_env: 'py38'
+          #            os: 'windows-latest'
+          - name: "py38 (macos)"
+            python: "3.8"
+            toxpython: "python3.8"
+            python_arch: "x64"
+            tox_env: "py38"
+            os: "macos-latest"
+          - name: "py39 (ubuntu) + coverage"
+            python: "3.9"
+            toxpython: "python3.9"
+            python_arch: "x64"
+            tox_env: "clean,py39,report"
+            os: "ubuntu-latest"
             codecov: true
-#          - name: 'py39 (windows)'
-#            python: '3.9'
-#            toxpython: 'python3.9'
-#            python_arch: 'x64'
-#            tox_env: 'py39'
-#            os: 'windows-latest'
-          - name: 'py39 (macos)'
-            python: '3.9'
-            toxpython: 'python3.9'
-            python_arch: 'x64'
-            tox_env: 'py39'
-            os: 'macos-latest'
-          - name: 'py310 (ubuntu)'
-            python: '3.10'
-            toxpython: 'python3.10'
-            python_arch: 'x64'
-            tox_env: 'py310'
-            os: 'ubuntu-latest'
+          #          - name: 'py39 (windows)'
+          #            python: '3.9'
+          #            toxpython: 'python3.9'
+          #            python_arch: 'x64'
+          #            tox_env: 'py39'
+          #            os: 'windows-latest'
+          - name: "py39 (macos)"
+            python: "3.9"
+            toxpython: "python3.9"
+            python_arch: "x64"
+            tox_env: "py39"
+            os: "macos-latest"
+          - name: "py310 (ubuntu)"
+            python: "3.10"
+            toxpython: "python3.10"
+            python_arch: "x64"
+            tox_env: "py310"
+            os: "ubuntu-latest"
           # TODO: tests are failing on Windows because of line breaks
-#          - name: 'py310 (windows)'
-#            python: '3.10'
-#            toxpython: 'python3.10'
-#            python_arch: 'x64'
-#            tox_env: 'py310'
-#            os: 'windows-latest'
-          - name: 'py310 (macos)'
-            python: '3.10'
-            toxpython: 'python3.10'
-            python_arch: 'x64'
-            tox_env: 'py310'
-            os: 'macos-latest'
+          #          - name: 'py310 (windows)'
+          #            python: '3.10'
+          #            toxpython: 'python3.10'
+          #            python_arch: 'x64'
+          #            tox_env: 'py310'
+          #            os: 'windows-latest'
+          - name: "py310 (macos)"
+            python: "3.10"
+            toxpython: "python3.10"
+            python_arch: "x64"
+            tox_env: "py310"
+            os: "macos-latest"
           # TODO: add Python 3.11
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python }}
-        architecture: ${{ matrix.python_arch }}
-    - name: install dependencies
-      run: |
-        python -mpip install --progress-bar=off -r ci/requirements.txt
-        virtualenv --version
-        pip --version
-        tox --version
-        pip list --format=freeze
-    # Thanks to https://github.com/lsst-sqre/safir/blob/master/.github/workflows/ci.yaml
-      # TODO: disable cache for now
-#    - name: Cache tox environments
-#      id: cache-tox
-#      uses: actions/cache@v3
-#      with:
-#        path: .tox
-#        # setup.cfg and pyproject.toml have versioning info that would
-#        # impact the tox environment.
-#        key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}
-    - name: test
-      env:
-        TOXPYTHON: '${{ matrix.toxpython }}'
-      run: >
-        tox -e ${{ matrix.tox_env }} -v
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          architecture: ${{ matrix.python_arch }}
+      - name: install dependencies
+        run: |
+          python -mpip install --progress-bar=off -r ci/requirements.txt
+          virtualenv --version
+          pip --version
+          tox --version
+          pip list --format=freeze
+        # TODO: disable cache for now
+      # Thanks to https://github.com/lsst-sqre/safir/blob/master/.github/workflows/ci.yaml
+      #    - name: Cache tox environments
+      #      id: cache-tox
+      #      uses: actions/cache@v3
+      #      with:
+      #        path: .tox
+      #        # setup.cfg and pyproject.toml have versioning info that would
+      #        # impact the tox environment.
+      #        key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}
+      - name: test
+        env:
+          TOXPYTHON: "${{ matrix.toxpython }}"
+        run: >
+          tox -e ${{ matrix.tox_env }} -v
     # https://github.com/codecov/example-python
     # TODO: codecov is not working
+
 #    - name: "Upload coverage to Codecov"
 #      uses: codecov/codecov-action@v3
 #      if: ${{ matrix.codecov }}
