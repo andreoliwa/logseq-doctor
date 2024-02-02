@@ -23,7 +23,7 @@ from typing import List
 
 import typer
 
-from logseq_doctor import flat_markdown_to_outline
+from logseq_doctor import _logseq_doctor, flat_markdown_to_outline
 from logseq_doctor.api import Block, Logseq
 
 app = typer.Typer(no_args_is_help=True)
@@ -51,13 +51,14 @@ def tidy_up(
         writable=True,
     ),
 ) -> None:
-    """Tidy up your Markdown files by removing empty bullets in any block."""
+    """Tidy up your Markdown files by removing empty bullets and double spaces in any block."""
     for each_file in markdown_file:
         old_contents = each_file.read_text()
-        new_contents = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
-        if old_contents != new_contents:
-            typer.echo(f"removed empty bullets from {each_file}")
-            each_file.write_text(new_contents)
+        rm_empty_bullets = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
+        rm_double_spaces = _logseq_doctor.rust_remove_consecutive_spaces(rm_empty_bullets)
+        if old_contents != rm_double_spaces:
+            typer.echo(f"removed empty bullets and double spaces from {each_file}")
+            each_file.write_text(rm_double_spaces)
 
 
 class TaskFormat(str, Enum):
