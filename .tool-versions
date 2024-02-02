@@ -1,2 +1,2 @@
 poetry 1.7.1
-pre-commit 3.5.0  # no more support for Python 3.8: https://github.com/pre-commit/pre-commit/releases/tag/v3.6.0
+pre-commit 3.6.0  # no more support for Python 3.8: https://github.com/pre-commit/pre-commit/releases/tag/v3.6.0
