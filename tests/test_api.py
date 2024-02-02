@@ -7,7 +7,6 @@ from uuid import UUID
 
 import pytest
 import responses
-
 from logseq_doctor.api import Block, Logseq, Page, Slice
 from logseq_doctor.constants import KANBAN_BOARD_SEARCH_STRING
 
