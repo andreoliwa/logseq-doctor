@@ -1,9 +1,8 @@
 import os
 from pathlib import Path
 
-from typer.testing import CliRunner
-
 from logseq_doctor.cli import app
+from typer.testing import CliRunner
 
 
 def test_remove_empty_bullets_from_multiple_files(datadir: Path) -> None:
