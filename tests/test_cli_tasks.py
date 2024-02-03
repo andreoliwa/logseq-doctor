@@ -5,10 +5,9 @@ from unittest.mock import Mock, patch
 from uuid import UUID
 
 import pytest
-from typer.testing import CliRunner
-
 from logseq_doctor.api import Block, Logseq
 from logseq_doctor.cli import app
+from typer.testing import CliRunner
 
 
 @pytest.fixture()

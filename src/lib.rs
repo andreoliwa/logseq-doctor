@@ -33,9 +33,13 @@ fn rust_remove_consecutive_spaces(file_contents: String) -> PyResult<String> {
 /// assert_eq!(remove_consecutive_spaces(
 ///     "    -   This   is   a  test\n   Another  test\n-  Dash  line  here   with   extra  spaces".to_string()).unwrap(),
 ///     "    - This is a test\n   Another  test\n- Dash line here with extra spaces".to_string());
+///
+/// let ends_with_linebreak = "- Root\n  - Child\n";
+/// assert_eq!(remove_consecutive_spaces(ends_with_linebreak.to_string()).unwrap(), ends_with_linebreak);
 /// ```
 pub fn remove_consecutive_spaces(file_contents: String) -> Result<String, ()> {
     let space_re = Regex::new(r" {2,}").unwrap();
+    let ends_with_linebreak = file_contents.ends_with('\n');
 
     let result = file_contents
         .lines()
@@ -53,5 +57,12 @@ pub fn remove_consecutive_spaces(file_contents: String) -> Result<String, ()> {
         .collect::<Vec<_>>()
         .join("\n");
 
-    Ok(result)
+    // Append a line break if the original string ended with one
+    let final_result = if ends_with_linebreak {
+        format!("{}\n", result)
+    } else {
+        result
+    };
+
+    Ok(final_result)
 }
