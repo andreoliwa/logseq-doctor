@@ -70,7 +70,42 @@ jobs:
             python_arch: "x64"
             tox_env: "py310"
             os: "macos-latest"
-          # TODO: add Python 3.11
+          - name: "py311 (ubuntu)"
+            python: "3.11"
+            toxpython: "python3.11"
+            python_arch: "x64"
+            tox_env: "py311"
+            os: "ubuntu-latest"
+          #          - name: 'py311 (windows)'
+          #            python: '3.11'
+          #            toxpython: 'python3.11'
+          #            python_arch: 'x64'
+          #            tox_env: 'py311'
+          #            os: 'windows-latest'
+          - name: "py311 (macos)"
+            python: "3.11"
+            toxpython: "python3.11"
+            python_arch: "x64"
+            tox_env: "py311"
+            os: "macos-latest"
+          - name: "py312 (ubuntu)"
+            python: "3.12"
+            toxpython: "python3.12"
+            python_arch: "x64"
+            tox_env: "py312"
+            os: "ubuntu-latest"
+          #          - name: 'py312 (windows)'
+          #            python: '3.12'
+          #            toxpython: 'python3.12'
+          #            python_arch: 'x64'
+          #            tox_env: 'py312'
+          #            os: 'windows-latest'
+          - name: "py312 (macos)"
+            python: "3.12"
+            toxpython: "python3.12"
+            python_arch: "x64"
+            tox_env: "py312"
+            os: "macos-latest"
     steps:
       - uses: actions/checkout@v4
         with:
