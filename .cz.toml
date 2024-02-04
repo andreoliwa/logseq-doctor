@@ -9,7 +9,7 @@ pre_bump_hooks = [
 ]
 tag_format = "v$version"
 update_changelog_on_bump = true
-version = "0.1.1"
+version = "0.2.0"
 version_files = [
   "docs/conf.py:version = release",
   "pyproject.toml:version =",

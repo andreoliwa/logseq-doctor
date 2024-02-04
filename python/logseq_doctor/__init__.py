@@ -8,7 +8,7 @@ import mistletoe
 from mistletoe import block_token, span_token, token
 from mistletoe.base_renderer import BaseRenderer
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 DASH = "-"
 
