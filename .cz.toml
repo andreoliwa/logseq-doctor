@@ -1,6 +1,7 @@
 # https://commitizen-tools.github.io/commitizen/bump/#configuration
 
 [tool.commitizen]
+annotated_tag = true
 gpg_sign = true
 major_version_zero = true
 name = "cz_conventional_commits"

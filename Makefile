@@ -56,5 +56,6 @@ release: # Bump the version, create a tag, commit and push. This will trigger th
 
 .release-post-bump:
 	git push --atomic origin master ${CZ_POST_CURRENT_TAG_VERSION}
-	gh release create ${CZ_POST_CURRENT_TAG_VERSION} -F ${CZ_POST_CHANGELOG_FILE_NAME}
+	gh release create ${CZ_POST_CURRENT_TAG_VERSION} --notes-from-tag
+	gh repo view --web
 .PHONY: .release-post-bump
