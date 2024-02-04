@@ -1,4 +1,4 @@
-name: build
+name: Python (tox)
 on: [push]
 jobs:
   test:
