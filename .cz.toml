@@ -4,6 +4,9 @@
 gpg_sign = true
 major_version_zero = true
 name = "cz_conventional_commits"
+post_bump_hooks = [
+  "make .release-post-bump",
+]
 pre_bump_hooks = [
   "make build",
 ]

@@ -51,6 +51,10 @@ test-watch: # Run tests and watch for changes
 release: # Bump the version, create a tag, commit and push. This will trigger the PyPI release on GitHub Actions
 	# https://commitizen-tools.github.io/commitizen/bump/#configuration
 	# See also: cz bump --help
-	cz bump --check-consistency
-	git push --atomic --tags
+	cz bump --dry-run --check-consistency 0.2.1
 .PHONY: release
+
+.release-post-bump:
+	git push --atomic origin master ${CZ_POST_CURRENT_TAG_VERSION}
+	gh release create ${CZ_POST_CURRENT_TAG_VERSION} -F ${CZ_POST_CHANGELOG_FILE_NAME}
+.PHONY: .release-post-bump
