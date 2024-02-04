@@ -14,6 +14,12 @@ jobs:
         with:
           # https://github.com/marketplace/actions/skip-duplicate-actions#skip-concurrent-workflow-runs
           concurrent_skipping: "same_content_newer"
+          # https://github.com/marketplace/actions/skip-duplicate-actions#cancel_others
+          cancel_others: true
+          # https://github.com/marketplace/actions/skip-duplicate-actions#do_not_skip
+          do_not_skip: '["workflow_dispatch", "schedule", "merge_group", "release"]'
+          # https://github.com/marketplace/actions/skip-duplicate-actions#paths
+          paths: '["Cargo.*", "pyproject.toml", "tox.ini", "python/**", "rust/**", "tests/**"]'
 
   test:
     needs: pre_job
@@ -143,9 +149,8 @@ jobs:
       #      uses: actions/cache@v3
       #      with:
       #        path: .tox
-      #        # setup.cfg and pyproject.toml have versioning info that would
-      #        # impact the tox environment.
-      #        key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}
+      #        # These files have versioning info that would impact the tox environment
+      #        key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
       - name: test
         env:
           TOXPYTHON: "${{ matrix.toxpython }}"
