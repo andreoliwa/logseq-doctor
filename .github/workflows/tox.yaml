@@ -15,7 +15,8 @@ jobs:
           # https://github.com/marketplace/actions/skip-duplicate-actions#skip-concurrent-workflow-runs
           concurrent_skipping: "same_content_newer"
           # https://github.com/marketplace/actions/skip-duplicate-actions#cancel_others
-          cancel_others: true
+          # Don't cancel other jobs, they might be pushes to master
+          cancel_others: false
           # https://github.com/marketplace/actions/skip-duplicate-actions#do_not_skip
           do_not_skip: '["workflow_dispatch", "schedule", "merge_group", "release"]'
           # https://github.com/marketplace/actions/skip-duplicate-actions#paths
