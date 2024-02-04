@@ -7,8 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     # Map a step output to a job output
     outputs:
-      # Don't skip jobs when pushing to master
-      should_skip: ${{ steps.skip_check.outputs.should_skip && ! (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@v5
