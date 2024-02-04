@@ -52,6 +52,8 @@ release: # Bump the version, create a tag, commit and push. This will trigger th
 	# https://commitizen-tools.github.io/commitizen/bump/#configuration
 	# See also: cz bump --help
 	cz bump --check-consistency
+	# TODO: publish the Rust crate on GitHub Actions instead of locally
+	cargo publish -p logseq --locked
 .PHONY: release
 
 .release-post-bump:
