@@ -73,3 +73,9 @@ docs/_build
 
 # Mypy Cache
 .mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# Rust
+target/

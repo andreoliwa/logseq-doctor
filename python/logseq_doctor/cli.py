@@ -5,14 +5,15 @@ Why does this file exist, and why not put this in __main__?
   You might be tempted to import things from __main__ later, but that will cause
   problems: the code will get executed twice:
 
-  - When you run `python -mlogseq_doctor` python will execute
+  - When you run `python -m logseq_doctor` python will execute
     ``__main__.py`` as a script. That means there won't be any
     ``logseq_doctor.__main__`` in ``sys.modules``.
   - When you import __main__ it will get executed again (as a module) because
     there's no ``logseq_doctor.__main__`` in ``sys.modules``.
 
-  Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
+  Also see (1) from https://click.pocoo.org/5/setuptools/#setuptools-integration
 """
+
 from __future__ import annotations
 
 import re
@@ -22,8 +23,8 @@ from typing import List
 
 import typer
 
-from logseq_doctor import flat_markdown_to_outline
-from logseq_doctor.api import Block, Kanban, Logseq, Page
+from logseq_doctor import flat_markdown_to_outline, rust_ext
+from logseq_doctor.api import Block, Logseq
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -50,20 +51,20 @@ def tidy_up(
         writable=True,
     ),
 ) -> None:
-    """Tidy up your Markdown files by removing empty bullets in any block."""
+    """Tidy up your Markdown files by removing empty bullets and double spaces in any block."""
     for each_file in markdown_file:
         old_contents = each_file.read_text()
-        new_contents = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
-        if old_contents != new_contents:
-            typer.echo(f"removed empty bullets from {each_file}")
-            each_file.write_text(new_contents)
+        rm_empty_bullets = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
+        rm_double_spaces = rust_ext.remove_consecutive_spaces(rm_empty_bullets)
+        if old_contents != rm_double_spaces:
+            typer.echo(f"removed empty bullets and double spaces from {each_file}")
+            each_file.write_text(rm_double_spaces)
 
 
 class TaskFormat(str, Enum):
     """Task format."""
 
     text = "text"
-    kanban = "kanban"
 
 
 @app.command()
@@ -80,40 +81,9 @@ def tasks(
         dir_okay=True,
         file_okay=False,
     ),
-    format_: TaskFormat = typer.Option(
-        TaskFormat.text,
-        "--format",
-        "--pretty",
-        "-f",
-        help="Output format",
-        case_sensitive=False,
-    ),
-    output_path: Path = typer.Option(
-        None,
-        "--output",
-        "-o",
-        help="Output path (used only on the Kanban output format)",
-        file_okay=True,
-        dir_okay=False,
-        writable=True,
-    ),
 ) -> None:
     """List tasks in Logseq."""
     logseq = Logseq(logseq_host_url, logseq_api_token, logseq_graph_path)
-    if format_ == TaskFormat.kanban:
-        if not output_path and len(tag_or_page) == 1:
-            first_tag = tag_or_page[0]
-            page = logseq.page_from_name(first_tag)
-            output_path = page.path
-            typer.echo(f"Assuming Kanban file from tag/page name ({first_tag!r})")
-
-        if not output_path:
-            typer.secho(
-                "Kanban format requires an output path when multiple (or no) tags or pages are provided",
-                fg=typer.colors.BRIGHT_RED,
-            )
-            raise typer.Exit(1)
-
     condition = ""
     if tag_or_page:
         if len(tag_or_page) == 1:
@@ -124,30 +94,6 @@ def tasks(
     query = f"(and{condition} (task TODO DOING WAITING NOW LATER))"
 
     blocks_sorted_by_date = Block.sort_by_date(logseq.query(query))
-
-    if format_ == TaskFormat.kanban:
-        page = Page(output_path)
-        page.add_line_break()
-
-        kanban = Kanban(page, blocks_sorted_by_date)
-        typer.echo("Page URL: ", nl=False)
-        typer.secho(page.url(logseq.graph_name), fg=typer.colors.BLUE, bold=True)
-        if kanban.find():
-            typer.echo(f"Kanban board being updated at {output_path}")
-            kanban.update()
-        else:
-            typer.echo(f"Kanban board being added to {output_path}")
-            try:
-                kanban.add()
-            except FileNotFoundError as err:
-                typer.secho(str(err), fg=typer.colors.BRIGHT_RED)
-                typer.secho("Add some content to the page and try again: ", fg=typer.colors.BRIGHT_RED, nl=False)
-                typer.secho(page.url(logseq.graph_name), fg=typer.colors.BLUE, bold=True)
-                raise typer.Exit(1) from err
-
-        page.remove_line_break()
-        return
-
     for block in blocks_sorted_by_date:
         typer.secho(f"{block.page_title}: ", fg=typer.colors.GREEN, nl=False)
         typer.secho(block.url(logseq.graph_name), fg=typer.colors.BLUE, bold=True, nl=False)

@@ -1,0 +1,27 @@
+version: "2"
+checks:
+  file-lines:
+    config:
+      threshold: 1000
+  method-complexity:
+    config:
+      threshold: 10
+plugins:
+  fixme:
+    enabled: false
+  editorconfig:
+    enabled: true
+  git-legal:
+    enabled: true
+  markdownlint:
+    enabled: false
+  pep8:
+    enabled: false
+  radon:
+    enabled: true
+    config:
+      threshold: C
+  sonar-python:
+    enabled: true
+  shellcheck:
+    enabled: true

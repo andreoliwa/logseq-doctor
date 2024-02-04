@@ -35,7 +35,7 @@ If you are proposing a feature:
 Development
 ===========
 
-To set up `logseq-doctor` for local development:
+To set up ``logseq-doctor`` for local development:
 
 1. Fork `logseq-doctor <https://github.com/andreoliwa/logseq-doctor>`_
    (look for the "Fork" button).
