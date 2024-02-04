@@ -1,5 +1,5 @@
 help: # Display this help
-	@cat Makefile | egrep '^[a-z0-9 ./-]*:.*#' | sed -E -e 's/:.+# */@ /g' -e 's/ .+@/@/g' | sort | awk -F@ '{printf "  \033[1;34m%-18s\033[0m %s\n", $$1, $$2}'
+	@cat Makefile | egrep '^[a-z0-9 ./-]*:.*#' | sed -E -e 's/:.+# */@ /g' -e 's/ .+@/@/g' | sort | awk -F@ '{printf "\033[1;34m%-15s\033[0m %s\n", $$1, $$2}'
 .PHONY: help
 
 build: # Build the Rust crate and Python package
@@ -47,3 +47,10 @@ test: # Run tests on both Python and Rust
 test-watch: # Run tests and watch for changes
 	source .tox/py311/bin/activate && ptw --runner "pytest --testmon"
 .PHONY: test-watch
+
+bump-release: # Bump the version, create a tag, commit and push. This will trigger the PyPI release on GitHub Actions
+	# https://commitizen-tools.github.io/commitizen/bump/#configuration
+	# See also: cz bump --help
+	cz bump --check-consistency
+	git push --atomic --tags
+.PHONY: bump-release
