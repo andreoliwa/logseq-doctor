@@ -37,7 +37,7 @@ license = "MIT"
 name = "logseq-doctor"
 readme = "README.rst"
 repository = "https://github.com/andreoliwa/logseq-doctor"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 version = "0.1.1"
 
 [[project.authors]]
@@ -55,7 +55,7 @@ lsd = "logseq_doctor.cli:app"
 
 [tool.black]
 line-length = 120
-target-version = ['py38']
+target-version = ['py39']
 
 # https://www.maturin.rs/config
 [tool.maturin]
@@ -165,11 +165,9 @@ max-complexity = 10
 # T201 `print` found
 # T203 `pprint` found
 # TCH003 Move standard library import into a type-checking block
-# UP006 non-pep585-annotation: it seems like a bug in Ruff because target-version is set to py38
 "ci/bootstrap.py" = ["ALL"]
 "docs/**" = ["ANN", "INP001", "T201", "T203"]
 "docs/conf.py" = ["A001"]
-"python/logseq_doctor/api.py" = ["UP006"]
 "python/logseq_doctor/cli.py" = ["B008", "PLR0913", "UP006"]
 "tests/**" = ["D100", "D103", "INP001", "PLR0913", "S101", "S105", "T201", "T203", "TCH003"]
 "tests/data/**" = ["INP001"]
