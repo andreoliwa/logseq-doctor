@@ -48,9 +48,9 @@ test-watch: # Run tests and watch for changes
 	source .tox/py311/bin/activate && ptw --runner "pytest --testmon"
 .PHONY: test-watch
 
-bump-release: # Bump the version, create a tag, commit and push. This will trigger the PyPI release on GitHub Actions
+release: # Bump the version, create a tag, commit and push. This will trigger the PyPI release on GitHub Actions
 	# https://commitizen-tools.github.io/commitizen/bump/#configuration
 	# See also: cz bump --help
 	cz bump --check-consistency
 	git push --atomic --tags
-.PHONY: bump-release
+.PHONY: release
