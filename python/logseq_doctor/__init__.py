@@ -8,9 +8,9 @@ import mistletoe
 from mistletoe import block_token, span_token, token
 from mistletoe.base_renderer import BaseRenderer
 
-__version__ = "0.2.1"
+from logseq_doctor.constants import CHAR_DASH
 
-DASH = "-"
+__version__ = "0.2.1"
 
 
 class LogseqRenderer(BaseRenderer):
@@ -31,7 +31,7 @@ class LogseqRenderer(BaseRenderer):
         """Setext headings: https://spec.commonmark.org/0.30/#setext-headings."""
         if isinstance(token, block_token.SetextHeading):
             # For now, only dealing with level 2 setext headers (dashes)
-            return self.render_inner(token) + f"{os.linesep}{DASH * 3}{os.linesep}"
+            return self.render_inner(token) + f"{os.linesep}{CHAR_DASH * 3}{os.linesep}"
 
         self.current_level = token.level
         hashes = "#" * token.level
@@ -70,7 +70,7 @@ class LogseqRenderer(BaseRenderer):
 
     def render_thematic_break(self, token: block_token.ThematicBreak) -> str:  # noqa: ARG002
         """Render a horizontal rule as a line of dashes."""
-        return f"{DASH * 3}{os.linesep}"
+        return f"{CHAR_DASH * 3}{os.linesep}"
 
     # TODO: refactor: the methods below are placeholders taken from BaseRenderer.render_map.
     #  - Uncomment them to use them during debugging.

@@ -15,14 +15,14 @@ import requests
 
 from logseq_doctor.constants import (
     BEGINNING,
-    DASH,
+    CHAR_DASH,
+    CHAR_NBSP,
+    CHAR_SPACE,
+    CHAR_TAB,
     KANBAN_BOARD_SEARCH_STRING,
     KANBAN_BOARD_TITLE,
     KANBAN_LIST,
     KANBAN_UNKNOWN_COLUMN,
-    NBSP,
-    SPACE,
-    TAB,
 )
 
 
@@ -56,8 +56,10 @@ class Block:
     @staticmethod
     def indent(text: str, *, level: int = 0, nl: bool = False) -> str:
         """Indent text by the desired level, preserving tabs."""
-        spaces = SPACE * (level * 2)
-        return indent(dedent(text.replace(TAB, NBSP)).strip().replace(NBSP, TAB), spaces) + (os.linesep if nl else "")
+        spaces = CHAR_SPACE * (level * 2)
+        return indent(dedent(text.replace(CHAR_TAB, CHAR_NBSP)).strip().replace(CHAR_NBSP, CHAR_TAB), spaces) + (
+            os.linesep if nl else ""
+        )
 
     @staticmethod
     def sort_by_date(blocks: list) -> list:
@@ -215,12 +217,12 @@ class Page:
             previous_line_break = self._find_previous_line_break(relative_content, pos_search_string, level)
             slice_start = previous_line_break + 1
 
-            column = relative_content[slice_start:].find(DASH)
+            column = relative_content[slice_start:].find(CHAR_DASH)
             if column == -1:
                 column = 0  # TODO: test this case
 
-            spaces = os.linesep + (SPACE * column)
-            spaces_with_dash = spaces + DASH
+            spaces = os.linesep + (CHAR_SPACE * column)
+            spaces_with_dash = spaces + CHAR_DASH
 
             pos_last_line = relative_content[slice_start:].find(spaces_with_dash)
             if pos_last_line == -1:
@@ -253,7 +255,7 @@ class Page:
     @staticmethod
     def _find_previous_line_break(relative_content: str, pos_search_string: int, level: int | None = None) -> int:
         if level is None:
-            bullet = DASH + SPACE
+            bullet = CHAR_DASH + CHAR_SPACE
             previous_dash = relative_content[:pos_search_string].rfind(bullet)
             if previous_dash == -1:
                 msg = "No bullet found before search string"
@@ -261,7 +263,7 @@ class Page:
 
             return relative_content[:previous_dash].rfind(os.linesep)
             # There are no line breaks before on the first line of the file
-        bullet = os.linesep + (SPACE * (level * 2)) + DASH + SPACE
+        bullet = os.linesep + (CHAR_SPACE * (level * 2)) + CHAR_DASH + CHAR_SPACE
         return relative_content[:pos_search_string].rfind(bullet)
 
 
@@ -302,8 +304,8 @@ class Kanban:
         key = f"{KANBAN_LIST}:: {column}"
         card = Block.indent(
             f"""
-            {TAB}- placeholder #.kboard-placeholder
-            {TAB}  {key}
+            {CHAR_TAB}- placeholder #.kboard-placeholder
+            {CHAR_TAB}  {key}
             """,
         )
         return key, card
@@ -317,10 +319,10 @@ class Kanban:
             content = f"{block.page_title}: {block.pretty_content} #[[{block.page_title}]]"
         return Block.indent(
             f"""
-            {TAB}- {content}
-            {TAB}  {KANBAN_LIST}:: {column}
-            {TAB}  collapsed:: true
-            {TAB}{TAB}- {block.embed}
+            {CHAR_TAB}- {content}
+            {CHAR_TAB}  {KANBAN_LIST}:: {column}
+            {CHAR_TAB}  collapsed:: true
+            {CHAR_TAB}{CHAR_TAB}- {block.embed}
             """,
         )
 

@@ -17,14 +17,26 @@ print-config: # Print the configuration used by maturin
 	PYO3_PRINT_CONFIG=1 maturin develop
 .PHONY: print-config
 
-install: # Create the virtualenv
+install: # Create the virtualenv and setup the local development environment
 	@echo $$(basename $$(pwd))
 	pyenv virtualenv $$(basename $$(pwd))
 	pyenv local $$(basename $$(pwd))
+# TODO: keep the list of dev packages in a single place; this was copied from tox.ini
+	$(MAKE) deps
 # Can't activate virtualenv from Makefile · Issue #372 · pyenv/pyenv-virtualenv
 # https://github.com/pyenv/pyenv-virtualenv/issues/372
-	@echo "Run 'pyenv activate' before running maturin commands"
+	@echo "Run 'pyenv activate' then `make smoke' to make sure the development environment is working"
 .PHONY: install
+
+deps: # Install the development dependencies
+	source ~/.pyenv/versions/logseq-doctor/bin/activate && \
+    		python -m pip install -U pip pytest pytest-cov pytest-datadir responses pytest-env pytest-watch pytest-testmon
+	$(MAKE) freeze
+.PHONY: deps
+
+freeze: # Show the installed packages
+	source ~/.pyenv/versions/logseq-doctor/bin/activate && python -m pip freeze
+.PHONY: freeze
 
 uninstall: # Remove the virtualenv
 	-rm .python-version
@@ -48,6 +60,10 @@ test-watch: # Run tests and watch for changes
 	source .tox/py311/bin/activate && ptw --runner "pytest --testmon"
 .PHONY: test-watch
 
+pytest: # Run tests with pytest
+	source ~/.pyenv/versions/logseq-doctor/bin/activate && pytest --cov --cov-report=term-missing -vv tests
+.PHONY: pytest
+
 release: # Bump the version, create a tag, commit and push. This will trigger the PyPI release on GitHub Actions
 	# https://commitizen-tools.github.io/commitizen/bump/#configuration
 	# See also: cz bump --help
@@ -61,3 +77,6 @@ release: # Bump the version, create a tag, commit and push. This will trigger th
 	gh release create ${CZ_POST_CURRENT_TAG_VERSION} --notes-from-tag
 	gh repo view --web
 .PHONY: .release-post-bump
+
+smoke: cli example test # Run simple tests to make sure the package is working
+.PHONY: smoke
