@@ -1,7 +1,23 @@
-name: Python (tox)
+name: tox
 on: [push]
 jobs:
+  # Adapted from https://github.com/marketplace/actions/skip-duplicate-actions
+  pre_job:
+    # continue-on-error: true # TODO: Uncomment once integration is finished
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      # Don't skip jobs when pushing to master
+      should_skip: ${{ steps.skip_check.outputs.should_skip && ! (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          # https://github.com/marketplace/actions/skip-duplicate-actions#skip-concurrent-workflow-runs
+          concurrent_skipping: "same_content_newer"
+
   test:
+    needs: pre_job
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
