@@ -3,7 +3,7 @@ on: [push]
 jobs:
   # Adapted from https://github.com/marketplace/actions/skip-duplicate-actions
   pre_job:
-    # continue-on-error: true # TODO: Uncomment once integration is finished
+    continue-on-error: true
     runs-on: ubuntu-latest
     # Map a step output to a job output
     outputs:
