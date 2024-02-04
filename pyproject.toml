@@ -61,7 +61,7 @@ target-version = ['py38']
 [tool.maturin]
 features = ["pyo3/extension-module"]
 manifest-path = "rust/logseq-doctor/Cargo.toml"
-module-name = "logseq_doctor._logseq_doctor"
+module-name = "logseq_doctor.rust_ext"
 python-source = "python"
 
 [tool.nitpick]

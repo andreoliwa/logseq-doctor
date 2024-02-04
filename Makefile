@@ -32,7 +32,7 @@ uninstall: # Remove the virtualenv
 .PHONY: uninstall
 
 example: develop # Run a simple example of Python code calling Rust code
-	python -c "from logseq_doctor import _logseq_doctor as rust; print(rust.rust_remove_consecutive_spaces('    - abc   123     def  \n'))"
+	python -c "from logseq_doctor import rust_ext; print(rust_ext.remove_consecutive_spaces('    - abc   123     def  \n'))"
 .PHONY: example
 
 cli: develop # Run the CLI with a Python click script as the entry point
