@@ -57,9 +57,7 @@
       "appveyor": "no",
       "github_actions": "yes",
       "requiresio": "no",
-      "_extensions": [
-        "jinja2_time.TimeExtension"
-      ],
+      "_extensions": ["jinja2_time.TimeExtension"],
       "_template": "https://github.com/ionelmc/cookiecutter-pylibrary"
     }
   },

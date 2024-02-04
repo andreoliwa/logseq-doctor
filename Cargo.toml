@@ -1,0 +1,3 @@
+[workspace]
+members = ["rust/logseq", "rust/logseq-doctor"]
+resolver = "2"

@@ -3,12 +3,11 @@ from pathlib import Path
 from textwrap import dedent
 
 import mistletoe
-from mistletoe.ast_renderer import ASTRenderer
-from typer.testing import CliRunner
-
 from logseq_doctor import flat_markdown_to_outline
 from logseq_doctor.cli import app
 from logseq_doctor.constants import NBSP
+from mistletoe.ast_renderer import ASTRenderer
+from typer.testing import CliRunner
 
 
 def assert_markdown(flat_md: str, outlined_md: str, *, ast: bool = False) -> None:

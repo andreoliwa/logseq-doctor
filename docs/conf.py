@@ -1,4 +1,5 @@
 """Sphinx configuration."""
+
 import os
 
 extensions = [

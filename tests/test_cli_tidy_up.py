@@ -1,9 +1,8 @@
 import os
 from pathlib import Path
 
-from typer.testing import CliRunner
-
 from logseq_doctor.cli import app
+from typer.testing import CliRunner
 
 
 def test_remove_empty_bullets_from_multiple_files(datadir: Path) -> None:
@@ -14,8 +13,8 @@ def test_remove_empty_bullets_from_multiple_files(datadir: Path) -> None:
 
     result = CliRunner().invoke(app, ["tidy-up", str(actual1), str(actual2)])
     assert (
-        result.output == f"removed empty bullets from {actual1}{os.linesep}"
-        f"removed empty bullets from {actual2}{os.linesep}"
+        result.output == f"removed empty bullets and double spaces from {actual1}{os.linesep}"
+        f"removed empty bullets and double spaces from {actual2}{os.linesep}"
     )
     assert result.exit_code == 0
     assert actual1.read_text() == expected1.read_text().strip()
