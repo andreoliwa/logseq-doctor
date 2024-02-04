@@ -1,3 +1,9 @@
+## v0.2.1 (2024-02-04)
+
+### Fix
+
+- automated release with "make release" from local computer
+
 ## v0.2.0 (2024-02-04)
 
 ### Feat
