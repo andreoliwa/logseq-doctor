@@ -5,13 +5,13 @@ Why does this file exist, and why not put this in __main__?
   You might be tempted to import things from __main__ later, but that will cause
   problems: the code will get executed twice:
 
-  - When you run `python -mlogseq_doctor` python will execute
+  - When you run `python -m logseq_doctor` python will execute
     ``__main__.py`` as a script. That means there won't be any
     ``logseq_doctor.__main__`` in ``sys.modules``.
   - When you import __main__ it will get executed again (as a module) because
     there's no ``logseq_doctor.__main__`` in ``sys.modules``.
 
-  Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
+  Also see (1) from https://click.pocoo.org/5/setuptools/#setuptools-integration
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from typing import List
 
 import typer
 
-from logseq_doctor import _logseq_doctor, flat_markdown_to_outline
+from logseq_doctor import flat_markdown_to_outline, rust_ext
 from logseq_doctor.api import Block, Logseq
 
 app = typer.Typer(no_args_is_help=True)
@@ -55,7 +55,7 @@ def tidy_up(
     for each_file in markdown_file:
         old_contents = each_file.read_text()
         rm_empty_bullets = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
-        rm_double_spaces = _logseq_doctor.rust_remove_consecutive_spaces(rm_empty_bullets)
+        rm_double_spaces = rust_ext.remove_consecutive_spaces(rm_empty_bullets)
         if old_contents != rm_double_spaces:
             typer.echo(f"removed empty bullets and double spaces from {each_file}")
             each_file.write_text(rm_double_spaces)
