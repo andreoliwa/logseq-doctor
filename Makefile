@@ -6,11 +6,10 @@ build: # Build the Rust crate and Python package
 	maturin build
 .PHONY: build
 
-develop: uncomment-crate # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
+develop: # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
 	maturin develop
 	# Rehashing is needed (once) to make the [project.scripts] section of pyproject.toml available in the PATH
 	pyenv rehash
-	$(MAKE) comment-crate
 	python -m pip freeze
 .PHONY: develop
 
@@ -40,14 +39,11 @@ cli: develop # Run the CLI with a Python click script as the entry point
 	lsd --help
 .PHONY: cli
 
-comment-crate: # Comment out the crate-type line in Cargo.toml
-	gsed -i 's/crate-type/#crate-type/' Cargo.toml
-.PHONY: comment-crate
-
-uncomment-crate: # Uncomment the crate-type line in Cargo.toml
-	gsed -i 's/#*crate-type/crate-type/' Cargo.toml
-.PHONY: uncomment-crate
-
-test-rs: comment-crate # Run tests and doctests on Rust code
+test: # Run tests on both Python and Rust
 	cargo test
-.PHONY: test-rs
+	tox -e py311
+.PHONY: test
+
+test-watch: # Run tests and watch for changes
+	source .tox/py311/bin/activate && ptw --runner "pytest --testmon"
+.PHONY: test-watch

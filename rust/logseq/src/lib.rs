@@ -1,17 +1,4 @@
-//! Logseq Doctor: heal your Markdown files
-use pyo3::prelude::*;
 use regex::Regex;
-
-#[pymodule]
-fn _logseq_doctor(_python: Python, module: &PyModule) -> PyResult<()> {
-    module.add_function(wrap_pyfunction!(rust_remove_consecutive_spaces, module)?)?;
-    Ok(())
-}
-
-#[pyfunction]
-fn rust_remove_consecutive_spaces(file_contents: String) -> PyResult<String> {
-    Ok(remove_consecutive_spaces(file_contents).unwrap())
-}
 
 /// Remove consecutive spaces on lines that begin with a dash, keeping leading spaces
 ///
@@ -24,7 +11,7 @@ fn rust_remove_consecutive_spaces(file_contents: String) -> PyResult<String> {
 /// # Examples
 ///
 /// ```
-/// use logseq_doctor::remove_consecutive_spaces;
+/// use logseq::remove_consecutive_spaces;
 /// assert_eq!(remove_consecutive_spaces("    abc   123     def  ".to_string()).unwrap(), "    abc   123     def  ".to_string());
 /// assert_eq!(remove_consecutive_spaces("\n  - abc  123\n    - def   4  5 ".to_string()).unwrap(), "\n  - abc 123\n    - def 4 5 ".to_string());
 /// assert_eq!(remove_consecutive_spaces(

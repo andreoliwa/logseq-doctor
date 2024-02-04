@@ -60,6 +60,7 @@ target-version = ['py38']
 # https://www.maturin.rs/config
 [tool.maturin]
 features = ["pyo3/extension-module"]
+manifest-path = "rust/logseq-doctor/Cargo.toml"
 module-name = "logseq_doctor._logseq_doctor"
 python-source = "python"
 

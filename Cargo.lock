@@ -58,11 +58,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "logseq"
+version = "0.1.0"
+dependencies = [
+ "regex",
+]
+
+[[package]]
 name = "logseq-doctor"
 version = "0.1.1"
 dependencies = [
+ "logseq",
  "pyo3",
- "regex",
 ]
 
 [[package]]
