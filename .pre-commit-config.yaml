@@ -28,12 +28,6 @@ repos:
     hooks:
       - id: ruff-format
       - id: ruff
-  - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.14.1
-    hooks:
-      - id: commitizen
-        stages:
-          - commit-msg
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:
@@ -58,3 +52,9 @@ repos:
       - id: prettier
         stages:
           - commit
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.14.1
+    hooks:
+      - id: commitizen
+        stages:
+          - commit-msg
