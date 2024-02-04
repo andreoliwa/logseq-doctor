@@ -3,7 +3,7 @@
 #
 #    maturin generate-ci github --zig
 #
-name: Maturin
+name: maturin
 
 on:
   push:
@@ -18,7 +18,28 @@ permissions:
   contents: read
 
 jobs:
+  # Adapted from https://github.com/marketplace/actions/skip-duplicate-actions
+  pre_job:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          # https://github.com/marketplace/actions/skip-duplicate-actions#skip-concurrent-workflow-runs
+          concurrent_skipping: "same_content_newer"
+          # https://github.com/marketplace/actions/skip-duplicate-actions#cancel_others
+          cancel_others: true
+          # https://github.com/marketplace/actions/skip-duplicate-actions#do_not_skip
+          do_not_skip: '["workflow_dispatch", "schedule", "merge_group", "release"]'
+          # https://github.com/marketplace/actions/skip-duplicate-actions#paths
+          paths: '["Cargo.*", "pyproject.toml", "python/**", "rust/**"]'
+
   linux:
+    needs: pre_job
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -42,6 +63,7 @@ jobs:
           path: dist
 
   windows:
+    needs: pre_job
     runs-on: windows-latest
     strategy:
       matrix:
@@ -65,6 +87,7 @@ jobs:
           path: dist
 
   macos:
+    needs: pre_job
     runs-on: macos-latest
     strategy:
       matrix:
@@ -87,6 +110,7 @@ jobs:
           path: dist
 
   sdist:
+    needs: pre_job
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
