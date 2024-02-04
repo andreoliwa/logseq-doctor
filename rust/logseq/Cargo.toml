@@ -1,9 +1,24 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.79"
 regex = "1.10.3"
 
+[lints.clippy]
+all = "deny"
+
+[lints.rust]
+missing_docs = "deny"
+
+# https://doc.rust-lang.org/cargo/reference/manifest.html#the-package-section
 [package]
+authors = ["W Augusto Andreoli <andreoli@sent.com>"]
+categories = ["command-line-utilities", "filesystem", "text-editors", "text-processing", "value-formatting"]
+description = "Handle Logseq Markdown files"
 edition = "2021"
+keywords = ["logseq", "markdown"]
+license = "MIT OR Apache-2.0"
 name = "logseq"
-version = "0.1.0"
+readme = "README.md"
+repository = "https://github.com/andreoliwa/logseq-doctor"
+version = "0.1.1"

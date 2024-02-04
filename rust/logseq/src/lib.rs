@@ -1,3 +1,5 @@
+//! # Handle [Logseq](https://logseq.com/) Markdown files
+
 use regex::Regex;
 
 /// Remove consecutive spaces on lines that begin with a dash, keeping leading spaces
@@ -24,7 +26,7 @@ use regex::Regex;
 /// let ends_with_linebreak = "- Root\n  - Child\n";
 /// assert_eq!(remove_consecutive_spaces(ends_with_linebreak.to_string()).unwrap(), ends_with_linebreak);
 /// ```
-pub fn remove_consecutive_spaces(file_contents: String) -> Result<String, ()> {
+pub fn remove_consecutive_spaces(file_contents: String) -> anyhow::Result<String> {
     let space_re = Regex::new(r" {2,}").unwrap();
     let ends_with_linebreak = file_contents.ends_with('\n');
 
