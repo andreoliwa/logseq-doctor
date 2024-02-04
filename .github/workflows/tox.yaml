@@ -1,7 +1,28 @@
-name: Python (tox)
+name: tox
 on: [push]
 jobs:
+  # Adapted from https://github.com/marketplace/actions/skip-duplicate-actions
+  pre_job:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          # https://github.com/marketplace/actions/skip-duplicate-actions#skip-concurrent-workflow-runs
+          concurrent_skipping: "same_content_newer"
+          # https://github.com/marketplace/actions/skip-duplicate-actions#cancel_others
+          cancel_others: true
+          # https://github.com/marketplace/actions/skip-duplicate-actions#do_not_skip
+          do_not_skip: '["workflow_dispatch", "schedule", "merge_group", "release"]'
+          # https://github.com/marketplace/actions/skip-duplicate-actions#paths
+          paths: '["Cargo.*", "pyproject.toml", "tox.ini", "python/**", "rust/**", "tests/**"]'
+
   test:
+    needs: pre_job
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
@@ -128,9 +149,8 @@ jobs:
       #      uses: actions/cache@v3
       #      with:
       #        path: .tox
-      #        # setup.cfg and pyproject.toml have versioning info that would
-      #        # impact the tox environment.
-      #        key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'setup.cfg') }}
+      #        # These files have versioning info that would impact the tox environment
+      #        key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
       - name: test
         env:
           TOXPYTHON: "${{ matrix.toxpython }}"
