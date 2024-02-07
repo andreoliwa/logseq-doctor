@@ -86,10 +86,11 @@ impl Journal {
     /// Appends the given Markdown content to the journal file
     pub fn append(&self, markdown: String) -> anyhow::Result<()> {
         let path = self.as_path();
+        eprint!("Journal {}: ", path.to_string_lossy());
 
         // if no markdown content, print an error and return
         if markdown.is_empty() {
-            eprintln!("No content to append to {:?}", path);
+            eprintln!("no content provided");
             return Ok(());
         }
 
@@ -109,13 +110,16 @@ impl Journal {
                 .create(true)
                 .truncate(true)
                 .open(&path)?;
-            eprintln!("New journal file {:?}", path);
+            eprintln!("new/recreated file");
         } else {
             file = OpenOptions::new().append(true).open(&path)?;
-            eprintln!("Appending to {:?}", path);
+            eprintln!("appending");
+
+            println!(); // Output all content to stdout
             file.write_all(b"\n")?;
         }
 
+        print!("{}", markdown);
         file.write_all(markdown.as_bytes())?;
         file.flush()?;
         Ok(())
