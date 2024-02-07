@@ -21,12 +21,16 @@ import sys
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path  # noqa: TCH003 Typer needs this import to infer the type of the argument
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
+import maya
 import typer
 
 from logseq_doctor import flat_markdown_to_outline, rust_ext
 from logseq_doctor.api import Block, Logseq
+
+if TYPE_CHECKING:
+    from datetime import date
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -116,10 +120,18 @@ def tasks(
 @app.command()
 def journal(
     ctx: typer.Context,
+    maya_date: str = typer.Option(
+        None,
+        "--date",
+        "-d",
+        help="Date of the journal page."
+        " You can use some natural language like 'yesterday', 'today', 'Friday', 'Wed', etc.",
+    ),
     outline: bool = typer.Option(False, "--outline", "-o", help="Convert flat Markdown to outline"),
     content: list[str] = typer.Argument(None, metavar="CONTENT", help="Content to appended to the current journal"),
 ) -> None:
     """Append content to the current journal page in Logseq."""
+    parsed_date: date | None = maya.when(maya_date).date if maya_date else None
     lines = []
     if content:
         lines.append(" ".join(content))
@@ -127,4 +139,4 @@ def journal(
         lines.append(sys.stdin.read())
     joined = "\n".join(lines)
     markdown = flat_markdown_to_outline(joined) if outline else joined
-    rust_ext.add_content(cast(GlobalOptions, ctx.obj).logseq_graph_path, markdown)
+    rust_ext.add_content(cast(GlobalOptions, ctx.obj).logseq_graph_path, markdown, parsed_date)

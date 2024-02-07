@@ -1,3 +1,5 @@
+ACTIVATE_VENV = source ~/.pyenv/versions/logseq-doctor/bin/activate
+
 help: # Display this help
 	@cat Makefile | egrep '^[a-z0-9 ./-]*:.*#' | sed -E -e 's/:.+# */@ /g' -e 's/ .+@/@/g' | sort | awk -F@ '{printf "\033[1;34m%-15s\033[0m %s\n", $$1, $$2}'
 .PHONY: help
@@ -7,7 +9,7 @@ build: # Build the Rust crate and Python package
 .PHONY: build
 
 develop: # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
-	maturin develop
+	$(ACTIVATE_VENV) && maturin develop
 .PHONY: develop
 
 rehash: # Rehashing is needed (once) to make the [project.scripts] section of pyproject.toml available in the PATH
@@ -15,33 +17,41 @@ rehash: # Rehashing is needed (once) to make the [project.scripts] section of py
 .PHONY: rehash
 
 print-config: # Print the configuration used by maturin
-	PYO3_PRINT_CONFIG=1 maturin develop
+	PYO3_PRINT_CONFIG=1 $(ACTIVATE_VENV) && maturin develop
 .PHONY: print-config
 
 install: # Create the virtualenv and setup the local development environment
 	@echo $$(basename $$(pwd))
-	pyenv virtualenv $$(basename $$(pwd))
+	-pyenv virtualenv $$(basename $$(pwd))
 	pyenv local $$(basename $$(pwd))
 # TODO: keep the list of dev packages in a single place; this was copied from tox.ini
 	$(MAKE) deps
 # Can't activate virtualenv from Makefile · Issue #372 · pyenv/pyenv-virtualenv
 # https://github.com/pyenv/pyenv-virtualenv/issues/372
-	@echo "Run 'pyenv activate' then `make smoke' to make sure the development environment is working"
+	$(MAKE) develop
+	@echo "Run 'make smoke' to check if the development environment is working"
 .PHONY: install
 
+pipx-install: # Install the package with pipx in editable mode. Do this when you want to use "lsd" outside of the development environment
+	-pipx install -e --force .
+.PHONY: pipx-install
+
+pipx-uninstall: # Uninstall only the pipx virtualenv. Use this when developing, so the local venv "lsd" is available instead of the pipx one
+	-pipx uninstall logseq-doctor
+.PHONY: pipx-uninstall
+
 deps: # Install the development dependencies
-	source ~/.pyenv/versions/logseq-doctor/bin/activate && \
-    		python -m pip install -U pip pytest pytest-cov pytest-datadir responses pytest-env pytest-watch pytest-testmon
+	$(ACTIVATE_VENV) && python -m pip install -U pip pytest pytest-cov pytest-datadir responses pytest-env pytest-watch pytest-testmon
 	$(MAKE) freeze
 .PHONY: deps
 
 freeze: # Show the installed packages
-	source ~/.pyenv/versions/logseq-doctor/bin/activate && python -m pip freeze
+	$(ACTIVATE_VENV) && python -m pip freeze
 .PHONY: freeze
 
-uninstall: # Remove the virtualenv
+uninstall: pipx-uninstall # Remove the virtualenv
 	-rm .python-version
-	-pyenv uninstall $$(basename $$(pwd))
+	-pyenv uninstall -f $$(basename $$(pwd))
 .PHONY: uninstall
 
 example: develop # Run a simple example of Python code calling Rust code
@@ -57,12 +67,12 @@ test: # Run tests on both Python and Rust
 	tox -e py311
 .PHONY: test
 
-test-watch: # Run tests and watch for changes
-	source .tox/py311/bin/activate && ptw --runner "pytest --testmon"
-.PHONY: test-watch
+watch: # Run tests and watch for changes
+	$(ACTIVATE_VENV) && ptw --runner "pytest --testmon"
+.PHONY: watch
 
 pytest: # Run tests with pytest
-	source ~/.pyenv/versions/logseq-doctor/bin/activate && pytest --cov --cov-report=term-missing -vv tests
+	$(ACTIVATE_VENV) && pytest --cov --cov-report=term-missing -vv tests
 .PHONY: pytest
 
 release: # Bump the version, create a tag, commit and push. This will trigger the PyPI release on GitHub Actions

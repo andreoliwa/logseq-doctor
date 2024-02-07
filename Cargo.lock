@@ -164,6 +164,7 @@ dependencies = [
 name = "logseq-doctor"
 version = "0.2.1"
 dependencies = [
+ "chrono",
  "logseq",
  "pyo3",
 ]

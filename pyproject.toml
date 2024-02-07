@@ -20,6 +20,7 @@ classifiers = [
   "Topic :: Text Processing :: Markup :: Markdown",
 ]
 dependencies = [
+  'maya',
   'mistletoe',
   'requests',
   'typer[all]',
