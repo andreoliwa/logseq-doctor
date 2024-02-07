@@ -38,6 +38,7 @@ pipx-install: # Install the package with pipx in editable mode. Do this when you
 
 pipx-uninstall: # Uninstall only the pipx virtualenv. Use this when developing, so the local venv "lsd" is available instead of the pipx one
 	-pipx uninstall logseq-doctor
+	$(MAKE) rehash
 .PHONY: pipx-uninstall
 
 deps: # Install the development dependencies

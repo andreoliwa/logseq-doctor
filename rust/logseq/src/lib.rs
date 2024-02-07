@@ -83,8 +83,8 @@ impl Journal {
         self.graph.join(journal_file_name)
     }
 
-    /// Appends the given Markdown content to the journal file
-    pub fn append(&self, markdown: String) -> anyhow::Result<()> {
+    fn _append_or_prepend(&self, markdown: String, append: bool) -> anyhow::Result<()> {
+        let prepend: bool = !append;
         let path = self.as_path();
         eprint!("Journal {}: ", path.to_string_lossy());
 
@@ -95,22 +95,31 @@ impl Journal {
         }
 
         let empty: bool;
-        if let Ok(content) = fs::read_to_string(&path) {
-            let trimmed_content = content.trim_end().trim_start_matches('-').trim_start();
+        let content;
+        if let Ok(valid_content) = fs::read_to_string(&path) {
+            content = valid_content.clone();
+            let trimmed_content = valid_content
+                .trim_end()
+                .trim_start_matches('-')
+                .trim_start();
             empty = trimmed_content.is_empty();
+            if empty {
+                eprintln!("truncated file");
+            }
         } else {
             empty = true;
+            content = String::new();
+            eprintln!("new file");
         }
 
         let mut file: File;
-        if empty {
+        if empty || prepend {
             // We need to overwrite the file because Logseq adds an empty bullet (dash) to empty pages
             file = OpenOptions::new()
                 .write(true)
                 .create(true)
                 .truncate(true)
                 .open(&path)?;
-            eprintln!("new/recreated file");
         } else {
             file = OpenOptions::new().append(true).open(&path)?;
             eprintln!("appending");
@@ -121,7 +130,20 @@ impl Journal {
 
         print!("{}", markdown);
         file.write_all(markdown.as_bytes())?;
+        if prepend {
+            file.write_all(content.as_bytes())?;
+        }
         file.flush()?;
         Ok(())
+    }
+
+    /// Appends the given Markdown content to the journal file at the end of the file
+    pub fn append(&self, markdown: String) -> anyhow::Result<()> {
+        self._append_or_prepend(markdown, true)
+    }
+
+    /// Prepends the given Markdown content to the journal file at the beginning of the file
+    pub fn prepend(&self, markdown: String) -> anyhow::Result<()> {
+        self._append_or_prepend(markdown, false)
     }
 }

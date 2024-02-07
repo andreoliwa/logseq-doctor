@@ -56,6 +56,12 @@ repos:
       - id: prettier
         stages:
           - commit
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+      - id: cargo-check
+      - id: clippy
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v3.14.1
     hooks:

@@ -127,8 +127,9 @@ def journal(
         help="Date of the journal page."
         " You can use some natural language like 'yesterday', 'today', 'Friday', 'Wed', etc.",
     ),
-    outline: bool = typer.Option(False, "--outline", "-o", help="Convert flat Markdown to outline"),
-    content: list[str] = typer.Argument(None, metavar="CONTENT", help="Content to appended to the current journal"),
+    format_: bool = typer.Option(False, "--format", "-f", help="Format flat text as Logseq outlined Markdown"),
+    prepend: bool = typer.Option(False, "--prepend", "-p", help="Prepend content instead of appending"),
+    content: list[str] = typer.Argument(None, metavar="CONTENT", help="Content to add to the current journal"),
 ) -> None:
     """Append content to the current journal page in Logseq."""
     parsed_date: date | None = maya.when(maya_date).date if maya_date else None
@@ -138,5 +139,5 @@ def journal(
     if not sys.stdin.isatty():
         lines.append(sys.stdin.read())
     joined = "\n".join(lines)
-    markdown = flat_markdown_to_outline(joined) if outline else joined
-    rust_ext.add_content(cast(GlobalOptions, ctx.obj).logseq_graph_path, markdown, parsed_date)
+    markdown = flat_markdown_to_outline(joined) if format_ else joined
+    rust_ext.add_content(cast(GlobalOptions, ctx.obj).logseq_graph_path, markdown, prepend, parsed_date)

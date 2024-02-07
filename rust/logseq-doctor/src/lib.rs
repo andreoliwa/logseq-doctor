@@ -22,14 +22,21 @@ fn remove_consecutive_spaces(file_contents: String) -> PyResult<String> {
 fn add_content(
     graph_path: PathBuf,
     markdown: String,
+    prepend: bool,
     parsed_date: Option<&PyDate>,
 ) -> PyResult<()> {
     let naive_date = match parsed_date {
         None => None,
-        Some(pydate) => pydate_to_naivedate(&pydate)
-            .expect(format!("Failed to parse date: {:?}", pydate).as_str()),
+        Some(pydate) => pydate_to_naivedate(pydate)
+            .unwrap_or_else(|err| panic!("Error {} while parsing date {:?}", err, pydate)),
     };
     let journal = logseq::Journal::new(graph_path, naive_date);
+    if prepend {
+        journal
+            .prepend(markdown)
+            .expect("Failed to prepend content to journal");
+        return Ok(());
+    }
     journal
         .append(markdown)
         .expect("Failed to append content to journal");
