@@ -1,6 +1,11 @@
 //! # Handle [Logseq](https://logseq.com/) Markdown files
 
+use chrono::{Local, NaiveDate};
 use regex::Regex;
+use std::fs;
+use std::fs::{File, OpenOptions};
+use std::io::Write;
+use std::path::PathBuf;
 
 /// Remove consecutive spaces on lines that begin with a dash, keeping leading spaces
 ///
@@ -54,4 +59,59 @@ pub fn remove_consecutive_spaces(file_contents: String) -> anyhow::Result<String
     };
 
     Ok(final_result)
+}
+
+/// A Logseq journal file
+pub struct Journal {
+    graph: PathBuf,
+    date: NaiveDate,
+}
+
+impl Journal {
+    /// Constructs a new Journal for the given date, or uses the current date if None is provided.
+    pub fn new(graph: PathBuf, date: Option<NaiveDate>) -> Self {
+        let final_date = date.unwrap_or_else(|| Local::now().date_naive());
+        Journal {
+            graph,
+            date: final_date,
+        }
+    }
+
+    /// Returns the full path to the journal file
+    pub fn as_path(&self) -> PathBuf {
+        let journal_file_name = format!("journals/{}.md", self.date.format("%Y_%m_%d"));
+        self.graph.join(journal_file_name)
+    }
+
+    /// Appends the given Markdown content to the journal file
+    pub fn append(&self, markdown: String) -> anyhow::Result<()> {
+        let path = self.as_path();
+
+        let empty: bool;
+        if let Ok(content) = fs::read_to_string(&path) {
+            let trimmed_content = content.trim_end().trim_start_matches('-').trim_start();
+            empty = trimmed_content.is_empty();
+        } else {
+            empty = true;
+        }
+
+        let mut file: File;
+        if empty {
+            // We need to overwrite the file because Logseq adds an empty bullet (dash) to empty pages
+            file = OpenOptions::new()
+                .write(true)
+                .create(true)
+                .truncate(true)
+                .open(&path)?;
+            eprintln!("New journal file {:?}", path);
+        } else {
+            file = OpenOptions::new().append(true).open(&path)?;
+            eprintln!("Appending to {:?}", path);
+            file.write_all(b"\n")?;
+        }
+
+        file.write_all(markdown.as_bytes())?;
+        file.flush()?;
+        Ok(())
+    }
 }

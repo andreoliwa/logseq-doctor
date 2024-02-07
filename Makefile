@@ -8,10 +8,11 @@ build: # Build the Rust crate and Python package
 
 develop: # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
 	maturin develop
-	# Rehashing is needed (once) to make the [project.scripts] section of pyproject.toml available in the PATH
-	pyenv rehash
-	python -m pip freeze
 .PHONY: develop
+
+rehash: # Rehashing is needed (once) to make the [project.scripts] section of pyproject.toml available in the PATH
+	pyenv rehash
+.PHONY: rehash
 
 print-config: # Print the configuration used by maturin
 	PYO3_PRINT_CONFIG=1 maturin develop
@@ -47,9 +48,9 @@ example: develop # Run a simple example of Python code calling Rust code
 	python -c "from logseq_doctor import rust_ext; print(rust_ext.remove_consecutive_spaces('    - abc   123     def  \n'))"
 .PHONY: example
 
-cli: develop # Run the CLI with a Python click script as the entry point
+run: develop rehash # Run the CLI with a Python click script as the entry point
 	lsd --help
-.PHONY: cli
+.PHONY: run
 
 test: # Run tests on both Python and Rust
 	cargo test
@@ -78,5 +79,9 @@ release: # Bump the version, create a tag, commit and push. This will trigger th
 	gh repo view --web
 .PHONY: .release-post-bump
 
-smoke: cli example test # Run simple tests to make sure the package is working
+smoke: run example test # Run simple tests to make sure the package is working
 .PHONY: smoke
+
+clippy: develop # Run clippy on the Rust code
+	cargo clippy
+.PHONY: clippy

@@ -17,8 +17,10 @@ Why does this file exist, and why not put this in __main__?
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path  # noqa: TCH003 Typer needs this import to infer the type of the argument
+from typing import cast
 
 import typer
 
@@ -28,9 +30,28 @@ from logseq_doctor.api import Block, Logseq
 app = typer.Typer(no_args_is_help=True)
 
 
+@dataclass
+class GlobalOptions:
+    """Global options for every sub-command."""
+
+    logseq_graph_path: Path
+
+
 @app.callback()
-def lsd() -> None:
+def lsd(
+    ctx: typer.Context,
+    logseq_graph_path: Path = typer.Option(
+        ...,
+        "--graph",
+        "-g",
+        help="Logseq graph",
+        envvar="LOGSEQ_GRAPH_PATH",
+        dir_okay=True,
+        file_okay=False,
+    ),
+) -> None:
     """Logseq Doctor: heal your flat old Markdown files before importing them."""
+    ctx.obj = GlobalOptions(logseq_graph_path)
 
 
 @app.command(no_args_is_help=True)
@@ -68,21 +89,13 @@ class TaskFormat(str, Enum):
 
 @app.command()
 def tasks(
+    ctx: typer.Context,
     tag_or_page: list[str] = typer.Argument(None, metavar="TAG", help="Tags or pages to query"),
     logseq_host_url: str = typer.Option(..., "--host", "-h", help="Logseq host", envvar="LOGSEQ_HOST_URL"),
     logseq_api_token: str = typer.Option(..., "--token", "-t", help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
-    logseq_graph_path: Path = typer.Option(
-        ...,
-        "--graph",
-        "-g",
-        help="Logseq graph",
-        envvar="LOGSEQ_GRAPH_PATH",
-        dir_okay=True,
-        file_okay=False,
-    ),
 ) -> None:
     """List tasks in Logseq."""
-    logseq = Logseq(logseq_host_url, logseq_api_token, logseq_graph_path)
+    logseq = Logseq(logseq_host_url, logseq_api_token, cast(GlobalOptions, ctx.obj).logseq_graph_path)
     condition = ""
     if tag_or_page:
         if len(tag_or_page) == 1:
@@ -97,3 +110,13 @@ def tasks(
         typer.secho(f"{block.page_title}: ", fg=typer.colors.GREEN, nl=False)
         typer.secho(block.url(logseq.graph_name), fg=typer.colors.BLUE, bold=True, nl=False)
         typer.echo(f" {block.raw_content}")
+
+
+@app.command()
+def journal(
+    ctx: typer.Context,
+    content: list[str] = typer.Argument(None, metavar="CONTENT", help="Content to appended to the current journal"),
+) -> None:
+    """Append content to the current journal page in Logseq."""
+    markdown = flat_markdown_to_outline(" ".join(content))
+    rust_ext.add_content(cast(GlobalOptions, ctx.obj).logseq_graph_path, markdown)

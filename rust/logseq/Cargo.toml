@@ -2,13 +2,14 @@
 
 [dependencies]
 anyhow = "1.0.79"
+chrono = "0.4.33"
 regex = "1.10.3"
 
 [lints.clippy]
 all = "deny"
 
 [lints.rust]
-missing_docs = "deny"
+missing_docs = "warn"
 
 # https://doc.rust-lang.org/cargo/reference/manifest.html#the-package-section
 [package]
