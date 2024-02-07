@@ -1,3 +1,3 @@
 # Rust crate for Logseq
 
-Handle [Logseq](https://logseq.com/) Markdown files.
+Handle [Logseq](https://logseq.com/) Markdown files in Rust.

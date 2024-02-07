@@ -16,7 +16,8 @@ missing_docs = "warn"
 [package]
 authors = ["W Augusto Andreoli <andreoli@sent.com>"]
 categories = ["command-line-utilities", "filesystem", "text-editors", "text-processing", "value-formatting"]
-description = "Handle Logseq Markdown files"
+description = "Handle Logseq Markdown files in Rust"
+documentation = "https://docs.rs/logseq"
 edition = "2021"
 keywords = ["logseq", "markdown"]
 license = "MIT OR Apache-2.0"

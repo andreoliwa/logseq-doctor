@@ -1,4 +1,4 @@
-//! # Handle [Logseq](https://logseq.com/) Markdown files
+//! Handle [Logseq](https://logseq.com/) Markdown files in Rust
 
 use chrono::{Local, NaiveDate};
 use regex::Regex;
