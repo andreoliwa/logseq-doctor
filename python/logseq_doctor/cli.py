@@ -116,12 +116,15 @@ def tasks(
 @app.command()
 def journal(
     ctx: typer.Context,
+    outline: bool = typer.Option(False, "--outline", "-o", help="Convert flat Markdown to outline"),
     content: list[str] = typer.Argument(None, metavar="CONTENT", help="Content to appended to the current journal"),
 ) -> None:
     """Append content to the current journal page in Logseq."""
-    lines = [" ".join(content)]
+    lines = []
+    if content:
+        lines.append(" ".join(content))
     if not sys.stdin.isatty():
-        lines.extend(sys.stdin.readlines())
-
-    markdown = flat_markdown_to_outline("\n".join(lines))
+        lines.append(sys.stdin.read())
+    joined = "\n".join(lines)
+    markdown = flat_markdown_to_outline(joined) if outline else joined
     rust_ext.add_content(cast(GlobalOptions, ctx.obj).logseq_graph_path, markdown)
