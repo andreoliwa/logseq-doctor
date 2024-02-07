@@ -130,7 +130,8 @@ impl Journal {
 
         print!("{}", markdown);
         file.write_all(markdown.as_bytes())?;
-        if prepend {
+        if prepend && !empty {
+            file.write_all(b"\n")?;
             file.write_all(content.as_bytes())?;
         }
         file.flush()?;
