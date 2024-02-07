@@ -1,3 +1,14 @@
+## v0.3.0 (2024-02-07)
+
+### Feat
+
+- **journal**: option to prepend content
+- **journal**: choose the date (with natural language)
+- **journal**: output content to stdout
+- **journal**: option to convert to outline (#17)
+- **journal**: pipe content from stdin (#17)
+- **journal**: append content to the current journal page (#17)
+
 ## v0.2.1 (2024-02-04)
 
 ### Fix

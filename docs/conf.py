@@ -19,7 +19,7 @@ project = "logseq-doctor"
 year = "2022"
 author = "W Augusto Andreoli"
 copyright = f"{year}, {author}"
-version = release = "0.2.1"
+version = release = "0.3.0"
 
 pygments_style = "trac"
 templates_path = ["."]
