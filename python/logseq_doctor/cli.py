@@ -17,6 +17,7 @@ Why does this file exist, and why not put this in __main__?
 from __future__ import annotations
 
 import re
+import sys
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path  # noqa: TCH003 Typer needs this import to infer the type of the argument
@@ -118,5 +119,9 @@ def journal(
     content: list[str] = typer.Argument(None, metavar="CONTENT", help="Content to appended to the current journal"),
 ) -> None:
     """Append content to the current journal page in Logseq."""
-    markdown = flat_markdown_to_outline(" ".join(content))
+    lines = [" ".join(content)]
+    if not sys.stdin.isatty():
+        lines.extend(sys.stdin.readlines())
+
+    markdown = flat_markdown_to_outline("\n".join(lines))
     rust_ext.add_content(cast(GlobalOptions, ctx.obj).logseq_graph_path, markdown)

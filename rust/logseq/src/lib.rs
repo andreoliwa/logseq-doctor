@@ -87,6 +87,12 @@ impl Journal {
     pub fn append(&self, markdown: String) -> anyhow::Result<()> {
         let path = self.as_path();
 
+        // if no markdown content, print an error and return
+        if markdown.is_empty() {
+            eprintln!("No content to append to {:?}", path);
+            return Ok(());
+        }
+
         let empty: bool;
         if let Ok(content) = fs::read_to_string(&path) {
             let trimmed_content = content.trim_end().trim_start_matches('-').trim_start();
