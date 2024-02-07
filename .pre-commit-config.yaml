@@ -6,6 +6,10 @@ ci:
   autoupdate_schedule: quarterly
   autofix_commit_msg: "chore(deps): auto fixes from pre-commit.com hooks\n\nfor more information, see https://pre-commit.ci"
   autoupdate_commit_msg: "chore(deps): pre-commit autoupdate"
+  # These hooks are meant to be run locally only.
+  # They fail on pre-commit.ci with "Executable `cargo` not found".
+  # Using "language: rust" also didn't work because these are not hooks written in Rust.
+  skip: [fmt, cargo-check, clippy]
 
 default_language_version:
   python: python3.11
