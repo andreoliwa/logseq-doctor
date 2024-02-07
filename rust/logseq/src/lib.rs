@@ -63,8 +63,10 @@ pub fn remove_consecutive_spaces(file_contents: String) -> anyhow::Result<String
 
 /// A Logseq journal file
 pub struct Journal {
-    graph: PathBuf,
-    date: NaiveDate,
+    /// The path to the Logseq graph
+    pub graph: PathBuf,
+    /// The date of the journal
+    pub date: NaiveDate,
 }
 
 impl Journal {
