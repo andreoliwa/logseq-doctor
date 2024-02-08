@@ -78,12 +78,25 @@ def tidy_up(
 ) -> None:
     """Tidy up your Markdown files by removing empty bullets and double spaces in any block."""
     for each_file in markdown_file:
+        changed = []
         old_contents = each_file.read_text()
+
+        # TODO: move these changes to Rust, inside tidy_up(), to avoid the file being written twice
         rm_empty_bullets = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
+        if rm_empty_bullets != old_contents:
+            changed.append("empty bullets")
+
         rm_double_spaces = rust_ext.remove_consecutive_spaces(rm_empty_bullets)
-        if old_contents != rm_double_spaces:
-            typer.echo(f"removed empty bullets and double spaces from {each_file}")
+        if rm_double_spaces != rm_empty_bullets:
+            changed.append("double spaces")
+        if changed:
             each_file.write_text(rm_double_spaces)
+
+        if rust_ext.tidy_up(each_file):
+            changed.append("brackets")
+
+        if changed:
+            typer.echo(f"{each_file}: {', '.join(changed)}")
 
 
 class TaskFormat(str, Enum):

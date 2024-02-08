@@ -10,6 +10,7 @@ use std::path::PathBuf;
 fn rust_ext(_python: Python, module: &PyModule) -> PyResult<()> {
     module.add_function(wrap_pyfunction!(remove_consecutive_spaces, module)?)?;
     module.add_function(wrap_pyfunction!(add_content, module)?)?;
+    module.add_function(wrap_pyfunction!(tidy_up, module)?)?;
     Ok(())
 }
 
@@ -49,4 +50,10 @@ fn pydate_to_naivedate(pydate: &PyDate) -> PyResult<Option<NaiveDate>> {
     let day = pydate.getattr("day")?.extract::<u32>()?;
 
     Ok(NaiveDate::from_ymd_opt(year, month, day))
+}
+
+#[pyfunction]
+fn tidy_up(page_path: PathBuf) -> PyResult<bool> {
+    let page = logseq::Page::new(page_path.as_path());
+    Ok(page.tidy_up().unwrap())
 }
