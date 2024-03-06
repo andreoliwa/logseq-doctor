@@ -3,7 +3,7 @@
 [dependencies]
 anyhow = "1.0.80"
 assert_fs = "1.1.1"
-chrono = "0.4.34"
+chrono = "0.4.35"
 regex = "1.10.3"
 
 [lints.clippy]
