@@ -4,7 +4,7 @@
 anyhow = "1.0.81"
 assert_fs = "1.1.1"
 chrono = "0.4.35"
-regex = "1.10.3"
+regex = "1.10.4"
 
 [lints.clippy]
 all = "deny"
