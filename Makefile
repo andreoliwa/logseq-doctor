@@ -21,6 +21,7 @@ print-config: # Print the configuration used by maturin
 .PHONY: print-config
 
 install: # Create the virtualenv and setup the local development environment
+	-rm .python-version
 	@echo $$(basename $$(pwd))
 	-pyenv virtualenv $$(basename $$(pwd))
 	pyenv local $$(basename $$(pwd))
