@@ -368,12 +368,10 @@ class Kanban:
                 key, card = self.render_column(column)
                 if not self.page.find_slice(key, start=board_start, end=board_end):
                     pos = self.page.insert(card, start=pos_next_insert)
-                    if pos_next_insert < pos:
-                        pos_next_insert = pos
+                    pos_next_insert = max(pos_next_insert, pos)
                     board_end += len(card) + len(os.linesep)
 
             card = self.render_card(column, block)
             pos = self.page.insert(card, start=pos_next_insert)
-            if pos_next_insert < pos:
-                pos_next_insert = pos
+            pos_next_insert = max(pos_next_insert, pos)
             board_end += len(card) + len(os.linesep)

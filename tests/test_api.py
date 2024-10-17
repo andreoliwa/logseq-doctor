@@ -11,7 +11,7 @@ from logseq_doctor.api import Block, Logseq, Page, Slice
 from logseq_doctor.constants import KANBAN_BOARD_SEARCH_STRING
 
 
-@pytest.fixture()
+@pytest.fixture
 def logseq() -> Logseq:
     return Logseq("http://localhost:1234", "token", "my-notes")
 
@@ -123,7 +123,7 @@ def test_replace_slice_from_existing_page(datadir: Path) -> None:
     assert before.read_text() == (datadir / "page-replace.md").read_text()
 
 
-@pytest.fixture()
+@pytest.fixture
 def existing_kanban(shared_datadir: Path) -> Page:
     return Page(shared_datadir / "existing-kanban.md")
 
@@ -178,7 +178,7 @@ def test_find_block_within_start_end_offsets(
     assert page.find_slice(search_string, start=43, end=161) == expected
 
 
-@pytest.fixture()
+@pytest.fixture
 def nested_kanban(datadir: Path) -> Page:
     return Page(datadir / "nested-kanban.md")
 

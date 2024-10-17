@@ -10,13 +10,13 @@ from logseq_doctor.cli import app
 from typer.testing import CliRunner
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_logseq_query() -> Mock:
     with patch.object(Logseq, "query") as mocked_method:
         yield mocked_method
 
 
-@pytest.fixture()
+@pytest.fixture
 def unsorted_blocks() -> list[Block]:
     return [
         Block(
@@ -50,7 +50,7 @@ def unsorted_blocks() -> list[Block]:
     ]
 
 
-@pytest.fixture()
+@pytest.fixture
 def blocks_sorted_by_date_content(unsorted_blocks: list[Block]) -> list[Block]:
     return [unsorted_blocks[3], unsorted_blocks[2], unsorted_blocks[0], unsorted_blocks[1]]
 
