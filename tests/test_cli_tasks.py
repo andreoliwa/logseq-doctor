@@ -78,10 +78,10 @@ def test_simple_text_output(
     result = CliRunner().invoke(app, ["tasks"])
     assert result.exit_code == 0
     expected = """
-        Third page: logseq://graph/my-notes?block-id=be4116f7-2c74-42af-af62-f38352631d11 Item without marker
-        Page: logseq://graph/my-notes?block-id=c3824880-7527-4ba6-a465-719f01f327de TODO Do something
-        Another page: logseq://graph/my-notes?block-id=6bcebf82-c557-4f58-84d0-3b91c7e59e93 DOING Focus on tasks
-        Title: logseq://graph/my-notes?block-id=0d62459e-8a6b-4635-8c2e-41fbef6da6f8 TODO Do yet another thing
+        Third page§logseq://graph/my-notes?block-id=be4116f7-2c74-42af-af62-f38352631d11§Item without marker
+        Page§logseq://graph/my-notes?block-id=c3824880-7527-4ba6-a465-719f01f327de§TODO Do something
+        Another page§logseq://graph/my-notes?block-id=6bcebf82-c557-4f58-84d0-3b91c7e59e93§DOING Focus on tasks
+        Title§logseq://graph/my-notes?block-id=0d62459e-8a6b-4635-8c2e-41fbef6da6f8§TODO Do yet another thing
     """
     assert result.stdout == dedent(expected).lstrip()
 
