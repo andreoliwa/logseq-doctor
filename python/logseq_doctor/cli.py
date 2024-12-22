@@ -16,11 +16,13 @@ Why does this file exist, and why not put this in __main__?
 
 from __future__ import annotations
 
+import os
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path  # noqa: TCH003 Typer needs this import to infer the type of the argument
+from pathlib import Path  # Typer needs this import to infer the type of the argument
 from typing import TYPE_CHECKING, cast
 
 import maya
@@ -65,6 +67,23 @@ def outline(text_file: typer.FileText) -> None:
     typer.echo(flat_markdown_to_outline(text_file.read()))
 
 
+def _call_golang_executable() -> bool:
+    # TODO: get the executable from an env var or some other way
+    executable_path = Path("~/Code/logseq-doctor/logseq-doctor").expanduser()
+    if not executable_path.exists():
+        msg = f"The executable '{executable_path}' does not exist."
+        raise FileNotFoundError(msg)
+    if not os.access(executable_path, os.X_OK):
+        msg = f"The file '{executable_path}' is not executable."
+        raise PermissionError(msg)
+    try:
+        subprocess.run([executable_path], check=True)  # noqa: S603
+    except subprocess.CalledProcessError as e:
+        typer.Abort(f"An error occurred while running the executable: {e}")
+        sys.exit(1)
+    return True
+
+
 @app.command()
 def tidy_up(
     markdown_file: list[Path] = typer.Argument(
@@ -89,6 +108,9 @@ def tidy_up(
         rm_double_spaces = rust_ext.remove_consecutive_spaces(rm_empty_bullets)
         if rm_double_spaces != rm_empty_bullets:
             changed.append("double spaces")
+            # TODO: this is just a test, remove it
+            _call_golang_executable()
+
         if changed:
             each_file.write_text(rm_double_spaces)
 

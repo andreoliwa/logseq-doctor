@@ -4,11 +4,16 @@ help: # Display this help
 	@cat Makefile | egrep '^[a-z0-9 ./-]*:.*#' | sed -E -e 's/:.+# */@ /g' -e 's/ .+@/@/g' | sort | awk -F@ '{printf "\033[1;34m%-15s\033[0m %s\n", $$1, $$2}'
 .PHONY: help
 
-build: # Build the Rust crate and Python package
-	maturin build
+build: build-go # Build the Rust crate and Python package
+	$(ACTIVATE_VENV) && maturin build
 .PHONY: build
 
-develop: # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
+build-go: # Build the Golang executable
+	go mod tidy
+	go build
+.PHONY: build-go
+
+develop: build-go # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
 	$(ACTIVATE_VENV) && maturin develop
 .PHONY: develop
 
