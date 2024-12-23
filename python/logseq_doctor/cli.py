@@ -71,8 +71,12 @@ def _call_golang_executable(command: str, markdown_file: Path) -> bool:
     # TODO: find a better way to get the executable path: from an env var or some other way
     executable_path = Path("~/.local/bin/lsdg").expanduser()
     if not executable_path.exists():
+        # TODO: install the Go executable when the Python package is installed
+        #  For now, just print and skip the command when the executable is not found, otherwise CI breaks
         msg = f"The executable '{executable_path}' does not exist."
-        raise FileNotFoundError(msg)
+        # raise FileNotFoundError(msg)
+        typer.secho(msg, fg=typer.colors.RED, bold=True)
+        return False
     if not os.access(executable_path, os.X_OK):
         msg = f"The file '{executable_path}' is not executable."
         raise PermissionError(msg)

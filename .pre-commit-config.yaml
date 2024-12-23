@@ -17,22 +17,22 @@ default_language_version:
 exclude: '^(\.tox|ci/templates|\.bumpversion\.cfg)(/|$)'
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: debug-statements
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.23.1
+    rev: v0.24.2
     hooks:
       - id: toml-sort-fix
         exclude: '.*\.lock$'
   - repo: https://github.com/google/keep-sorted
-    rev: v0.3.0
+    rev: v0.5.1
     hooks:
       - id: keep-sorted
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.2.1
+    rev: v0.8.4
     hooks:
       - id: ruff-format
       - id: ruff
@@ -47,7 +47,7 @@ repos:
       - id: bashate
         args: [-i, E006]
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.9.0.6
+    rev: v0.10.0.1
     hooks:
       - id: shellcheck
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
@@ -67,8 +67,19 @@ repos:
       - id: cargo-check
       - id: clippy
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.14.1
+    rev: v4.1.0
     hooks:
       - id: commitizen
         stages:
           - commit-msg
+  - repo: https://github.com/mxr/sync-pre-commit-deps
+    rev: v0.0.1
+    hooks:
+      - id: sync-pre-commit-deps
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.62.2
+    hooks:
+      - id: golangci-lint
+        name: golangci-lint
+        entry: golangci-lint run
+        language: system

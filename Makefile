@@ -31,6 +31,11 @@ print-config: # Print the configuration used by maturin
 	PYO3_PRINT_CONFIG=1 $(ACTIVATE_VENV) && maturin develop
 .PHONY: print-config
 
+install-go: # Install Go tools for development
+	# https://github.com/golangci/golangci-lint#install-golangci-lint
+	brew install golangci-lint
+.PHONY: install-go
+
 install: # Create the virtualenv and setup the local development environment
 	-rm .python-version
 	@echo $$(basename $$(pwd))
