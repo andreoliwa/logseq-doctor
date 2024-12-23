@@ -10,8 +10,14 @@ build: build-go # Build the Rust crate and Python package
 
 build-go: # Build the Golang executable
 	go mod tidy
-	go build
+	go build -o lsdg main.go
+	mv lsdg ~/.local/bin/
 .PHONY: build-go
+
+clean: # Clean the build artifacts
+	cargo clean
+	-rm ~/.local/bin/lsdg
+.PHONY: clean
 
 develop: build-go # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
 	$(ACTIVATE_VENV) && maturin develop

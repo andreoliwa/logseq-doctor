@@ -67,9 +67,9 @@ def outline(text_file: typer.FileText) -> None:
     typer.echo(flat_markdown_to_outline(text_file.read()))
 
 
-def _call_golang_executable() -> bool:
-    # TODO: get the executable from an env var or some other way
-    executable_path = Path("~/Code/logseq-doctor/logseq-doctor").expanduser()
+def _call_golang_executable(command: str, markdown_file: Path) -> bool:
+    # TODO: find a better way to get the executable path: from an env var or some other way
+    executable_path = Path("~/.local/bin/lsdg").expanduser()
     if not executable_path.exists():
         msg = f"The executable '{executable_path}' does not exist."
         raise FileNotFoundError(msg)
@@ -77,7 +77,9 @@ def _call_golang_executable() -> bool:
         msg = f"The file '{executable_path}' is not executable."
         raise PermissionError(msg)
     try:
-        subprocess.run([executable_path], check=True)  # noqa: S603
+        result = subprocess.run([executable_path, command, str(markdown_file)], check=False)  # noqa: S603
+        if result.returncode != 0:
+            sys.exit(result.returncode)
     except subprocess.CalledProcessError as e:
         typer.Abort(f"An error occurred while running the executable: {e}")
         sys.exit(1)
@@ -97,6 +99,8 @@ def tidy_up(
 ) -> None:
     """Tidy up your Markdown files by removing empty bullets and double spaces in any block."""
     for each_file in markdown_file:
+        _call_golang_executable("tidy-up", each_file)
+
         changed = []
         old_contents = each_file.read_text()
 
@@ -108,8 +112,6 @@ def tidy_up(
         rm_double_spaces = rust_ext.remove_consecutive_spaces(rm_empty_bullets)
         if rm_double_spaces != rm_empty_bullets:
             changed.append("double spaces")
-            # TODO: this is just a test, remove it
-            _call_golang_executable()
 
         if changed:
             each_file.write_text(rm_double_spaces)
