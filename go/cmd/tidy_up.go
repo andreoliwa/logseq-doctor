@@ -1,9 +1,14 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"github.com/aholstenson/logseq-go"
+	"github.com/aholstenson/logseq-go/content"
 	"github.com/spf13/cobra"
+	"log"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -13,15 +18,47 @@ var tidyUpCmd = &cobra.Command{
 	Short: "Tidy up your Markdown files.",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		dir := os.Getenv("LOGSEQ_GRAPH_PATH")
+		if dir == "" {
+			log.Fatalln("LOGSEQ_GRAPH_PATH environment variable is not set.")
+		}
+
+		ctx := context.Background()
+		graph, err := logseq.Open(ctx, dir)
+		if err != nil {
+			log.Fatalln("error opening graph: %w", err)
+			return
+		}
+
 		changes := make([]string, 0)
-		for _, f := range args {
-			if !isValidMarkdownFile(f) {
-				fmt.Println(f + ": skipping, not a Markdown file")
+		var what string
+		exitCode := 0
+		for _, path := range args {
+			if !isValidMarkdownFile(path) {
+				fmt.Printf("%s: skipping, not a Markdown file\n", path)
 			} else {
-				changes = append(changes, "fake Golang success message")
-				fmt.Println(f + ": " + strings.Join(changes, ", "))
+				page, err := graph.OpenViaPath(path)
+				if err != nil {
+					log.Fatalf("%s: error opening file via path: %s\n", path, err)
+					return
+				}
+				if page == nil {
+					log.Fatalf("%s: error opening file via path: page is nil\n", path)
+					return
+				}
+
+				what = checkForbiddenReferences(page)
+				if what != "" {
+					changes = append(changes, what)
+				}
+
+				if len(changes) > 0 {
+					exitCode = 1
+					fmt.Printf("%s: %s\n", path, strings.Join(changes, ", "))
+				}
 			}
 		}
+		os.Exit(exitCode)
 	},
 }
 
@@ -55,4 +92,52 @@ func isValidMarkdownFile(filePath string) bool {
 	}
 
 	return !info.IsDir()
+}
+
+// checkForbiddenReferences checks if a page has forbidden references to other pages or tags.
+func checkForbiddenReferences(page logseq.Page) string {
+	all := make([]string, 0)
+	for _, block := range page.Blocks() {
+		block.Children().FilterDeep(func(n content.Node) bool {
+			var to string
+			if pageLink, ok := n.(*content.PageLink); ok {
+				to = pageLink.To
+			} else if tag, ok := n.(*content.Hashtag); ok {
+				to = tag.To
+			}
+
+			// TODO: these values should be read from a config file or env var
+			forbidden := false
+			switch strings.ToLower(to) {
+			case "quick capture":
+				forbidden = true
+			case "inbox":
+				forbidden = true
+			}
+			if forbidden {
+				all = append(all, to)
+			}
+			return false
+		})
+	}
+	if len(all) > 0 {
+		unique := sortAndRemoveDuplicates(all)
+		return fmt.Sprintf("remove these forbidden references to pages/tags: %s", strings.Join(unique, ", "))
+	}
+	return ""
+}
+
+func sortAndRemoveDuplicates(elements []string) []string {
+	seen := make(map[string]bool)
+	uniqueElements := make([]string, 0)
+
+	for _, element := range elements {
+		if !seen[element] {
+			seen[element] = true
+			uniqueElements = append(uniqueElements, element)
+		}
+	}
+	sort.Strings(uniqueElements)
+
+	return uniqueElements
 }
