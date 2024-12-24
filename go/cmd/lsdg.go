@@ -9,8 +9,9 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "lsdg",
-	Short: "Logseq Doctor (Go): heal your Markdown files for Logseq",
-	Long: `A tool that manipulates Logseq Markdown files.
+	Short: "Logseq Doctor (Go) heals your Markdown files for Logseq",
+	Long: `Logseq Doctor (Go) heals your Markdown files for Logseq.
+
 Convert flat Markdown to Logseq outline, clean up Markdown,
 prevent invalid content, and more stuff to come.
 

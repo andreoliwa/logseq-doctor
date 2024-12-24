@@ -51,6 +51,10 @@ var tidyUpCmd = &cobra.Command{
 				if what != "" {
 					changes = append(changes, what)
 				}
+				what = checkRunningTasks(page)
+				if what != "" {
+					changes = append(changes, what)
+				}
 
 				if len(changes) > 0 {
 					exitCode = 1
@@ -140,4 +144,24 @@ func sortAndRemoveDuplicates(elements []string) []string {
 	sort.Strings(uniqueElements)
 
 	return uniqueElements
+}
+
+// checkRunningTasks checks if a page has running tasks (DOING, etc.).
+func checkRunningTasks(page logseq.Page) string {
+	running := false
+	for _, block := range page.Blocks() {
+		block.Children().FilterDeep(func(n content.Node) bool {
+			if task, ok := n.(*content.TaskMarker); ok {
+				s := task.Status
+				if s == content.TaskStatusDoing || s == content.TaskStatusInProgress {
+					running = true
+				}
+			}
+			return false
+		})
+	}
+	if running {
+		return "stop the running tasks (DOING/IN-PROGRESS)"
+	}
+	return ""
 }
