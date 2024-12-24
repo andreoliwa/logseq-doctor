@@ -31,12 +31,11 @@ print-config: # Print the configuration used by maturin
 	PYO3_PRINT_CONFIG=1 $(ACTIVATE_VENV) && maturin develop
 .PHONY: print-config
 
-install-go: # Install Go tools for development
+install-local: build-go # Create the virtualenv and setup the local development environment
+	# Neede for the pre-commit hook
 	# https://github.com/golangci/golangci-lint#install-golangci-lint
 	brew install golangci-lint
-.PHONY: install-go
 
-install: # Create the virtualenv and setup the local development environment
 	-rm .python-version
 	@echo $$(basename $$(pwd))
 	-pyenv virtualenv $$(basename $$(pwd))
@@ -47,16 +46,17 @@ install: # Create the virtualenv and setup the local development environment
 # https://github.com/pyenv/pyenv-virtualenv/issues/372
 	$(MAKE) develop
 	@echo "Run 'make smoke' to check if the development environment is working"
-.PHONY: install
+.PHONY: install-local
 
-pipx-install: # Install the package with pipx in editable mode. Do this when you want to use "lsd" outside of the development environment
+install-global: build-go # Install the package with pipx in editable mode. Do this when you want to use "lsd" outside of the development environment
 	-pipx install -e --force .
-.PHONY: pipx-install
+	$(MAKE) rehash
+.PHONY: install-global
 
-pipx-uninstall: # Uninstall only the pipx virtualenv. Use this when developing, so the local venv "lsd" is available instead of the pipx one
+.uninstall-global: # Uninstall only the pipx virtualenv. Use this when developing, so the local venv "lsd" is available instead of the pipx one
 	-pipx uninstall logseq-doctor
 	$(MAKE) rehash
-.PHONY: pipx-uninstall
+.PHONY: .uninstall-global
 
 deps: # Install the development dependencies
 	$(ACTIVATE_VENV) && python -m pip install -U pip pytest pytest-cov pytest-datadir responses pytest-env pytest-watch pytest-testmon
@@ -67,7 +67,7 @@ freeze: # Show the installed packages
 	$(ACTIVATE_VENV) && python -m pip freeze
 .PHONY: freeze
 
-uninstall: pipx-uninstall # Remove the virtualenv
+uninstall: clean .uninstall-global # Remove both local and global (virtualenv and pipx)
 	-rm .python-version
 	-pyenv uninstall -f $$(basename $$(pwd))
 .PHONY: uninstall
