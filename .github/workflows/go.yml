@@ -17,5 +17,5 @@ jobs:
           GO111MODULE: "auto"
       - name: Upload coverage to CodeCov
         uses: codecov/codecov-action@v5
-        env:
+        with:
           token: ${{ secrets.CODECOV_TOKEN }}
