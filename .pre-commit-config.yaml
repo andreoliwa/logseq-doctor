@@ -9,7 +9,9 @@ ci:
   # These hooks are meant to be run locally only.
   # They fail on pre-commit.ci with "Executable `cargo` not found".
   # Using "language: rust" also didn't work because these are not hooks written in Rust.
-  skip: [fmt, cargo-check, clippy]
+  # This one also fails for Go:
+  # Executable `golangci-lint` not found
+  skip: [fmt, cargo-check, clippy, golangci-lint]
 
 default_language_version:
   python: python3.11
