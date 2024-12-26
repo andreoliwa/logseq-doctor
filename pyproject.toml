@@ -26,7 +26,6 @@ dependencies = [
   'typer[all]',
 ]
 description = "Logseq Doctor: heal your Markdown files"
-dynamic = ["version"]
 keywords = [
   "knowledge-base",
   "knowledge-graph",

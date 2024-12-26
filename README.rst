@@ -53,7 +53,14 @@ Overview
 
 Logseq Doctor: heal your flat old Markdown files before importing them.
 
-**Note:** *this project is still alpha, so it's a bit rough on the edges (documentation and feature-wise).*
+.. warning::
+
+    This project is still alpha, so it's very rough on the edges (documentation and feature-wise).
+
+    At the moment, it has a Python package shipped with a Rust module, plus an external Go executable with recent additions.
+
+    The long-term plan is to convert it to Go and slowly remove Rust and Python.
+    New features will be added to the Go executable only.
 
 Installation
 ============
@@ -67,6 +74,18 @@ You can also install the development version with::
     pipx install git+https://github.com/andreoliwa/logseq-doctor
 
 You will then have the ``lsd`` command available globally in your system.
+
+If you want to use the ``lsd tidy-up`` command, (for now) you will need to manually install the Go executable from the latest ``master`` branch::
+
+    go install github.com/andreoliwa/logseq-doctor@f7c0f0f  # use the latest commit hash after the @
+
+``lsdg`` is the expected name for the Go executable, so you need to rename it::
+
+    mv $(go env GOPATH)/bin/logseq-doctor $(go env GOPATH)/bin/lsdg
+
+Confirm if it's in your path::
+
+    ls -l $(go env GOPATH)/bin/lsdg
 
 Quick start
 ===========

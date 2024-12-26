@@ -11,13 +11,20 @@ build: build-go # Build the Rust crate and Python package
 build-go: # Build the Golang executable
 	go mod tidy
 	go build -o lsdg main.go
-	mv lsdg ~/.local/bin/
+	mv lsdg `go env GOPATH`/bin/
+	$(MAKE) list-go
 .PHONY: build-go
 
 clean: # Clean the build artifacts
 	cargo clean
-	-rm ~/.local/bin/lsdg
+	-rm `go env GOPATH`/bin/logseq-doctor
+	-rm `go env GOPATH`/bin/lsdg
+	$(MAKE) list-go
 .PHONY: clean
+
+list-go: # List the installed Go packages
+	ls -l `go env GOPATH`/bin/
+.PHONY: list-go
 
 develop: build-go # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
 	$(ACTIVATE_VENV) && maturin develop
@@ -32,7 +39,7 @@ print-config: # Print the configuration used by maturin
 .PHONY: print-config
 
 install-local: build-go # Create the virtualenv and setup the local development environment
-	# Neede for the pre-commit hook
+	# Needed for the pre-commit hook
 	# https://github.com/golangci/golangci-lint#install-golangci-lint
 	brew install golangci-lint
 
