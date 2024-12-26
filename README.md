@@ -80,10 +80,7 @@ To run all the tests run:
 
 Note, to combine the coverage data from all the tox environments run:
 
-+------+---------------------------------------------------------------+
-| Win | set PYTEST_ADDOPTS=--cov-append |
-| dows | tox |
-+------+---------------------------------------------------------------+
-| O | PYTEST_ADDOPTS=--cov-append tox |
-| ther | |
-+------+---------------------------------------------------------------+
+| OS      |                                     |
+| ------- | ----------------------------------- |
+| Windows | set PYTEST_ADDOPTS=--cov-append tox |
+| Other   | PYTEST_ADDOPTS=--cov-append tox     |
