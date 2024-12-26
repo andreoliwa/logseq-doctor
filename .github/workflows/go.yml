@@ -1,0 +1,21 @@
+name: Go
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+      - name: Run tests and generate coverage data
+        run: |
+          go test -race -v ./... -coverprofile=coverage.out -covermode=atomic
+        env:
+          GO111MODULE: "auto"
+      - name: Upload coverage to CodeCov
+        uses: codecov/codecov-action@v5
+        env:
+          token: ${{ secrets.CODECOV_TOKEN }}

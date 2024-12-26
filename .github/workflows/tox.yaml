@@ -143,11 +143,12 @@ jobs:
           TOXPYTHON: "${{ matrix.toxpython }}"
         run: >
           tox -e ${{ matrix.tox_env }} -v
-    # https://github.com/codecov/example-python
-    # TODO: codecov is not working
 
-#    - name: "Upload coverage to Codecov"
-#      uses: codecov/codecov-action@v3
-#      if: ${{ matrix.codecov }}
-#      with:
-#        fail_ci_if_error: true
+# TODO: don't upload Python yet
+#      - name: Upload coverage to CodeCov
+#        uses: codecov/codecov-action@v5
+#        env:
+#          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+#        if: ${{ matrix.codecov }}
+#        with:
+#          fail_ci_if_error: true
