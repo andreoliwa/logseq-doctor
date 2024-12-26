@@ -1,34 +1,10 @@
 # Overview
 
-+---------+-----------------------------------------------------------+
-| docs | [![Documentation                                          |
-|         |  Status](https://readthedocs.org/projects/logseq-doctor/b |
-| | adge/?style=flat)](https://logseq-doctor.readthedocs.io/) |
-+---------+-----------------------------------------------------------+
-| tests | | [![Git                                                  |
-|         | Hub Actions Build Status](https://github.com/andreoliwa/l |
-| | ogseq-doctor/actions/workflows/github-actions.yml/badge.s |
-| | vg)](https://github.com/andreoliwa/logseq-doctor/actions) |
-| | | [![Coverage Status](https://codecov.io/gh/andreoliw |
-| | a/logseq-doctor/branch/master/graphs/badge.svg?branch=mas |
-| | ter)](https://codecov.io/github/andreoliwa/logseq-doctor) |
-+---------+-----------------------------------------------------------+
-| package | | [![PyPI                                                 |
-|         |  Package latest release](https://img.shields.io/pypi/v/lo |
-| | gseq-doctor.svg)](https://pypi.org/project/logseq-doctor) |
-| | [![PyPI Wheel](https://img.shields.io/pypi/wheel/lo |
-| | gseq-doctor.svg)](https://pypi.org/project/logseq-doctor) |
-| | [![Supp                                                 |
-|         | orted versions](https://img.shields.io/pypi/pyversions/lo |
-| | gseq-doctor.svg)](https://pypi.org/project/logseq-doctor) |
-| | [![Supported imple                                      |
-|         | mentations](https://img.shields.io/pypi/implementation/lo |
-| | gseq-doctor.svg)](https://pypi.org/project/logseq-doctor) |
-| | | [![Commits s                                            |
-|         | ince latest release](https://img.shields.io/github/commit |
-| | s-since/andreoliwa/logseq-doctor/v0.3.0.svg)](https://git |
-| | hub.com/andreoliwa/logseq-doctor/compare/v0.3.0...master) |
-+---------+-----------------------------------------------------------+
+|         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| docs    | [![Documentation Status](https://readthedocs.org/projects/logseq-doctor/badge/?style=flat)](https://logseq-doctor.readthedocs.io/)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| tests   | [![Maturin Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/maturin.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions) [![Tox Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/tox.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions) [![Coverage Status](https://codecov.io/gh/andreoliwa/logseq-doctor/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/github/andreoliwa/logseq-doctor)                                                                                                                                                                                       |
+| package | [![PyPI Package latest release](https://img.shields.io/pypi/v/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![PyPI Wheel](https://img.shields.io/pypi/wheel/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![Supported versions](https://img.shields.io/pypi/pyversions/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![Supported implementations](https://img.shields.io/pypi/implementation/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![Commits since latest release](https://img.shields.io/github/commits-since/andreoliwa/logseq-doctor/v0.3.0.svg)](https://github.com/andreoliwa/logseq-doctor/compare/v0.3.0...master) |
 
 Logseq Doctor: heal your flat old Markdown files before importing them.
 
