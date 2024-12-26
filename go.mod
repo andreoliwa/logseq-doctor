@@ -3,7 +3,7 @@ module github.com/andreoliwa/logseq-doctor
 go 1.21
 
 require (
-	github.com/aholstenson/logseq-go v0.0.0-20240211185252-504b4e13ddcd
+	github.com/andreoliwa/logseq-go v0.0.0-20241226195503-ec30920a9c1c
 	github.com/spf13/cobra v1.8.1
 )
 
@@ -34,6 +34,3 @@ require (
 	golang.org/x/text v0.9.0 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
-
-// TODO: poiting to the latest commit in my fork, while I still don't open a PR on the original repo
-replace github.com/aholstenson/logseq-go => github.com/andreoliwa/logseq-go v0.0.0-20241223211450-c9b96370e272

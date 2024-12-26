@@ -3,8 +3,8 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/aholstenson/logseq-go"
-	"github.com/aholstenson/logseq-go/content"
+	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/content"
 	"github.com/spf13/cobra"
 	"log"
 	"os"
