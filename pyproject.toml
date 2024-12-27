@@ -23,7 +23,7 @@ dependencies = [
   'maya',
   'mistletoe',
   'requests',
-  'typer[all]',
+  'typer-slim',
 ]
 description = "Logseq Doctor: heal your Markdown files"
 keywords = [
