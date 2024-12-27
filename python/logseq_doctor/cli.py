@@ -16,11 +16,13 @@ Why does this file exist, and why not put this in __main__?
 
 from __future__ import annotations
 
+import os
 import re
+import subprocess
 import sys
 from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path  # noqa: TCH003 Typer needs this import to infer the type of the argument
+from pathlib import Path  # Typer needs this import to infer the type of the argument
 from typing import TYPE_CHECKING, cast
 
 import maya
@@ -65,6 +67,36 @@ def outline(text_file: typer.FileText) -> None:
     typer.echo(flat_markdown_to_outline(text_file.read()))
 
 
+def _call_golang_exe(command: str, markdown_file: Path) -> int:
+    display_errors = not bool(os.environ.get("LOGSEQ_GO_IGNORE_ERRORS", False))
+
+    exe_str = os.environ.get("LOGSEQ_GO_EXE_PATH", "~/go/bin/lsdg")
+    if not exe_str:
+        if display_errors:
+            typer.secho("The environment variable 'LOGSEQ_GO_EXE_PATH' is not set.", fg=typer.colors.RED, bold=True)
+            return 1
+        return 0
+
+    # TODO: install the Go executable when the Python package is installed
+    exe_path = Path(exe_str).expanduser()
+    if not exe_path.exists():
+        if display_errors:
+            typer.secho(f"The executable '{exe_path}' does not exist.", fg=typer.colors.RED, bold=True)
+        return 2
+    if not os.access(exe_path, os.X_OK):
+        if display_errors:
+            typer.secho(f"The file '{exe_path}' is not executable.", fg=typer.colors.RED, bold=True)
+        return 3
+    try:
+        result = subprocess.run([exe_path, command, str(markdown_file)], check=False)  # noqa: S603
+    except subprocess.CalledProcessError as err:
+        if display_errors:
+            typer.secho(f"An error occurred while running the executable: {err}")
+        return 4
+    else:
+        return result.returncode
+
+
 @app.command()
 def tidy_up(
     markdown_file: list[Path] = typer.Argument(
@@ -77,26 +109,30 @@ def tidy_up(
     ),
 ) -> None:
     """Tidy up your Markdown files by removing empty bullets and double spaces in any block."""
+    exit_code = 0
     for each_file in markdown_file:
+        golang_exit_code = _call_golang_exe("tidy-up", each_file)
+        if golang_exit_code:
+            exit_code = golang_exit_code
+
         changed = []
         old_contents = each_file.read_text()
 
-        # TODO: move these changes to Rust, inside tidy_up(), to avoid the file being written twice
+        # TODO: move these changes to Go
         rm_empty_bullets = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
         if rm_empty_bullets != old_contents:
             changed.append("empty bullets")
-
-        rm_double_spaces = rust_ext.remove_consecutive_spaces(rm_empty_bullets)
-        if rm_double_spaces != rm_empty_bullets:
-            changed.append("double spaces")
-        if changed:
-            each_file.write_text(rm_double_spaces)
+            each_file.write_text(rm_empty_bullets)
 
         if rust_ext.tidy_up(each_file):
             changed.append("brackets")
 
         if changed:
+            if not exit_code:
+                exit_code = 1
             typer.echo(f"{each_file}: {', '.join(changed)}")
+    if exit_code:
+        sys.exit(exit_code)
 
 
 class TaskFormat(str, Enum):

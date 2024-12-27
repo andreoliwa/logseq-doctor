@@ -7,24 +7,19 @@ use pyo3::types::PyDate;
 use std::path::PathBuf;
 
 #[pymodule]
-fn rust_ext(_python: Python, module: &PyModule) -> PyResult<()> {
-    module.add_function(wrap_pyfunction!(remove_consecutive_spaces, module)?)?;
+fn rust_ext(_python: Python, module: &Bound<PyModule>) -> PyResult<()> {
     module.add_function(wrap_pyfunction!(add_content, module)?)?;
     module.add_function(wrap_pyfunction!(tidy_up, module)?)?;
     Ok(())
 }
 
 #[pyfunction]
-fn remove_consecutive_spaces(file_contents: String) -> PyResult<String> {
-    Ok(logseq::remove_consecutive_spaces(file_contents).unwrap())
-}
-
-#[pyfunction]
+#[pyo3(signature = (graph_path, markdown, prepend, parsed_date=None))]
 fn add_content(
     graph_path: PathBuf,
     markdown: String,
     prepend: bool,
-    parsed_date: Option<&PyDate>,
+    parsed_date: Option<&Bound<PyDate>>,
 ) -> PyResult<()> {
     let naive_date = match parsed_date {
         None => None,
@@ -44,7 +39,7 @@ fn add_content(
     Ok(())
 }
 
-fn pydate_to_naivedate(pydate: &PyDate) -> PyResult<Option<NaiveDate>> {
+fn pydate_to_naivedate(pydate: &Bound<PyDate>) -> PyResult<Option<NaiveDate>> {
     let year = pydate.getattr("year")?.extract::<i32>()?;
     let month = pydate.getattr("month")?.extract::<u32>()?;
     let day = pydate.getattr("day")?.extract::<u32>()?;

@@ -1,14 +1,33 @@
 ACTIVATE_VENV = source ~/.pyenv/versions/logseq-doctor/bin/activate
+GO_TEST = go test -v ./... -race -covermode=atomic
 
 help: # Display this help
 	@cat Makefile | egrep '^[a-z0-9 ./-]*:.*#' | sed -E -e 's/:.+# */@ /g' -e 's/ .+@/@/g' | sort | awk -F@ '{printf "\033[1;34m%-15s\033[0m %s\n", $$1, $$2}'
 .PHONY: help
 
-build: # Build the Rust crate and Python package
-	maturin build
+build: build-go # Build the Rust crate and Python package
+	$(ACTIVATE_VENV) && maturin build
 .PHONY: build
 
-develop: # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
+build-go: # Build the Golang executable
+	go mod tidy
+	go build -o lsdg main.go
+	mv lsdg `go env GOPATH`/bin/
+	$(MAKE) list-go
+.PHONY: build-go
+
+clean: # Clean the build artifacts
+	cargo clean
+	-rm `go env GOPATH`/bin/logseq-doctor
+	-rm `go env GOPATH`/bin/lsdg
+	$(MAKE) list-go
+.PHONY: clean
+
+list-go: # List the installed Go packages
+	ls -l `go env GOPATH`/bin/
+.PHONY: list-go
+
+develop: build-go # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
 	$(ACTIVATE_VENV) && maturin develop
 .PHONY: develop
 
@@ -20,7 +39,11 @@ print-config: # Print the configuration used by maturin
 	PYO3_PRINT_CONFIG=1 $(ACTIVATE_VENV) && maturin develop
 .PHONY: print-config
 
-install: # Create the virtualenv and setup the local development environment
+install-local: build-go # Create the virtualenv and setup the local development environment
+	# Needed for the pre-commit hook
+	# https://github.com/golangci/golangci-lint#install-golangci-lint
+	brew install golangci-lint
+
 	-rm .python-version
 	@echo $$(basename $$(pwd))
 	-pyenv virtualenv $$(basename $$(pwd))
@@ -31,16 +54,17 @@ install: # Create the virtualenv and setup the local development environment
 # https://github.com/pyenv/pyenv-virtualenv/issues/372
 	$(MAKE) develop
 	@echo "Run 'make smoke' to check if the development environment is working"
-.PHONY: install
+.PHONY: install-local
 
-pipx-install: # Install the package with pipx in editable mode. Do this when you want to use "lsd" outside of the development environment
+install-global: build-go # Install the package with pipx in editable mode. Do this when you want to use "lsd" outside of the development environment
 	-pipx install -e --force .
-.PHONY: pipx-install
+	$(MAKE) rehash
+.PHONY: install-global
 
-pipx-uninstall: # Uninstall only the pipx virtualenv. Use this when developing, so the local venv "lsd" is available instead of the pipx one
+.uninstall-global: # Uninstall only the pipx virtualenv. Use this when developing, so the local venv "lsd" is available instead of the pipx one
 	-pipx uninstall logseq-doctor
 	$(MAKE) rehash
-.PHONY: pipx-uninstall
+.PHONY: .uninstall-global
 
 deps: # Install the development dependencies
 	$(ACTIVATE_VENV) && python -m pip install -U pip pytest pytest-cov pytest-datadir responses pytest-env pytest-watch pytest-testmon
@@ -51,23 +75,27 @@ freeze: # Show the installed packages
 	$(ACTIVATE_VENV) && python -m pip freeze
 .PHONY: freeze
 
-uninstall: pipx-uninstall # Remove the virtualenv
+uninstall: clean .uninstall-global # Remove both local and global (virtualenv and pipx)
 	-rm .python-version
 	-pyenv uninstall -f $$(basename $$(pwd))
 .PHONY: uninstall
-
-example: develop # Run a simple example of Python code calling Rust code
-	python -c "from logseq_doctor import rust_ext; print(rust_ext.remove_consecutive_spaces('    - abc   123     def  \n'))"
-.PHONY: example
 
 run: develop rehash # Run the CLI with a Python click script as the entry point
 	lsd --help
 .PHONY: run
 
-test: # Run tests on both Python and Rust
+test: test-go # Run tests on Python, Rust and Go
 	cargo test
 	tox -e py311
 .PHONY: test
+
+test-go: # Run Go tests
+	$(GO_TEST)
+.PHONY: test-go
+
+test-go-coverage: # Run Go tests with coverage
+	$(GO_TEST) -coverprofile=coverage-go.out
+.PHONY: test-go-coverage
 
 watch: # Run tests and watch for changes
 	$(ACTIVATE_VENV) && ptw --runner "pytest --testmon"
@@ -91,7 +119,7 @@ release: # Bump the version, create a tag, commit and push. This will trigger th
 	gh repo view --web
 .PHONY: .release-post-bump
 
-smoke: run example test # Run simple tests to make sure the package is working
+smoke: run test # Run simple tests to make sure the package is working
 .PHONY: smoke
 
 clippy: develop # Run clippy on the Rust code

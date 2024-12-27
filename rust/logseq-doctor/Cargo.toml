@@ -1,7 +1,7 @@
 [dependencies]
-chrono = "0.4.37"
+chrono = "0.4.39"
 logseq = {path = "../logseq"}
-pyo3 = {version = "0.21.1"}
+pyo3 = {features = ["extension-module"], version = "0.23.3"}
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]

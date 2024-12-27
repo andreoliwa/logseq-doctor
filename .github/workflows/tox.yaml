@@ -1,5 +1,6 @@
 name: tox
 on: [push]
+
 jobs:
   # Adapted from https://github.com/marketplace/actions/skip-duplicate-actions
   pre_job:
@@ -20,7 +21,7 @@ jobs:
           # https://github.com/marketplace/actions/skip-duplicate-actions#do_not_skip
           do_not_skip: '["workflow_dispatch", "schedule", "merge_group", "release"]'
           # https://github.com/marketplace/actions/skip-duplicate-actions#paths
-          paths: '["Cargo.*", "pyproject.toml", "tox.ini", "python/**", "rust/**", "tests/**"]'
+          paths: '["go.*", "*.go", "go/**", "Cargo.*", "pyproject.toml", "python/**", "rust/**"]'
 
   test:
     needs: pre_job
@@ -50,12 +51,6 @@ jobs:
           #            python_arch: 'x64'
           #            tox_env: 'py39'
           #            os: 'windows-latest'
-          - name: "py39 (macos)"
-            python: "3.9"
-            toxpython: "python3.9"
-            python_arch: "x64"
-            tox_env: "py39"
-            os: "macos-latest"
           - name: "py310 (ubuntu)"
             python: "3.10"
             toxpython: "python3.10"
@@ -69,12 +64,6 @@ jobs:
           #            python_arch: 'x64'
           #            tox_env: 'py310'
           #            os: 'windows-latest'
-          - name: "py310 (macos)"
-            python: "3.10"
-            toxpython: "python3.10"
-            python_arch: "x64"
-            tox_env: "py310"
-            os: "macos-latest"
           - name: "py311 (ubuntu)"
             python: "3.11"
             toxpython: "python3.11"
@@ -140,11 +129,9 @@ jobs:
           TOXPYTHON: "${{ matrix.toxpython }}"
         run: >
           tox -e ${{ matrix.tox_env }} -v
-    # https://github.com/codecov/example-python
-    # TODO: codecov is not working
-
-#    - name: "Upload coverage to Codecov"
-#      uses: codecov/codecov-action@v3
-#      if: ${{ matrix.codecov }}
-#      with:
-#        fail_ci_if_error: true
+      - name: Upload coverage to CodeCov
+        uses: codecov/codecov-action@v5
+        if: ${{ matrix.codecov }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true

@@ -18,7 +18,7 @@ version_files = [
   "docs/conf.py:version = release",
   "pyproject.toml:version =",
   "python/logseq_doctor/__init__.py",
-  "README.rst:github",
+  "README.md:github",
   "rust/logseq-doctor/Cargo.toml:version =",
   "rust/logseq/Cargo.toml:version =",
 ]
