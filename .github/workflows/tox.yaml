@@ -51,12 +51,6 @@ jobs:
           #            python_arch: 'x64'
           #            tox_env: 'py39'
           #            os: 'windows-latest'
-          - name: "py39 (macos)"
-            python: "3.9"
-            toxpython: "python3.9"
-            python_arch: "x64"
-            tox_env: "py39"
-            os: "macos-latest"
           - name: "py310 (ubuntu)"
             python: "3.10"
             toxpython: "python3.10"
@@ -70,12 +64,6 @@ jobs:
           #            python_arch: 'x64'
           #            tox_env: 'py310'
           #            os: 'windows-latest'
-          - name: "py310 (macos)"
-            python: "3.10"
-            toxpython: "python3.10"
-            python_arch: "x64"
-            tox_env: "py310"
-            os: "macos-latest"
           - name: "py311 (ubuntu)"
             python: "3.11"
             toxpython: "python3.11"
