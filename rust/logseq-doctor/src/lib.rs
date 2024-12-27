@@ -20,6 +20,7 @@ fn remove_consecutive_spaces(file_contents: String) -> PyResult<String> {
 }
 
 #[pyfunction]
+#[pyo3(signature = (graph_path, markdown, prepend, parsed_date=None))]
 fn add_content(
     graph_path: PathBuf,
     markdown: String,

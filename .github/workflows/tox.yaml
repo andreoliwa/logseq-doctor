@@ -1,7 +1,5 @@
 name: tox
-# TODO: disabling for now, lots of things failing
-#on: [push]
-on: [workflow_dispatch]
+on: [push]
 
 jobs:
   # Adapted from https://github.com/marketplace/actions/skip-duplicate-actions
@@ -53,12 +51,6 @@ jobs:
           #            python_arch: 'x64'
           #            tox_env: 'py39'
           #            os: 'windows-latest'
-          - name: "py39 (macos)"
-            python: "3.9"
-            toxpython: "python3.9"
-            python_arch: "x64"
-            tox_env: "py39"
-            os: "macos-latest"
           - name: "py310 (ubuntu)"
             python: "3.10"
             toxpython: "python3.10"
@@ -72,12 +64,6 @@ jobs:
           #            python_arch: 'x64'
           #            tox_env: 'py310'
           #            os: 'windows-latest'
-          - name: "py310 (macos)"
-            python: "3.10"
-            toxpython: "python3.10"
-            python_arch: "x64"
-            tox_env: "py310"
-            os: "macos-latest"
           - name: "py311 (ubuntu)"
             python: "3.11"
             toxpython: "python3.11"
@@ -143,11 +129,9 @@ jobs:
           TOXPYTHON: "${{ matrix.toxpython }}"
         run: >
           tox -e ${{ matrix.tox_env }} -v
-    # https://github.com/codecov/example-python
-    # TODO: codecov is not working
-
-#    - name: "Upload coverage to Codecov"
-#      uses: codecov/codecov-action@v3
-#      if: ${{ matrix.codecov }}
-#      with:
-#        fail_ci_if_error: true
+      - name: Upload coverage to CodeCov
+        uses: codecov/codecov-action@v5
+        if: ${{ matrix.codecov }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
