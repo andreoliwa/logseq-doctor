@@ -8,15 +8,9 @@ use std::path::PathBuf;
 
 #[pymodule]
 fn rust_ext(_python: Python, module: &Bound<PyModule>) -> PyResult<()> {
-    module.add_function(wrap_pyfunction!(remove_consecutive_spaces, module)?)?;
     module.add_function(wrap_pyfunction!(add_content, module)?)?;
     module.add_function(wrap_pyfunction!(tidy_up, module)?)?;
     Ok(())
-}
-
-#[pyfunction]
-fn remove_consecutive_spaces(file_contents: String) -> PyResult<String> {
-    Ok(logseq::remove_consecutive_spaces(file_contents).unwrap())
 }
 
 #[pyfunction]

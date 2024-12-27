@@ -16,7 +16,12 @@ import (
 var tidyUpCmd = &cobra.Command{
 	Use:   "tidy-up",
 	Short: "Tidy up your Markdown files.",
-	Args:  cobra.MinimumNArgs(1),
+	Long: `Tidy up your Markdown files, checking for invalid content and fixing some of them automatically.
+
+- Check for forbidden references to pages/tags
+- Check for running tasks (DOING)
+- Check for double spaces`,
+	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		dir := os.Getenv("LOGSEQ_GRAPH_PATH")
 		if dir == "" {
@@ -30,8 +35,6 @@ var tidyUpCmd = &cobra.Command{
 			return
 		}
 
-		changes := make([]string, 0)
-		var what string
 		exitCode := 0
 		for _, path := range args {
 			if !isValidMarkdownFile(path) {
@@ -47,18 +50,20 @@ var tidyUpCmd = &cobra.Command{
 					return
 				}
 
-				what = checkForbiddenReferences(page)
-				if what != "" {
-					changes = append(changes, what)
-				}
-				what = checkRunningTasks(page)
-				if what != "" {
-					changes = append(changes, what)
+				changes := make([]string, 0)
+
+				functions := []func(logseq.Page) string{checkForbiddenReferences, checkRunningTasks, checkConsecutiveSpaces}
+				for _, f := range functions {
+					if msg := f(page); msg != "" {
+						changes = append(changes, msg)
+					}
 				}
 
 				if len(changes) > 0 {
 					exitCode = 1
-					fmt.Printf("%s: %s\n", path, strings.Join(changes, ", "))
+					for _, change := range changes {
+						fmt.Printf("%s: %s\n", path, change)
+					}
 				}
 			}
 		}
@@ -148,20 +153,50 @@ func sortAndRemoveDuplicates(elements []string) []string {
 
 // checkRunningTasks checks if a page has running tasks (DOING, etc.).
 func checkRunningTasks(page logseq.Page) string {
-	running := false
+	all := make([]string, 0)
 	for _, block := range page.Blocks() {
 		block.Children().FilterDeep(func(n content.Node) bool {
 			if task, ok := n.(*content.TaskMarker); ok {
 				s := task.Status
-				if s == content.TaskStatusDoing || s == content.TaskStatusInProgress {
-					running = true
+				// TODO: the conversion from a task status to the "DOING"/"IN-PROGRESS" strings should be done in logseq-go
+				if s == content.TaskStatusDoing {
+					all = append(all, "DOING")
+				}
+				if s == content.TaskStatusInProgress {
+					all = append(all, "IN-PROGRESS")
 				}
 			}
 			return false
 		})
 	}
-	if running {
-		return "stop the running tasks (DOING/IN-PROGRESS)"
+	if len(all) > 0 {
+		unique := sortAndRemoveDuplicates(all)
+		return fmt.Sprintf("stop the running tasks: %s", strings.Join(unique, ", "))
+	}
+	return ""
+}
+
+func checkConsecutiveSpaces(page logseq.Page) string {
+	all := make([]string, 0)
+	for _, block := range page.Blocks() {
+		block.Children().FilterDeep(func(n content.Node) bool {
+			var value string
+			if text, ok := n.(*content.Text); ok {
+				value = text.Value
+			} else if pageLink, ok := n.(*content.PageLink); ok {
+				value = pageLink.To
+			} else if tag, ok := n.(*content.Hashtag); ok {
+				value = tag.To
+			}
+			if strings.Contains(value, "  ") {
+				all = append(all, fmt.Sprintf("'%s'", value))
+			}
+			return false
+		})
+	}
+	if len(all) > 0 {
+		unique := sortAndRemoveDuplicates(all)
+		return fmt.Sprintf("double spaces: %s", strings.Join(unique, ", "))
 	}
 	return ""
 }
