@@ -98,7 +98,9 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist --find-interpreter
+          # --find-interpreter fails on Python 3.13
+          args: --release --out dist -i python3.10
+          # TODO -i python3.11  -i python3.12
           sccache: "true"
         env:
           # To avoid this CI error:
