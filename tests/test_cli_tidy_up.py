@@ -13,7 +13,7 @@ def test_remove_empty_bullets_from_multiple_files(datadir: Path) -> None:
 
     result = CliRunner().invoke(app, ["tidy-up", str(actual1), str(actual2)])
     assert result.output == f"{actual1}: empty bullets{os.linesep}{actual2}: empty bullets{os.linesep}"
-    assert result.exit_code == 0
+    assert result.exit_code == 1
     assert actual1.read_text() == expected1.read_text().strip()
     assert actual2.read_text() == expected2.read_text().strip()
 

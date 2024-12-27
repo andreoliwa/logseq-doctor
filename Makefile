@@ -80,10 +80,6 @@ uninstall: clean .uninstall-global # Remove both local and global (virtualenv an
 	-pyenv uninstall -f $$(basename $$(pwd))
 .PHONY: uninstall
 
-example: develop # Run a simple example of Python code calling Rust code
-	python -c "from logseq_doctor import rust_ext; print(rust_ext.remove_consecutive_spaces('    - abc   123     def  \n'))"
-.PHONY: example
-
 run: develop rehash # Run the CLI with a Python click script as the entry point
 	lsd --help
 .PHONY: run
@@ -123,7 +119,7 @@ release: # Bump the version, create a tag, commit and push. This will trigger th
 	gh repo view --web
 .PHONY: .release-post-bump
 
-smoke: run example test # Run simple tests to make sure the package is working
+smoke: run test # Run simple tests to make sure the package is working
 .PHONY: smoke
 
 clippy: develop # Run clippy on the Rust code

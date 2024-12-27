@@ -67,27 +67,34 @@ def outline(text_file: typer.FileText) -> None:
     typer.echo(flat_markdown_to_outline(text_file.read()))
 
 
-def _call_golang_executable(command: str, markdown_file: Path) -> bool:
-    # TODO: find a better way to get the executable path: from an env var or some other way
-    executable_path = Path("~/go/lsdg").expanduser()
-    if not executable_path.exists():
+def _call_golang_exe(command: str, markdown_file: Path) -> int:
+    display_errors = not bool(os.environ.get("LOGSEQ_GO_IGNORE_ERRORS", False))
+
+    exe_str = os.environ.get("LOGSEQ_GO_EXE_PATH", "~/go/bin/lsdg")
+    if not exe_str:
+        if display_errors:
+            typer.secho("The environment variable 'LOGSEQ_GO_EXE_PATH' is not set.", fg=typer.colors.RED, bold=True)
+            return 1
+        return 0
+
+    exe_path = Path(exe_str).expanduser()
+    if not exe_path.exists():
         # TODO: install the Go executable when the Python package is installed
-        #  For now, don't do anything and skip the command when the executable is not found, otherwise CI breaks
-        # msg = f"The executable '{executable_path}' does not exist."
-        # raise FileNotFoundError(msg)
-        # typer.secho(msg, fg=typer.colors.RED, bold=True)
-        return False
-    if not os.access(executable_path, os.X_OK):
-        msg = f"The file '{executable_path}' is not executable."
-        raise PermissionError(msg)
+        if display_errors:
+            typer.secho(f"The executable '{exe_path}' does not exist.", fg=typer.colors.RED, bold=True)
+        return 2
+    if not os.access(exe_path, os.X_OK):
+        if display_errors:
+            typer.secho(f"The file '{exe_path}' is not executable.", fg=typer.colors.RED, bold=True)
+        return 3
     try:
-        result = subprocess.run([executable_path, command, str(markdown_file)], check=False)  # noqa: S603
-        if result.returncode != 0:
-            sys.exit(result.returncode)
-    except subprocess.CalledProcessError as e:
-        typer.Abort(f"An error occurred while running the executable: {e}")
-        sys.exit(1)
-    return True
+        result = subprocess.run([exe_path, command, str(markdown_file)], check=False)  # noqa: S603
+    except subprocess.CalledProcessError as err:
+        if display_errors:
+            typer.secho(f"An error occurred while running the executable: {err}")
+        return 4
+    else:
+        return result.returncode
 
 
 @app.command()
@@ -102,8 +109,11 @@ def tidy_up(
     ),
 ) -> None:
     """Tidy up your Markdown files by removing empty bullets and double spaces in any block."""
+    exit_code = 0
     for each_file in markdown_file:
-        _call_golang_executable("tidy-up", each_file)
+        golang_exit_code = _call_golang_exe("tidy-up", each_file)
+        if golang_exit_code:
+            exit_code = golang_exit_code
 
         changed = []
         old_contents = each_file.read_text()
@@ -112,19 +122,17 @@ def tidy_up(
         rm_empty_bullets = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
         if rm_empty_bullets != old_contents:
             changed.append("empty bullets")
-
-        rm_double_spaces = rust_ext.remove_consecutive_spaces(rm_empty_bullets)
-        if rm_double_spaces != rm_empty_bullets:
-            changed.append("double spaces")
-
-        if changed:
-            each_file.write_text(rm_double_spaces)
+            each_file.write_text(rm_empty_bullets)
 
         if rust_ext.tidy_up(each_file):
             changed.append("brackets")
 
         if changed:
+            if not exit_code:
+                exit_code = 1
             typer.echo(f"{each_file}: {', '.join(changed)}")
+    if exit_code:
+        sys.exit(exit_code)
 
 
 class TaskFormat(str, Enum):
