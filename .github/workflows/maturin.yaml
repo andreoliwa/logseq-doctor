@@ -7,10 +7,11 @@ name: maturin
 
 on:
   push:
-    branches:
-      - master
-    tags:
-      - "*"
+  # TODO:
+  #    branches:
+  #      - master
+  #    tags:
+  #      - "*"
   pull_request:
   workflow_dispatch:
 
