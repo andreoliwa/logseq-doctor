@@ -25,8 +25,6 @@ jobs:
 
   test:
     needs: pre_job
-    # TODO for now
-    #    if: needs.pre_job.outputs.should_skip != 'true'
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
@@ -103,13 +101,16 @@ jobs:
             os: "macos-latest"
     steps:
       - uses: actions/checkout@v4
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         with:
           fetch-depth: 0
       - uses: actions/setup-python@v5
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         with:
           python-version: ${{ matrix.python }}
           architecture: ${{ matrix.python_arch }}
       - name: install dependencies
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         run: |
           python -mpip install --progress-bar=off -r ci/requirements.txt
           virtualenv --version
@@ -118,6 +119,7 @@ jobs:
           pip list --format=freeze
       # Thanks to https://github.com/lsst-sqre/safir/blob/master/.github/workflows/ci.yaml
       - name: Cache tox environments
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         id: cache-tox
         uses: actions/cache@v3
         with:
@@ -125,6 +127,7 @@ jobs:
           # These files have versioning info that would impact the tox environment
           key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
       - name: test
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         env:
           TOXPYTHON: "${{ matrix.toxpython }}"
         run: >
