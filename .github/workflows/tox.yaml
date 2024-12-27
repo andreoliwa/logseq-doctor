@@ -25,12 +25,11 @@ jobs:
 
   test:
     needs: pre_job
-    if: needs.pre_job.outputs.should_skip != 'true'
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - name: "docs"
@@ -102,29 +101,33 @@ jobs:
             os: "macos-latest"
     steps:
       - uses: actions/checkout@v4
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         with:
           fetch-depth: 0
       - uses: actions/setup-python@v5
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         with:
           python-version: ${{ matrix.python }}
           architecture: ${{ matrix.python_arch }}
       - name: install dependencies
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         run: |
           python -mpip install --progress-bar=off -r ci/requirements.txt
           virtualenv --version
           pip --version
           tox --version
           pip list --format=freeze
-        # TODO: disable cache for now
       # Thanks to https://github.com/lsst-sqre/safir/blob/master/.github/workflows/ci.yaml
-      #    - name: Cache tox environments
-      #      id: cache-tox
-      #      uses: actions/cache@v3
-      #      with:
-      #        path: .tox
-      #        # These files have versioning info that would impact the tox environment
-      #        key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
+      - name: Cache tox environments
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
+        id: cache-tox
+        uses: actions/cache@v3
+        with:
+          path: .tox
+          # These files have versioning info that would impact the tox environment
+          key: tox-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
       - name: test
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         env:
           TOXPYTHON: "${{ matrix.toxpython }}"
         run: >
