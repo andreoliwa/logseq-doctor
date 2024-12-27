@@ -7,11 +7,10 @@ name: maturin
 
 on:
   push:
-  # TODO:
-  #    branches:
-  #      - master
-  #    tags:
-  #      - "*"
+    branches:
+      - master
+    tags:
+      - "*"
   pull_request:
   workflow_dispatch:
 
@@ -72,7 +71,10 @@ jobs:
           sccache: "true"
           manylinux: auto
         env:
+          # To avoid using Python 3.13, because PyO3 is not ready for it
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
+          # To avoid error[E0432]: unresolved import `pyo3::types::PyDate`... but it's not working,
+          # this is not as simple as setting an env var, but I can't find how to disable the Limited API
           PYO3_LIMITED_API: ""
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -104,7 +106,10 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: "true"
         env:
+          # To avoid using Python 3.13, because PyO3 is not ready for it
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
+          # To avoid error[E0432]: unresolved import `pyo3::types::PyDate`... but it's not working,
+          # this is not as simple as setting an env var, but I can't find how to disable the Limited API
           PYO3_LIMITED_API: ""
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -135,7 +140,10 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: "true"
         env:
+          # To avoid using Python 3.13, because PyO3 is not ready for it
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
+          # To avoid error[E0432]: unresolved import `pyo3::types::PyDate`... but it's not working,
+          # this is not as simple as setting an env var, but I can't find how to disable the Limited API
           PYO3_LIMITED_API: ""
       - name: Upload wheels
         uses: actions/upload-artifact@v4
