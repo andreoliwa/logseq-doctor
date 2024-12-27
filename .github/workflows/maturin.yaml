@@ -73,6 +73,7 @@ jobs:
           manylinux: auto
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
+          PYO3_LIMITED_API: ""
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -104,6 +105,7 @@ jobs:
           sccache: "true"
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
+          PYO3_LIMITED_API: ""
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -134,6 +136,7 @@ jobs:
           sccache: "true"
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
+          PYO3_LIMITED_API: ""
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
