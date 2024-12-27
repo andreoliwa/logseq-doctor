@@ -121,7 +121,7 @@ jobs:
       - name: Cache tox environments
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         id: cache-tox
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .tox
           # These files have versioning info that would impact the tox environment
