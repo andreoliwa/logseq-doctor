@@ -38,7 +38,7 @@ jobs:
           # https://github.com/marketplace/actions/skip-duplicate-actions#do_not_skip
           do_not_skip: '["workflow_dispatch", "schedule", "merge_group", "release"]'
           # https://github.com/marketplace/actions/skip-duplicate-actions#paths
-          paths: '["Cargo.*", "pyproject.toml", "python/**", "rust/**"]'
+          paths: '["go.*", "*.go", "go/**", "Cargo.*", "pyproject.toml", "python/**", "rust/**"]'
 
   linux:
     needs: pre_job

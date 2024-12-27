@@ -108,7 +108,7 @@ def tidy_up(
         changed = []
         old_contents = each_file.read_text()
 
-        # TODO: move these changes to Rust, inside tidy_up(), to avoid the file being written twice
+        # TODO: move these changes to Go
         rm_empty_bullets = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
         if rm_empty_bullets != old_contents:
             changed.append("empty bullets")
