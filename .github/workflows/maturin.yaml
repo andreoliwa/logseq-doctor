@@ -100,6 +100,13 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
           sccache: "true"
+        env:
+          # To avoid this CI error:
+          #   --- stderr
+          #  error: the configured Python interpreter version (3.13) is newer than PyO3's maximum supported version (3.12)
+          #  = help: please check if an updated version of PyO3 is available. Current version: 0.21.1
+          #  = help: set PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 to suppress this check and build anyway using the stable ABI
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
