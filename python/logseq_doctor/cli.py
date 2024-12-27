@@ -77,9 +77,9 @@ def _call_golang_exe(command: str, markdown_file: Path) -> int:
             return 1
         return 0
 
+    # TODO: install the Go executable when the Python package is installed
     exe_path = Path(exe_str).expanduser()
     if not exe_path.exists():
-        # TODO: install the Go executable when the Python package is installed
         if display_errors:
             typer.secho(f"The executable '{exe_path}' does not exist.", fg=typer.colors.RED, bold=True)
         return 2
