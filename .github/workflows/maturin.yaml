@@ -5,13 +5,14 @@
 #
 name: maturin
 
+# TODO: the build is failing with unresolved import `pyo3::types::PyDate`
 on:
-  push:
-    branches:
-      - master
-    tags:
-      - "*"
-  pull_request:
+  #  push:
+  #    branches:
+  #      - master
+  #    tags:
+  #      - "*"
+  #  pull_request:
   workflow_dispatch:
 
 permissions:

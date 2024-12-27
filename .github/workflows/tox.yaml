@@ -1,7 +1,5 @@
 name: tox
-# TODO: disabling for now, lots of things failing
-#on: [push]
-on: [workflow_dispatch]
+on: [push]
 
 jobs:
   # Adapted from https://github.com/marketplace/actions/skip-duplicate-actions
