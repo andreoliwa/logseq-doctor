@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"context"
+	"github.com/andreoliwa/logseq-go"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -64,4 +67,43 @@ func TestIsValidMarkdownFile(t *testing.T) {
 			}
 		})
 	}
+}
+
+func setupPage(t *testing.T, name string) logseq.Page {
+	ctx := context.Background()
+	graph, err := logseq.Open(ctx, filepath.Join("testdata", "graph"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	page, err := graph.OpenPage(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return page
+}
+
+func TestCheckForbiddenReferences(t *testing.T) {
+	invalid := setupPage(t, "forbidden")
+	assert.Equal(t, "remove 4 forbidden references to pages/tags: Inbox, quick capture", checkForbiddenReferences(invalid))
+
+	valid := setupPage(t, "valid")
+	assert.Equal(t, "", checkForbiddenReferences(valid))
+}
+
+func TestCheckRunningTasks(t *testing.T) {
+	invalid := setupPage(t, "running")
+	assert.Equal(t, "stop 2 running task(s): DOING, IN-PROGRESS", checkRunningTasks(invalid))
+
+	valid := setupPage(t, "valid")
+	assert.Equal(t, "", checkRunningTasks(valid))
+}
+
+func TestCheckDoubleSpaces(t *testing.T) {
+	invalid := setupPage(t, "spaces")
+	assert.Equal(t, "3 double spaces: 'Link   With  Spaces  ', 'Regular   text with  spaces', 'some  tag with   spaces'", checkDoubleSpaces(invalid))
+
+	valid := setupPage(t, "valid")
+	assert.Equal(t, "", checkDoubleSpaces(valid))
 }

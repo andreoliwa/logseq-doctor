@@ -1,0 +1,7 @@
+- no forbidden pages [[here]]
+  - nested
+- top level
+  - child
+    - deep nested #[[bla bla]] as a tag
+- no running tasks
+- no double spaces

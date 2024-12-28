@@ -1,0 +1,5 @@
+- some [[quick capture]] on top level
+  - nested [[Inbox]]
+- top level #Inbox
+  - child
+    - deep nested #[[quick capture]] as a tag

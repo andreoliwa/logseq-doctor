@@ -10,6 +10,9 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.21"
+      - name: Install richgo
+        run: |
+          go install github.com/kyoh86/richgo@latest
       - name: Run tests and generate coverage data
         run: |
           make test-go-coverage

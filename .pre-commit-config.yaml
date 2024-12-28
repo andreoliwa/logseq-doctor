@@ -61,7 +61,7 @@ repos:
     hooks:
       - id: prettier
         stages:
-          - commit
+          - pre-commit
   - repo: https://github.com/doublify/pre-commit-rust
     rev: v1.0
     hooks:

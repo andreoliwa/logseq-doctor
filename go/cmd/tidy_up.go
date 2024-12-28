@@ -52,7 +52,7 @@ var tidyUpCmd = &cobra.Command{
 
 				changes := make([]string, 0)
 
-				functions := []func(logseq.Page) string{checkForbiddenReferences, checkRunningTasks, checkConsecutiveSpaces}
+				functions := []func(logseq.Page) string{checkForbiddenReferences, checkRunningTasks, checkDoubleSpaces}
 				for _, f := range functions {
 					if msg := f(page); msg != "" {
 						changes = append(changes, msg)
@@ -129,9 +129,10 @@ func checkForbiddenReferences(page logseq.Page) string {
 			return false
 		})
 	}
-	if len(all) > 0 {
+	count := len(all)
+	if count > 0 {
 		unique := sortAndRemoveDuplicates(all)
-		return fmt.Sprintf("remove these forbidden references to pages/tags: %s", strings.Join(unique, ", "))
+		return fmt.Sprintf("remove %d forbidden references to pages/tags: %s", count, strings.Join(unique, ", "))
 	}
 	return ""
 }
@@ -169,14 +170,15 @@ func checkRunningTasks(page logseq.Page) string {
 			return false
 		})
 	}
-	if len(all) > 0 {
+	count := len(all)
+	if count > 0 {
 		unique := sortAndRemoveDuplicates(all)
-		return fmt.Sprintf("stop the running tasks: %s", strings.Join(unique, ", "))
+		return fmt.Sprintf("stop %d running task(s): %s", count, strings.Join(unique, ", "))
 	}
 	return ""
 }
 
-func checkConsecutiveSpaces(page logseq.Page) string {
+func checkDoubleSpaces(page logseq.Page) string {
 	all := make([]string, 0)
 	for _, block := range page.Blocks() {
 		block.Children().FilterDeep(func(n content.Node) bool {
@@ -194,9 +196,10 @@ func checkConsecutiveSpaces(page logseq.Page) string {
 			return false
 		})
 	}
-	if len(all) > 0 {
+	count := len(all)
+	if count > 0 {
 		unique := sortAndRemoveDuplicates(all)
-		return fmt.Sprintf("double spaces: %s", strings.Join(unique, ", "))
+		return fmt.Sprintf("%d double spaces: %s", count, strings.Join(unique, ", "))
 	}
 	return ""
 }
