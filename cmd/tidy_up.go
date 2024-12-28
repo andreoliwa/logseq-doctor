@@ -3,17 +3,18 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
-	"github.com/spf13/cobra"
 	"log"
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/content"
+	"github.com/spf13/cobra"
 )
 
-// tidyUpCmd represents the tidyUp command
-var tidyUpCmd = &cobra.Command{
+// tidyUpCmd represents the tidyUp command.
+var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 	Use:   "tidy-up",
 	Short: "Tidy up your Markdown files.",
 	Long: `Tidy up your Markdown files, checking for invalid content and fixing some of them automatically.
@@ -22,7 +23,7 @@ var tidyUpCmd = &cobra.Command{
 - Check for running tasks (DOING)
 - Check for double spaces`,
 	Args: cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, args []string) {
 		dir := os.Getenv("LOGSEQ_GRAPH_PATH")
 		if dir == "" {
 			log.Fatalln("LOGSEQ_GRAPH_PATH environment variable is not set.")
@@ -32,7 +33,6 @@ var tidyUpCmd = &cobra.Command{
 		graph, err := logseq.Open(ctx, dir)
 		if err != nil {
 			log.Fatalln("error opening graph: %w", err)
-			return
 		}
 
 		exitCode := 0
@@ -43,11 +43,9 @@ var tidyUpCmd = &cobra.Command{
 				page, err := graph.OpenViaPath(path)
 				if err != nil {
 					log.Fatalf("%s: error opening file via path: %s\n", path, err)
-					return
 				}
 				if page == nil {
 					log.Fatalf("%s: error opening file via path: page is nil\n", path)
-					return
 				}
 
 				changes := make([]string, 0)
@@ -73,16 +71,6 @@ var tidyUpCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(tidyUpCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// tidyUpCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// tidyUpCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // isValidMarkdownFile checks if a file is a Markdown file, by looking at its extension, not its content.
@@ -106,34 +94,40 @@ func isValidMarkdownFile(filePath string) bool {
 // checkForbiddenReferences checks if a page has forbidden references to other pages or tags.
 func checkForbiddenReferences(page logseq.Page) string {
 	all := make([]string, 0)
+
 	for _, block := range page.Blocks() {
 		block.Children().FilterDeep(func(n content.Node) bool {
-			var to string
+			var reference string
 			if pageLink, ok := n.(*content.PageLink); ok {
-				to = pageLink.To
+				reference = pageLink.To
 			} else if tag, ok := n.(*content.Hashtag); ok {
-				to = tag.To
+				reference = tag.To
 			}
 
 			// TODO: these values should be read from a config file or env var
 			forbidden := false
-			switch strings.ToLower(to) {
+
+			switch strings.ToLower(reference) {
 			case "quick capture":
 				forbidden = true
 			case "inbox":
 				forbidden = true
 			}
+
 			if forbidden {
-				all = append(all, to)
+				all = append(all, reference)
 			}
+
 			return false
 		})
 	}
-	count := len(all)
-	if count > 0 {
+
+	if count := len(all); count > 0 {
 		unique := sortAndRemoveDuplicates(all)
+
 		return fmt.Sprintf("remove %d forbidden references to pages/tags: %s", count, strings.Join(unique, ", "))
 	}
+
 	return ""
 }
 
@@ -144,9 +138,11 @@ func sortAndRemoveDuplicates(elements []string) []string {
 	for _, element := range elements {
 		if !seen[element] {
 			seen[element] = true
+
 			uniqueElements = append(uniqueElements, element)
 		}
 	}
+
 	sort.Strings(uniqueElements)
 
 	return uniqueElements
@@ -155,51 +151,62 @@ func sortAndRemoveDuplicates(elements []string) []string {
 // checkRunningTasks checks if a page has running tasks (DOING, etc.).
 func checkRunningTasks(page logseq.Page) string {
 	all := make([]string, 0)
+
 	for _, block := range page.Blocks() {
 		block.Children().FilterDeep(func(n content.Node) bool {
 			if task, ok := n.(*content.TaskMarker); ok {
-				s := task.Status
-				// TODO: the conversion from a task status to the "DOING"/"IN-PROGRESS" strings should be done in logseq-go
-				if s == content.TaskStatusDoing {
+				status := task.Status
+				// TODO: convert to strings "DOING"/"IN-PROGRESS" in logseq-go
+				if status == content.TaskStatusDoing {
 					all = append(all, "DOING")
 				}
-				if s == content.TaskStatusInProgress {
+
+				if status == content.TaskStatusInProgress {
 					all = append(all, "IN-PROGRESS")
 				}
 			}
+
 			return false
 		})
 	}
-	count := len(all)
-	if count > 0 {
+
+	if count := len(all); count > 0 {
 		unique := sortAndRemoveDuplicates(all)
+
 		return fmt.Sprintf("stop %d running task(s): %s", count, strings.Join(unique, ", "))
 	}
+
 	return ""
 }
 
 func checkDoubleSpaces(page logseq.Page) string {
 	all := make([]string, 0)
+
 	for _, block := range page.Blocks() {
-		block.Children().FilterDeep(func(n content.Node) bool {
+		block.Children().FilterDeep(func(node content.Node) bool {
 			var value string
-			if text, ok := n.(*content.Text); ok {
+
+			if text, ok := node.(*content.Text); ok {
 				value = text.Value
-			} else if pageLink, ok := n.(*content.PageLink); ok {
+			} else if pageLink, ok := node.(*content.PageLink); ok {
 				value = pageLink.To
-			} else if tag, ok := n.(*content.Hashtag); ok {
+			} else if tag, ok := node.(*content.Hashtag); ok {
 				value = tag.To
 			}
+
 			if strings.Contains(value, "  ") {
 				all = append(all, fmt.Sprintf("'%s'", value))
 			}
+
 			return false
 		})
 	}
-	count := len(all)
-	if count > 0 {
+
+	if count := len(all); count > 0 {
 		unique := sortAndRemoveDuplicates(all)
+
 		return fmt.Sprintf("%d double spaces: %s", count, strings.Join(unique, ", "))
 	}
+
 	return ""
 }

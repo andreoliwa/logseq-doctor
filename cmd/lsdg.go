@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
+// rootCmd represents the base command when called without any subcommands.
+var rootCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 	Use:   "lsdg",
 	Short: "Logseq Doctor (Go) heals your Markdown files for Logseq",
 	Long: `Logseq Doctor (Go) heals your Markdown files for Logseq.
@@ -40,5 +40,5 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

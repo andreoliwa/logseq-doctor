@@ -1,0 +1,17 @@
+# https://golangci-lint.run/usage/configuration/
+linters:
+  enable-all: true
+  disable:
+    # keep-sorted start
+    - copyloopvar
+    - depguard
+    - exportloopref
+    - forbidigo
+    - gci
+    - gochecknoinits
+    - godox
+    - intrange
+    - ireturn
+    - paralleltest
+    - testpackage
+    # keep-sorted end
