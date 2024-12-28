@@ -16,6 +16,13 @@ build-go: # Build the Golang executable
 	$(MAKE) list-go
 .PHONY: build-go
 
+refresh-go: # Refresh the Go dependencies from the last commit
+	LAST_COMMIT=$$(cd ../logseq-go; git log -1 --format=%h); \
+		echo "LAST_COMMIT: $$LAST_COMMIT"; \
+		go get -u github.com/andreoliwa/logseq-go@$$LAST_COMMIT
+	go mod tidy
+.PHONY: refresh-go
+
 clean: # Clean the build artifacts
 	cargo clean
 	-rm `go env GOPATH`/bin/logseq-doctor

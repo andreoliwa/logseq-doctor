@@ -10,8 +10,10 @@ linters:
     - gci
     - gochecknoinits
     - godox
+    - gofmt
+    - gofumpt
+    - goimports
     - intrange
     - ireturn
     - paralleltest
-    - testpackage
     # keep-sorted end

@@ -1,4 +1,4 @@
-package cmd
+package cmd //nolint:testpackage
 
 import (
 	"context"
@@ -93,27 +93,34 @@ func setupPage(t *testing.T, name string) logseq.Page {
 
 func TestCheckForbiddenReferences(t *testing.T) {
 	invalid := setupPage(t, "forbidden")
-	assert.Equal(t, "remove 4 forbidden references to pages/tags: Inbox, quick capture",
+	assert.Equal(t, tidyInfo{"remove 4 forbidden references to pages/tags: Inbox, quick capture", false},
 		checkForbiddenReferences(invalid))
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, "", checkForbiddenReferences(valid))
+	assert.Equal(t, tidyInfo{"", false}, checkForbiddenReferences(valid))
 }
 
 func TestCheckRunningTasks(t *testing.T) {
 	invalid := setupPage(t, "running")
-	assert.Equal(t, "stop 2 running task(s): DOING, IN-PROGRESS", checkRunningTasks(invalid))
+	assert.Equal(t, tidyInfo{"stop 2 running task(s): DOING, IN-PROGRESS", false}, checkRunningTasks(invalid))
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, "", checkRunningTasks(valid))
+	assert.Equal(t, tidyInfo{"", false}, checkRunningTasks(valid))
 }
 
-func TestCheckDoubleSpaces(t *testing.T) {
+func TestRemoveDoubleSpaces(t *testing.T) {
 	invalid := setupPage(t, "spaces")
 	assert.Equal(t,
-		"3 double spaces: 'Link   With  Spaces  ', 'Regular   text with  spaces', 'some  tag with   spaces'",
-		checkDoubleSpaces(invalid))
+		tidyInfo{"fixed 4 double spaces: 'Link   With  Spaces  ', 'Regular   text with  spaces'," +
+			" 'some  page   title  with  spaces', 'some  tag with   spaces'", true},
+		removeDoubleSpaces(invalid))
+
+	// TODO: compare the saved Markdown file with spaces.md.golden.
+	//  I tested manually and it works but I need to do something like:
+	// actual := os.ReadFile(invalid.Path())
+	// expected := os.ReadFile(invalid.Path() + ".golden")
+	// assert.Equal(t, expected, actual)
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, "", checkDoubleSpaces(valid))
+	assert.Equal(t, tidyInfo{"", false}, removeDoubleSpaces(valid))
 }

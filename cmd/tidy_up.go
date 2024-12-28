@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -35,12 +36,15 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 			log.Fatalln("error opening graph: %w", err)
 		}
 
+		transaction := graph.NewTransaction()
+		shouldSave := false
+
 		exitCode := 0
 		for _, path := range args {
 			if !isValidMarkdownFile(path) {
 				fmt.Printf("%s: skipping, not a Markdown file\n", path)
 			} else {
-				page, err := graph.OpenViaPath(path)
+				page, err := transaction.OpenViaPath(path)
 				if err != nil {
 					log.Fatalf("%s: error opening file via path: %s\n", path, err)
 				}
@@ -48,21 +52,32 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 					log.Fatalf("%s: error opening file via path: page is nil\n", path)
 				}
 
-				changes := make([]string, 0)
+				messages := make([]string, 0)
 
-				functions := []func(logseq.Page) string{checkForbiddenReferences, checkRunningTasks, checkDoubleSpaces}
+				functions := []func(logseq.Page) tidyInfo{
+					checkForbiddenReferences, checkRunningTasks, removeDoubleSpaces}
 				for _, f := range functions {
-					if msg := f(page); msg != "" {
-						changes = append(changes, msg)
+					info := f(page)
+					if info.msg != "" {
+						messages = append(messages, info.msg)
+					}
+					if info.changed {
+						shouldSave = true
 					}
 				}
 
-				if len(changes) > 0 {
+				if len(messages) > 0 {
 					exitCode = 1
-					for _, change := range changes {
-						fmt.Printf("%s: %s\n", path, change)
+					for _, msg := range messages {
+						fmt.Printf("%s: %s\n", path, msg)
 					}
 				}
+			}
+		}
+		if shouldSave {
+			err = transaction.Save()
+			if err != nil {
+				log.Fatalf("error saving transaction: %s\n", err)
 			}
 		}
 		os.Exit(exitCode)
@@ -91,12 +106,17 @@ func isValidMarkdownFile(filePath string) bool {
 	return !info.IsDir()
 }
 
+type tidyInfo struct {
+	msg     string
+	changed bool
+}
+
 // checkForbiddenReferences checks if a page has forbidden references to other pages or tags.
-func checkForbiddenReferences(page logseq.Page) string {
+func checkForbiddenReferences(page logseq.Page) tidyInfo {
 	all := make([]string, 0)
 
 	for _, block := range page.Blocks() {
-		block.Children().FilterDeep(func(n content.Node) bool {
+		block.Children().FindDeep(func(n content.Node) bool {
 			var reference string
 			if pageLink, ok := n.(*content.PageLink); ok {
 				reference = pageLink.To
@@ -125,10 +145,11 @@ func checkForbiddenReferences(page logseq.Page) string {
 	if count := len(all); count > 0 {
 		unique := sortAndRemoveDuplicates(all)
 
-		return fmt.Sprintf("remove %d forbidden references to pages/tags: %s", count, strings.Join(unique, ", "))
+		return tidyInfo{fmt.Sprintf("remove %d forbidden references to pages/tags: %s",
+			count, strings.Join(unique, ", ")), false}
 	}
 
-	return ""
+	return tidyInfo{"", false}
 }
 
 func sortAndRemoveDuplicates(elements []string) []string {
@@ -149,11 +170,11 @@ func sortAndRemoveDuplicates(elements []string) []string {
 }
 
 // checkRunningTasks checks if a page has running tasks (DOING, etc.).
-func checkRunningTasks(page logseq.Page) string {
+func checkRunningTasks(page logseq.Page) tidyInfo {
 	all := make([]string, 0)
 
 	for _, block := range page.Blocks() {
-		block.Children().FilterDeep(func(n content.Node) bool {
+		block.Children().FindDeep(func(n content.Node) bool {
 			if task, ok := n.(*content.TaskMarker); ok {
 				status := task.Status
 				// TODO: convert to strings "DOING"/"IN-PROGRESS" in logseq-go
@@ -173,29 +194,41 @@ func checkRunningTasks(page logseq.Page) string {
 	if count := len(all); count > 0 {
 		unique := sortAndRemoveDuplicates(all)
 
-		return fmt.Sprintf("stop %d running task(s): %s", count, strings.Join(unique, ", "))
+		return tidyInfo{fmt.Sprintf("stop %d running task(s): %s", count, strings.Join(unique, ", ")), false}
 	}
 
-	return ""
+	return tidyInfo{"", false}
 }
 
-func checkDoubleSpaces(page logseq.Page) string {
+func removeDoubleSpaces(page logseq.Page) tidyInfo {
 	all := make([]string, 0)
+	doubleSpaceRegex := regexp.MustCompile(`\s{2,}`)
+	fixed := false
 
 	for _, block := range page.Blocks() {
-		block.Children().FilterDeep(func(node content.Node) bool {
-			var value string
+		block.Children().FindDeep(func(node content.Node) bool {
+			var oldValue string
 
 			if text, ok := node.(*content.Text); ok {
-				value = text.Value
+				oldValue = text.Value
 			} else if pageLink, ok := node.(*content.PageLink); ok {
-				value = pageLink.To
+				oldValue = pageLink.To
 			} else if tag, ok := node.(*content.Hashtag); ok {
-				value = tag.To
+				oldValue = tag.To
 			}
 
-			if strings.Contains(value, "  ") {
-				all = append(all, fmt.Sprintf("'%s'", value))
+			if strings.Contains(oldValue, "  ") {
+				all = append(all, fmt.Sprintf("'%s'", oldValue))
+				newValue := doubleSpaceRegex.ReplaceAllString(oldValue, " ")
+				fixed = true
+
+				if text, ok := node.(*content.Text); ok {
+					text.Value = newValue
+				} else if pageLink, ok := node.(*content.PageLink); ok {
+					pageLink.To = newValue
+				} else if tag, ok := node.(*content.Hashtag); ok {
+					tag.To = newValue
+				}
 			}
 
 			return false
@@ -205,8 +238,8 @@ func checkDoubleSpaces(page logseq.Page) string {
 	if count := len(all); count > 0 {
 		unique := sortAndRemoveDuplicates(all)
 
-		return fmt.Sprintf("%d double spaces: %s", count, strings.Join(unique, ", "))
+		return tidyInfo{fmt.Sprintf("fixed %d double spaces: %s", count, strings.Join(unique, ", ")), fixed}
 	}
 
-	return ""
+	return tidyInfo{"", fixed}
 }
