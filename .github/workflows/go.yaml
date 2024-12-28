@@ -55,20 +55,20 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov == 'true' }}
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
       - name: Set up Go
-        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov == 'true' }}
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
       - name: Run tests and generate coverage data
-        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov == 'true' }}
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         run: |
           make test-go-coverage
         env:
           GO111MODULE: "auto"
       - name: Upload coverage to CodeCov
-        if: ${{ matrix.codecov == 'true' }}
+        if: ${{ matrix.codecov }}
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
