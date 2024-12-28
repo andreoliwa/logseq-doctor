@@ -29,12 +29,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
           go-version: "stable"
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
+      - uses: golangci/golangci-lint-action@v6
         with:
           version: "v1.60"
 
@@ -44,28 +42,26 @@ jobs:
       matrix:
         include:
           - name: "ubuntu + coverage"
-            os: ubuntu-latest
-            go: stable
+            os: "ubuntu-latest"
+            go: "stable"
             codecov: true
           - name: "macos"
-            os: macos-latest
-            go: stable
+            os: "macos-latest"
+            go: "stable"
           - name: "windows"
-            os: windows-latest
-            go: stable
+            os: "windows-latest"
+            go: "stable"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
-      - name: Set up Go
+      - uses: actions/setup-go@v5
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
-        uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
-      - name: Run tests and generate coverage data
+      - name: Run tests with coverage
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
-        run: |
-          make test-go-coverage
+        run: make test-go-coverage
         env:
           GO111MODULE: "auto"
       - name: Upload coverage to CodeCov
