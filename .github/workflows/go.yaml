@@ -39,24 +39,33 @@ jobs:
 
   test:
     needs: pre_job
-    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     strategy:
       matrix:
-        go: [stable]
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            go: stable
+            codecov: true
+          - os: macos-latest
+            go: stable
+          - os: windows-latest
+            go: stable
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov == 'true' }}
       - name: Set up Go
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov == 'true' }}
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
       - name: Run tests and generate coverage data
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov == 'true' }}
         run: |
           make test-go-coverage
         env:
           GO111MODULE: "auto"
       - name: Upload coverage to CodeCov
+        if: ${{ matrix.codecov == 'true' }}
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
