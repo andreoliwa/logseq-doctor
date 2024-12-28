@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/andreoliwa/logseq-go v0.0.0-20241226195503-ec30920a9c1c
 	github.com/spf13/cobra v1.8.1
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.10.0
 )
 
 require (
