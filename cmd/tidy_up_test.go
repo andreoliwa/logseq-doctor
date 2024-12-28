@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"context"
-	"github.com/andreoliwa/logseq-go"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/andreoliwa/logseq-go"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSortAndRemoveDuplicates(t *testing.T) {
@@ -20,7 +21,11 @@ func TestSortAndRemoveDuplicates(t *testing.T) {
 		{"one element", []string{"apple"}, []string{"apple"}},
 		{"duplicates", []string{"orange", "apple", "banana", "apple"}, []string{"apple", "banana", "orange"}},
 		{"sorted unique", []string{"orange", "banana", "apple"}, []string{"apple", "banana", "orange"}},
-		{"unsorted with duplicates", []string{"orange", "banana", "apple", "apple", "orange"}, []string{"apple", "banana", "orange"}},
+		{
+			"unsorted with duplicates",
+			[]string{"orange", "banana", "apple", "apple", "orange"},
+			[]string{"apple", "banana", "orange"},
+		},
 	}
 
 	for _, test := range tests {
@@ -51,8 +56,7 @@ func TestIsValidMarkdownFile(t *testing.T) {
 
 	// Create a valid markdown file
 	validFilePath := filepath.Join(dir, "valid_markdown_file.md")
-	err := os.WriteFile(validFilePath, []byte("# Test"), 0644)
-	if err != nil {
+	if err := os.WriteFile(validFilePath, []byte("# Test"), 0o600); err != nil {
 		t.Fatalf("Failed to create test file: %v", err)
 	}
 
@@ -70,7 +74,10 @@ func TestIsValidMarkdownFile(t *testing.T) {
 }
 
 func setupPage(t *testing.T, name string) logseq.Page {
+	t.Helper()
+
 	ctx := context.Background()
+
 	graph, err := logseq.Open(ctx, filepath.Join("testdata", "graph"))
 	if err != nil {
 		t.Fatal(err)
@@ -86,7 +93,8 @@ func setupPage(t *testing.T, name string) logseq.Page {
 
 func TestCheckForbiddenReferences(t *testing.T) {
 	invalid := setupPage(t, "forbidden")
-	assert.Equal(t, "remove 4 forbidden references to pages/tags: Inbox, quick capture", checkForbiddenReferences(invalid))
+	assert.Equal(t, "remove 4 forbidden references to pages/tags: Inbox, quick capture",
+		checkForbiddenReferences(invalid))
 
 	valid := setupPage(t, "valid")
 	assert.Equal(t, "", checkForbiddenReferences(valid))
@@ -102,7 +110,9 @@ func TestCheckRunningTasks(t *testing.T) {
 
 func TestCheckDoubleSpaces(t *testing.T) {
 	invalid := setupPage(t, "spaces")
-	assert.Equal(t, "3 double spaces: 'Link   With  Spaces  ', 'Regular   text with  spaces', 'some  tag with   spaces'", checkDoubleSpaces(invalid))
+	assert.Equal(t,
+		"3 double spaces: 'Link   With  Spaces  ', 'Regular   text with  spaces', 'some  tag with   spaces'",
+		checkDoubleSpaces(invalid))
 
 	valid := setupPage(t, "valid")
 	assert.Equal(t, "", checkDoubleSpaces(valid))

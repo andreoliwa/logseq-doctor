@@ -1,5 +1,5 @@
 name: tox
-on: [push]
+on: push
 
 jobs:
   # Adapted from https://github.com/marketplace/actions/skip-duplicate-actions
@@ -21,7 +21,7 @@ jobs:
           # https://github.com/marketplace/actions/skip-duplicate-actions#do_not_skip
           do_not_skip: '["workflow_dispatch", "schedule", "merge_group", "release"]'
           # https://github.com/marketplace/actions/skip-duplicate-actions#paths
-          paths: '["go.*", "*.go", "go/**", "Cargo.*", "pyproject.toml", "python/**", "rust/**"]'
+          paths: '["go.*", "*.go", "cmd/**", "Cargo.*", "pyproject.toml", "python/**", "rust/**"]'
 
   test:
     needs: pre_job

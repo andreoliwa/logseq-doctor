@@ -8,14 +8,15 @@
 
 Logseq Doctor: heal your flat old Markdown files before importing them.
 
-**NOTE:** This project is still alpha, so it\'s very rough on the edges
-(documentation and feature-wise).
-
-At the moment, it has a Python package shipped with a Rust module, plus
-an external Go executable with recent additions.
-
-The long-term plan is to convert it to Go and slowly remove Rust and
-Python. New features will be added to the Go executable only.
+> [!NOTE]
+> This project is still alpha, so it\'s very rough on the edges
+> (documentation and feature-wise).
+>
+> At the moment, it has a Python package shipped with a Rust extension, plus
+> an external Go executable with recent additions.
+>
+> The long-term plan is to convert it to Go and slowly remove Rust and
+> Python. New features will be added to the Go executable only.
 
 ## Installation
 

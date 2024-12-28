@@ -1,24 +1,71 @@
 name: go
-on: [push, pull_request]
-jobs:
-  build:
-    runs-on: ubuntu-latest
+on: push
 
+jobs:
+  # Adapted from https://github.com/marketplace/actions/skip-duplicate-actions
+  pre_job:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          # https://github.com/marketplace/actions/skip-duplicate-actions#skip-concurrent-workflow-runs
+          concurrent_skipping: "same_content_newer"
+          # https://github.com/marketplace/actions/skip-duplicate-actions#cancel_others
+          # Don't cancel other jobs, they might be pushes to master
+          cancel_others: false
+          # https://github.com/marketplace/actions/skip-duplicate-actions#do_not_skip
+          do_not_skip: '["workflow_dispatch", "schedule", "merge_group", "release"]'
+          # https://github.com/marketplace/actions/skip-duplicate-actions#paths
+          paths: '["go.*", "*.go", "cmd/**", "Cargo.*", "pyproject.toml", "python/**", "rust/**"]'
+
+  lint:
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
-          go-version: "1.21"
-      - name: Install richgo
-        run: |
-          go install github.com/kyoh86/richgo@latest
-      - name: Run tests and generate coverage data
-        run: |
-          make test-go-coverage
+          go-version: "stable"
+      - uses: golangci/golangci-lint-action@v6
+        with:
+          version: "v1.60"
+
+  test:
+    needs: pre_job
+    strategy:
+      matrix:
+        include:
+          - name: "ubuntu + coverage"
+            os: "ubuntu-latest"
+            go: "stable"
+            codecov: true
+          - name: "macos"
+            os: "macos-latest"
+            go: "stable"
+          - name: "windows"
+            os: "windows-latest"
+            go: "stable"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
+      - uses: actions/setup-go@v5
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Run tests with coverage
+        if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
+        run: make test-go-coverage
         env:
           GO111MODULE: "auto"
       - name: Upload coverage to CodeCov
+        if: ${{ matrix.codecov }}
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

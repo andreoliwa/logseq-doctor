@@ -3,10 +3,10 @@ coverage:
     project:
       default:
         # Target coverage for the whole project https://docs.codecov.com/docs/commit-status#target
-        target: 50%
+        target: 75%
 
         # Maximum decrease in coverage https://docs.codecov.com/docs/commit-status#threshold
-        threshold: 10%
+        threshold: 5%
 
     patch:
       default:
