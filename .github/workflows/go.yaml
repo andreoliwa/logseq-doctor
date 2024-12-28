@@ -1,5 +1,6 @@
 name: go
-on: [push, pull_request]
+on: push
+
 jobs:
   # Adapted from https://github.com/marketplace/actions/skip-duplicate-actions
   pre_job:

@@ -1,5 +1,5 @@
 name: tox
-on: [push]
+on: push
 
 jobs:
   # Adapted from https://github.com/marketplace/actions/skip-duplicate-actions
