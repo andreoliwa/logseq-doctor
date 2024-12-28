@@ -42,12 +42,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - name: "ubuntu + coverage"
+            os: ubuntu-latest
             go: stable
             codecov: true
-          - os: macos-latest
+          - name: "macos"
+            os: macos-latest
             go: stable
-          - os: windows-latest
+          - name: "windows"
+            os: windows-latest
             go: stable
     runs-on: ${{ matrix.os }}
     steps:
