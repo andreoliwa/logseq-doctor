@@ -16,27 +16,17 @@ build-go: # Build the Golang executable
 	$(MAKE) list-go
 .PHONY: build-go
 
-refresh-go: # Refresh the Go dependencies from the last commit
-	LAST_COMMIT=$$(cd ../logseq-go; git log -1 --format=%h); \
-		echo "LAST_COMMIT: $$LAST_COMMIT"; \
-		go get -u github.com/andreoliwa/logseq-go@$$LAST_COMMIT
-	go mod tidy
-.PHONY: refresh-go
-
 clean: # Clean the build artifacts
 	cargo clean
 	-rm `go env GOPATH`/bin/logseq-doctor
 	-rm `go env GOPATH`/bin/lsdg
+	-rm -rf .pytest_cache .ruff_cache build/
 	$(MAKE) list-go
 .PHONY: clean
 
 list-go: # List the installed Go packages
 	ls -l `go env GOPATH`/bin/
 .PHONY: list-go
-
-develop: build-go # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
-	$(ACTIVATE_VENV) && maturin develop
-.PHONY: develop
 
 rehash: # Rehashing is needed (once) to make the [project.scripts] section of pyproject.toml available in the PATH
 	pyenv rehash
@@ -46,7 +36,7 @@ print-config: # Print the configuration used by maturin
 	PYO3_PRINT_CONFIG=1 $(ACTIVATE_VENV) && maturin develop
 .PHONY: print-config
 
-install-local: build-go # Create the virtualenv and setup the local development environment
+setup: build-go # Set up the local development environment
 	# Needed for the pre-commit hook
 	# https://github.com/golangci/golangci-lint#install-golangci-lint
 	brew install golangci-lint
@@ -56,36 +46,55 @@ install-local: build-go # Create the virtualenv and setup the local development 
 	-pyenv virtualenv $$(basename $$(pwd))
 	pyenv local $$(basename $$(pwd))
 # TODO: keep the list of dev packages in a single place; this was copied from tox.ini
-	$(MAKE) deps
-# Can't activate virtualenv from Makefile · Issue #372 · pyenv/pyenv-virtualenv
-# https://github.com/pyenv/pyenv-virtualenv/issues/372
+	$(MAKE) setup-deps
 	$(MAKE) develop
 	@echo "Run 'make smoke' to check if the development environment is working"
-.PHONY: install-local
+.PHONY: setup
 
-install-global: build-go # Install the package with pipx in editable mode. Do this when you want to use "lsd" outside of the development environment
+develop: build-go # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
+	# Can't activate virtualenv from Makefile · Issue #372 · pyenv/pyenv-virtualenv
+	# https://github.com/pyenv/pyenv-virtualenv/issues/372
+	$(ACTIVATE_VENV) && maturin develop
+.PHONY: develop
+
+install: build-go # Install the package with pipx in editable mode. Do this when you want to use "lsd" outside of the development environment
 	-pipx install -e --force .
 	$(MAKE) rehash
-.PHONY: install-global
+	$(MAKE) which
+.PHONY: install
 
-.uninstall-global: # Uninstall only the pipx virtualenv. Use this when developing, so the local venv "lsd" is available instead of the pipx one
-	-pipx uninstall logseq-doctor
-	$(MAKE) rehash
-.PHONY: .uninstall-global
+which: # Show the location of the installed executables
+	which lsd
+	lsd
+	which lsdg
+	lsdg
+.PHONY: which
 
-deps: # Install the development dependencies
+setup-deps: setup-deps-go # Set up the development dependencies
 	$(ACTIVATE_VENV) && python -m pip install -U pip pytest pytest-cov pytest-datadir responses pytest-env pytest-watch pytest-testmon
 	$(MAKE) freeze
-.PHONY: deps
+.PHONY: setup-deps
+
+setup-deps-go: # Set up the logseq-go dependency from the last commit of the local repo
+	LAST_COMMIT=$$(cd ../logseq-go; git log -1 --format=%h); \
+		echo "LAST_COMMIT: $$LAST_COMMIT"; \
+		go get -u github.com/andreoliwa/logseq-go@$$LAST_COMMIT
+	go mod tidy
+.PHONY: setup-deps-go
 
 freeze: # Show the installed packages
 	$(ACTIVATE_VENV) && python -m pip freeze
 .PHONY: freeze
 
-uninstall: clean .uninstall-global # Remove both local and global (virtualenv and pipx)
-	-rm .python-version
+uninstall: clean uninstall-pipx # Remove both local and global (virtualenv and pipx)
+	-rm -rf .python-version .tox
 	-pyenv uninstall -f $$(basename $$(pwd))
 .PHONY: uninstall
+
+uninstall-pipx: # Uninstall pipx virtualenv. Use this when developing, so the local venv "lsd" is available instead of the pipx one
+	-pipx uninstall logseq-doctor
+	$(MAKE) rehash
+.PHONY: .uninstall-pipx
 
 run: develop rehash # Run the CLI with a Python click script as the entry point
 	lsd --help
