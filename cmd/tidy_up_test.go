@@ -131,12 +131,12 @@ func TestCheckRunningTasks(t *testing.T) {
 func TestRemoveDoubleSpaces(t *testing.T) {
 	invalid := setupPage(t, "spaces")
 	assert.Equal(t,
-		changedPage{"fixed 4 double spaces: 'Link   With  Spaces  ', 'Regular   text with  spaces'," +
+		changedPage{"4 double spaces fixed: 'Link   With  Spaces  ', 'Regular   text with  spaces'," +
 			" 'some  page   title  with  spaces', 'some  tag with   spaces'", true},
 		removeDoubleSpaces(invalid))
 
-	// TODO: compare the saved Markdown file with spaces.md.golden.
-	//  I tested manually and it works but I need to do something like:
+	// TODO: compare the saved Markdown file with the golden file
+	//  I tested manually, and it works, but I need to do something like:
 	// actual := os.ReadFile(invalid.Path())
 	// expected := os.ReadFile(invalid.Path() + ".golden")
 	// assert.Equal(t, expected, actual)
@@ -148,9 +148,21 @@ func TestRemoveDoubleSpaces(t *testing.T) {
 func TestRemoveUnnecessaryBracketsFromTags(t *testing.T) {
 	invalid := setupFileContents(t, "tag-brackets")
 	changed := removeUnnecessaryBracketsFromTags(invalid.oldContents)
-	assert.Equal(t, "removed unnecessary brackets from tags", changed.msg)
+	assert.Equal(t, "unnecessary tag brackets removed", changed.msg)
 	golden.Assert(t, changed.newContents, invalid.goldenPath)
 
 	valid := setupFileContents(t, "valid")
 	assert.Equal(t, changedContents{"", ""}, removeUnnecessaryBracketsFromTags(valid.oldContents))
+}
+
+func TestRemoveEmptyBullets(t *testing.T) {
+	invalid := setupPage(t, "empty-bullets")
+	assert.Equal(t,
+		changedPage{"6 empty bullets removed", true},
+		removeEmptyBullets(invalid))
+
+	// TODO: compare the saved Markdown file with the golden file. I tested manually and it works
+
+	valid := setupPage(t, "valid")
+	assert.Equal(t, changedPage{"", false}, removeEmptyBullets(valid))
 }

@@ -18,11 +18,13 @@ import (
 var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 	Use:   "tidy-up",
 	Short: "Tidy up your Markdown files.",
+	// TODO: dynamically generate the long description based on the functions in the code.
 	Long: `Tidy up your Markdown files, checking for invalid content and fixing some of them automatically.
 
 - Check for forbidden references to pages/tags
 - Check for running tasks (DOING)
 - Check for double spaces`,
+	// TODO: add help for the Markdown files accepted as arguments, "lsdg tidy-up [flags] file1.md [file2.md ...]".
 	Args: cobra.MinimumNArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
 		dir := os.Getenv("LOGSEQ_GRAPH_PATH")
@@ -88,7 +90,7 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 				}
 
 				for _, f := range []func(logseq.Page) changedPage{
-					checkForbiddenReferences, checkRunningTasks, removeDoubleSpaces,
+					checkForbiddenReferences, checkRunningTasks, removeDoubleSpaces, removeEmptyBullets,
 				} {
 					result := f(page)
 					if result.msg != "" {
@@ -278,7 +280,7 @@ func removeDoubleSpaces(page logseq.Page) changedPage {
 	if count := len(all); count > 0 {
 		unique := sortAndRemoveDuplicates(all)
 
-		return changedPage{fmt.Sprintf("fixed %d double spaces: %s", count, strings.Join(unique, ", ")), fixed}
+		return changedPage{fmt.Sprintf("%d double spaces fixed: %s", count, strings.Join(unique, ", ")), fixed}
 	}
 
 	return changedPage{"", fixed}
@@ -295,8 +297,42 @@ func removeUnnecessaryBracketsFromTags(oldContents string) changedContents {
 
 	newContents := re.ReplaceAllString(oldContents, "#$1")
 	if newContents != oldContents {
-		return changedContents{"removed unnecessary brackets from tags", newContents}
+		return changedContents{"unnecessary tag brackets removed", newContents}
 	}
 
 	return changedContents{"", ""}
+}
+
+func removeEmptyBullets(page logseq.Page) changedPage {
+	removed := 0
+	// TODO: add methods Find* and Filter* to logseq.Page in logseq-go and replace this for loop with page.FindDeep()
+	//  - Create an interface for it with all 4 methods Find(), FindDeep(), Filter(), FilterDeep()?
+	//  - Reuse this interface in existing methods in logseq-go?
+	//    They have different signatures: node content.Node, block *content.Block
+	//  - Use generics for this interface or create 2 interfaces?
+	for _, block := range page.Blocks() {
+		if block.FirstChild() == nil {
+			block.RemoveSelf()
+
+			removed++
+		} else {
+			block.Children().FindDeep(func(node content.Node) bool {
+				if nestedBlock, ok := node.(*content.Block); ok {
+					if nestedBlock.FirstChild() == nil {
+						nestedBlock.RemoveSelf()
+
+						removed++
+					}
+				}
+
+				return false
+			})
+		}
+	}
+
+	if removed > 0 {
+		return changedPage{fmt.Sprintf("%d empty bullets removed", removed), true}
+	}
+
+	return changedPage{"", false}
 }

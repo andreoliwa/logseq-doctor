@@ -45,6 +45,10 @@ Confirm if it\'s in your path:
 
     ls -l $(go env GOPATH)/bin/lsdg
 
+To build from the source, clone the repository and run:
+
+    make install
+
 ## Quick start
 
 Type `lsd` without arguments to check the current commands and options:
@@ -62,14 +66,36 @@ Type `lsd` without arguments to check the current commands and options:
     ╭─ Commands ───────────────────────────────────────────────────────────────────╮
     │ outline  Convert flat Markdown to outline.                                   │
     │ tasks    List tasks in Logseq.                                               │
-    │ tidy-up  Tidy up your Markdown files by removing empty bullets in any block. │
     ╰──────────────────────────────────────────────────────────────────────────────╯
+
+Type `lsdg` (the Go executable) without arguments to check the current commands and options:
+
+    Logseq Doctor (Go) heals your Markdown files for Logseq.
+
+    Convert flat Markdown to Logseq outline, clean up Markdown,
+    prevent invalid content, and more stuff to come.
+
+    "lsd"" is the CLI tool originally written in Python and Rust; "lsdg"" is the Go version.
+    The intention is to slowly convert everything to Go.
+
+    Usage:
+    lsdg [command]
+
+    Available Commands:
+    completion  Generate the autocompletion script for the specified shell
+    help        Help about any command
+    tidy-up     Tidy up your Markdown files.
+
+    Flags:
+    -h, --help   help for lsdg
+
+    Use "lsdg [command] --help" for more information about a command.
 
 ## Development
 
 To set up local development:
 
-    make install-local
+    make setup
 
 Run this to see help on all available targets:
 

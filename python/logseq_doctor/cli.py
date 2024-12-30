@@ -17,7 +17,6 @@ Why does this file exist, and why not put this in __main__?
 from __future__ import annotations
 
 import os
-import re
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -95,41 +94,6 @@ def _call_golang_exe(command: str, markdown_file: Path) -> int:
         return 4
     else:
         return result.returncode
-
-
-@app.command()
-def tidy_up(
-    markdown_file: list[Path] = typer.Argument(
-        ...,
-        help="Markdown files to tidy up",
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        writable=True,
-    ),
-) -> None:
-    """Tidy up your Markdown files by removing empty bullets and double spaces in any block."""
-    exit_code = 0
-    for each_file in markdown_file:
-        golang_exit_code = _call_golang_exe("tidy-up", each_file)
-        if golang_exit_code:
-            exit_code = golang_exit_code
-
-        changed = []
-        old_contents = each_file.read_text()
-
-        # TODO: move these changes to Go
-        rm_empty_bullets = re.sub(r"(\n\s*-\s*$)", "", old_contents, flags=re.MULTILINE)
-        if rm_empty_bullets != old_contents:
-            changed.append("empty bullets")
-            each_file.write_text(rm_empty_bullets)
-
-        if changed:
-            if not exit_code:
-                exit_code = 1
-            typer.echo(f"{each_file}: {', '.join(changed)}")
-    if exit_code:
-        sys.exit(exit_code)
 
 
 class TaskFormat(str, Enum):

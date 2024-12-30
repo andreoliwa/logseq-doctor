@@ -123,8 +123,6 @@ src = ["python/src"]
 [tool.ruff.lint]
 # https://docs.astral.sh/ruff/settings/#ignore
 ignore = [
-  "ANN101", # Missing type annotation for `self` in method
-  "ANN102", # Missing type annotation for `cls` in classmethod
   "COM812",
   "D107", # Missing docstring in `__init__`
   "D202", # No blank lines allowed after function docstring

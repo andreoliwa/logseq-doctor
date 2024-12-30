@@ -1,0 +1,11 @@
+- some text
+-
+- another after empty bullet
+  -
+  - between
+  -
+  - nested
+    -
+    - deep
+    -
+  -
