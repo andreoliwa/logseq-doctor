@@ -5,7 +5,7 @@ go 1.23
 toolchain go1.23.4
 
 require (
-	github.com/andreoliwa/logseq-go v0.0.0-20241228161444-32088a5a9491
+	github.com/andreoliwa/logseq-go v0.0.0-20241230174416-276dc3d5f4ac
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
 	gotest.tools/v3 v3.5.1
