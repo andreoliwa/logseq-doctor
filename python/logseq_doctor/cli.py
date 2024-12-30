@@ -124,9 +124,6 @@ def tidy_up(
             changed.append("empty bullets")
             each_file.write_text(rm_empty_bullets)
 
-        if rust_ext.tidy_up(each_file):
-            changed.append("brackets")
-
         if changed:
             if not exit_code:
                 exit_code = 1

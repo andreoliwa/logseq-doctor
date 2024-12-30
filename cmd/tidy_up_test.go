@@ -9,6 +9,7 @@ import (
 
 	"github.com/andreoliwa/logseq-go"
 	"github.com/stretchr/testify/assert"
+	"gotest.tools/v3/golden"
 )
 
 func TestSortAndRemoveDuplicates(t *testing.T) {
@@ -91,27 +92,46 @@ func setupPage(t *testing.T, name string) logseq.Page {
 	return page
 }
 
+type resultSetupFileContents struct {
+	oldContents string
+	goldenPath  string
+}
+
+func setupFileContents(t *testing.T, name string) resultSetupFileContents {
+	t.Helper()
+
+	subdir := filepath.Join("graph", "pages", name+".md")
+	path := filepath.Join("testdata", subdir)
+
+	bytes, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return resultSetupFileContents{string(bytes), subdir + ".golden"}
+}
+
 func TestCheckForbiddenReferences(t *testing.T) {
 	invalid := setupPage(t, "forbidden")
-	assert.Equal(t, tidyInfo{"remove 4 forbidden references to pages/tags: Inbox, quick capture", false},
+	assert.Equal(t, changedPage{"remove 4 forbidden references to pages/tags: Inbox, quick capture", false},
 		checkForbiddenReferences(invalid))
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, tidyInfo{"", false}, checkForbiddenReferences(valid))
+	assert.Equal(t, changedPage{"", false}, checkForbiddenReferences(valid))
 }
 
 func TestCheckRunningTasks(t *testing.T) {
 	invalid := setupPage(t, "running")
-	assert.Equal(t, tidyInfo{"stop 2 running task(s): DOING, IN-PROGRESS", false}, checkRunningTasks(invalid))
+	assert.Equal(t, changedPage{"stop 2 running task(s): DOING, IN-PROGRESS", false}, checkRunningTasks(invalid))
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, tidyInfo{"", false}, checkRunningTasks(valid))
+	assert.Equal(t, changedPage{"", false}, checkRunningTasks(valid))
 }
 
 func TestRemoveDoubleSpaces(t *testing.T) {
 	invalid := setupPage(t, "spaces")
 	assert.Equal(t,
-		tidyInfo{"fixed 4 double spaces: 'Link   With  Spaces  ', 'Regular   text with  spaces'," +
+		changedPage{"fixed 4 double spaces: 'Link   With  Spaces  ', 'Regular   text with  spaces'," +
 			" 'some  page   title  with  spaces', 'some  tag with   spaces'", true},
 		removeDoubleSpaces(invalid))
 
@@ -122,5 +142,15 @@ func TestRemoveDoubleSpaces(t *testing.T) {
 	// assert.Equal(t, expected, actual)
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, tidyInfo{"", false}, removeDoubleSpaces(valid))
+	assert.Equal(t, changedPage{"", false}, removeDoubleSpaces(valid))
+}
+
+func TestRemoveUnnecessaryBracketsFromTags(t *testing.T) {
+	invalid := setupFileContents(t, "tag-brackets")
+	changed := removeUnnecessaryBracketsFromTags(invalid.oldContents)
+	assert.Equal(t, "removed unnecessary brackets from tags", changed.msg)
+	golden.Assert(t, changed.newContents, invalid.goldenPath)
+
+	valid := setupFileContents(t, "valid")
+	assert.Equal(t, changedContents{"", ""}, removeUnnecessaryBracketsFromTags(valid.oldContents))
 }

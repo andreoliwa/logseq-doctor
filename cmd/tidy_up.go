@@ -37,13 +37,48 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 		}
 
 		transaction := graph.NewTransaction()
-		shouldSave := false
+		commit := false
 
 		exitCode := 0
 		for _, path := range args {
 			if !isValidMarkdownFile(path) {
 				fmt.Printf("%s: skipping, not a Markdown file\n", path)
 			} else {
+				// Some fixes still need modifications directly on the file contents.
+				// We will do them first, and apply each function on top of the previously modified contents.
+				bytes, err := os.ReadFile(path)
+				if err != nil {
+					log.Fatalf("%s: error reading file contents: %s\n", path, err)
+				}
+				currentFileContents := string(bytes)
+
+				fileInfo, err := os.Stat(path)
+				if err != nil {
+					log.Fatalf("%s: error getting file info: %s\n", path, err)
+				}
+
+				messages := make([]string, 0)
+
+				write := false
+				for _, f := range []func(string) changedContents{
+					removeUnnecessaryBracketsFromTags,
+				} {
+					result := f(currentFileContents)
+					if result.msg != "" {
+						messages = append(messages, result.msg)
+						// Pass the new contents to the next function.
+						currentFileContents = result.newContents
+						write = true
+					}
+				}
+				if write {
+					err := os.WriteFile(path, []byte(currentFileContents), fileInfo.Mode())
+					if err != nil {
+						log.Fatalf("%s: error writing file contents: %s\n", path, err)
+					}
+				}
+
+				// Now we will apply the functions that modify the Markdown through a Page and a transaction.
 				page, err := transaction.OpenViaPath(path)
 				if err != nil {
 					log.Fatalf("%s: error opening file via path: %s\n", path, err)
@@ -52,17 +87,15 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 					log.Fatalf("%s: error opening file via path: page is nil\n", path)
 				}
 
-				messages := make([]string, 0)
-
-				functions := []func(logseq.Page) tidyInfo{
-					checkForbiddenReferences, checkRunningTasks, removeDoubleSpaces}
-				for _, f := range functions {
-					info := f(page)
-					if info.msg != "" {
-						messages = append(messages, info.msg)
+				for _, f := range []func(logseq.Page) changedPage{
+					checkForbiddenReferences, checkRunningTasks, removeDoubleSpaces,
+				} {
+					result := f(page)
+					if result.msg != "" {
+						messages = append(messages, result.msg)
 					}
-					if info.changed {
-						shouldSave = true
+					if result.changed {
+						commit = true
 					}
 				}
 
@@ -74,7 +107,7 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 				}
 			}
 		}
-		if shouldSave {
+		if commit {
 			err = transaction.Save()
 			if err != nil {
 				log.Fatalf("error saving transaction: %s\n", err)
@@ -106,13 +139,20 @@ func isValidMarkdownFile(filePath string) bool {
 	return !info.IsDir()
 }
 
-type tidyInfo struct {
+// changedContents is the result of a check function that modifies file contents directly without a transaction.
+type changedContents struct {
+	msg         string
+	newContents string
+}
+
+// changedPage is the result of a check function that modifies Markdown through a Page and a transaction.
+type changedPage struct {
 	msg     string
 	changed bool
 }
 
 // checkForbiddenReferences checks if a page has forbidden references to other pages or tags.
-func checkForbiddenReferences(page logseq.Page) tidyInfo {
+func checkForbiddenReferences(page logseq.Page) changedPage {
 	all := make([]string, 0)
 
 	for _, block := range page.Blocks() {
@@ -145,11 +185,11 @@ func checkForbiddenReferences(page logseq.Page) tidyInfo {
 	if count := len(all); count > 0 {
 		unique := sortAndRemoveDuplicates(all)
 
-		return tidyInfo{fmt.Sprintf("remove %d forbidden references to pages/tags: %s",
+		return changedPage{fmt.Sprintf("remove %d forbidden references to pages/tags: %s",
 			count, strings.Join(unique, ", ")), false}
 	}
 
-	return tidyInfo{"", false}
+	return changedPage{"", false}
 }
 
 func sortAndRemoveDuplicates(elements []string) []string {
@@ -170,7 +210,7 @@ func sortAndRemoveDuplicates(elements []string) []string {
 }
 
 // checkRunningTasks checks if a page has running tasks (DOING, etc.).
-func checkRunningTasks(page logseq.Page) tidyInfo {
+func checkRunningTasks(page logseq.Page) changedPage {
 	all := make([]string, 0)
 
 	for _, block := range page.Blocks() {
@@ -194,13 +234,13 @@ func checkRunningTasks(page logseq.Page) tidyInfo {
 	if count := len(all); count > 0 {
 		unique := sortAndRemoveDuplicates(all)
 
-		return tidyInfo{fmt.Sprintf("stop %d running task(s): %s", count, strings.Join(unique, ", ")), false}
+		return changedPage{fmt.Sprintf("stop %d running task(s): %s", count, strings.Join(unique, ", ")), false}
 	}
 
-	return tidyInfo{"", false}
+	return changedPage{"", false}
 }
 
-func removeDoubleSpaces(page logseq.Page) tidyInfo {
+func removeDoubleSpaces(page logseq.Page) changedPage {
 	all := make([]string, 0)
 	doubleSpaceRegex := regexp.MustCompile(`\s{2,}`)
 	fixed := false
@@ -238,8 +278,25 @@ func removeDoubleSpaces(page logseq.Page) tidyInfo {
 	if count := len(all); count > 0 {
 		unique := sortAndRemoveDuplicates(all)
 
-		return tidyInfo{fmt.Sprintf("fixed %d double spaces: %s", count, strings.Join(unique, ", ")), fixed}
+		return changedPage{fmt.Sprintf("fixed %d double spaces: %s", count, strings.Join(unique, ", ")), fixed}
 	}
 
-	return tidyInfo{"", fixed}
+	return changedPage{"", fixed}
+}
+
+// removeUnnecessaryBracketsFromTags removes unnecessary brackets from hashtags.
+// logseq-go rewrites tags correctly when saving the transaction, removing unnecessary brackets.
+// But, when reading the file, the AST doesn't provide the information if a tag has brackets or not.
+// So I would have to rewrite the file to fix them, and I don't want to do it every time there is a tag without spaces.
+// Also, as of 2024-12-30, logseq-go has a bug when reading properties with spaces in values,
+// which causes them to be partially removed from the file, destroying data. I will report it soon.
+func removeUnnecessaryBracketsFromTags(oldContents string) changedContents {
+	re := regexp.MustCompile(`#\[\[([^ ]*?)]]`)
+
+	newContents := re.ReplaceAllString(oldContents, "#$1")
+	if newContents != oldContents {
+		return changedContents{"removed unnecessary brackets from tags", newContents}
+	}
+
+	return changedContents{"", ""}
 }

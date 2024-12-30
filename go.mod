@@ -8,6 +8,7 @@ require (
 	github.com/andreoliwa/logseq-go v0.0.0-20241228161444-32088a5a9491
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
+	gotest.tools/v3 v3.5.1
 )
 
 require (
@@ -28,6 +29,7 @@ require (
 	github.com/dgryski/go-metro v0.0.0-20211217172704-adc40b04c140 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kamstrup/intmap v0.5.1 // indirect

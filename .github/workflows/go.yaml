@@ -45,12 +45,15 @@ jobs:
             os: "ubuntu-latest"
             go: "stable"
             codecov: true
+            normalize_crlf_to_lf: "true"
           - name: "macos"
             os: "macos-latest"
             go: "stable"
+            normalize_crlf_to_lf: "true"
           - name: "windows"
             os: "windows-latest"
             go: "stable"
+            normalize_crlf_to_lf: "false"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -64,6 +67,9 @@ jobs:
         run: make test-go-coverage
         env:
           GO111MODULE: "auto"
+          # Golden files should be treated differently on Windows
+          # https://pkg.go.dev/gotest.tools/v3/golden#pkg-variables
+          GOTESTTOOLS_GOLDEN_NormalizeCRLFToLF: "${{ matrix.normalize_crlf_to_lf }}"
       - name: Upload coverage to CodeCov
         if: ${{ matrix.codecov }}
         uses: codecov/codecov-action@v5
