@@ -38,9 +38,6 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 			log.Fatalln("error opening graph: %w", err)
 		}
 
-		transaction := graph.NewTransaction()
-		commit := false
-
 		exitCode := 0
 		for _, path := range args {
 			if !isValidMarkdownFile(path) {
@@ -81,6 +78,9 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 				}
 
 				// Now we will apply the functions that modify the Markdown through a Page and a transaction.
+				transaction := graph.NewTransaction()
+				commit := false
+
 				page, err := transaction.OpenViaPath(path)
 				if err != nil {
 					log.Fatalf("%s: error opening file via path: %s\n", path, err)
@@ -107,12 +107,16 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 						fmt.Printf("%s: %s\n", path, msg)
 					}
 				}
-			}
-		}
-		if commit {
-			err = transaction.Save()
-			if err != nil {
-				log.Fatalf("error saving transaction: %s\n", err)
+
+				if commit {
+					// Only one transaction per file, to avoid saving files that were not modified but were opened.
+					// logseq-go rewrites Markdown, and it modified brackets in content without need.
+					// I'll avoid using .Save() without need until these bugs are fixed.
+					err = transaction.Save()
+					if err != nil {
+						log.Fatalf("error saving transaction: %s\n", err)
+					}
+				}
 			}
 		}
 		os.Exit(exitCode)
