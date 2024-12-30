@@ -75,7 +75,7 @@ repos:
         stages:
           - commit-msg
   - repo: https://github.com/mxr/sync-pre-commit-deps
-    rev: v0.0.1
+    rev: v0.0.2
     hooks:
       - id: sync-pre-commit-deps
   - repo: https://github.com/golangci/golangci-lint
