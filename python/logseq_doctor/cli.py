@@ -18,20 +18,15 @@ from __future__ import annotations
 
 import os
 import subprocess
-import sys
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path  # Typer needs this import to infer the type of the argument
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
-import maya
 import typer
 
-from logseq_doctor import flat_markdown_to_outline, rust_ext
+from logseq_doctor import flat_markdown_to_outline
 from logseq_doctor.api import Block, Logseq
-
-if TYPE_CHECKING:
-    from datetime import date
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -125,29 +120,3 @@ def tasks(
         typer.secho(f"{block.page_title}§", fg=typer.colors.GREEN, nl=False)
         typer.secho(block.url(logseq.graph_name), fg=typer.colors.BLUE, bold=True, nl=False)
         typer.echo(f"§{block.raw_content}")
-
-
-@app.command()
-def journal(
-    ctx: typer.Context,
-    maya_date: str = typer.Option(
-        None,
-        "--date",
-        "-d",
-        help="Date of the journal page."
-        " You can use some natural language like 'yesterday', 'today', 'Friday', 'Wed', etc.",
-    ),
-    format_: bool = typer.Option(False, "--format", "-f", help="Format flat text as Logseq outlined Markdown"),
-    prepend: bool = typer.Option(False, "--prepend", "-p", help="Prepend content instead of appending"),
-    content: list[str] = typer.Argument(None, metavar="CONTENT", help="Content to add to the current journal"),
-) -> None:
-    """Append content to the current journal page in Logseq."""
-    parsed_date: date | None = maya.when(maya_date).date if maya_date else None
-    lines = []
-    if content:
-        lines.append(" ".join(content))
-    if not sys.stdin.isatty():
-        lines.append(sys.stdin.read())
-    joined = "\n".join(lines)
-    markdown = flat_markdown_to_outline(joined) if format_ else joined
-    rust_ext.add_content(cast(GlobalOptions, ctx.obj).logseq_graph_path, markdown, prepend, parsed_date)

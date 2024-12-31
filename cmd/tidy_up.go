@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
@@ -27,16 +26,7 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 	// TODO: add help for the Markdown files accepted as arguments, "lsdg tidy-up [flags] file1.md [file2.md ...]".
 	Args: cobra.MinimumNArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
-		dir := os.Getenv("LOGSEQ_GRAPH_PATH")
-		if dir == "" {
-			log.Fatalln("LOGSEQ_GRAPH_PATH environment variable is not set.")
-		}
-
-		ctx := context.Background()
-		graph, err := logseq.Open(ctx, dir)
-		if err != nil {
-			log.Fatalln("error opening graph: %w", err)
-		}
+		graph := openGraph("")
 
 		exitCode := 0
 		for _, path := range args {

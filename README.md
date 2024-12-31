@@ -57,16 +57,19 @@ Type `lsd` without arguments to check the current commands and options:
 
     Logseq Doctor: heal your flat old Markdown files before importing them.
 
-    ╭─ Options ────────────────────────────────────────────────────────────────────╮
-    │ --install-completion          Install completion for the current shell.      │
-    │ --show-completion             Show completion for the current shell, to copy │
-    │                               it or customize the installation.              │
-    │ --help                        Show this message and exit.                    │
-    ╰──────────────────────────────────────────────────────────────────────────────╯
-    ╭─ Commands ───────────────────────────────────────────────────────────────────╮
-    │ outline  Convert flat Markdown to outline.                                   │
-    │ tasks    List tasks in Logseq.                                               │
-    ╰──────────────────────────────────────────────────────────────────────────────╯
+    Options:
+    -g, --graph DIRECTORY           Logseq graph  [env var: LOGSEQ_GRAPH_PATH;
+    required]
+    --install-completion [bash|zsh|fish|powershell|pwsh]
+    Install completion for the specified shell.
+    --show-completion [bash|zsh|fish|powershell|pwsh]
+    Show completion for the specified shell, to
+    copy it or customize the installation.
+    --help                          Show this message and exit.
+
+    Commands:
+    outline  Convert flat Markdown to outline.
+    tasks    List tasks in Logseq.
 
 Type `lsdg` (the Go executable) without arguments to check the current commands and options:
 
@@ -83,6 +86,7 @@ Type `lsdg` (the Go executable) without arguments to check the current commands 
 
     Available Commands:
     completion  Generate the autocompletion script for the specified shell
+    content     Append raw Markdown content to Logseq
     help        Help about any command
     tidy-up     Tidy up your Markdown files.
 
