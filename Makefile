@@ -1,4 +1,3 @@
-ACTIVATE_VENV = source ~/.pyenv/versions/logseq-doctor/bin/activate
 GO_TEST = go test -v ./... -race -covermode=atomic
 
 help: # Display this help
@@ -6,7 +5,7 @@ help: # Display this help
 .PHONY: help
 
 build: build-go # Build the Rust crate and Python package
-	$(ACTIVATE_VENV) && maturin build
+	uv build
 .PHONY: build
 
 build-go: # Build the Golang executable
@@ -32,30 +31,24 @@ rehash: # Rehashing is needed (once) to make the [project.scripts] section of py
 	pyenv rehash
 .PHONY: rehash
 
-print-config: # Print the configuration used by maturin
-	PYO3_PRINT_CONFIG=1 $(ACTIVATE_VENV) && maturin develop
-.PHONY: print-config
+setup: # Set up the local development environment
+	uv sync
+# TODO: keep the list of dev packages in a single place; this was copied from tox.ini
+	uv add --dev pytest pytest-cov pytest-datadir responses pytest-env pytest-watch pytest-testmon
+	$(MAKE) setup-go
+	@echo "Run 'make smoke' to check if the development environment is working"
+.PHONY: setup
 
-setup: build-go # Set up the local development environment
+setup-go: # Set up Go dependencies (logseq-go from the last commit of the local repo + golangci-lint)
 	# Needed for the pre-commit hook
 	# https://github.com/golangci/golangci-lint#install-golangci-lint
 	brew install golangci-lint
 
-	-rm .python-version
-	@echo $$(basename $$(pwd))
-	-pyenv virtualenv $$(basename $$(pwd))
-	pyenv local $$(basename $$(pwd))
-# TODO: keep the list of dev packages in a single place; this was copied from tox.ini
-	$(MAKE) setup-deps
-	$(MAKE) develop
-	@echo "Run 'make smoke' to check if the development environment is working"
-.PHONY: setup
-
-develop: build-go # Install the crate as module in the current virtualenv, rehash pyenv to put CLI scripts in PATH
-	# Can't activate virtualenv from Makefile · Issue #372 · pyenv/pyenv-virtualenv
-	# https://github.com/pyenv/pyenv-virtualenv/issues/372
-	$(ACTIVATE_VENV) && maturin develop
-.PHONY: develop
+	LAST_COMMIT=$$(cd ../logseq-go; git log -1 --format=%h); \
+		echo "LAST_COMMIT: $$LAST_COMMIT"; \
+		go get -u github.com/andreoliwa/logseq-go@$$LAST_COMMIT
+	go mod tidy
+.PHONY: setup-go
 
 install: build-go # Install the package with pipx in editable mode. Do this when you want to use "lsd" outside of the development environment
 	-pipx install -e --force .
@@ -70,35 +63,14 @@ which: # Show the location of the installed executables
 	lsdg
 .PHONY: which
 
-setup-deps: setup-deps-go # Set up the development dependencies
-	$(ACTIVATE_VENV) && python -m pip install -U pip pytest pytest-cov pytest-datadir responses pytest-env pytest-watch pytest-testmon
-	$(MAKE) freeze
-.PHONY: setup-deps
-
-setup-deps-go: # Set up the logseq-go dependency from the last commit of the local repo
-	LAST_COMMIT=$$(cd ../logseq-go; git log -1 --format=%h); \
-		echo "LAST_COMMIT: $$LAST_COMMIT"; \
-		go get -u github.com/andreoliwa/logseq-go@$$LAST_COMMIT
-	go mod tidy
-.PHONY: setup-deps-go
-
-freeze: # Show the installed packages
-	$(ACTIVATE_VENV) && python -m pip freeze
-.PHONY: freeze
-
 uninstall: clean uninstall-pipx # Remove both local and global (virtualenv and pipx)
-	-rm -rf .python-version .tox
-	-pyenv uninstall -f $$(basename $$(pwd))
+	-rm -rf .python-version .tox .venv
 .PHONY: uninstall
 
 uninstall-pipx: # Uninstall pipx virtualenv. Use this when developing, so the local venv "lsd" is available instead of the pipx one
 	-pipx uninstall logseq-doctor
 	$(MAKE) rehash
 .PHONY: .uninstall-pipx
-
-run: develop rehash # Run the CLI with a Python click script as the entry point
-	lsd --help
-.PHONY: run
 
 test: test-go # Run tests on Python, Rust and Go
 	cargo test
@@ -114,11 +86,11 @@ test-go-coverage: # Run Go tests with coverage
 .PHONY: test-go-coverage
 
 watch: # Run tests and watch for changes
-	$(ACTIVATE_VENV) && ptw --runner "pytest --testmon"
+	uv run ptw --runner "pytest --testmon"
 .PHONY: watch
 
 pytest: # Run tests with pytest
-	$(ACTIVATE_VENV) && pytest --cov --cov-report=term-missing -vv tests
+	uv run pytest --cov --cov-report=term-missing -vv tests
 .PHONY: pytest
 
 release: # Bump the version, create a tag, commit and push. This will trigger the PyPI release on GitHub Actions
@@ -135,7 +107,8 @@ release: # Bump the version, create a tag, commit and push. This will trigger th
 	gh repo view --web
 .PHONY: .release-post-bump
 
-smoke: run test # Run simple tests to make sure the package is working
+smoke: rehash test # Run simple tests to make sure the package is working
+	uv run lsd --help
 .PHONY: smoke
 
 clippy: develop # Run clippy on the Rust code

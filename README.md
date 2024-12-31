@@ -3,7 +3,7 @@
 |         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | docs    | [![Documentation Status](https://readthedocs.org/projects/logseq-doctor/badge/?style=flat)](https://logseq-doctor.readthedocs.io/)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| tests   | [![Go Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/go.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions) [![Maturin Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/maturin.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions) [![Tox Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/tox.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions) [![Coverage Status](https://codecov.io/gh/andreoliwa/logseq-doctor/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/github/andreoliwa/logseq-doctor)                            |
+| tests   | [![Go Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/go.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions) [![Tox Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/tox.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions) [![Coverage Status](https://codecov.io/gh/andreoliwa/logseq-doctor/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/github/andreoliwa/logseq-doctor)                                                                                                                                                                                                 |
 | package | [![PyPI Package latest release](https://img.shields.io/pypi/v/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![PyPI Wheel](https://img.shields.io/pypi/wheel/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![Supported versions](https://img.shields.io/pypi/pyversions/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![Supported implementations](https://img.shields.io/pypi/implementation/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![Commits since latest release](https://img.shields.io/github/commits-since/andreoliwa/logseq-doctor/v0.3.0.svg)](https://github.com/andreoliwa/logseq-doctor/compare/v0.3.0...master) |
 
 Logseq Doctor: heal your flat old Markdown files before importing them.
@@ -12,11 +12,10 @@ Logseq Doctor: heal your flat old Markdown files before importing them.
 > This project is still alpha, so it\'s very rough on the edges
 > (documentation and feature-wise).
 >
-> At the moment, it has a Python package shipped with a Rust extension, plus
-> an external Go executable with recent additions.
+> At the moment, it has both a Python and Go CLI.
 >
-> The long-term plan is to convert it to Go and slowly remove Rust and
-> Python. New features will be added to the Go executable only.
+> The long-term plan is to convert it to Go and slowly remove Python.
+> New features will be added to the Go CLI only.
 
 ## Installation
 
@@ -78,7 +77,7 @@ Type `lsdg` (the Go executable) without arguments to check the current commands 
     Convert flat Markdown to Logseq outline, clean up Markdown,
     prevent invalid content, and more stuff to come.
 
-    "lsd"" is the CLI tool originally written in Python and Rust; "lsdg"" is the Go version.
+    "lsd"" is the CLI tool originally written in Python; "lsdg"" is the Go version.
     The intention is to slowly convert everything to Go.
 
     Usage:

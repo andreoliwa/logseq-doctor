@@ -18,7 +18,7 @@ var rootCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 Convert flat Markdown to Logseq outline, clean up Markdown,
 prevent invalid content, and more stuff to come.
 
-"lsd"" is the CLI tool originally written in Python and Rust; "lsdg"" is the Go version.
+"lsd" is the CLI tool originally written in Python; "lsdg" is the Go version.
 The intention is to slowly convert everything to Go.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:

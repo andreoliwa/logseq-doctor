@@ -41,7 +41,7 @@ class GlobalOptions:
 @app.callback()
 def lsd(
     ctx: typer.Context,
-    logseq_graph_path: Path = typer.Option(
+    logseq_graph_path: Path = typer.Option(  # noqa: B008
         ...,
         "--graph",
         "-g",
@@ -100,7 +100,7 @@ class TaskFormat(str, Enum):
 @app.command()
 def tasks(
     ctx: typer.Context,
-    tag_or_page: list[str] = typer.Argument(None, metavar="TAG", help="Tags or pages to query"),
+    tag_or_page: list[str] = typer.Argument(None, metavar="TAG", help="Tags or pages to query"),  # noqa: B008
     logseq_host_url: str = typer.Option(..., "--host", "-h", help="Logseq host", envvar="LOGSEQ_HOST_URL"),
     logseq_api_token: str = typer.Option(..., "--token", "-t", help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
 ) -> None:

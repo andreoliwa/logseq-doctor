@@ -33,7 +33,7 @@ def exec_in_env():
                 check_call(["virtualenv", env_path])
         print("Installing `jinja2` into bootstrap environment...")
         check_call([join(bin_path, "pip"), "install", "jinja2", "tox"])
-    python_executable = join(bin_path, "python")
+    python_executable = join(bin_path, "src")
     if not os.path.exists(python_executable):
         python_executable += ".exe"
 
