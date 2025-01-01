@@ -79,7 +79,7 @@ repos:
     hooks:
       - id: sync-pre-commit-deps
   - repo: https://github.com/golangci/golangci-lint
-    rev: v1.62.2
+    rev: v1.63.1
     hooks:
       - id: golangci-lint
         name: golangci-lint
