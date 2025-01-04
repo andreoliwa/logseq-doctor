@@ -7,11 +7,8 @@ ci:
   autofix_commit_msg: "chore(deps): auto fixes from pre-commit.com hooks\n\nfor more information, see https://pre-commit.ci"
   autoupdate_commit_msg: "chore(deps): pre-commit autoupdate"
   # These hooks are meant to be run locally only.
-  # They fail on pre-commit.ci with "Executable `cargo` not found".
-  # Using "language: rust" also didn't work because these are not hooks written in Rust.
-  # This one also fails for Go:
-  # Executable `golangci-lint` not found
-  skip: [fmt, cargo-check, clippy, golangci-lint]
+  # They fail on pre-commit.ci, e.g. "Executable `golangci-lint` not found"
+  skip: [golangci-lint]
 
 default_language_version:
   python: python3.11
@@ -62,12 +59,6 @@ repos:
       - id: prettier
         stages:
           - pre-commit
-  - repo: https://github.com/doublify/pre-commit-rust
-    rev: v1.0
-    hooks:
-      - id: fmt
-      - id: cargo-check
-      - id: clippy
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.1.0
     hooks:

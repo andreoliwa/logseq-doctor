@@ -77,6 +77,3 @@ docs/_build
 
 # Ruff
 .ruff_cache/
-
-# Rust
-target/

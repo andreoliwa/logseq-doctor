@@ -1,2 +1,0 @@
-- Some text with #tag1 and #tag2
-  - #[[this one stays]] but #this-one-loses-brackets
