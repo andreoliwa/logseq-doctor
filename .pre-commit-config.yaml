@@ -60,7 +60,7 @@ repos:
         stages:
           - pre-commit
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.2.0
+    rev: v4.2.1
     hooks:
       - id: commitizen
         stages:
