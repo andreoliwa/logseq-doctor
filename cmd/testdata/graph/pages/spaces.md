@@ -7,3 +7,5 @@
     - Here we have #[[some  tag with   spaces]]
     - top level 2
 - [[some  page   title  with  spaces]]
+- | A           | B                     | C            |
+  | keep tables | formatted by Prettier | with padding |

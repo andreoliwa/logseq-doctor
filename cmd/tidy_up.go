@@ -236,7 +236,8 @@ func checkRunningTasks(page logseq.Page) changedPage {
 	return changedPage{"", false}
 }
 
-func removeDoubleSpaces(page logseq.Page) changedPage {
+// removeDoubleSpaces removes double spaces from text, page links, and tags, except for tables.
+func removeDoubleSpaces(page logseq.Page) changedPage { //nolint:cyclop
 	all := make([]string, 0)
 	doubleSpaceRegex := regexp.MustCompile(`\s{2,}`)
 	fixed := false
@@ -245,15 +246,20 @@ func removeDoubleSpaces(page logseq.Page) changedPage {
 		block.Children().FindDeep(func(node content.Node) bool {
 			var oldValue string
 
+			isTable := false
+
 			if text, ok := node.(*content.Text); ok {
 				oldValue = text.Value
+				if strings.HasPrefix(oldValue, "|") {
+					isTable = true
+				}
 			} else if pageLink, ok := node.(*content.PageLink); ok {
 				oldValue = pageLink.To
 			} else if tag, ok := node.(*content.Hashtag); ok {
 				oldValue = tag.To
 			}
 
-			if strings.Contains(oldValue, "  ") {
+			if !isTable && strings.Contains(oldValue, "  ") {
 				all = append(all, fmt.Sprintf("'%s'", oldValue))
 				newValue := doubleSpaceRegex.ReplaceAllString(oldValue, " ")
 				fixed = true
