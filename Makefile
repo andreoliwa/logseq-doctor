@@ -105,6 +105,11 @@ release: # Bump the version, create a tag, commit and push. This will trigger th
 	gh repo view --web
 .PHONY: .release-post-bump
 
-smoke: rehash test # Run simple tests to make sure the package is working
+smoke: rehash test check-installed # Run simple tests to make sure the package is working
 	uv run lsd --help
 .PHONY: smoke
+
+check-installed: # Run the main executabless to confirm they are installed properly in the PATH
+	-lsd
+	-lsdg
+.PHONY: check-installed

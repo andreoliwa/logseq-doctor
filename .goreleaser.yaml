@@ -18,7 +18,7 @@ builds:
       - darwin
 
 archives:
-  - format: tar.gz
+  - formats: ["tar.gz"]
     name_template: >-
       {{ .ProjectName }}_
       {{- title .Os }}_
@@ -29,7 +29,7 @@ archives:
     # use zip for windows archives
     format_overrides:
       - goos: windows
-        format: zip
+        formats: ["tar.gz"]
 
 changelog:
   sort: asc
@@ -38,6 +38,7 @@ changelog:
       - "^docs:"
       - "^test:"
 
+# https://goreleaser.com/customization/homebrew/
 brews:
   - name: logseq-doctor
     commit_author:
@@ -45,17 +46,18 @@ brews:
       email: andreoliwa@sent.com
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
     directory: Formula
-    description: "Logseq Doctor: heal your Markdown files"
+    description: "Heal your Logseq Markdown files"
     license: "MIT"
-    # https://goreleaser.com/customization/homebrew/
     # Rename the executable to "lsdg"
     # https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md#bininstall-foo
     install: |
       bin.install "logseq-doctor" => "lsdg"
     test: |
-      system "#{bin}/lsdg --help"
+      assert_match "Logseq Doctor (Go) heals your Markdown files for Logseq.", shell_output("#{bin}/lsdg")
     # Repository to push the generated files to.
     repository:
+      pull_request:
+        enabled: true
       owner: andreoliwa
       name: homebrew-formulae
       branch: master

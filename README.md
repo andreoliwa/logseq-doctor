@@ -19,6 +19,8 @@ Logseq Doctor: heal your flat old Markdown files before importing them.
 
 ## Installation
 
+### Python executable
+
 The recommended way is to install `logseq-doctor` globally with
 [pipx](https://github.com/pypa/pipx):
 
@@ -30,21 +32,26 @@ You can also install the development version with:
 
 You will then have the `lsd` command available globally in your system.
 
-If you want to use the `lsd tidy-up` command, (for now) you will need to
-manually install the Go executable from the latest `master` branch:
+### Go binary executable
 
-    go install github.com/andreoliwa/logseq-doctor@f7c0f0f  # use the latest commit hash after the @
+The recommended way for macOS and Linux is to install with Homebrew:
 
-`lsdg` is the expected name for the Go executable, so you need to rename
-it:
+    brew install andreoliwa/formulae/logseq-doctor
 
-    mv $(go env GOPATH)/bin/logseq-doctor $(go env GOPATH)/bin/lsdg
+If you install manually, you need to rename the binary afterward:
+
+    go install github.com/andreoliwa/logseq-doctor@latest
+    mv "$(go env GOPATH)/bin/logseq-doctor" "$(go env GOPATH)/bin/lsdg"
 
 Confirm if it\'s in your path:
 
+    which lsdg
+    # or
     ls -l $(go env GOPATH)/bin/lsdg
 
-To build from the source, clone the repository and run:
+### Build from source
+
+To build and install from the source (both Python and Go executables), clone the repository and run:
 
     make install
 
