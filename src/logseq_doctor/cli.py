@@ -103,6 +103,7 @@ def tasks(
     tag_or_page: list[str] = typer.Argument(None, metavar="TAG", help="Tags or pages to query"),  # noqa: B008
     logseq_host_url: str = typer.Option(..., "--host", "-h", help="Logseq host", envvar="LOGSEQ_HOST_URL"),
     logseq_api_token: str = typer.Option(..., "--token", "-t", help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
+    json_: bool = typer.Option(False, "--json", help="Output in JSON format"),
 ) -> None:
     """List tasks in Logseq."""
     logseq = Logseq(logseq_host_url, logseq_api_token, cast(GlobalOptions, ctx.obj).logseq_graph_path)
@@ -115,7 +116,11 @@ def tasks(
             condition = f" (or {pages})"
     query = f"(and{condition} (task TODO DOING WAITING NOW LATER))"
 
-    blocks_sorted_by_date = Block.sort_by_date(logseq.query(query))
+    if json_:
+        typer.echo(logseq.query_json(query))
+        return
+
+    blocks_sorted_by_date = Block.sort_by_date(logseq.query_blocks(query))
     for block in blocks_sorted_by_date:
         typer.secho(f"{block.page_title}§", fg=typer.colors.GREEN, nl=False)
         typer.secho(block.url(logseq.graph_name), fg=typer.colors.BLUE, bold=True, nl=False)
