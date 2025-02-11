@@ -1,0 +1,62 @@
+version: 2
+
+project_name: logseq-doctor
+
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+    # you may remove this if you don't need go generate
+    - go generate ./...
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+brews:
+  - name: logseq-doctor
+    commit_author:
+      name: andreoliwa
+      email: andreoliwa@sent.com
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    directory: Formula
+    description: "Logseq Doctor: heal your Markdown files"
+    license: "MIT"
+    # https://goreleaser.com/customization/homebrew/
+    # Rename the executable to "lsdg"
+    # https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md#bininstall-foo
+    install: |
+      bin.install "logseq-doctor" => "lsdg"
+    test: |
+      system "#{bin}/lsdg --help"
+    # Repository to push the generated files to.
+    repository:
+      owner: andreoliwa
+      name: homebrew-formulae
+      branch: master
+      token: "{{ .Env.GITHUB_TOKEN }}"
