@@ -2,7 +2,7 @@ module github.com/andreoliwa/logseq-doctor
 
 go 1.23
 
-toolchain go1.23.6
+toolchain go1.24.0
 
 require (
 	github.com/andreoliwa/logseq-go v0.0.0-20250107233117-3b9f58bed6b7
