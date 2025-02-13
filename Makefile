@@ -91,12 +91,15 @@ pytest: # Run tests with pytest
 	uv run pytest --cov --cov-report=term-missing -vv tests
 .PHONY: pytest
 
-release: # Bump the version, create a tag, commit and push. This will trigger the PyPI release on GitHub Actions
+release: # Create a GitHub release for the Go package only
+# TODO: create a release for the Python package as well
+	gh workflow run release.yaml
 	# https://commitizen-tools.github.io/commitizen/bump/#configuration
 	# See also: cz bump --help
-	@echo "THIS IS ONLY A DRY-RUN. Remove --dry-run to actually bump the version when some bug fix or new feature is ready to publish"
+	#@echo "THIS IS ONLY A DRY-RUN. Remove --dry-run to actually bump the version when some bug fix or new feature is ready to publish"
 	# TODO: remove --dry-run when there is some bug fix or new feature ready to publish
-	cz bump --dry-run --check-consistency
+	# Bump the version, create a tag, commit and push. This will trigger the PyPI release on GitHub Actions
+	#cz bump --dry-run --check-consistency
 .PHONY: release
 
 .release-post-bump: # This is called in .cz.toml in post_bump_hooks
