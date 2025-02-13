@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import urllib.parse
 from dataclasses import dataclass, field
@@ -80,8 +81,7 @@ class Logseq:
         """Return the graph name from the path."""
         return self.graph_path.stem
 
-    def query(self, query: str) -> list[Block]:
-        """Query Logseq API."""
+    def _run_query(self, query: str) -> dict:
         session = requests.Session()
         session.headers.update(
             {
@@ -91,9 +91,12 @@ class Logseq:
         )
         resp = session.post(f"{self.url}/api", json={"method": "logseq.db.q", "args": [query]})
         resp.raise_for_status()
+        return resp.json()
 
+    def query_blocks(self, query: str) -> list[Block]:
+        """Query Logseq API and return blocks."""
         rows: list[Block] = []
-        for obj in resp.json():
+        for obj in self._run_query(query):
             page = obj.get("page", {})
             block_id = obj.get("uuid")
             rows.append(
@@ -106,6 +109,10 @@ class Logseq:
                 ),
             )
         return rows
+
+    def query_json(self, query: str) -> str:
+        """Query Logseq API and return JSON."""
+        return json.dumps(self._run_query(query))
 
     def page_from_name(self, name: str) -> Page:
         """Return a Page object from a page name."""

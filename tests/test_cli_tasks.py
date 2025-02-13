@@ -11,8 +11,8 @@ from typer.testing import CliRunner
 
 
 @pytest.fixture
-def mock_logseq_query() -> Mock:
-    with patch.object(Logseq, "query") as mocked_method:
+def mock_logseq_query_blocks() -> Mock:
+    with patch.object(Logseq, "query_blocks") as mocked_method:
         yield mocked_method
 
 
@@ -63,18 +63,18 @@ def blocks_sorted_by_date_content(unsorted_blocks: list[Block]) -> list[Block]:
         (["tag1", "page2"], "(and (or [[tag1]] [[page2]]) (task TODO DOING WAITING NOW LATER))"),
     ],
 )
-def test_search_with_tags(mock_logseq_query: Mock, tags: list[str], expected_query: str) -> None:
+def test_search_with_tags(mock_logseq_query_blocks: Mock, tags: list[str], expected_query: str) -> None:
     result = CliRunner().invoke(app, ["tasks", *tags])
     assert result.exit_code == 0
-    assert mock_logseq_query.call_count == 1
-    mock_logseq_query.assert_called_once_with(expected_query)
+    assert mock_logseq_query_blocks.call_count == 1
+    mock_logseq_query_blocks.assert_called_once_with(expected_query)
 
 
 def test_simple_text_output(
-    mock_logseq_query: Mock,
+    mock_logseq_query_blocks: Mock,
     unsorted_blocks: list[Block],
 ) -> None:
-    mock_logseq_query.return_value = unsorted_blocks
+    mock_logseq_query_blocks.return_value = unsorted_blocks
     result = CliRunner().invoke(app, ["tasks"])
     assert result.exit_code == 0
     expected = """

@@ -70,9 +70,10 @@ repos:
     hooks:
       - id: sync-pre-commit-deps
   - repo: https://github.com/golangci/golangci-lint
-    rev: v1.64.4
+    rev: v1.64.5
     hooks:
       - id: golangci-lint
         name: golangci-lint
         entry: golangci-lint run
         language: system
+        verbose: true

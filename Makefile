@@ -112,4 +112,6 @@ smoke: rehash test check-installed # Run simple tests to make sure the package i
 check-installed: # Run the main executabless to confirm they are installed properly in the PATH
 	-lsd
 	-lsdg
+	-which lsd
+	-which lsdg
 .PHONY: check-installed

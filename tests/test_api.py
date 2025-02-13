@@ -33,7 +33,7 @@ def test_block_url() -> None:
 @responses.activate
 def test_query(logseq: Logseq, datadir: Path) -> None:
     responses.post("http://localhost:1234/api", json=json.loads((datadir / "valid-todo-tasks.json").read_text()))
-    assert logseq.query("doesn't matter, the response is mocked anyway") == [
+    assert logseq.query_blocks("doesn't matter, the response is mocked anyway") == [
         Block(
             block_id=UUID("644069fc-ecd3-4ac0-9363-4fd63cdb18b3"),
             journal_iso_date=20230419,
