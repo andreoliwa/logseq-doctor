@@ -98,12 +98,13 @@ class TaskFormat(str, Enum):
 
 
 @app.command()
-def tasks(
+def tasks(  # noqa: PLR0913
     ctx: typer.Context,
     tag_or_page: list[str] = typer.Argument(None, metavar="TAG", help="Tags or pages to query"),  # noqa: B008
     logseq_host_url: str = typer.Option(..., "--host", "-h", help="Logseq host", envvar="LOGSEQ_HOST_URL"),
     logseq_api_token: str = typer.Option(..., "--token", "-t", help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
     json_: bool = typer.Option(False, "--json", help="Output in JSON format"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
 ) -> None:
     """List tasks in Logseq."""
     logseq = Logseq(logseq_host_url, logseq_api_token, cast(GlobalOptions, ctx.obj).logseq_graph_path)
@@ -115,6 +116,8 @@ def tasks(
             pages = " ".join([f"[[{tp}]]" for tp in tag_or_page])
             condition = f" (or {pages})"
     query = f"(and{condition} (task TODO DOING WAITING NOW LATER))"
+    if verbose:
+        typer.echo(f"Query: {query}")
 
     if json_:
         typer.echo(logseq.query_json(query))
