@@ -5,7 +5,6 @@ linters:
     # keep-sorted start
     - copyloopvar
     - depguard
-    - exportloopref
     - forbidigo
     - gci
     - gochecknoinits
