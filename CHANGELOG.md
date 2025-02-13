@@ -1,9 +1,8 @@
 # [0.5.0](https://github.com/andreoliwa/logseq-doctor/compare/v0.4.0...v0.5.0) (2025-02-13)
 
-
 ### Features
 
-* **tasks:** JSON format ([#121](https://github.com/andreoliwa/logseq-doctor/issues/121)) ([07da841](https://github.com/andreoliwa/logseq-doctor/commit/07da841b4f64e5a72f9edb6f578f91dd47e53ed4))
+- **tasks:** JSON format ([#121](https://github.com/andreoliwa/logseq-doctor/issues/121)) ([07da841](https://github.com/andreoliwa/logseq-doctor/commit/07da841b4f64e5a72f9edb6f578f91dd47e53ed4))
 
 # [0.4.0](https://github.com/andreoliwa/logseq-doctor/compare/v0.3.0...v0.4.0) (2025-02-11)
 
