@@ -6,7 +6,7 @@ toolchain go1.24.0
 
 require (
 	github.com/andreoliwa/logseq-go v0.0.0-20250107233117-3b9f58bed6b7
-	github.com/spf13/cobra v1.9.0
+	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	gotest.tools/v3 v3.5.2
 )
