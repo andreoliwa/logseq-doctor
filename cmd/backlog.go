@@ -37,8 +37,7 @@ func init() {
 	rootCmd.AddCommand(backlogCmd)
 }
 
-// TODO: refactor this function after all main features are implemented and tested.
-func updateBacklog() error { //nolint:cyclop,funlen,gocognit
+func updateBacklog() error {
 	graph := openGraph("")
 	if graph == nil {
 		return ErrFailedOpenGraph
@@ -57,44 +56,21 @@ func updateBacklog() error { //nolint:cyclop,funlen,gocognit
 			return fmt.Errorf("failed to open page: %w", err)
 		}
 
-		refsFromPage := NewSet[string]()
-
-		for _, block := range page.Blocks() {
-			block.Children().FindDeep(func(n content.Node) bool {
-				if ref, ok := n.(*content.BlockRef); ok {
-					refsFromPage.Add(ref.ID)
-				}
-
-				return false
-			})
-		}
+		existingTasks := refsFromPages(page)
 
 		fmt.Printf("%s: %s from %s\n", pageName,
-			FormatCount(refsFromPage.Size(), "task", "tasks"),
+			FormatCount(existingTasks.Size(), "task", "tasks"),
 			strings.Join(pages, ", "))
 
-		query := buildQuery(pages)
-		fmt.Printf("  query: %s\n", query)
-
-		jsonStr, err := queryJSON(query)
+		queriedTasks, err := queryTasksFromPages(pages)
 		if err != nil {
-			return fmt.Errorf("failed to query Logseq API: %w", err)
-		}
-
-		jsonTasks, err := extractTasks(jsonStr)
-		if err != nil {
-			return fmt.Errorf("failed to extract tasks: %w", err)
-		}
-
-		refsFromQuery := NewSet[string]()
-		for _, e := range jsonTasks {
-			refsFromQuery.Add(e.UUID)
+			return err
 		}
 
 		newRefs := NewSet[string]()
 
-		for _, ref := range refsFromQuery.Values() {
-			if !refsFromPage.Contains(ref) {
+		for _, ref := range queriedTasks.Values() {
+			if !existingTasks.Contains(ref) {
 				newRefs.Add(ref)
 			}
 		}
@@ -105,51 +81,29 @@ func updateBacklog() error { //nolint:cyclop,funlen,gocognit
 			continue
 		}
 
-		transaction := graph.NewTransaction()
-
-		page, err = transaction.OpenPage(pageName)
+		err = saveBacklog(graph, pageName, newRefs)
 		if err != nil {
-			return fmt.Errorf("failed to open page for transaction: %w", err)
+			return err
 		}
-
-		blocks := page.Blocks()
-
-		var first *content.Block
-		if len(blocks) == 0 {
-			first = nil
-		} else {
-			first = blocks[0]
-		}
-
-		for _, ref := range newRefs.Values() {
-			block := content.NewBlock(content.NewBlockRef(ref))
-			if first == nil {
-				page.AddBlock(block)
-			} else {
-				page.InsertBlockBefore(block, first)
-			}
-		}
-
-		divider := content.NewBlock(content.NewParagraph(
-			content.NewPageLink("quick capture"),
-			content.NewText(" New tasks above this line"),
-		))
-
-		if first == nil {
-			page.AddBlock(divider)
-		} else {
-			page.InsertBlockBefore(divider, first)
-		}
-
-		err = transaction.Save()
-		if err != nil {
-			return fmt.Errorf("failed to save transaction: %w", err)
-		}
-
-		fmt.Printf("\033[92m  updated with %s\033[0m\n", FormatCount(newRefs.Size(), "new task", "new tasks"))
 	}
 
 	return nil
+}
+
+func refsFromPages(page logseq.Page) *Set[string] {
+	existingTasks := NewSet[string]()
+
+	for _, block := range page.Blocks() {
+		block.Children().FindDeep(func(n content.Node) bool {
+			if ref, ok := n.(*content.BlockRef); ok {
+				existingTasks.Add(ref.ID)
+			}
+
+			return false
+		})
+	}
+
+	return existingTasks
 }
 
 func linesFromBacklog(graph *logseq.Graph) ([][]string, error) {
@@ -185,11 +139,29 @@ func linesFromBacklog(graph *logseq.Graph) ([][]string, error) {
 	return lines, nil
 }
 
-func buildQuery(tagsOrPages []string) string {
-	if len(tagsOrPages) == 0 {
-		return ""
+func queryTasksFromPages(pages []string) (*Set[string], error) {
+	query := findQuery(pages)
+	fmt.Printf("  query: %s\n", query)
+
+	jsonStr, err := queryJSON(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query Logseq API: %w", err)
 	}
 
+	jsonTasks, err := extractTasks(jsonStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to extract tasks: %w", err)
+	}
+
+	refsFromQuery := NewSet[string]()
+	for _, e := range jsonTasks {
+		refsFromQuery.Add(e.UUID)
+	}
+
+	return refsFromQuery, nil
+}
+
+func findQuery(tagsOrPages []string) string {
 	var condition string
 	if len(tagsOrPages) == 1 {
 		condition = fmt.Sprintf("[[%s]]", tagsOrPages[0])
@@ -266,4 +238,51 @@ func extractTasks(jsonStr string) ([]taskJSON, error) {
 	}
 
 	return tasks, nil
+}
+
+func saveBacklog(graph *logseq.Graph, pageName string, newRefs *Set[string]) error {
+	transaction := graph.NewTransaction()
+
+	page, err := transaction.OpenPage(pageName)
+	if err != nil {
+		return fmt.Errorf("failed to open page for transaction: %w", err)
+	}
+
+	blocks := page.Blocks()
+
+	var first *content.Block
+	if len(blocks) == 0 {
+		first = nil
+	} else {
+		first = blocks[0]
+	}
+
+	for _, ref := range newRefs.Values() {
+		block := content.NewBlock(content.NewBlockRef(ref))
+		if first == nil {
+			page.AddBlock(block)
+		} else {
+			page.InsertBlockBefore(block, first)
+		}
+	}
+
+	divider := content.NewBlock(content.NewParagraph(
+		content.NewPageLink("quick capture"),
+		content.NewText(" New tasks above this line"),
+	))
+
+	if first == nil {
+		page.AddBlock(divider)
+	} else {
+		page.InsertBlockBefore(divider, first)
+	}
+
+	err = transaction.Save()
+	if err != nil {
+		return fmt.Errorf("failed to save transaction: %w", err)
+	}
+
+	fmt.Printf("\033[92m  updated with %s\033[0m\n", FormatCount(newRefs.Size(), "new task", "new tasks"))
+
+	return nil
 }
