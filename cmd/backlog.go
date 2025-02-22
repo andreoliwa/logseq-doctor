@@ -50,39 +50,32 @@ func updateBacklog() error {
 	}
 
 	for _, pages := range lines {
-		pageName := "backlog/" + pages[0]
+		pageTitle := "backlog/" + pages[0]
 
-		page, err := graph.OpenPage(pageName)
+		page, err := graph.OpenPage(pageTitle)
 		if err != nil {
 			return fmt.Errorf("failed to open page: %w", err)
 		}
 
-		existingTasks := refsFromPages(page)
+		existingRefs := refsFromPages(page)
 
-		fmt.Printf("%s: %s\n", PageColor(pageName), FormatCount(existingTasks.Size(), "task", "tasks"))
+		fmt.Printf("%s: %s\n", PageColor(pageTitle), FormatCount(existingRefs.Size(), "task", "tasks"))
 
-		queriedTasks, err := queryTasksFromPages(graph, pages, existingTasks)
+		queriedRefs, err := queryTasksFromPages(graph, pages, existingRefs)
 		if err != nil {
 			return err
 		}
 
-		newRefs := NewSet[string]()
+		newRefs := queriedRefs.Diff(existingRefs)
+		obsoleteRefs := existingRefs.Diff(queriedRefs)
 
-		for _, ref := range queriedTasks.Values() {
-			if !existingTasks.Contains(ref) {
-				newRefs.Add(ref)
+		if newRefs.Size() > 0 || obsoleteRefs.Size() > 0 {
+			err = saveBacklog(graph, pageTitle, newRefs, obsoleteRefs)
+			if err != nil {
+				return err
 			}
-		}
-
-		if newRefs.Size() == 0 {
-			color.Yellow("  no new tasks found")
-
-			continue
-		}
-
-		err = saveBacklog(graph, pageName, newRefs)
-		if err != nil {
-			return err
+		} else {
+			color.Yellow("  no new/deleted tasks found")
 		}
 	}
 
@@ -90,19 +83,19 @@ func updateBacklog() error {
 }
 
 func refsFromPages(page logseq.Page) *Set[string] {
-	existingTasks := NewSet[string]()
+	existingRefs := NewSet[string]()
 
 	for _, block := range page.Blocks() {
 		block.Children().FindDeep(func(n content.Node) bool {
 			if ref, ok := n.(*content.BlockRef); ok {
-				existingTasks.Add(ref.ID)
+				existingRefs.Add(ref.ID)
 			}
 
 			return false
 		})
 	}
 
-	return existingTasks
+	return existingRefs
 }
 
 func linesFromBacklog(graph *logseq.Graph) ([][]string, error) {
@@ -114,20 +107,20 @@ func linesFromBacklog(graph *logseq.Graph) ([][]string, error) {
 	var lines [][]string
 
 	for _, block := range page.Blocks() {
-		var pages []string
+		var pageTitles []string
 
 		block.Children().FindDeep(func(n content.Node) bool {
 			if pageLink, ok := n.(*content.PageLink); ok {
-				pages = append(pages, pageLink.To)
+				pageTitles = append(pageTitles, pageLink.To)
 			} else if tag, ok := n.(*content.Hashtag); ok {
-				pages = append(pages, tag.To)
+				pageTitles = append(pageTitles, tag.To)
 			}
 
 			return false
 		})
 
-		if len(pages) > 0 {
-			lines = append(lines, pages)
+		if len(pageTitles) > 0 {
+			lines = append(lines, pageTitles)
 		}
 	}
 
@@ -138,19 +131,19 @@ func linesFromBacklog(graph *logseq.Graph) ([][]string, error) {
 	return lines, nil
 }
 
-func queryTasksFromPages(graph *logseq.Graph, pages []string, existingTasks *Set[string]) (*Set[string], error) {
+func queryTasksFromPages(graph *logseq.Graph, pageTitles []string, existingRefs *Set[string]) (*Set[string], error) {
 	refsFromAllQueries := NewSet[string]()
 
-	for _, page := range pages {
-		fmt.Printf("  %s: ", PageColor(page))
+	for _, pageTitle := range pageTitles {
+		fmt.Printf("  %s: ", PageColor(pageTitle))
 
-		query, err := findFirstQuery(graph, page)
+		query, err := findFirstQuery(graph, pageTitle)
 		if err != nil {
 			return nil, err
 		}
 
 		if query == "" {
-			query = defaultQuery(page)
+			query = defaultQuery(pageTitle)
 		}
 
 		jsonStr, err := queryLogseqAPI(query)
@@ -168,7 +161,7 @@ func queryTasksFromPages(graph *logseq.Graph, pages []string, existingTasks *Set
 		newCount := 0
 
 		for _, t := range jsonTasks {
-			if !existingTasks.Contains(t.UUID) {
+			if !existingRefs.Contains(t.UUID) {
 				newCount++
 			}
 
@@ -186,10 +179,10 @@ func queryTasksFromPages(graph *logseq.Graph, pages []string, existingTasks *Set
 	return refsFromAllQueries, nil
 }
 
-func findFirstQuery(graph *logseq.Graph, pageName string) (string, error) {
+func findFirstQuery(graph *logseq.Graph, pageTitle string) (string, error) {
 	var query string
 
-	page, err := graph.OpenPage(pageName)
+	page, err := graph.OpenPage(pageTitle)
 	if err != nil {
 		return "", fmt.Errorf("failed to open page: %w", err)
 	}
@@ -212,17 +205,16 @@ func findFirstQuery(graph *logseq.Graph, pageName string) (string, error) {
 
 	fmt.Printf("found query %s\n", query)
 
-	return replaceCurrentPage(query, pageName), nil
+	return replaceCurrentPage(query, pageTitle), nil
 }
 
 // replaceCurrentPage replaces the current page placeholder in the query with the actual page name.
-// replaceCurrentPage replaces the current page placeholder in the query with the actual page name.
-func replaceCurrentPage(query, pageName string) string {
-	return strings.ReplaceAll(query, "<% current page %>", "[["+pageName+"]]")
+func replaceCurrentPage(query, pageTitle string) string {
+	return strings.ReplaceAll(query, "<% current page %>", "[["+pageTitle+"]]")
 }
 
-func defaultQuery(page string) string {
-	query := fmt.Sprintf("(and [[%s]] (task TODO DOING WAITING))", page)
+func defaultQuery(pageTitle string) string {
+	query := fmt.Sprintf("(and [[%s]] (task TODO DOING WAITING))", pageTitle)
 	fmt.Printf("default query %s\n", query)
 
 	return query
@@ -293,38 +285,52 @@ func extractTasks(jsonStr string) ([]taskJSON, error) {
 	return tasks, nil
 }
 
-func saveBacklog(graph *logseq.Graph, pageName string, newRefs *Set[string]) error {
+func saveBacklog( //nolint:cyclop,funlen
+	graph *logseq.Graph, pageTitle string, newRefs, obsoleteRefs *Set[string]) error {
 	transaction := graph.NewTransaction()
 
-	page, err := transaction.OpenPage(pageName)
+	page, err := transaction.OpenPage(pageTitle)
 	if err != nil {
 		return fmt.Errorf("failed to open page for transaction: %w", err)
 	}
 
-	blocks := page.Blocks()
-
 	var first *content.Block
-	if len(blocks) == 0 {
-		first = nil
-	} else {
-		first = blocks[0]
-	}
 
 	dividerBlock := content.NewBlock(content.NewParagraph(
 		content.NewPageLink("quick capture"),
 		content.NewText(" New tasks above this line"),
 	))
-
 	hasDivider := false
+	deletedCount := 0
 
-	for _, block := range blocks {
+	for i, block := range page.Blocks() {
+		if i == 0 {
+			first = block
+		}
+
+		// Will only add a divider block if there are new tasks to add
 		// TODO: add AsMarkdown() or ContentHash() or Hash() to content.Block, to make it possible to compare blocks
 		//  Or fix the message "the operator == is not defined on NodeList"
 		if block.GomegaString() == dividerBlock.GomegaString() {
 			hasDivider = true
-
-			break
 		}
+
+		// Remove refs marked for deletion
+		block.Children().FindDeep(func(node content.Node) bool {
+			if ref, ok := node.(*content.BlockRef); ok {
+				if obsoleteRefs.Contains(ref.ID) {
+					// Block ref's parents are: paragraph and block
+					// TODO: handle cases when the block ref is nested under another block ref.
+					//  This will remove the obsolete block and its children.
+					//  Should I show a warning message to the user and prevent the block from being deleted?
+					node.Parent().Parent().RemoveSelf()
+
+					deletedCount++
+				}
+			}
+
+			return false
+		})
 	}
 
 	for _, ref := range newRefs.Values() {
@@ -336,7 +342,7 @@ func saveBacklog(graph *logseq.Graph, pageName string, newRefs *Set[string]) err
 		}
 	}
 
-	if !hasDivider {
+	if !hasDivider && newRefs.Size() > 0 {
 		if first == nil {
 			page.AddBlock(dividerBlock)
 		} else {
@@ -349,7 +355,13 @@ func saveBacklog(graph *logseq.Graph, pageName string, newRefs *Set[string]) err
 		return fmt.Errorf("failed to save transaction: %w", err)
 	}
 
-	color.Green("  updated with a total of %s", FormatCount(newRefs.Size(), "new task", "new tasks"))
+	if newRefs.Size() > 0 {
+		color.Green("  updated with a total of %s", FormatCount(newRefs.Size(), "new task", "new tasks"))
+	}
+
+	if deletedCount > 0 {
+		color.Red("  %s removed (completed or unreferenced)", FormatCount(deletedCount, "task was", "tasks were"))
+	}
 
 	return nil
 }

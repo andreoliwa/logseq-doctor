@@ -47,6 +47,25 @@ func (s *Set[T]) Values() []T {
 	return keys
 }
 
+// Diff returns a new set containing elements that are in the current set but not in the provided sets.
+func (s *Set[T]) Diff(sets ...*Set[T]) *Set[T] {
+	result := NewSet[T]()
+
+	// Copy all elements of the current set into the result
+	for key := range s.data {
+		result.Add(key)
+	}
+
+	// Remove elements that are present in any of the given sets
+	for _, otherSet := range sets {
+		for key := range otherSet.data {
+			result.Remove(key)
+		}
+	}
+
+	return result
+}
+
 // FormatCount returns a string with the count and the singular or plural form of a word.
 func FormatCount(count int, singular, plural string) string {
 	if count == 1 {
