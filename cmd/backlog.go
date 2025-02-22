@@ -310,24 +310,38 @@ func saveBacklog(graph *logseq.Graph, pageName string, newRefs *Set[string]) err
 		first = blocks[0]
 	}
 
-	for _, ref := range newRefs.Values() {
-		block := content.NewBlock(content.NewBlockRef(ref))
-		if first == nil {
-			page.AddBlock(block)
-		} else {
-			page.InsertBlockBefore(block, first)
-		}
-	}
-
-	divider := content.NewBlock(content.NewParagraph(
+	dividerBlock := content.NewBlock(content.NewParagraph(
 		content.NewPageLink("quick capture"),
 		content.NewText(" New tasks above this line"),
 	))
 
-	if first == nil {
-		page.AddBlock(divider)
-	} else {
-		page.InsertBlockBefore(divider, first)
+	hasDivider := false
+
+	for _, block := range blocks {
+		// TODO: add AsMarkdown() or ContentHash() or Hash() to content.Block, to make it possible to compare blocks
+		//  Or fix the message "the operator == is not defined on NodeList"
+		if block.GomegaString() == dividerBlock.GomegaString() {
+			hasDivider = true
+
+			break
+		}
+	}
+
+	for _, ref := range newRefs.Values() {
+		newBlock := content.NewBlock(content.NewBlockRef(ref))
+		if first == nil {
+			page.AddBlock(newBlock)
+		} else {
+			page.InsertBlockBefore(newBlock, first)
+		}
+	}
+
+	if !hasDivider {
+		if first == nil {
+			page.AddBlock(dividerBlock)
+		} else {
+			page.InsertBlockBefore(dividerBlock, first)
+		}
 	}
 
 	err = transaction.Save()
