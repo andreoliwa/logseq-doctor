@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"io"
 	"net/http"
@@ -58,11 +59,9 @@ func updateBacklog() error {
 
 		existingTasks := refsFromPages(page)
 
-		fmt.Printf("%s: %s from %s\n", pageName,
-			FormatCount(existingTasks.Size(), "task", "tasks"),
-			strings.Join(pages, ", "))
+		fmt.Printf("%s: %s\n", PageColor(pageName), FormatCount(existingTasks.Size(), "task", "tasks"))
 
-		queriedTasks, err := queryTasksFromPages(graph, pages)
+		queriedTasks, err := queryTasksFromPages(graph, pages, existingTasks)
 		if err != nil {
 			return err
 		}
@@ -76,7 +75,7 @@ func updateBacklog() error {
 		}
 
 		if newRefs.Size() == 0 {
-			fmt.Printf("\033[33m  no new tasks found\033[0m\n")
+			color.Yellow("  no new tasks found")
 
 			continue
 		}
@@ -139,10 +138,12 @@ func linesFromBacklog(graph *logseq.Graph) ([][]string, error) {
 	return lines, nil
 }
 
-func queryTasksFromPages(graph *logseq.Graph, pages []string) (*Set[string], error) {
+func queryTasksFromPages(graph *logseq.Graph, pages []string, existingTasks *Set[string]) (*Set[string], error) {
 	refsFromAllQueries := NewSet[string]()
 
 	for _, page := range pages {
+		fmt.Printf("  %s: ", PageColor(page))
+
 		query, err := findFirstQuery(graph, page)
 		if err != nil {
 			return nil, err
@@ -150,9 +151,6 @@ func queryTasksFromPages(graph *logseq.Graph, pages []string) (*Set[string], err
 
 		if query == "" {
 			query = defaultQuery(page)
-			fmt.Printf("  default query: %s\n", query)
-		} else {
-			fmt.Printf("  found query: %s\n", query)
 		}
 
 		jsonStr, err := queryLogseqAPI(query)
@@ -165,8 +163,23 @@ func queryTasksFromPages(graph *logseq.Graph, pages []string) (*Set[string], err
 			return nil, fmt.Errorf("failed to extract tasks: %w", err)
 		}
 
+		fmt.Printf("    queried %s, ", FormatCount(len(jsonTasks), "task", "tasks"))
+
+		newCount := 0
+
 		for _, t := range jsonTasks {
+			if !existingTasks.Contains(t.UUID) {
+				newCount++
+			}
+
 			refsFromAllQueries.Add(t.UUID)
+		}
+
+		formatted := FormatCount(newCount, "new task", "new tasks")
+		if newCount == 0 {
+			fmt.Printf("found %s\n", formatted)
+		} else {
+			color.Green("found %s", formatted)
 		}
 	}
 
@@ -193,6 +206,12 @@ func findFirstQuery(graph *logseq.Graph, pageName string) (string, error) {
 		})
 	}
 
+	if query == "" {
+		return "", nil
+	}
+
+	fmt.Printf("found query %s\n", query)
+
 	return replaceCurrentPage(query, pageName), nil
 }
 
@@ -203,7 +222,10 @@ func replaceCurrentPage(query, pageName string) string {
 }
 
 func defaultQuery(page string) string {
-	return fmt.Sprintf("(and [[%s]] (task TODO DOING WAITING))", page)
+	query := fmt.Sprintf("(and [[%s]] (task TODO DOING WAITING))", page)
+	fmt.Printf("default query %s\n", query)
+
+	return query
 }
 
 // queryLogseqAPI sends a query to the Logseq API and returns the result as JSON.
@@ -313,7 +335,7 @@ func saveBacklog(graph *logseq.Graph, pageName string, newRefs *Set[string]) err
 		return fmt.Errorf("failed to save transaction: %w", err)
 	}
 
-	fmt.Printf("\033[92m  updated with %s\033[0m\n", FormatCount(newRefs.Size(), "new task", "new tasks"))
+	color.Green("  updated with a total of %s", FormatCount(newRefs.Size(), "new task", "new tasks"))
 
 	return nil
 }

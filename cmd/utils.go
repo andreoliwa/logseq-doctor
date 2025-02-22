@@ -1,6 +1,9 @@
 package cmd
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/fatih/color"
+)
 
 // Set is a simple implementation of a set using a map.
 type Set[T comparable] struct {
@@ -52,3 +55,6 @@ func FormatCount(count int, singular, plural string) string {
 
 	return fmt.Sprintf("%d %s", count, plural)
 }
+
+// PageColor is a color function for page names.
+var PageColor = color.New(color.FgHiWhite).SprintfFunc() //nolint:gochecknoglobals

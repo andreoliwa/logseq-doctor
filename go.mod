@@ -6,6 +6,7 @@ toolchain go1.24.0
 
 require (
 	github.com/andreoliwa/logseq-go v0.0.0-20250107233117-3b9f58bed6b7
+	github.com/fatih/color v1.18.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	gotest.tools/v3 v3.5.2
@@ -35,6 +36,8 @@ require (
 	github.com/kamstrup/intmap v0.5.1 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/kr/text v0.2.0 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
