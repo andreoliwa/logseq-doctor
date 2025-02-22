@@ -62,7 +62,7 @@ func updateBacklog() error {
 			FormatCount(existingTasks.Size(), "task", "tasks"),
 			strings.Join(pages, ", "))
 
-		queriedTasks, err := queryTasksFromPages(pages)
+		queriedTasks, err := queryTasksFromPages(graph, pages)
 		if err != nil {
 			return err
 		}
@@ -139,49 +139,75 @@ func linesFromBacklog(graph *logseq.Graph) ([][]string, error) {
 	return lines, nil
 }
 
-func queryTasksFromPages(pages []string) (*Set[string], error) {
-	query := findQuery(pages)
-	fmt.Printf("  query: %s\n", query)
+func queryTasksFromPages(graph *logseq.Graph, pages []string) (*Set[string], error) {
+	refsFromAllQueries := NewSet[string]()
 
-	jsonStr, err := queryJSON(query)
-	if err != nil {
-		return nil, fmt.Errorf("failed to query Logseq API: %w", err)
-	}
-
-	jsonTasks, err := extractTasks(jsonStr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to extract tasks: %w", err)
-	}
-
-	refsFromQuery := NewSet[string]()
-	for _, e := range jsonTasks {
-		refsFromQuery.Add(e.UUID)
-	}
-
-	return refsFromQuery, nil
-}
-
-func findQuery(tagsOrPages []string) string {
-	var condition string
-	if len(tagsOrPages) == 1 {
-		condition = fmt.Sprintf("[[%s]]", tagsOrPages[0])
-	} else {
-		withBrackets := make([]string, len(tagsOrPages))
-		for i, page := range tagsOrPages {
-			withBrackets[i] = fmt.Sprintf("[[%s]]", page)
+	for _, page := range pages {
+		query, err := findFirstQuery(graph, page)
+		if err != nil {
+			return nil, err
 		}
 
-		pages := strings.Join(withBrackets, " ")
-		condition = "(or " + pages + ")"
+		if query == "" {
+			query = defaultQuery(page)
+			fmt.Printf("  default query: %s\n", query)
+		} else {
+			fmt.Printf("  found query: %s\n", query)
+		}
+
+		jsonStr, err := queryLogseqAPI(query)
+		if err != nil {
+			return nil, fmt.Errorf("failed to query Logseq API: %w", err)
+		}
+
+		jsonTasks, err := extractTasks(jsonStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to extract tasks: %w", err)
+		}
+
+		for _, t := range jsonTasks {
+			refsFromAllQueries.Add(t.UUID)
+		}
 	}
 
-	query := "(and " + condition + " (task TODO DOING WAITING))"
-
-	return query
+	return refsFromAllQueries, nil
 }
 
-// queryJSON sends a query to the Logseq API and returns the result as JSON.
-func queryJSON(query string) (string, error) {
+func findFirstQuery(graph *logseq.Graph, pageName string) (string, error) {
+	var query string
+
+	page, err := graph.OpenPage(pageName)
+	if err != nil {
+		return "", fmt.Errorf("failed to open page: %w", err)
+	}
+
+	for _, block := range page.Blocks() {
+		block.Children().FindDeep(func(n content.Node) bool {
+			if q, ok := n.(*content.Query); ok {
+				query = q.Query
+			} else if qc, ok := n.(*content.QueryCommand); ok {
+				query = qc.Query
+			}
+
+			return false
+		})
+	}
+
+	return replaceCurrentPage(query, pageName), nil
+}
+
+// replaceCurrentPage replaces the current page placeholder in the query with the actual page name.
+// replaceCurrentPage replaces the current page placeholder in the query with the actual page name.
+func replaceCurrentPage(query, pageName string) string {
+	return strings.ReplaceAll(query, "<% current page %>", "[["+pageName+"]]")
+}
+
+func defaultQuery(page string) string {
+	return fmt.Sprintf("(and [[%s]] (task TODO DOING WAITING))", page)
+}
+
+// queryLogseqAPI sends a query to the Logseq API and returns the result as JSON.
+func queryLogseqAPI(query string) (string, error) {
 	apiToken := os.Getenv("LOGSEQ_API_TOKEN")
 
 	hostURL := os.Getenv("LOGSEQ_HOST_URL")
@@ -190,11 +216,16 @@ func queryJSON(query string) (string, error) {
 	}
 
 	client := &http.Client{} //nolint:exhaustruct
-	payload := strings.NewReader(fmt.Sprintf(`{"method":"logseq.db.q","args":["%s"]}`, query))
+
+	jsonQuery, err := json.Marshal(query)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal query: %w", err)
+	}
 
 	ctx := context.Background()
+	payload := fmt.Sprintf(`{"method":"logseq.db.q","args":[%s]}`, string(jsonQuery))
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, hostURL+"/api", payload)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, hostURL+"/api", strings.NewReader(payload))
 	if err != nil {
 		return "", fmt.Errorf("failed to create new request: %w", err)
 	}
@@ -209,7 +240,7 @@ func queryJSON(query string) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("status %s: %w", resp.Status, ErrQueryLogseqAPI)
+		return "", fmt.Errorf("status %s with payload:\n%s: %w", resp.Status, payload, ErrInvalidResponseStatus)
 	}
 
 	body, err := io.ReadAll(resp.Body)
