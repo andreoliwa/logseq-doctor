@@ -304,7 +304,7 @@ func extractTasks(jsonStr string) ([]taskJSON, error) {
 	return tasks, nil
 }
 
-func insertAndRemoveRefs( //nolint:cyclop,funlen
+func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	graph *logseq.Graph, pageTitle string, newRefs, obsoleteRefs *Set[string]) (*Set[string], error) {
 	transaction := graph.NewTransaction()
 
@@ -313,14 +313,14 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen
 		return nil, fmt.Errorf("failed to open page for transaction: %w", err)
 	}
 
-	var firstTask, dividerNewTasks, dividerFocus *content.Block
+	var firstBlock, dividerNewTasks, dividerFocus, blockAfterFocus, insertPoint *content.Block
 
 	deletedCount := 0
 	focusRefs := NewSet[string]()
 
 	for i, block := range page.Blocks() {
 		if i == 0 {
-			firstTask = block
+			firstBlock = block
 		}
 
 		// TODO: add AsMarkdown() or ContentHash() or Hash() to content.Block, to make it possible to compare blocks
@@ -330,6 +330,14 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen
 			dividerNewTasks = block
 		} else if blockHash == dividerFocusHash {
 			dividerFocus = block
+
+			nodeAfterFocus := block.NextSibling()
+			if nodeAfterFocus != nil {
+				converted, ok := nodeAfterFocus.(*content.Block)
+				if ok {
+					blockAfterFocus = converted
+				}
+			}
 		}
 
 		// Remove refs marked for deletion
@@ -353,22 +361,28 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen
 		})
 	}
 
+	if blockAfterFocus != nil {
+		insertPoint = blockAfterFocus
+	} else {
+		insertPoint = firstBlock
+	}
+
 	// Insert new tasks before the first one
 	for _, ref := range newRefs.Values() {
 		newTask := content.NewBlock(content.NewBlockRef(ref))
-		if firstTask == nil {
+		if insertPoint == nil {
 			page.AddBlock(newTask)
 		} else {
-			page.InsertBlockBefore(newTask, firstTask)
+			page.InsertBlockBefore(newTask, insertPoint)
 		}
 	}
 
 	// Will only add a divider block if there are new tasks to add
 	if dividerNewTasks == nil && newRefs.Size() > 0 {
-		if firstTask == nil {
+		if insertPoint == nil {
 			page.AddBlock(dividerNewTasksContent)
 		} else {
-			page.InsertBlockBefore(dividerNewTasksContent, firstTask)
+			page.InsertBlockBefore(dividerNewTasksContent, insertPoint)
 		}
 	}
 
