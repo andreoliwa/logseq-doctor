@@ -66,6 +66,20 @@ func (s *Set[T]) Diff(sets ...*Set[T]) *Set[T] {
 	return result
 }
 
+// Update adds all elements from the given sets into the current set.
+func (s *Set[T]) Update(sets ...*Set[T]) {
+	for _, otherSet := range sets {
+		for key := range otherSet.data {
+			s.Add(key)
+		}
+	}
+}
+
+// Clear removes all elements from the set.
+func (s *Set[T]) Clear() {
+	s.data = make(map[T]struct{})
+}
+
 // FormatCount returns a string with the count and the singular or plural form of a word.
 func FormatCount(count int, singular, plural string) string {
 	if count == 1 {

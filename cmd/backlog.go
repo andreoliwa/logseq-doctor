@@ -16,6 +16,16 @@ import (
 
 const backlogName = "backlog"
 
+var dividerNewTasksContent = content.NewBlock(content.NewParagraph( //nolint:gochecknoglobals
+	content.NewPageLink("quick capture"),
+	content.NewText(" New tasks above this line"),
+))
+var dividerNewTasksHash = dividerNewTasksContent.GomegaString()  //nolint:gochecknoglobals
+var dividerFocusContent = content.NewBlock(content.NewParagraph( //nolint:gochecknoglobals
+	content.NewText("Focus"),
+))
+var dividerFocusHash = dividerFocusContent.GomegaString() //nolint:gochecknoglobals
+
 var backlogCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 	Use:   "backlog",
 	Short: "Aggregate tasks from multiple pages into a backlog",
@@ -26,7 +36,7 @@ The first argument specifies the name of the backlog page, while tasks are retri
 This setup enables users to rearrange tasks using the arrow keys and manage task states (start/stop)
 directly within the interface.`,
 	Run: func(_ *cobra.Command, _ []string) {
-		err := updateBacklog()
+		err := processAllBacklogs()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -38,48 +48,69 @@ func init() {
 	rootCmd.AddCommand(backlogCmd)
 }
 
-func updateBacklog() error {
+func processAllBacklogs() error {
 	graph := openGraph("")
 	if graph == nil {
 		return ErrFailedOpenGraph
 	}
 
-	lines, err := linesFromBacklog(graph)
+	lines, err := linesWithPages(graph)
 	if err != nil {
 		return err
 	}
 
+	allFocusRefs := NewSet[string]()
+
 	for _, pages := range lines {
-		pageTitle := "backlog/" + pages[0]
-
-		page, err := graph.OpenPage(pageTitle)
-		if err != nil {
-			return fmt.Errorf("failed to open page: %w", err)
-		}
-
-		existingRefs := refsFromPages(page)
-
-		fmt.Printf("%s: %s\n", PageColor(pageTitle), FormatCount(existingRefs.Size(), "task", "tasks"))
-
-		queriedRefs, err := queryTasksFromPages(graph, pages, existingRefs)
+		focusRefsFromPage, err := processSingleBacklog(graph, "backlog/"+pages[0], func() (*Set[string], error) {
+			return queryTasksFromPages(graph, pages)
+		})
 		if err != nil {
 			return err
 		}
 
-		newRefs := queriedRefs.Diff(existingRefs)
-		obsoleteRefs := existingRefs.Diff(queriedRefs)
+		allFocusRefs.Update(focusRefsFromPage)
+	}
 
-		if newRefs.Size() > 0 || obsoleteRefs.Size() > 0 {
-			err = saveBacklog(graph, pageTitle, newRefs, obsoleteRefs)
-			if err != nil {
-				return err
-			}
-		} else {
-			color.Yellow("  no new/deleted tasks found")
-		}
+	_, err = processSingleBacklog(graph, "backlog/Focus", func() (*Set[string], error) {
+		return allFocusRefs, nil
+	})
+	if err != nil {
+		return err
 	}
 
 	return nil
+}
+
+func processSingleBacklog(graph *logseq.Graph, pageTitle string,
+	queryRefs func() (*Set[string], error)) (*Set[string], error) {
+	page, err := graph.OpenPage(pageTitle)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open page: %w", err)
+	}
+
+	existingRefs := refsFromPages(page)
+
+	fmt.Printf("%s: %s\n", PageColor(pageTitle), FormatCount(existingRefs.Size(), "task", "tasks"))
+
+	refsToInsert, err := queryRefs()
+	if err != nil {
+		return nil, err
+	}
+
+	newRefs := refsToInsert.Diff(existingRefs)
+	obsoleteRefs := existingRefs.Diff(refsToInsert)
+
+	if newRefs.Size() <= 0 && obsoleteRefs.Size() <= 0 {
+		color.Yellow("  no new/deleted tasks found")
+	}
+
+	focusRefsFromPage, err := insertAndRemoveRefs(graph, pageTitle, newRefs, obsoleteRefs)
+	if err != nil {
+		return nil, err
+	}
+
+	return focusRefsFromPage, nil
 }
 
 func refsFromPages(page logseq.Page) *Set[string] {
@@ -98,7 +129,7 @@ func refsFromPages(page logseq.Page) *Set[string] {
 	return existingRefs
 }
 
-func linesFromBacklog(graph *logseq.Graph) ([][]string, error) {
+func linesWithPages(graph *logseq.Graph) ([][]string, error) {
 	page, err := graph.OpenPage(backlogName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open backlog page: %w", err)
@@ -131,7 +162,7 @@ func linesFromBacklog(graph *logseq.Graph) ([][]string, error) {
 	return lines, nil
 }
 
-func queryTasksFromPages(graph *logseq.Graph, pageTitles []string, existingRefs *Set[string]) (*Set[string], error) {
+func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*Set[string], error) {
 	refsFromAllQueries := NewSet[string]()
 
 	for _, pageTitle := range pageTitles {
@@ -144,7 +175,13 @@ func queryTasksFromPages(graph *logseq.Graph, pageTitles []string, existingRefs 
 
 		if query == "" {
 			query = defaultQuery(pageTitle)
+
+			fmt.Print("default")
+		} else {
+			fmt.Print("found")
 		}
+
+		fmt.Printf(" query %s", query)
 
 		jsonStr, err := queryLogseqAPI(query)
 		if err != nil {
@@ -156,23 +193,10 @@ func queryTasksFromPages(graph *logseq.Graph, pageTitles []string, existingRefs 
 			return nil, fmt.Errorf("failed to extract tasks: %w", err)
 		}
 
-		fmt.Printf("    queried %s, ", FormatCount(len(jsonTasks), "task", "tasks"))
-
-		newCount := 0
+		fmt.Printf(", queried %s\n", FormatCount(len(jsonTasks), "task", "tasks"))
 
 		for _, t := range jsonTasks {
-			if !existingRefs.Contains(t.UUID) {
-				newCount++
-			}
-
 			refsFromAllQueries.Add(t.UUID)
-		}
-
-		formatted := FormatCount(newCount, "new task", "new tasks")
-		if newCount == 0 {
-			fmt.Printf("found %s\n", formatted)
-		} else {
-			color.Green("found %s", formatted)
 		}
 	}
 
@@ -203,8 +227,6 @@ func findFirstQuery(graph *logseq.Graph, pageTitle string) (string, error) {
 		return "", nil
 	}
 
-	fmt.Printf("found query %s\n", query)
-
 	return replaceCurrentPage(query, pageTitle), nil
 }
 
@@ -214,10 +236,7 @@ func replaceCurrentPage(query, pageTitle string) string {
 }
 
 func defaultQuery(pageTitle string) string {
-	query := fmt.Sprintf("(and [[%s]] (task TODO DOING WAITING))", pageTitle)
-	fmt.Printf("default query %s\n", query)
-
-	return query
+	return fmt.Sprintf("(and [[%s]] (task TODO DOING WAITING))", pageTitle)
 }
 
 // queryLogseqAPI sends a query to the Logseq API and returns the result as JSON.
@@ -285,34 +304,32 @@ func extractTasks(jsonStr string) ([]taskJSON, error) {
 	return tasks, nil
 }
 
-func saveBacklog( //nolint:cyclop,funlen
-	graph *logseq.Graph, pageTitle string, newRefs, obsoleteRefs *Set[string]) error {
+func insertAndRemoveRefs( //nolint:cyclop,funlen
+	graph *logseq.Graph, pageTitle string, newRefs, obsoleteRefs *Set[string]) (*Set[string], error) {
 	transaction := graph.NewTransaction()
 
 	page, err := transaction.OpenPage(pageTitle)
 	if err != nil {
-		return fmt.Errorf("failed to open page for transaction: %w", err)
+		return nil, fmt.Errorf("failed to open page for transaction: %w", err)
 	}
 
-	var first *content.Block
+	var firstTask, dividerNewTasks, dividerFocus *content.Block
 
-	dividerBlock := content.NewBlock(content.NewParagraph(
-		content.NewPageLink("quick capture"),
-		content.NewText(" New tasks above this line"),
-	))
-	hasDivider := false
 	deletedCount := 0
+	focusRefs := NewSet[string]()
 
 	for i, block := range page.Blocks() {
 		if i == 0 {
-			first = block
+			firstTask = block
 		}
 
-		// Will only add a divider block if there are new tasks to add
 		// TODO: add AsMarkdown() or ContentHash() or Hash() to content.Block, to make it possible to compare blocks
 		//  Or fix the message "the operator == is not defined on NodeList"
-		if block.GomegaString() == dividerBlock.GomegaString() {
-			hasDivider = true
+		blockHash := block.GomegaString()
+		if blockHash == dividerNewTasksHash {
+			dividerNewTasks = block
+		} else if blockHash == dividerFocusHash {
+			dividerFocus = block
 		}
 
 		// Remove refs marked for deletion
@@ -326,6 +343,9 @@ func saveBacklog( //nolint:cyclop,funlen
 					node.Parent().Parent().RemoveSelf()
 
 					deletedCount++
+				} else if dividerFocus == nil {
+					// Keep adding tasks to the focus section until the divider is found
+					focusRefs.Add(ref.ID)
 				}
 			}
 
@@ -333,35 +353,41 @@ func saveBacklog( //nolint:cyclop,funlen
 		})
 	}
 
+	// Insert new tasks before the first one
 	for _, ref := range newRefs.Values() {
-		newBlock := content.NewBlock(content.NewBlockRef(ref))
-		if first == nil {
-			page.AddBlock(newBlock)
+		newTask := content.NewBlock(content.NewBlockRef(ref))
+		if firstTask == nil {
+			page.AddBlock(newTask)
 		} else {
-			page.InsertBlockBefore(newBlock, first)
+			page.InsertBlockBefore(newTask, firstTask)
 		}
 	}
 
-	if !hasDivider && newRefs.Size() > 0 {
-		if first == nil {
-			page.AddBlock(dividerBlock)
+	// Will only add a divider block if there are new tasks to add
+	if dividerNewTasks == nil && newRefs.Size() > 0 {
+		if firstTask == nil {
+			page.AddBlock(dividerNewTasksContent)
 		} else {
-			page.InsertBlockBefore(dividerBlock, first)
+			page.InsertBlockBefore(dividerNewTasksContent, firstTask)
 		}
 	}
 
 	err = transaction.Save()
 	if err != nil {
-		return fmt.Errorf("failed to save transaction: %w", err)
+		return nil, fmt.Errorf("failed to save transaction: %w", err)
 	}
 
 	if newRefs.Size() > 0 {
-		color.Green("  updated with a total of %s", FormatCount(newRefs.Size(), "new task", "new tasks"))
+		color.Green("  %s", FormatCount(newRefs.Size(), "new task", "new tasks"))
 	}
 
 	if deletedCount > 0 {
 		color.Red("  %s removed (completed or unreferenced)", FormatCount(deletedCount, "task was", "tasks were"))
 	}
 
-	return nil
+	if dividerFocus == nil {
+		focusRefs.Clear()
+	}
+
+	return focusRefs, nil
 }
