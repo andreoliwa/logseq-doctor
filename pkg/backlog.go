@@ -1,0 +1,315 @@
+package pkg
+
+import (
+	"fmt"
+	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/content"
+	"github.com/andreoliwa/lsd/internal"
+	"github.com/fatih/color"
+	"strings"
+)
+
+const backlogName = "backlog"
+
+var dividerNewTasksContent = content.NewBlock(content.NewParagraph( //nolint:gochecknoglobals
+	content.NewPageLink("quick capture"),
+	content.NewText(" New tasks above this line"),
+))
+var dividerNewTasksHash = dividerNewTasksContent.GomegaString()  //nolint:gochecknoglobals
+var dividerFocusContent = content.NewBlock(content.NewParagraph( //nolint:gochecknoglobals
+	content.NewText("Focus"),
+))
+var dividerFocusHash = dividerFocusContent.GomegaString() //nolint:gochecknoglobals
+
+func ProcessAllBacklogs() error {
+	graph := internal.OpenGraphFromDirOrEnv("")
+	if graph == nil {
+		return internal.ErrFailedOpenGraph
+	}
+
+	lines, err := linesWithPages(graph)
+	if err != nil {
+		return err
+	}
+
+	allFocusRefs := NewSet[string]()
+
+	for _, pages := range lines {
+		focusRefsFromPage, err := processSingleBacklog(graph, "backlog/"+pages[0], func() (*Set[string], error) {
+			return queryTasksFromPages(graph, pages)
+		})
+		if err != nil {
+			return err
+		}
+
+		allFocusRefs.Update(focusRefsFromPage)
+	}
+
+	_, err = processSingleBacklog(graph, "backlog/Focus", func() (*Set[string], error) {
+		return allFocusRefs, nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func processSingleBacklog(graph *logseq.Graph, pageTitle string,
+	queryRefs func() (*Set[string], error)) (*Set[string], error) {
+	page, err := graph.OpenPage(pageTitle)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open page: %w", err)
+	}
+
+	existingRefs := refsFromPages(page)
+
+	fmt.Printf("%s: %s\n", PageColor(pageTitle), FormatCount(existingRefs.Size(), "task", "tasks"))
+
+	refsToInsert, err := queryRefs()
+	if err != nil {
+		return nil, err
+	}
+
+	newRefs := refsToInsert.Diff(existingRefs)
+	obsoleteRefs := existingRefs.Diff(refsToInsert)
+
+	if newRefs.Size() <= 0 && obsoleteRefs.Size() <= 0 {
+		color.Yellow("  no new/deleted tasks found")
+	}
+
+	focusRefsFromPage, err := insertAndRemoveRefs(graph, pageTitle, newRefs, obsoleteRefs)
+	if err != nil {
+		return nil, err
+	}
+
+	return focusRefsFromPage, nil
+}
+
+func refsFromPages(page logseq.Page) *Set[string] {
+	existingRefs := NewSet[string]()
+
+	for _, block := range page.Blocks() {
+		block.Children().FindDeep(func(n content.Node) bool {
+			if ref, ok := n.(*content.BlockRef); ok {
+				existingRefs.Add(ref.ID)
+			}
+
+			return false
+		})
+	}
+
+	return existingRefs
+}
+
+func linesWithPages(graph *logseq.Graph) ([][]string, error) {
+	page, err := graph.OpenPage(backlogName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open backlog page: %w", err)
+	}
+
+	var lines [][]string
+
+	for _, block := range page.Blocks() {
+		var pageTitles []string
+
+		block.Children().FindDeep(func(n content.Node) bool {
+			if pageLink, ok := n.(*content.PageLink); ok {
+				pageTitles = append(pageTitles, pageLink.To)
+			} else if tag, ok := n.(*content.Hashtag); ok {
+				pageTitles = append(pageTitles, tag.To)
+			}
+
+			return false
+		})
+
+		if len(pageTitles) > 0 {
+			lines = append(lines, pageTitles)
+		}
+	}
+
+	if len(lines) == 0 {
+		fmt.Println("no pages found in the backlog")
+	}
+
+	return lines, nil
+}
+
+func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*Set[string], error) {
+	refsFromAllQueries := NewSet[string]()
+
+	for _, pageTitle := range pageTitles {
+		fmt.Printf("  %s: ", PageColor(pageTitle))
+
+		query, err := findFirstQuery(graph, pageTitle)
+		if err != nil {
+			return nil, err
+		}
+
+		if query == "" {
+			query = defaultQuery(pageTitle)
+
+			fmt.Print("default")
+		} else {
+			fmt.Print("found")
+		}
+
+		fmt.Printf(" query %s", query)
+
+		jsonStr, err := internal.QueryLogseqAPI(query)
+		if err != nil {
+			return nil, fmt.Errorf("failed to query Logseq API: %w", err)
+		}
+
+		jsonTasks, err := extractTasksFromJSON(jsonStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to extract tasks: %w", err)
+		}
+
+		fmt.Printf(", queried %s\n", FormatCount(len(jsonTasks), "task", "tasks"))
+
+		for _, t := range jsonTasks {
+			refsFromAllQueries.Add(t.UUID)
+		}
+	}
+
+	return refsFromAllQueries, nil
+}
+
+func findFirstQuery(graph *logseq.Graph, pageTitle string) (string, error) {
+	var query string
+
+	page, err := graph.OpenPage(pageTitle)
+	if err != nil {
+		return "", fmt.Errorf("failed to open page: %w", err)
+	}
+
+	for _, block := range page.Blocks() {
+		block.Children().FindDeep(func(n content.Node) bool {
+			if q, ok := n.(*content.Query); ok {
+				query = q.Query
+			} else if qc, ok := n.(*content.QueryCommand); ok {
+				query = qc.Query
+			}
+
+			return false
+		})
+	}
+
+	if query == "" {
+		return "", nil
+	}
+
+	return replaceCurrentPage(query, pageTitle), nil
+}
+
+// replaceCurrentPage replaces the current page placeholder in the query with the actual page name.
+func replaceCurrentPage(query, pageTitle string) string {
+	return strings.ReplaceAll(query, "<% current page %>", "[["+pageTitle+"]]")
+}
+
+func defaultQuery(pageTitle string) string {
+	return fmt.Sprintf("(and [[%s]] (task TODO DOING WAITING))", pageTitle)
+}
+
+func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
+	graph *logseq.Graph, pageTitle string, newRefs, obsoleteRefs *Set[string]) (*Set[string], error) {
+	transaction := graph.NewTransaction()
+
+	page, err := transaction.OpenPage(pageTitle)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open page for transaction: %w", err)
+	}
+
+	var firstBlock, dividerNewTasks, dividerFocus, blockAfterFocus, insertPoint *content.Block
+
+	deletedCount := 0
+	focusRefs := NewSet[string]()
+
+	for i, block := range page.Blocks() {
+		if i == 0 {
+			firstBlock = block
+		}
+
+		// TODO: add AsMarkdown() or ContentHash() or Hash() to content.Block, to make it possible to compare blocks
+		//  Or fix the message "the operator == is not defined on NodeList"
+		blockHash := block.GomegaString()
+		if blockHash == dividerNewTasksHash {
+			dividerNewTasks = block
+		} else if blockHash == dividerFocusHash {
+			dividerFocus = block
+
+			nodeAfterFocus := block.NextSibling()
+			if nodeAfterFocus != nil {
+				converted, ok := nodeAfterFocus.(*content.Block)
+				if ok {
+					blockAfterFocus = converted
+				}
+			}
+		}
+
+		// Remove refs marked for deletion
+		block.Children().FindDeep(func(node content.Node) bool {
+			if ref, ok := node.(*content.BlockRef); ok {
+				if obsoleteRefs.Contains(ref.ID) {
+					// Block ref's parents are: paragraph and block
+					// TODO: handle cases when the block ref is nested under another block ref.
+					//  This will remove the obsolete block and its children.
+					//  Should I show a warning message to the user and prevent the block from being deleted?
+					node.Parent().Parent().RemoveSelf()
+
+					deletedCount++
+				} else if dividerFocus == nil {
+					// Keep adding tasks to the focus section until the divider is found
+					focusRefs.Add(ref.ID)
+				}
+			}
+
+			return false
+		})
+	}
+
+	if blockAfterFocus != nil {
+		insertPoint = blockAfterFocus
+	} else {
+		insertPoint = firstBlock
+	}
+
+	// Insert new tasks before the first one
+	for _, ref := range newRefs.Values() {
+		newTask := content.NewBlock(content.NewBlockRef(ref))
+		if insertPoint == nil {
+			page.AddBlock(newTask)
+		} else {
+			page.InsertBlockBefore(newTask, insertPoint)
+		}
+	}
+
+	// Will only add a divider block if there are new tasks to add
+	if dividerNewTasks == nil && newRefs.Size() > 0 {
+		if insertPoint == nil {
+			page.AddBlock(dividerNewTasksContent)
+		} else {
+			page.InsertBlockBefore(dividerNewTasksContent, insertPoint)
+		}
+	}
+
+	err = transaction.Save()
+	if err != nil {
+		return nil, fmt.Errorf("failed to save transaction: %w", err)
+	}
+
+	if newRefs.Size() > 0 {
+		color.Green("  %s", FormatCount(newRefs.Size(), "new task", "new tasks"))
+	}
+
+	if deletedCount > 0 {
+		color.Red("  %s removed (completed or unreferenced)", FormatCount(deletedCount, "task was", "tasks were"))
+	}
+
+	if dividerFocus == nil {
+		focusRefs.Clear()
+	}
+
+	return focusRefs, nil
+}

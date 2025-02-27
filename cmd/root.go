@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"context"
-	"github.com/andreoliwa/logseq-go"
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -44,22 +41,4 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-func openGraph(dir string) *logseq.Graph {
-	if dir == "" {
-		dir = os.Getenv("LOGSEQ_GRAPH_PATH")
-		if dir == "" {
-			log.Fatalln("LOGSEQ_GRAPH_PATH environment variable is not set.")
-		}
-	}
-
-	ctx := context.Background()
-
-	graph, err := logseq.Open(ctx, dir)
-	if err != nil {
-		log.Fatalln("error opening graph: %w", err)
-	}
-
-	return graph
 }

@@ -1,6 +1,7 @@
-package cmd
+package pkg
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/fatih/color"
 )
@@ -91,3 +92,23 @@ func FormatCount(count int, singular, plural string) string {
 
 // PageColor is a color function for page names.
 var PageColor = color.New(color.FgHiWhite).SprintfFunc() //nolint:gochecknoglobals
+
+type taskJSON struct {
+	UUID    string   `json:"uuid"`
+	Marker  string   `json:"marker"`
+	Content string   `json:"content"`
+	Page    pageJSON `json:"page"`
+}
+
+type pageJSON struct {
+	JournalDay int `json:"journalDay"`
+}
+
+func extractTasksFromJSON(jsonStr string) ([]taskJSON, error) {
+	var tasks []taskJSON
+	if err := json.Unmarshal([]byte(jsonStr), &tasks); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JSON: %w", err)
+	}
+
+	return tasks, nil
+}

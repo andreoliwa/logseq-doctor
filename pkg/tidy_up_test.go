@@ -1,7 +1,8 @@
-package cmd //nolint:testpackage
+package pkg_test
 
 import (
 	"context"
+	"github.com/andreoliwa/lsd/pkg"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -31,44 +32,9 @@ func TestSortAndRemoveDuplicates(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result := sortAndRemoveDuplicates(test.input)
+			result := pkg.SortAndRemoveDuplicates(test.input)
 			if !reflect.DeepEqual(result, test.expected) {
 				t.Errorf("Expected %v, got %v", test.expected, result)
-			}
-		})
-	}
-}
-
-func TestIsValidMarkdownFile(t *testing.T) {
-	tests := []struct {
-		name     string
-		filePath string
-		expected bool
-	}{
-		{"empty path", "", false},
-		{"invalid extension", "file.txt", false},
-		{"non-existent file", "non_existent_file.md", false},
-		{"directory path", "./", false},
-		{"valid markdown file", "valid_markdown_file.md", true},
-	}
-
-	// Create a temporary directory for test files
-	dir := t.TempDir()
-
-	// Create a valid markdown file
-	validFilePath := filepath.Join(dir, "valid_markdown_file.md")
-	if err := os.WriteFile(validFilePath, []byte("# Test"), 0o600); err != nil {
-		t.Fatalf("Failed to create test file: %v", err)
-	}
-
-	// Update the file path for the valid markdown file test case
-	tests[4].filePath = validFilePath
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			result := isValidMarkdownFile(test.filePath)
-			if result != test.expected {
-				t.Errorf("For %q, expected %v, got %v", test.filePath, test.expected, result)
 			}
 		})
 	}
@@ -113,27 +79,27 @@ func setupFileContents(t *testing.T, name string) resultSetupFileContents {
 
 func TestCheckForbiddenReferences(t *testing.T) {
 	invalid := setupPage(t, "forbidden")
-	assert.Equal(t, changedPage{"remove 4 forbidden references to pages/tags: Inbox, quick capture", false},
-		checkForbiddenReferences(invalid))
+	assert.Equal(t, pkg.ChangedPage{"remove 4 forbidden references to pages/tags: Inbox, quick capture", false},
+		pkg.CheckForbiddenReferences(invalid))
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, changedPage{"", false}, checkForbiddenReferences(valid))
+	assert.Equal(t, pkg.ChangedPage{"", false}, pkg.CheckForbiddenReferences(valid))
 }
 
 func TestCheckRunningTasks(t *testing.T) {
 	invalid := setupPage(t, "running")
-	assert.Equal(t, changedPage{"stop 2 running task(s): DOING, IN-PROGRESS", false}, checkRunningTasks(invalid))
+	assert.Equal(t, pkg.ChangedPage{"stop 2 running task(s): DOING, IN-PROGRESS", false}, pkg.CheckRunningTasks(invalid))
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, changedPage{"", false}, checkRunningTasks(valid))
+	assert.Equal(t, pkg.ChangedPage{"", false}, pkg.CheckRunningTasks(valid))
 }
 
 func TestRemoveDoubleSpaces(t *testing.T) {
 	invalid := setupPage(t, "spaces")
 	assert.Equal(t,
-		changedPage{"4 double spaces fixed: 'Link   With  Spaces  ', 'Regular   text with  spaces'," +
+		pkg.ChangedPage{"4 double spaces fixed: 'Link   With  Spaces  ', 'Regular   text with  spaces'," +
 			" 'some  page   title  with  spaces', 'some  tag with   spaces'", true},
-		removeDoubleSpaces(invalid))
+		pkg.RemoveDoubleSpaces(invalid))
 
 	// TODO: compare the saved Markdown file with the golden file
 	//  I tested manually, and it works, but I need to do something like:
@@ -142,27 +108,27 @@ func TestRemoveDoubleSpaces(t *testing.T) {
 	// assert.Equal(t, expected, actual)
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, changedPage{"", false}, removeDoubleSpaces(valid))
+	assert.Equal(t, pkg.ChangedPage{"", false}, pkg.RemoveDoubleSpaces(valid))
 }
 
 func TestRemoveUnnecessaryBracketsFromTags(t *testing.T) {
 	invalid := setupFileContents(t, "tag-brackets")
-	changed := removeUnnecessaryBracketsFromTags(invalid.oldContents)
-	assert.Equal(t, "unnecessary tag brackets removed", changed.msg)
-	golden.Assert(t, changed.newContents, invalid.goldenPath)
+	changed := pkg.RemoveUnnecessaryBracketsFromTags(invalid.oldContents)
+	assert.Equal(t, "unnecessary tag brackets removed", changed.Msg)
+	golden.Assert(t, changed.NewContents, invalid.goldenPath)
 
 	valid := setupFileContents(t, "valid")
-	assert.Equal(t, changedContents{"", ""}, removeUnnecessaryBracketsFromTags(valid.oldContents))
+	assert.Equal(t, pkg.ChangedContents{"", ""}, pkg.RemoveUnnecessaryBracketsFromTags(valid.oldContents))
 }
 
 func TestRemoveEmptyBullets(t *testing.T) {
 	invalid := setupPage(t, "empty-bullets")
 	assert.Equal(t,
-		changedPage{"6 empty bullets removed", true},
-		removeEmptyBullets(invalid))
+		pkg.ChangedPage{"6 empty bullets removed", true},
+		pkg.RemoveEmptyBullets(invalid))
 
 	// TODO: compare the saved Markdown file with the golden file. I tested manually and it works
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, changedPage{"", false}, removeEmptyBullets(valid))
+	assert.Equal(t, pkg.ChangedPage{"", false}, pkg.RemoveEmptyBullets(valid))
 }

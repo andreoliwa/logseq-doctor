@@ -1,6 +1,7 @@
-package cmd_test
+package pkg_test
 
 import (
+	"github.com/andreoliwa/lsd/pkg"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/fs"
 	"os"
@@ -8,10 +9,44 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andreoliwa/lsd/cmd"
 	"github.com/stretchr/testify/assert"
 	"gotest.tools/v3/golden"
 )
+
+func TestIsValidMarkdownFile(t *testing.T) {
+	tests := []struct {
+		name     string
+		filePath string
+		expected bool
+	}{
+		{"empty path", "", false},
+		{"invalid extension", "file.txt", false},
+		{"non-existent file", "non_existent_file.md", false},
+		{"directory path", "./", false},
+		{"valid markdown file", "valid_markdown_file.md", true},
+	}
+
+	// Create a temporary directory for test files
+	dir := t.TempDir()
+
+	// Create a valid markdown file
+	validFilePath := filepath.Join(dir, "valid_markdown_file.md")
+	if err := os.WriteFile(validFilePath, []byte("# Test"), 0o600); err != nil {
+		t.Fatalf("Failed to create test file: %v", err)
+	}
+
+	// Update the file path for the valid markdown file test case
+	tests[4].filePath = validFilePath
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := pkg.IsValidMarkdownFile(test.filePath)
+			if result != test.expected {
+				t.Errorf("For %q, expected %v, got %v", test.filePath, test.expected, result)
+			}
+		})
+	}
+}
 
 func TestAppendRawMarkdownToJournal(t *testing.T) {
 	graphDir := filepath.Join("testdata", "graph")
@@ -20,7 +55,7 @@ func TestAppendRawMarkdownToJournal(t *testing.T) {
 		fs.WithDir("journals", fs.FromDir(filepath.Join(graphDir, "journals"))))
 
 	now := time.Now()
-	assert.Equal(t, 0, cmd.AppendRawMarkdownToJournal(tempDir.Path(), now, ""))
+	assert.Equal(t, 0, pkg.AppendRawMarkdownToJournal(tempDir.Path(), now, ""))
 
 	contentToAppend, err := os.ReadFile(filepath.Join("testdata", "append-raw-journal.md"))
 	require.NoError(t, err)
@@ -28,7 +63,7 @@ func TestAppendRawMarkdownToJournal(t *testing.T) {
 	testCase := func(day int, expectedFilename string) func(*testing.T) {
 		return func(*testing.T) {
 			date := time.Date(2024, 12, day, 0, 0, 0, 0, time.UTC)
-			cmd.AppendRawMarkdownToJournal(tempDir.Path(), date, string(contentToAppend))
+			pkg.AppendRawMarkdownToJournal(tempDir.Path(), date, string(contentToAppend))
 			modifiedContents, err := os.ReadFile(filepath.Join(tempDir.Path(), "journals",
 				expectedFilename+".md"))
 			require.NoError(t, err)
