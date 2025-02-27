@@ -49,12 +49,11 @@ brews:
     homepage: "https://github.com/andreoliwa/logseq-doctor"
     description: "Heal your Logseq Markdown files"
     license: "MIT"
-    # Rename the executable to "lsdg"
     # https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md#bininstall-foo
     install: |
-      bin.install "logseq-doctor" => "lsdg"
+      bin.install "lsd"
     test: |
-      assert_match "Logseq Doctor (Go) heals your Markdown files for Logseq.", shell_output("#{bin}/lsdg")
+      assert_match "Logseq Doctor (Go) heals your Markdown files for Logseq.", shell_output("#{bin}/lsd")
     # Repository to push the generated files to.
     repository:
       pull_request:

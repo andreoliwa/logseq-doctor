@@ -53,7 +53,7 @@ email = "andreoliwa@sent.com"
 name = "W. Augusto Andreoli"
 
 [project.scripts]
-lsd = "logseq_doctor.cli:app"
+lsdpy = "logseq_doctor.cli:app"
 
 [project.urls]
 "Changelog" = "https://logseq-doctor.readthedocs.io/en/latest/changelog.html"

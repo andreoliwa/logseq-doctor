@@ -39,7 +39,7 @@ class GlobalOptions:
 
 
 @app.callback()
-def lsd(
+def lsdpy(
     ctx: typer.Context,
     logseq_graph_path: Path = typer.Option(  # noqa: B008
         ...,
@@ -64,7 +64,7 @@ def outline(text_file: typer.FileText) -> None:
 def _call_golang_exe(command: str, markdown_file: Path) -> int:
     display_errors = not bool(os.environ.get("LOGSEQ_GO_IGNORE_ERRORS", False))
 
-    exe_str = os.environ.get("LOGSEQ_GO_EXE_PATH", "~/go/bin/lsdg")
+    exe_str = os.environ.get("LOGSEQ_GO_EXE_PATH", "~/go/bin/lsd")
     if not exe_str:
         if display_errors:
             typer.secho("The environment variable 'LOGSEQ_GO_EXE_PATH' is not set.", fg=typer.colors.RED, bold=True)

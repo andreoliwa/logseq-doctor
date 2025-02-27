@@ -30,7 +30,7 @@ You can also install the development version with:
 
     pipx install git+https://github.com/andreoliwa/logseq-doctor
 
-You will then have the `lsd` command available globally in your system.
+You will then have the `lsdpy` command available globally in your system.
 
 ### Go binary executable
 
@@ -38,16 +38,15 @@ The recommended way for macOS and Linux is to install with Homebrew:
 
     brew install andreoliwa/formulae/logseq-doctor
 
-If you install manually, you need to rename the binary afterward:
+Or you can install manually:
 
     go install github.com/andreoliwa/logseq-doctor@latest
-    mv "$(go env GOPATH)/bin/logseq-doctor" "$(go env GOPATH)/bin/lsdg"
 
 Confirm if it\'s in your path:
 
-    which lsdg
+    which lsd
     # or
-    ls -l $(go env GOPATH)/bin/lsdg
+    ls -l $(go env GOPATH)/bin/lsd
 
 ### Build from source
 
@@ -57,9 +56,9 @@ To build and install from the source (both Python and Go executables), clone the
 
 ## Quick start
 
-Type `lsd` without arguments to check the current commands and options:
+Type `lsdpy` without arguments to check the current commands and options:
 
-    Usage: lsd [OPTIONS] COMMAND [ARGS]...
+    Usage: lsdpy [OPTIONS] COMMAND [ARGS]...
 
     Logseq Doctor: heal your flat old Markdown files before importing them.
 
@@ -77,18 +76,18 @@ Type `lsd` without arguments to check the current commands and options:
     outline  Convert flat Markdown to outline.
     tasks    List tasks in Logseq.
 
-Type `lsdg` (the Go executable) without arguments to check the current commands and options:
+Type `lsd` (the Go executable) without arguments to check the current commands and options:
 
     Logseq Doctor (Go) heals your Markdown files for Logseq.
 
     Convert flat Markdown to Logseq outline, clean up Markdown,
     prevent invalid content, and more stuff to come.
 
-    "lsd"" is the CLI tool originally written in Python; "lsdg"" is the Go version.
+    "lsdpy"" is the CLI tool originally written in Python; "lsd"" is the Go version.
     The intention is to slowly convert everything to Go.
 
     Usage:
-    lsdg [command]
+    lsd [command]
 
     Available Commands:
     completion  Generate the autocompletion script for the specified shell
@@ -97,9 +96,9 @@ Type `lsdg` (the Go executable) without arguments to check the current commands 
     tidy-up     Tidy up your Markdown files.
 
     Flags:
-    -h, --help   help for lsdg
+    -h, --help   help for lsd
 
-    Use "lsdg [command] --help" for more information about a command.
+    Use "lsd [command] --help" for more information about a command.
 
 ## Development
 

@@ -10,14 +10,13 @@ build: build-go # Build the Python package
 
 build-go: # Build the Golang executable
 	go mod tidy
-	go build -o lsdg main.go
-	mv lsdg `go env GOPATH`/bin/
+	go build
+	mv lsd `go env GOPATH`/bin/
 	$(MAKE) list-go
 .PHONY: build-go
 
 clean: # Clean the build artifacts
-	-rm `go env GOPATH`/bin/logseq-doctor
-	-rm `go env GOPATH`/bin/lsdg
+	-rm `go env GOPATH`/bin/lsd
 	-rm -rf .pytest_cache .ruff_cache build/
 	$(MAKE) list-go
 .PHONY: clean
@@ -49,24 +48,24 @@ setup-go: # Set up Go dependencies (logseq-go from the last commit of the local 
 	go mod tidy
 .PHONY: setup-go
 
-install: build-go # Install the package with pipx in editable mode. Do this when you want to use "lsd" outside of the development environment
+install: build-go # Install the package with pipx in editable mode. Do this when you want to use "lsdpy" outside of the development environment
 	-pipx install -e --force .
 	$(MAKE) rehash
 	$(MAKE) which
 .PHONY: install
 
-which: # Show the location of the installed executables
-	which lsd
-	lsd
-	which lsdg
-	lsdg
+which: # Run the main executables to confirm they are installed properly in the PATH
+	-which lsd
+	-lsd
+	-which lsdpy
+	-lsdpy
 .PHONY: which
 
 uninstall: clean uninstall-pipx # Remove both local and global (virtualenv and pipx)
 	-rm -rf .python-version .tox .venv
 .PHONY: uninstall
 
-uninstall-pipx: # Uninstall pipx virtualenv. Use this when developing, so the local venv "lsd" is available instead of the pipx one
+uninstall-pipx: # Uninstall pipx virtualenv. Use this when developing, so the local venv "lsdpy" is available instead of the pipx one
 	-pipx uninstall logseq-doctor
 	$(MAKE) rehash
 .PHONY: .uninstall-pipx
@@ -108,13 +107,6 @@ release: # Create a GitHub release for the Go package only
 	gh repo view --web
 .PHONY: .release-post-bump
 
-smoke: rehash test check-installed # Run simple tests to make sure the package is working
-	uv run lsd --help
+smoke: rehash test which # Run simple tests to make sure the package is working
+	uv run lsdpy --help
 .PHONY: smoke
-
-check-installed: # Run the main executabless to confirm they are installed properly in the PATH
-	-lsd
-	-lsdg
-	-which lsd
-	-which lsdg
-.PHONY: check-installed

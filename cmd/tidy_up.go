@@ -15,7 +15,7 @@ import (
 
 // tidyUpCmd represents the tidyUp command.
 var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
-	Use:   "tidy-up",
+	Use:   "tidy-up file1.md [file2.md ...]",
 	Short: "Tidy up your Markdown files.",
 	// TODO: dynamically generate the long description based on the functions in the code.
 	Long: `Tidy up your Markdown files, checking for invalid content and fixing some of them automatically.
@@ -23,7 +23,6 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 - Check for forbidden references to pages/tags
 - Check for running tasks (DOING)
 - Check for double spaces`,
-	// TODO: add help for the Markdown files accepted as arguments, "lsdg tidy-up [flags] file1.md [file2.md ...]".
 	Args: cobra.MinimumNArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
 		graph := openGraph("")

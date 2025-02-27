@@ -41,7 +41,7 @@
       "pre_commit": "yes",
       "pre_commit_formatter": "black",
       "command_line_interface": "click",
-      "command_line_interface_bin_name": "lsd",
+      "command_line_interface_bin_name": "lsdpy",
       "coveralls": "no",
       "codecov": "yes",
       "scrutinizer": "no",

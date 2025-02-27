@@ -22,7 +22,7 @@ THE SOFTWARE.
 package main
 
 import (
-	"github.com/andreoliwa/logseq-doctor/cmd"
+	"github.com/andreoliwa/lsd/cmd"
 )
 
 func main() {

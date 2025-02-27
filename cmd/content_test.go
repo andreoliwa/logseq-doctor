@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andreoliwa/logseq-doctor/cmd"
+	"github.com/andreoliwa/lsd/cmd"
 	"github.com/stretchr/testify/assert"
 	"gotest.tools/v3/golden"
 )
