@@ -21,7 +21,20 @@ var dividerFocusContent = content.NewBlock(content.NewParagraph( //nolint:gochec
 ))
 var dividerFocusHash = dividerFocusContent.GomegaString() //nolint:gochecknoglobals
 
-func ProcessAllBacklogs() error {
+type Backlog struct {
+	Graph                    *logseq.Graph
+	FuncProcessSingleBacklog func(graph *logseq.Graph, path string,
+		query func() (*Set[string], error)) (*Set[string], error)
+}
+
+func NewBacklog(graph *logseq.Graph) *Backlog {
+	return &Backlog{
+		Graph:                    graph,
+		FuncProcessSingleBacklog: processSingleBacklog,
+	}
+}
+
+func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 	graph := internal.OpenGraphFromDirOrEnv("")
 	if graph == nil {
 		return internal.ErrFailedOpenGraph
@@ -33,9 +46,31 @@ func ProcessAllBacklogs() error {
 	}
 
 	allFocusRefs := NewSet[string]()
+	processAllPages := len(partialNames) == 0
+
+	if processAllPages {
+		fmt.Println("Processing all pages in the backlog")
+	} else {
+		fmt.Printf("Processing pages with partial names: %s\n", strings.Join(partialNames, ", "))
+	}
 
 	for _, pages := range lines {
-		focusRefsFromPage, err := processSingleBacklog(graph, "backlog/"+pages[0], func() (*Set[string], error) {
+		title := pages[0]
+		processThisPage := processAllPages
+
+		for _, partialName := range partialNames {
+			if strings.Contains(strings.ToLower(title), strings.ToLower(partialName)) {
+				processThisPage = true
+
+				break
+			}
+		}
+
+		if !processThisPage {
+			continue
+		}
+
+		focusRefsFromPage, err := p.FuncProcessSingleBacklog(graph, "backlog/"+title, func() (*Set[string], error) {
 			return queryTasksFromPages(graph, pages)
 		})
 		if err != nil {
@@ -45,14 +80,17 @@ func ProcessAllBacklogs() error {
 		allFocusRefs.Update(focusRefsFromPage)
 	}
 
-	_, err = processSingleBacklog(graph, "backlog/Focus", func() (*Set[string], error) {
-		return allFocusRefs, nil
-	})
-	if err != nil {
-		return err
+	if !processAllPages {
+		color.Yellow("Skipping focus page because not all pages were processed")
+
+		return nil
 	}
 
-	return nil
+	_, err = p.FuncProcessSingleBacklog(graph, "backlog/Focus", func() (*Set[string], error) {
+		return allFocusRefs, nil
+	})
+
+	return err
 }
 
 func processSingleBacklog(graph *logseq.Graph, pageTitle string,
