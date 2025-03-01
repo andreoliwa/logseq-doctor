@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"bufio"
+	"github.com/andreoliwa/lsd/internal"
 	"github.com/andreoliwa/lsd/pkg"
 	"log"
-	"os"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -19,15 +18,12 @@ var contentCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 Pipe your content via stdin.
 For now, it will be appended at the end of the current journal page.`,
 	Run: func(_ *cobra.Command, _ []string) {
-		scanner := bufio.NewScanner(os.Stdin)
-		var stdin string
-		for scanner.Scan() {
-			stdin += scanner.Text() + "\n"
+		graph := internal.OpenGraphFromDirOrEnv("")
+		stdin := internal.ReadFromStdin()
+		_, err := pkg.AppendRawMarkdownToJournal(graph, time.Now(), stdin)
+		if err != nil {
+			log.Fatalln(err)
 		}
-		if err := scanner.Err(); err != nil {
-			log.Fatalln("Error reading input:", err)
-		}
-		pkg.AppendRawMarkdownToJournal("", time.Now(), stdin)
 	},
 }
 

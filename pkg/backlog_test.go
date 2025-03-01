@@ -1,60 +1,17 @@
 package pkg_test
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/lsd/internal/testutils"
 	"github.com/andreoliwa/lsd/pkg"
-	"github.com/fatih/color"
-	"io"
-	"os"
 	"strings"
 	"testing"
 )
 
-// captureOutput captures both stdout and stderr.
-func captureOutput(function func()) string {
-	// Create pipes
-	oldStdout := os.Stdout
-	oldStderr := os.Stderr
-	read, write, _ := os.Pipe()
-
-	// Set stdout and stderr to the pipe
-	os.Stdout = write
-	os.Stderr = write
-
-	// Disable color to avoid ANSI escape sequences in captured output
-	color.NoColor = true
-	color.Output = os.Stderr
-
-	// Create a channel to read output asynchronously
-	outC := make(chan string)
-
-	// Start a goroutine to read output
-	go func() {
-		var buf bytes.Buffer
-		_, _ = io.Copy(&buf, read)
-		outC <- buf.String()
-	}()
-
-	// Run the function
-	function()
-
-	// Close the writer to signal EOF
-	_ = write.Close()
-
-	// Restore stdout and stderr
-	os.Stdout = oldStdout
-	os.Stderr = oldStderr
-
-	// Return captured output
-	return <-outC
-}
-
 func TestProcessBacklog(t *testing.T) {
-	mockGraph := &logseq.Graph{}
-	processor := &pkg.Backlog{
-		Graph: mockGraph,
+	backlog := &pkg.Backlog{
+		Graph: testutils.OpenTestGraph(t),
 		FuncProcessSingleBacklog: func(_ *logseq.Graph, _ string,
 			_ func() (*pkg.Set[string], error)) (*pkg.Set[string], error) {
 			return pkg.NewSet[string](), nil
@@ -80,8 +37,8 @@ func TestProcessBacklog(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			output := captureOutput(func() {
-				_ = processor.ProcessBacklogs(test.input) // Ignore error handling for now
+			output := testutils.CaptureOutput(func() {
+				_ = backlog.ProcessBacklogs(test.input) // Ignore error handling for now
 			})
 			fmt.Printf("Captured output:\n%s\n", output)
 

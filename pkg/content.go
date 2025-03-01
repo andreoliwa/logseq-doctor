@@ -2,8 +2,7 @@ package pkg
 
 import (
 	"fmt"
-	"github.com/andreoliwa/lsd/internal"
-	"log"
+	"github.com/andreoliwa/logseq-go"
 	"os"
 	"strings"
 	"time"
@@ -30,24 +29,26 @@ func IsValidMarkdownFile(filePath string) bool {
 // AppendRawMarkdownToJournal appends raw Markdown content to the journal page for the given date.
 // I tried appending blocks with `logseq-go` but there is and with text containing brackets.
 // e.g. "[something]" is escaped like "\[something\]" and this breaks links.
-func AppendRawMarkdownToJournal(graphDir string, date time.Time, rawMarkdown string) int { //nolint:funlen,cyclop
+func AppendRawMarkdownToJournal(graph *logseq.Graph, date time.Time, //nolint:cyclop
+	rawMarkdown string) (int, error) {
 	if rawMarkdown == "" {
-		return 0
+		return 0, nil
 	}
 
-	graph := internal.OpenGraphFromDirOrEnv(graphDir)
-
-	path, _ := graph.JournalPath(date)
+	path, err := graph.JournalPath(date)
+	if err != nil {
+		return 0, fmt.Errorf("error getting journal path: %w", err)
+	}
 
 	var originalContents string
 
 	var empty bool
 
-	_, err := os.Stat(path)
+	_, err = os.Stat(path)
 	if err == nil {
 		bytes, readErr := os.ReadFile(path)
 		if readErr != nil {
-			log.Fatalln("error reading journal file:", readErr)
+			return 0, fmt.Errorf("error reading journal file: %w", readErr)
 		}
 
 		originalContents = string(bytes)
@@ -80,24 +81,16 @@ func AppendRawMarkdownToJournal(graphDir string, date time.Time, rawMarkdown str
 
 	file, err := os.OpenFile(path, flags, perm)
 	if err != nil {
-		log.Fatalln("error opening journal file:", err)
+		return 0, fmt.Errorf("error opening journal file: %w", err)
 	}
-
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			log.Fatalln("error closing journal file:", err)
-		}
-	}(file)
+	defer file.Close()
 
 	size, err := file.WriteString(rawMarkdown)
 	if err != nil {
-		fmt.Println(fmt.Errorf("error writing to journal file: %w", err))
-
-		return 0
+		return 0, fmt.Errorf("error writing journal file: %w", err)
 	}
 
-	return size
+	return size, nil
 }
 
 // TODO: use and improve this function when appending tasks to the current journal.

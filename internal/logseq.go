@@ -12,11 +12,14 @@ import (
 	"strings"
 )
 
+// OpenGraphFromDirOrEnv opens a Logseq graph from a directory or environment variable.
+// It doesn't return an error and aborts the program if it fails because it's an internal function.
+// This is done on purpose to avoid error handling boilerplate code throughout the package.
 func OpenGraphFromDirOrEnv(dir string) *logseq.Graph {
 	if dir == "" {
 		dir = os.Getenv("LOGSEQ_GRAPH_PATH")
 		if dir == "" {
-			log.Fatalln("LOGSEQ_GRAPH_PATH environment variable is not set.")
+			log.Fatalln("the LOGSEQ_GRAPH_PATH environment variable is not set.")
 		}
 	}
 

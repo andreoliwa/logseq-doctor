@@ -35,12 +35,7 @@ func NewBacklog(graph *logseq.Graph) *Backlog {
 }
 
 func (p *Backlog) ProcessBacklogs(partialNames []string) error {
-	graph := internal.OpenGraphFromDirOrEnv("")
-	if graph == nil {
-		return internal.ErrFailedOpenGraph
-	}
-
-	lines, err := linesWithPages(graph)
+	lines, err := linesWithPages(p.Graph)
 	if err != nil {
 		return err
 	}
@@ -70,8 +65,8 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 			continue
 		}
 
-		focusRefsFromPage, err := p.FuncProcessSingleBacklog(graph, "backlog/"+title, func() (*Set[string], error) {
-			return queryTasksFromPages(graph, pages)
+		focusRefsFromPage, err := p.FuncProcessSingleBacklog(p.Graph, "backlog/"+title, func() (*Set[string], error) {
+			return queryTasksFromPages(p.Graph, pages)
 		})
 		if err != nil {
 			return err
@@ -86,7 +81,7 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 		return nil
 	}
 
-	_, err = p.FuncProcessSingleBacklog(graph, "backlog/Focus", func() (*Set[string], error) {
+	_, err = p.FuncProcessSingleBacklog(p.Graph, "backlog/Focus", func() (*Set[string], error) {
 		return allFocusRefs, nil
 	})
 
@@ -102,7 +97,7 @@ func processSingleBacklog(graph *logseq.Graph, pageTitle string,
 
 	existingRefs := refsFromPages(page)
 
-	fmt.Printf("%s: %s\n", PageColor(pageTitle), FormatCount(existingRefs.Size(), "task", "tasks"))
+	fmt.Printf("%s: %s\n", internal.PageColor(pageTitle), FormatCount(existingRefs.Size(), "task", "tasks"))
 
 	refsToInsert, err := queryRefs()
 	if err != nil {
@@ -177,7 +172,7 @@ func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*Set[string]
 	refsFromAllQueries := NewSet[string]()
 
 	for _, pageTitle := range pageTitles {
-		fmt.Printf("  %s: ", PageColor(pageTitle))
+		fmt.Printf("  %s: ", internal.PageColor(pageTitle))
 
 		query, err := findFirstQuery(graph, pageTitle)
 		if err != nil {
@@ -199,7 +194,7 @@ func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*Set[string]
 			return nil, fmt.Errorf("failed to query Logseq API: %w", err)
 		}
 
-		jsonTasks, err := extractTasksFromJSON(jsonStr)
+		jsonTasks, err := internal.ExtractTasksFromJSON(jsonStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to extract tasks: %w", err)
 		}

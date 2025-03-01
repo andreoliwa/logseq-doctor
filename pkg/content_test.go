@@ -1,9 +1,9 @@
 package pkg_test
 
 import (
+	"github.com/andreoliwa/lsd/internal/testutils"
 	"github.com/andreoliwa/lsd/pkg"
 	"github.com/stretchr/testify/require"
-	"gotest.tools/v3/fs"
 	"os"
 	"path/filepath"
 	"testing"
@@ -49,13 +49,13 @@ func TestIsValidMarkdownFile(t *testing.T) {
 }
 
 func TestAppendRawMarkdownToJournal(t *testing.T) {
-	graphDir := filepath.Join("testdata", "graph")
-	tempDir := fs.NewDir(t, "append-raw",
-		fs.WithDir("logseq", fs.FromDir(filepath.Join(graphDir, "logseq"))),
-		fs.WithDir("journals", fs.FromDir(filepath.Join(graphDir, "journals"))))
+	graph := testutils.OpenTestGraph(t)
 
 	now := time.Now()
-	assert.Equal(t, 0, pkg.AppendRawMarkdownToJournal(tempDir.Path(), now, ""))
+
+	size, err := pkg.AppendRawMarkdownToJournal(graph, now, "")
+	require.NoError(t, err)
+	assert.Equal(t, 0, size)
 
 	contentToAppend, err := os.ReadFile(filepath.Join("testdata", "append-raw-journal.md"))
 	require.NoError(t, err)
@@ -63,8 +63,11 @@ func TestAppendRawMarkdownToJournal(t *testing.T) {
 	testCase := func(day int, expectedFilename string) func(*testing.T) {
 		return func(*testing.T) {
 			date := time.Date(2024, 12, day, 0, 0, 0, 0, time.UTC)
-			pkg.AppendRawMarkdownToJournal(tempDir.Path(), date, string(contentToAppend))
-			modifiedContents, err := os.ReadFile(filepath.Join(tempDir.Path(), "journals",
+
+			_, err = pkg.AppendRawMarkdownToJournal(graph, date, string(contentToAppend))
+			require.NoError(t, err)
+
+			modifiedContents, err := os.ReadFile(filepath.Join(graph.Directory(), "journals",
 				expectedFilename+".md"))
 			require.NoError(t, err)
 			golden.Assert(t, string(modifiedContents), filepath.Join("graph", "journals",
