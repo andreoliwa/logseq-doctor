@@ -225,6 +225,11 @@ func findFirstQuery(graph *logseq.Graph, pageTitle string) (string, error) {
 				query = qc.Query
 			}
 
+			if query != "" {
+				// Stop after finding one query
+				return true
+			}
+
 			return false
 		})
 	}
