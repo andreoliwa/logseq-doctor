@@ -113,7 +113,8 @@ func processSingleBacklog(graph *logseq.Graph, pageTitle string,
 		color.Yellow("  no new/deleted tasks found")
 	}
 
-	focusRefsFromPage, err := insertAndRemoveRefs(graph, pageTitle, newBlockRefs, obsoleteBlockRefs)
+	focusRefsFromPage, err := insertAndRemoveRefs(graph, pageTitle, existingBlockRefs, newBlockRefs, obsoleteBlockRefs,
+		blockRefsFromQuery.Overdue)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +258,9 @@ func defaultQuery(pageTitle string) string {
 }
 
 func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
-	graph *logseq.Graph, pageTitle string, newRefs, obsoleteRefs *utils.Set[string]) (*utils.Set[string], error) {
+	graph *logseq.Graph, pageTitle string, existingBlockRefs, newBlockRefs, obsoleteBlockRefs,
+	overdueBlockRefs *utils.Set[string],
+) (*utils.Set[string], error) {
 	transaction := graph.NewTransaction()
 
 	page, err := transaction.OpenPage(pageTitle)
@@ -265,9 +268,10 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		return nil, fmt.Errorf("failed to open page for transaction: %w", err)
 	}
 
-	var firstBlock, dividerNewTasks, dividerFocus, blockAfterFocus, insertPoint *content.Block
+	var firstBlock, dividerNewTasks, dividerFocus *content.Block
 
 	deletedCount := 0
+	movedCount := 0
 	focusRefs := utils.NewSet[string]()
 
 	for i, block := range page.Blocks() {
@@ -280,62 +284,83 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		blockHash := block.GomegaString()
 		if blockHash == dividerNewTasksHash {
 			dividerNewTasks = block
+
+			continue
 		} else if blockHash == dividerFocusHash {
 			dividerFocus = block
 
-			nodeAfterFocus := block.NextSibling()
-			if nodeAfterFocus != nil {
-				converted, ok := nodeAfterFocus.(*content.Block)
-				if ok {
-					blockAfterFocus = converted
-				}
-			}
+			continue
 		}
 
-		// Remove refs marked for deletion
+		// Remove refs marked for deletion or overdue tasks
 		block.Children().FindDeep(func(node content.Node) bool {
-			if ref, ok := node.(*content.BlockRef); ok {
-				if obsoleteRefs.Contains(ref.ID) {
+			if blockRef, ok := node.(*content.BlockRef); ok {
+				shouldDelete := false
+
+				switch {
+				case obsoleteBlockRefs.Contains(blockRef.ID):
+					shouldDelete = true
+
+					deletedCount++
+				case overdueBlockRefs.Contains(blockRef.ID):
+					shouldDelete = true
+
+					existingBlockRefs.Remove(blockRef.ID)
+
+					movedCount++
+				case dividerFocus == nil:
+					// Keep adding tasks to the focus section until the divider is found
+					focusRefs.Add(blockRef.ID)
+				}
+
+				if shouldDelete {
 					// Block ref's parents are: paragraph and block
 					// TODO: handle cases when the block ref is nested under another block ref.
 					//  This will remove the obsolete block and its children.
 					//  Should I show a warning message to the user and prevent the block from being deleted?
-					node.Parent().Parent().RemoveSelf()
-
-					deletedCount++
-				} else if dividerFocus == nil {
-					// Keep adding tasks to the focus section until the divider is found
-					focusRefs.Add(ref.ID)
+					blockRef.Parent().Parent().RemoveSelf()
 				}
+
+				return true
 			}
 
 			return false
 		})
 	}
 
-	if blockAfterFocus != nil {
-		insertPoint = blockAfterFocus
-	} else {
-		insertPoint = firstBlock
-	}
-
-	// Insert new tasks before the first one
-	for _, ref := range newRefs.Values() {
-		newTask := content.NewBlock(content.NewBlockRef(ref))
-		if insertPoint == nil {
-			page.AddBlock(newTask)
-		} else {
-			page.InsertBlockBefore(newTask, insertPoint)
-		}
-	}
+	//  Sections: Focus / Overdue / New tasks
 
 	// Will only add a divider block if there are new tasks to add
-	if dividerNewTasks == nil && newRefs.Size() > 0 {
-		if insertPoint == nil {
-			page.AddBlock(dividerNewTasksContent)
-		} else {
-			page.InsertBlockBefore(dividerNewTasksContent, insertPoint)
+	if dividerNewTasks == nil && newBlockRefs.Size() > 0 {
+		insertOrAddBlock(page, firstBlock, dividerFocus, dividerNewTasksContent)
+	}
+
+	// Insert (new and moved) overdue tasks after the focus section and before the new ones
+	//  If they are moved to the top, all overdue tasks will go to the focus page, and this misses the point.
+	//  The user should decide manually which tasks should have focus.
+	for _, blockRef := range overdueBlockRefs.Values() {
+		if existingBlockRefs.Contains(blockRef) {
+			continue
 		}
+
+		overdueTask := content.NewBlock(content.NewParagraph(
+			content.NewText("📅 "),
+			content.NewStrong(content.NewText("overdue")),
+			content.NewText(" "),
+			content.NewBlockRef(blockRef),
+			content.NewText(" 📌"),
+		))
+		insertOrAddBlock(page, firstBlock, dividerFocus, overdueTask)
+	}
+
+	// Insert new tasks
+	for _, blockRef := range newBlockRefs.Values() {
+		if overdueBlockRefs.Contains(blockRef) {
+			// Don't add overdue tasks again
+			continue
+		}
+
+		insertOrAddBlock(page, firstBlock, dividerFocus, content.NewBlock(content.NewBlockRef(blockRef)))
 	}
 
 	err = transaction.Save()
@@ -343,12 +368,16 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		return nil, fmt.Errorf("failed to save transaction: %w", err)
 	}
 
-	if newRefs.Size() > 0 {
-		color.Green("  %s", utils.FormatCount(newRefs.Size(), "new task", "new tasks"))
+	if newBlockRefs.Size() > 0 {
+		color.Green("  %s", utils.FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
 	}
 
 	if deletedCount > 0 {
 		color.Red("  %s removed (completed or unreferenced)", utils.FormatCount(deletedCount, "task was", "tasks were"))
+	}
+
+	if movedCount > 0 {
+		color.Magenta("  %s moved around", utils.FormatCount(movedCount, "task was", "tasks were"))
 	}
 
 	if dividerFocus == nil {
@@ -356,4 +385,16 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	}
 
 	return focusRefs, nil
+}
+
+func insertOrAddBlock(page logseq.Page, firstBlock *content.Block, dividerFocus *content.Block,
+	newTask *content.Block) {
+	switch {
+	case dividerFocus != nil:
+		page.InsertBlockAfter(newTask, dividerFocus)
+	case firstBlock != nil:
+		page.InsertBlockBefore(newTask, firstBlock)
+	default:
+		page.AddBlock(newTask)
+	}
 }
