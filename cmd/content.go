@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/andreoliwa/lsd/internal"
-	"github.com/andreoliwa/lsd/pkg"
 	"log"
 	"time"
 
@@ -20,7 +19,7 @@ For now, it will be appended at the end of the current journal page.`,
 	Run: func(_ *cobra.Command, _ []string) {
 		graph := internal.OpenGraphFromDirOrEnv("")
 		stdin := internal.ReadFromStdin()
-		_, err := pkg.AppendRawMarkdownToJournal(graph, time.Now(), stdin)
+		_, err := internal.AppendRawMarkdownToJournal(graph, time.Now(), stdin)
 		if err != nil {
 			log.Fatalln(err)
 		}

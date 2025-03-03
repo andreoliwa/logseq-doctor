@@ -1,8 +1,8 @@
-package pkg_test
+package internal_test
 
 import (
+	"github.com/andreoliwa/lsd/internal"
 	"github.com/andreoliwa/lsd/internal/testutils"
-	"github.com/andreoliwa/lsd/pkg"
 	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
@@ -40,7 +40,7 @@ func TestIsValidMarkdownFile(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result := pkg.IsValidMarkdownFile(test.filePath)
+			result := internal.IsValidMarkdownFile(test.filePath)
 			if result != test.expected {
 				t.Errorf("For %q, expected %v, got %v", test.filePath, test.expected, result)
 			}
@@ -53,7 +53,7 @@ func TestAppendRawMarkdownToJournal(t *testing.T) {
 
 	now := time.Now()
 
-	size, err := pkg.AppendRawMarkdownToJournal(graph, now, "")
+	size, err := internal.AppendRawMarkdownToJournal(graph, now, "")
 	require.NoError(t, err)
 	assert.Equal(t, 0, size)
 
@@ -64,7 +64,7 @@ func TestAppendRawMarkdownToJournal(t *testing.T) {
 		return func(*testing.T) {
 			date := time.Date(2024, 12, day, 0, 0, 0, 0, time.UTC)
 
-			_, err = pkg.AppendRawMarkdownToJournal(graph, date, string(contentToAppend))
+			_, err = internal.AppendRawMarkdownToJournal(graph, date, string(contentToAppend))
 			require.NoError(t, err)
 
 			modifiedContents, err := os.ReadFile(filepath.Join(graph.Directory(), "journals",

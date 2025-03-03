@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"github.com/andreoliwa/lsd/internal"
-	"github.com/andreoliwa/lsd/pkg"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -22,7 +21,7 @@ This setup enables users to rearrange tasks using the arrow keys and manage task
 directly within the interface.`,
 	Run: func(_ *cobra.Command, args []string) {
 		graph := internal.OpenGraphFromDirOrEnv("")
-		proc := pkg.NewBacklog(graph)
+		proc := internal.NewBacklog(graph)
 
 		err := proc.ProcessBacklogs(args)
 		if err != nil {

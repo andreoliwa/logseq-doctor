@@ -1,8 +1,8 @@
-package pkg_test
+package internal_test
 
 import (
 	"context"
-	"github.com/andreoliwa/lsd/pkg"
+	"github.com/andreoliwa/lsd/internal"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -32,7 +32,7 @@ func TestSortAndRemoveDuplicates(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result := pkg.SortAndRemoveDuplicates(test.input)
+			result := internal.SortAndRemoveDuplicates(test.input)
 			if !reflect.DeepEqual(result, test.expected) {
 				t.Errorf("Expected %v, got %v", test.expected, result)
 			}
@@ -79,27 +79,28 @@ func setupFileContents(t *testing.T, name string) resultSetupFileContents {
 
 func TestCheckForbiddenReferences(t *testing.T) {
 	invalid := setupPage(t, "forbidden")
-	assert.Equal(t, pkg.ChangedPage{"remove 4 forbidden references to pages/tags: Inbox, quick capture", false},
-		pkg.CheckForbiddenReferences(invalid))
+	assert.Equal(t, internal.ChangedPage{"remove 4 forbidden references to pages/tags: Inbox, quick capture", false},
+		internal.CheckForbiddenReferences(invalid))
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, pkg.ChangedPage{"", false}, pkg.CheckForbiddenReferences(valid))
+	assert.Equal(t, internal.ChangedPage{"", false}, internal.CheckForbiddenReferences(valid))
 }
 
 func TestCheckRunningTasks(t *testing.T) {
 	invalid := setupPage(t, "running")
-	assert.Equal(t, pkg.ChangedPage{"stop 2 running task(s): DOING, IN-PROGRESS", false}, pkg.CheckRunningTasks(invalid))
+	assert.Equal(t, internal.ChangedPage{"stop 2 running task(s): DOING, IN-PROGRESS", false},
+		internal.CheckRunningTasks(invalid))
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, pkg.ChangedPage{"", false}, pkg.CheckRunningTasks(valid))
+	assert.Equal(t, internal.ChangedPage{"", false}, internal.CheckRunningTasks(valid))
 }
 
 func TestRemoveDoubleSpaces(t *testing.T) {
 	invalid := setupPage(t, "spaces")
 	assert.Equal(t,
-		pkg.ChangedPage{"4 double spaces fixed: 'Link   With  Spaces  ', 'Regular   text with  spaces'," +
+		internal.ChangedPage{"4 double spaces fixed: 'Link   With  Spaces  ', 'Regular   text with  spaces'," +
 			" 'some  page   title  with  spaces', 'some  tag with   spaces'", true},
-		pkg.RemoveDoubleSpaces(invalid))
+		internal.RemoveDoubleSpaces(invalid))
 
 	// TODO: compare the saved Markdown file with the golden file
 	//  I tested manually, and it works, but I need to do something like:
@@ -108,27 +109,27 @@ func TestRemoveDoubleSpaces(t *testing.T) {
 	// assert.Equal(t, expected, actual)
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, pkg.ChangedPage{"", false}, pkg.RemoveDoubleSpaces(valid))
+	assert.Equal(t, internal.ChangedPage{"", false}, internal.RemoveDoubleSpaces(valid))
 }
 
 func TestRemoveUnnecessaryBracketsFromTags(t *testing.T) {
 	invalid := setupFileContents(t, "tag-brackets")
-	changed := pkg.RemoveUnnecessaryBracketsFromTags(invalid.oldContents)
+	changed := internal.RemoveUnnecessaryBracketsFromTags(invalid.oldContents)
 	assert.Equal(t, "unnecessary tag brackets removed", changed.Msg)
 	golden.Assert(t, changed.NewContents, invalid.goldenPath)
 
 	valid := setupFileContents(t, "valid")
-	assert.Equal(t, pkg.ChangedContents{"", ""}, pkg.RemoveUnnecessaryBracketsFromTags(valid.oldContents))
+	assert.Equal(t, internal.ChangedContents{"", ""}, internal.RemoveUnnecessaryBracketsFromTags(valid.oldContents))
 }
 
 func TestRemoveEmptyBullets(t *testing.T) {
 	invalid := setupPage(t, "empty-bullets")
 	assert.Equal(t,
-		pkg.ChangedPage{"6 empty bullets removed", true},
-		pkg.RemoveEmptyBullets(invalid))
+		internal.ChangedPage{"6 empty bullets removed", true},
+		internal.RemoveEmptyBullets(invalid))
 
 	// TODO: compare the saved Markdown file with the golden file. I tested manually and it works
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, pkg.ChangedPage{"", false}, pkg.RemoveEmptyBullets(valid))
+	assert.Equal(t, internal.ChangedPage{"", false}, internal.RemoveEmptyBullets(valid))
 }

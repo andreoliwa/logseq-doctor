@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/andreoliwa/lsd/internal"
-	"github.com/andreoliwa/lsd/pkg"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -23,7 +22,7 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 
 		exitCode := 0
 		for _, path := range args {
-			if pkg.TidyUpOneFile(graph, path) != 0 {
+			if internal.TidyUpOneFile(graph, path) != 0 {
 				exitCode = 1
 			}
 		}

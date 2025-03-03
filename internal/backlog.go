@@ -1,10 +1,9 @@
-package pkg
+package internal
 
 import (
 	"fmt"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
-	"github.com/andreoliwa/lsd/internal"
 	"github.com/andreoliwa/lsd/pkg/utils"
 	"github.com/fatih/color"
 	"strings"
@@ -25,7 +24,7 @@ var dividerFocusHash = dividerFocusContent.GomegaString() //nolint:gochecknoglob
 type Backlog struct {
 	Graph                    *logseq.Graph
 	FuncProcessSingleBacklog func(graph *logseq.Graph, path string,
-		query func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error)
+		query func() (*CategorizedTasks, error)) (*utils.Set[string], error)
 }
 
 func NewBacklog(graph *logseq.Graph) *Backlog {
@@ -41,7 +40,7 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 		return err
 	}
 
-	allFocusTasks := internal.NewCategorizedTasks()
+	allFocusTasks := NewCategorizedTasks()
 	processAllPages := len(partialNames) == 0
 
 	if processAllPages {
@@ -67,7 +66,7 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 		}
 
 		focusRefsFromPage, err := p.FuncProcessSingleBacklog(p.Graph, "backlog/"+title,
-			func() (*internal.CategorizedTasks, error) {
+			func() (*CategorizedTasks, error) {
 				return queryTasksFromPages(p.Graph, pages)
 			})
 		if err != nil {
@@ -83,7 +82,7 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 		return nil
 	}
 
-	_, err = p.FuncProcessSingleBacklog(p.Graph, "backlog/Focus", func() (*internal.CategorizedTasks, error) {
+	_, err = p.FuncProcessSingleBacklog(p.Graph, "backlog/Focus", func() (*CategorizedTasks, error) {
 		return &allFocusTasks, nil
 	})
 
@@ -91,7 +90,7 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 }
 
 func processSingleBacklog(graph *logseq.Graph, pageTitle string,
-	funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error) {
+	funcQueryRefs func() (*CategorizedTasks, error)) (*utils.Set[string], error) {
 	page, err := graph.OpenPage(pageTitle)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open page: %w", err)
@@ -99,7 +98,7 @@ func processSingleBacklog(graph *logseq.Graph, pageTitle string,
 
 	existingBlockRefs := blockRefsFromPages(page)
 
-	fmt.Printf("%s: %s\n", internal.PageColor(pageTitle), utils.FormatCount(existingBlockRefs.Size(), "task", "tasks"))
+	fmt.Printf("%s: %s\n", PageColor(pageTitle), utils.FormatCount(existingBlockRefs.Size(), "task", "tasks"))
 
 	blockRefsFromQuery, err := funcQueryRefs()
 	if err != nil {
@@ -171,11 +170,11 @@ func linesWithPages(graph *logseq.Graph) ([][]string, error) {
 	return lines, nil
 }
 
-func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*internal.CategorizedTasks, error) {
-	tasks := internal.NewCategorizedTasks()
+func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*CategorizedTasks, error) {
+	tasks := NewCategorizedTasks()
 
 	for _, pageTitle := range pageTitles {
-		fmt.Printf("  %s: ", internal.PageColor(pageTitle))
+		fmt.Printf("  %s: ", PageColor(pageTitle))
 
 		query, err := findFirstQuery(graph, pageTitle)
 		if err != nil {
@@ -192,12 +191,12 @@ func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*internal.Ca
 
 		fmt.Printf(" query %s", query)
 
-		jsonStr, err := internal.QueryLogseqAPI(query)
+		jsonStr, err := QueryLogseqAPI(query)
 		if err != nil {
 			return nil, fmt.Errorf("failed to query Logseq API: %w", err)
 		}
 
-		jsonTasks, err := internal.ExtractTasksFromJSON(jsonStr)
+		jsonTasks, err := ExtractTasksFromJSON(jsonStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to extract tasks: %w", err)
 		}
