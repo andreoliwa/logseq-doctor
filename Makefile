@@ -17,6 +17,7 @@ build-go: # Build the Golang executable
 .PHONY: build-go
 
 clean: # Clean the build artifacts
+	-rm `go env GOPATH`/bin/logseq-doctor
 	-rm `go env GOPATH`/bin/lsd
 	-rm -rf .pytest_cache .ruff_cache build/
 	$(MAKE) list-go

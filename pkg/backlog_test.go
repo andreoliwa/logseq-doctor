@@ -3,8 +3,10 @@ package pkg_test
 import (
 	"fmt"
 	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/lsd/internal"
 	"github.com/andreoliwa/lsd/internal/testutils"
 	"github.com/andreoliwa/lsd/pkg"
+	"github.com/andreoliwa/lsd/pkg/utils"
 	"strings"
 	"testing"
 )
@@ -13,8 +15,8 @@ func TestProcessBacklog(t *testing.T) {
 	backlog := &pkg.Backlog{
 		Graph: testutils.OpenTestGraph(t),
 		FuncProcessSingleBacklog: func(_ *logseq.Graph, _ string,
-			_ func() (*pkg.Set[string], error)) (*pkg.Set[string], error) {
-			return pkg.NewSet[string](), nil
+			_ func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error) {
+			return utils.NewSet[string](), nil
 		},
 	}
 

@@ -5,6 +5,7 @@ import (
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 	"github.com/andreoliwa/lsd/internal"
+	"github.com/andreoliwa/lsd/pkg/utils"
 	"github.com/fatih/color"
 	"strings"
 )
@@ -24,7 +25,7 @@ var dividerFocusHash = dividerFocusContent.GomegaString() //nolint:gochecknoglob
 type Backlog struct {
 	Graph                    *logseq.Graph
 	FuncProcessSingleBacklog func(graph *logseq.Graph, path string,
-		query func() (*Set[string], error)) (*Set[string], error)
+		query func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error)
 }
 
 func NewBacklog(graph *logseq.Graph) *Backlog {
@@ -40,7 +41,7 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 		return err
 	}
 
-	allFocusRefs := NewSet[string]()
+	allFocusTasks := internal.NewCategorizedTasks()
 	processAllPages := len(partialNames) == 0
 
 	if processAllPages {
@@ -65,14 +66,15 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 			continue
 		}
 
-		focusRefsFromPage, err := p.FuncProcessSingleBacklog(p.Graph, "backlog/"+title, func() (*Set[string], error) {
-			return queryTasksFromPages(p.Graph, pages)
-		})
+		focusRefsFromPage, err := p.FuncProcessSingleBacklog(p.Graph, "backlog/"+title,
+			func() (*internal.CategorizedTasks, error) {
+				return queryTasksFromPages(p.Graph, pages)
+			})
 		if err != nil {
 			return err
 		}
 
-		allFocusRefs.Update(focusRefsFromPage)
+		allFocusTasks.All.Update(focusRefsFromPage)
 	}
 
 	if !processAllPages {
@@ -81,37 +83,37 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 		return nil
 	}
 
-	_, err = p.FuncProcessSingleBacklog(p.Graph, "backlog/Focus", func() (*Set[string], error) {
-		return allFocusRefs, nil
+	_, err = p.FuncProcessSingleBacklog(p.Graph, "backlog/Focus", func() (*internal.CategorizedTasks, error) {
+		return &allFocusTasks, nil
 	})
 
 	return err
 }
 
 func processSingleBacklog(graph *logseq.Graph, pageTitle string,
-	queryRefs func() (*Set[string], error)) (*Set[string], error) {
+	funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error) {
 	page, err := graph.OpenPage(pageTitle)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open page: %w", err)
 	}
 
-	existingRefs := refsFromPages(page)
+	existingBlockRefs := blockRefsFromPages(page)
 
-	fmt.Printf("%s: %s\n", internal.PageColor(pageTitle), FormatCount(existingRefs.Size(), "task", "tasks"))
+	fmt.Printf("%s: %s\n", internal.PageColor(pageTitle), utils.FormatCount(existingBlockRefs.Size(), "task", "tasks"))
 
-	refsToInsert, err := queryRefs()
+	blockRefsFromQuery, err := funcQueryRefs()
 	if err != nil {
 		return nil, err
 	}
 
-	newRefs := refsToInsert.Diff(existingRefs)
-	obsoleteRefs := existingRefs.Diff(refsToInsert)
+	newBlockRefs := blockRefsFromQuery.All.Diff(existingBlockRefs)
+	obsoleteBlockRefs := existingBlockRefs.Diff(blockRefsFromQuery.All)
 
-	if newRefs.Size() <= 0 && obsoleteRefs.Size() <= 0 {
+	if newBlockRefs.Size() <= 0 && obsoleteBlockRefs.Size() <= 0 {
 		color.Yellow("  no new/deleted tasks found")
 	}
 
-	focusRefsFromPage, err := insertAndRemoveRefs(graph, pageTitle, newRefs, obsoleteRefs)
+	focusRefsFromPage, err := insertAndRemoveRefs(graph, pageTitle, newBlockRefs, obsoleteBlockRefs)
 	if err != nil {
 		return nil, err
 	}
@@ -119,8 +121,8 @@ func processSingleBacklog(graph *logseq.Graph, pageTitle string,
 	return focusRefsFromPage, nil
 }
 
-func refsFromPages(page logseq.Page) *Set[string] {
-	existingRefs := NewSet[string]()
+func blockRefsFromPages(page logseq.Page) *utils.Set[string] {
+	existingRefs := utils.NewSet[string]()
 
 	for _, block := range page.Blocks() {
 		block.Children().FindDeep(func(n content.Node) bool {
@@ -168,8 +170,8 @@ func linesWithPages(graph *logseq.Graph) ([][]string, error) {
 	return lines, nil
 }
 
-func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*Set[string], error) {
-	refsFromAllQueries := NewSet[string]()
+func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*internal.CategorizedTasks, error) {
+	tasks := internal.NewCategorizedTasks()
 
 	for _, pageTitle := range pageTitles {
 		fmt.Printf("  %s: ", internal.PageColor(pageTitle))
@@ -199,14 +201,18 @@ func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*Set[string]
 			return nil, fmt.Errorf("failed to extract tasks: %w", err)
 		}
 
-		fmt.Printf(", queried %s\n", FormatCount(len(jsonTasks), "task", "tasks"))
+		fmt.Printf(", queried %s\n", utils.FormatCount(len(jsonTasks), "task", "tasks"))
 
 		for _, t := range jsonTasks {
-			refsFromAllQueries.Add(t.UUID)
+			if t.Overdue() {
+				tasks.Overdue.Add(t.UUID)
+			}
+
+			tasks.All.Add(t.UUID)
 		}
 	}
 
-	return refsFromAllQueries, nil
+	return &tasks, nil
 }
 
 func findFirstQuery(graph *logseq.Graph, pageTitle string) (string, error) {
@@ -247,11 +253,11 @@ func replaceCurrentPage(query, pageTitle string) string {
 }
 
 func defaultQuery(pageTitle string) string {
-	return fmt.Sprintf("(and [[%s]] (task TODO DOING WAITING))", pageTitle)
+	return fmt.Sprintf("(and [[%s]] (task TODO LATER DOING NOW WAITING))", pageTitle)
 }
 
 func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
-	graph *logseq.Graph, pageTitle string, newRefs, obsoleteRefs *Set[string]) (*Set[string], error) {
+	graph *logseq.Graph, pageTitle string, newRefs, obsoleteRefs *utils.Set[string]) (*utils.Set[string], error) {
 	transaction := graph.NewTransaction()
 
 	page, err := transaction.OpenPage(pageTitle)
@@ -262,7 +268,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	var firstBlock, dividerNewTasks, dividerFocus, blockAfterFocus, insertPoint *content.Block
 
 	deletedCount := 0
-	focusRefs := NewSet[string]()
+	focusRefs := utils.NewSet[string]()
 
 	for i, block := range page.Blocks() {
 		if i == 0 {
@@ -338,11 +344,11 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	}
 
 	if newRefs.Size() > 0 {
-		color.Green("  %s", FormatCount(newRefs.Size(), "new task", "new tasks"))
+		color.Green("  %s", utils.FormatCount(newRefs.Size(), "new task", "new tasks"))
 	}
 
 	if deletedCount > 0 {
-		color.Red("  %s removed (completed or unreferenced)", FormatCount(deletedCount, "task was", "tasks were"))
+		color.Red("  %s removed (completed or unreferenced)", utils.FormatCount(deletedCount, "task was", "tasks were"))
 	}
 
 	if dividerFocus == nil {
