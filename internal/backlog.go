@@ -108,10 +108,6 @@ func processSingleBacklog(graph *logseq.Graph, pageTitle string,
 	newBlockRefs := blockRefsFromQuery.All.Diff(existingBlockRefs)
 	obsoleteBlockRefs := existingBlockRefs.Diff(blockRefsFromQuery.All)
 
-	if newBlockRefs.Size() <= 0 && obsoleteBlockRefs.Size() <= 0 {
-		color.Yellow("  no new/deleted tasks found")
-	}
-
 	focusRefsFromPage, err := insertAndRemoveRefs(graph, pageTitle, existingBlockRefs, newBlockRefs, obsoleteBlockRefs,
 		blockRefsFromQuery.Overdue)
 	if err != nil {
@@ -302,14 +298,13 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 
 					deletedCount++
 				case overdueBlockRefs.Contains(blockRef.ID):
-					shouldDelete = true
+					if !nextChildHasPin(node) {
+						shouldDelete = true
 
-					existingBlockRefs.Remove(blockRef.ID)
+						existingBlockRefs.Remove(blockRef.ID)
 
-					movedCount++
-				case dividerFocus == nil:
-					// Keep adding tasks to the focus section until the divider is found
-					focusRefs.Add(blockRef.ID)
+						movedCount++
+					}
 				}
 
 				if shouldDelete {
@@ -318,6 +313,9 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 					//  This will remove the obsolete block and its children.
 					//  Should I show a warning message to the user and prevent the block from being deleted?
 					blockRef.Parent().Parent().RemoveSelf()
+				} else if dividerFocus == nil {
+					// Keep adding tasks to the focus section until the divider is found
+					focusRefs.Add(blockRef.ID)
 				}
 
 				return true
@@ -362,21 +360,33 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		insertOrAddBlock(page, firstBlock, dividerFocus, content.NewBlock(content.NewBlockRef(blockRef)))
 	}
 
-	err = transaction.Save()
-	if err != nil {
-		return nil, fmt.Errorf("failed to save transaction: %w", err)
-	}
+	save := false
 
 	if newBlockRefs.Size() > 0 {
 		color.Green("  %s", utils.FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
+
+		save = true
 	}
 
 	if deletedCount > 0 {
 		color.Red("  %s removed (completed or unreferenced)", utils.FormatCount(deletedCount, "task was", "tasks were"))
+
+		save = true
 	}
 
 	if movedCount > 0 {
 		color.Magenta("  %s moved around", utils.FormatCount(movedCount, "task was", "tasks were"))
+
+		save = true
+	}
+
+	if save {
+		err = transaction.Save()
+		if err != nil {
+			return nil, fmt.Errorf("failed to save transaction: %w", err)
+		}
+	} else {
+		color.Yellow("  no new/deleted/moved tasks")
 	}
 
 	if dividerFocus == nil {
@@ -384,6 +394,17 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	}
 
 	return focusRefs, nil
+}
+
+func nextChildHasPin(node content.Node) bool {
+	nextChild := node.NextSibling()
+	if nextChild != nil {
+		if text, ok := nextChild.(*content.Text); ok {
+			return strings.Contains(text.Value, "📌")
+		}
+	}
+
+	return false
 }
 
 func insertOrAddBlock(page logseq.Page, firstBlock *content.Block, dividerFocus *content.Block,
