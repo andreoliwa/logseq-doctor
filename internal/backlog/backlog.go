@@ -22,23 +22,20 @@ var dividerFocusHash = dividerFocusContent.GomegaString() //nolint:gochecknoglob
 
 type Backlog interface {
 	ProcessAll(partialNames []string) error
-	// TODO: add to interface
-	// ProcessOne(pageTitle string, funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error)
+	ProcessOne(pageTitle string, funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error)
 }
 
 type backlogImpl struct {
-	graph                    *logseq.Graph
-	funcProcessSingleBacklog func(graph *logseq.Graph, path string,
-		query func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error)
+	graph        *logseq.Graph
 	configReader ConfigReader
 }
 
 func NewBacklog(graph *logseq.Graph, reader ConfigReader) Backlog {
-	return &backlogImpl{graph: graph, configReader: reader, funcProcessSingleBacklog: processSingleBacklog}
+	return &backlogImpl{graph: graph, configReader: reader}
 }
 
-func (p *backlogImpl) ProcessAll(partialNames []string) error {
-	config, err := p.configReader.ReadConfig()
+func (b *backlogImpl) ProcessAll(partialNames []string) error {
+	config, err := b.configReader.ReadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to read config: %w", err)
 	}
@@ -67,9 +64,9 @@ func (p *backlogImpl) ProcessAll(partialNames []string) error {
 			continue
 		}
 
-		focusRefsFromPage, err := processSingleBacklog(p.graph, backlogConfig.OutputPage,
+		focusRefsFromPage, err := b.ProcessOne(backlogConfig.OutputPage,
 			func() (*internal.CategorizedTasks, error) {
-				return queryTasksFromPages(p.graph, backlogConfig.InputPages)
+				return queryTasksFromPages(b.graph, backlogConfig.InputPages)
 			})
 		if err != nil {
 			return err
@@ -84,18 +81,16 @@ func (p *backlogImpl) ProcessAll(partialNames []string) error {
 		return nil
 	}
 
-	_, err = processSingleBacklog(p.graph, "backlog/Focus", func() (*internal.CategorizedTasks, error) {
+	_, err = b.ProcessOne("backlog/Focus", func() (*internal.CategorizedTasks, error) {
 		return &allFocusTasks, nil
 	})
 
 	return err
 }
 
-func processSingleBacklog(graph *logseq.Graph, pageTitle string,
-	// TODO: add to interface
-	// func (p *backlogImpl) ProcessOne(pageTitle string,
+func (b *backlogImpl) ProcessOne(pageTitle string,
 	funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error) {
-	page, err := graph.OpenPage(pageTitle)
+	page, err := b.graph.OpenPage(pageTitle)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open page: %w", err)
 	}
@@ -112,7 +107,7 @@ func processSingleBacklog(graph *logseq.Graph, pageTitle string,
 	newBlockRefs := blockRefsFromQuery.All.Diff(existingBlockRefs)
 	obsoleteBlockRefs := existingBlockRefs.Diff(blockRefsFromQuery.All)
 
-	focusRefsFromPage, err := insertAndRemoveRefs(graph, pageTitle, existingBlockRefs, newBlockRefs, obsoleteBlockRefs,
+	focusRefsFromPage, err := insertAndRemoveRefs(b.graph, pageTitle, existingBlockRefs, newBlockRefs, obsoleteBlockRefs,
 		blockRefsFromQuery.Overdue)
 	if err != nil {
 		return nil, err

@@ -1,11 +1,7 @@
 package backlog //nolint:testpackage
 
 import (
-	"fmt"
-	"github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/lsd/internal"
 	"github.com/andreoliwa/lsd/internal/testutils"
-	"github.com/andreoliwa/lsd/pkg/utils"
 	"strings"
 	"testing"
 )
@@ -13,11 +9,7 @@ import (
 func TestProcessBacklog(t *testing.T) {
 	graph := testutils.OpenTestGraph(t, "..")
 	backlog := &backlogImpl{
-		graph: graph,
-		funcProcessSingleBacklog: func(_ *logseq.Graph, _ string,
-			_ func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error) {
-			return utils.NewSet[string](), nil
-		},
+		graph:        graph,
 		configReader: NewPageConfigReader(graph, "backlog"),
 	}
 
@@ -43,7 +35,6 @@ func TestProcessBacklog(t *testing.T) {
 			output := testutils.CaptureOutput(func() {
 				_ = backlog.ProcessAll(test.input) // Ignore error handling for now
 			})
-			fmt.Printf("Captured output:\n%s\n", output)
 
 			if !strings.Contains(output, test.expected) {
 				t.Errorf("Expected output %q not found in: %q", test.expected, output)
