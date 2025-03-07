@@ -49,7 +49,7 @@ func TestIsValidMarkdownFile(t *testing.T) {
 }
 
 func TestAppendRawMarkdownToJournal(t *testing.T) {
-	graph := testutils.OpenTestGraph(t)
+	graph := testutils.OpenTestGraph(t, "")
 
 	now := time.Now()
 
@@ -70,7 +70,7 @@ func TestAppendRawMarkdownToJournal(t *testing.T) {
 			modifiedContents, err := os.ReadFile(filepath.Join(graph.Directory(), "journals",
 				expectedFilename+".md"))
 			require.NoError(t, err)
-			golden.Assert(t, string(modifiedContents), filepath.Join("graph", "journals",
+			golden.Assert(t, string(modifiedContents), filepath.Join(graph.Directory(), "journals",
 				expectedFilename+".md.golden"))
 		}
 	}

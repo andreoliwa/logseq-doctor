@@ -1,4 +1,4 @@
-package internal_test
+package backlog //nolint:testpackage
 
 import (
 	"fmt"
@@ -11,12 +11,14 @@ import (
 )
 
 func TestProcessBacklog(t *testing.T) {
-	backlog := &internal.Backlog{
-		Graph: testutils.OpenTestGraph(t),
-		FuncProcessSingleBacklog: func(_ *logseq.Graph, _ string,
+	graph := testutils.OpenTestGraph(t, "..")
+	backlog := &backlogImpl{
+		graph: graph,
+		funcProcessSingleBacklog: func(_ *logseq.Graph, _ string,
 			_ func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error) {
 			return utils.NewSet[string](), nil
 		},
+		configReader: NewPageConfigReader(graph, "backlog"),
 	}
 
 	tests := []struct {
@@ -39,7 +41,7 @@ func TestProcessBacklog(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			output := testutils.CaptureOutput(func() {
-				_ = backlog.ProcessBacklogs(test.input) // Ignore error handling for now
+				_ = backlog.ProcessAll(test.input) // Ignore error handling for now
 			})
 			fmt.Printf("Captured output:\n%s\n", output)
 

@@ -45,7 +45,7 @@ func setupPage(t *testing.T, name string) logseq.Page {
 
 	ctx := context.Background()
 
-	graph, err := logseq.Open(ctx, filepath.Join("testdata", "graph"))
+	graph, err := logseq.Open(ctx, filepath.Join("testdata", "example-graph"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,7 +66,7 @@ type resultSetupFileContents struct {
 func setupFileContents(t *testing.T, name string) resultSetupFileContents {
 	t.Helper()
 
-	subdir := filepath.Join("graph", "pages", name+".md")
+	subdir := filepath.Join("example-graph", "pages", name+".md")
 	path := filepath.Join("testdata", subdir)
 
 	bytes, err := os.ReadFile(path)

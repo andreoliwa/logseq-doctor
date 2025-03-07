@@ -1,15 +1,14 @@
-package internal
+package backlog
 
 import (
 	"fmt"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
+	"github.com/andreoliwa/lsd/internal"
 	"github.com/andreoliwa/lsd/pkg/utils"
 	"github.com/fatih/color"
 	"strings"
 )
-
-const backlogName = "backlog"
 
 var dividerNewTasksContent = content.NewBlock(content.NewParagraph( //nolint:gochecknoglobals
 	content.NewPageLink("quick capture"),
@@ -21,26 +20,30 @@ var dividerFocusContent = content.NewBlock(content.NewParagraph( //nolint:gochec
 ))
 var dividerFocusHash = dividerFocusContent.GomegaString() //nolint:gochecknoglobals
 
-type Backlog struct {
-	Graph                    *logseq.Graph
-	FuncProcessSingleBacklog func(graph *logseq.Graph, path string,
-		query func() (*CategorizedTasks, error)) (*utils.Set[string], error)
+type Backlog interface {
+	ProcessAll(partialNames []string) error
+	// TODO: add to interface
+	// ProcessOne(pageTitle string, funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error)
 }
 
-func NewBacklog(graph *logseq.Graph) *Backlog {
-	return &Backlog{
-		Graph:                    graph,
-		FuncProcessSingleBacklog: processSingleBacklog,
-	}
+type backlogImpl struct {
+	graph                    *logseq.Graph
+	funcProcessSingleBacklog func(graph *logseq.Graph, path string,
+		query func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error)
+	configReader ConfigReader
 }
 
-func (p *Backlog) ProcessBacklogs(partialNames []string) error {
-	lines, err := linesWithPages(p.Graph)
+func NewBacklog(graph *logseq.Graph, reader ConfigReader) Backlog {
+	return &backlogImpl{graph: graph, configReader: reader, funcProcessSingleBacklog: processSingleBacklog}
+}
+
+func (p *backlogImpl) ProcessAll(partialNames []string) error {
+	config, err := p.configReader.ReadConfig()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read config: %w", err)
 	}
 
-	allFocusTasks := NewCategorizedTasks()
+	allFocusTasks := internal.NewCategorizedTasks()
 	processAllPages := len(partialNames) == 0
 
 	if processAllPages {
@@ -49,12 +52,11 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 		fmt.Printf("Processing pages with partial names: %s\n", strings.Join(partialNames, ", "))
 	}
 
-	for _, pages := range lines {
-		title := pages[0]
+	for _, backlogConfig := range config.Backlogs {
 		processThisPage := processAllPages
 
 		for _, partialName := range partialNames {
-			if strings.Contains(strings.ToLower(title), strings.ToLower(partialName)) {
+			if strings.Contains(strings.ToLower(backlogConfig.OutputPage), strings.ToLower(partialName)) {
 				processThisPage = true
 
 				break
@@ -65,9 +67,9 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 			continue
 		}
 
-		focusRefsFromPage, err := p.FuncProcessSingleBacklog(p.Graph, "backlog/"+title,
-			func() (*CategorizedTasks, error) {
-				return queryTasksFromPages(p.Graph, pages)
+		focusRefsFromPage, err := processSingleBacklog(p.graph, backlogConfig.OutputPage,
+			func() (*internal.CategorizedTasks, error) {
+				return queryTasksFromPages(p.graph, backlogConfig.InputPages)
 			})
 		if err != nil {
 			return err
@@ -82,7 +84,7 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 		return nil
 	}
 
-	_, err = p.FuncProcessSingleBacklog(p.Graph, "backlog/Focus", func() (*CategorizedTasks, error) {
+	_, err = processSingleBacklog(p.graph, "backlog/Focus", func() (*internal.CategorizedTasks, error) {
 		return &allFocusTasks, nil
 	})
 
@@ -90,7 +92,9 @@ func (p *Backlog) ProcessBacklogs(partialNames []string) error {
 }
 
 func processSingleBacklog(graph *logseq.Graph, pageTitle string,
-	funcQueryRefs func() (*CategorizedTasks, error)) (*utils.Set[string], error) {
+	// TODO: add to interface
+	// func (p *backlogImpl) ProcessOne(pageTitle string,
+	funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error) {
 	page, err := graph.OpenPage(pageTitle)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open page: %w", err)
@@ -98,7 +102,7 @@ func processSingleBacklog(graph *logseq.Graph, pageTitle string,
 
 	existingBlockRefs := blockRefsFromPages(page)
 
-	fmt.Printf("%s: %s\n", PageColor(pageTitle), utils.FormatCount(existingBlockRefs.Size(), "task", "tasks"))
+	fmt.Printf("%s: %s\n", internal.PageColor(pageTitle), utils.FormatCount(existingBlockRefs.Size(), "task", "tasks"))
 
 	blockRefsFromQuery, err := funcQueryRefs()
 	if err != nil {
@@ -133,44 +137,11 @@ func blockRefsFromPages(page logseq.Page) *utils.Set[string] {
 	return existingRefs
 }
 
-func linesWithPages(graph *logseq.Graph) ([][]string, error) {
-	page, err := graph.OpenPage(backlogName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open backlog page: %w", err)
-	}
-
-	var lines [][]string
-
-	for _, block := range page.Blocks() {
-		var pageTitles []string
-
-		block.Children().FindDeep(func(n content.Node) bool {
-			if pageLink, ok := n.(*content.PageLink); ok {
-				pageTitles = append(pageTitles, pageLink.To)
-			} else if tag, ok := n.(*content.Hashtag); ok {
-				pageTitles = append(pageTitles, tag.To)
-			}
-
-			return false
-		})
-
-		if len(pageTitles) > 0 {
-			lines = append(lines, pageTitles)
-		}
-	}
-
-	if len(lines) == 0 {
-		fmt.Println("no pages found in the backlog")
-	}
-
-	return lines, nil
-}
-
-func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*CategorizedTasks, error) {
-	tasks := NewCategorizedTasks()
+func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*internal.CategorizedTasks, error) {
+	tasks := internal.NewCategorizedTasks()
 
 	for _, pageTitle := range pageTitles {
-		fmt.Printf("  %s: ", PageColor(pageTitle))
+		fmt.Printf("  %s: ", internal.PageColor(pageTitle))
 
 		query, err := findFirstQuery(graph, pageTitle)
 		if err != nil {
@@ -187,12 +158,12 @@ func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*Categorized
 
 		fmt.Printf(" query %s", query)
 
-		jsonStr, err := QueryLogseqAPI(query)
+		jsonStr, err := internal.QueryLogseqAPI(query)
 		if err != nil {
 			return nil, fmt.Errorf("failed to query Logseq API: %w", err)
 		}
 
-		jsonTasks, err := ExtractTasksFromJSON(jsonStr)
+		jsonTasks, err := internal.ExtractTasksFromJSON(jsonStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to extract tasks: %w", err)
 		}
