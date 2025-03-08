@@ -9,14 +9,10 @@ import (
 	"testing"
 )
 
-func OpenTestGraph(t *testing.T, relativePath string) *logseq.Graph {
+func OpenTestGraph(t *testing.T) *logseq.Graph {
 	t.Helper()
 
-	if relativePath == "" {
-		relativePath = "."
-	}
-
-	dir, err := filepath.Abs(filepath.Join(relativePath, "testdata", "example-graph"))
+	dir, err := filepath.Abs(filepath.Join("testdata", "example-graph"))
 	require.NoError(t, err)
 
 	tempDir := fs.NewDir(t, "append-raw",

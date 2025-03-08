@@ -12,8 +12,8 @@ import (
 )
 
 func TestPageConfigReader_emptyBacklog(t *testing.T) {
-	graph := testutils.OpenTestGraph(t, "..")
-	reader := backlog.NewPageConfigReader(graph, "emptybacklog")
+	graph := testutils.OpenTestGraph(t)
+	reader := backlog.NewPageConfigReader(graph, "non-existing")
 
 	result, err := reader.ReadConfig()
 	require.NoError(t, err)
@@ -25,8 +25,9 @@ func TestPageConfigReader_emptyBacklog(t *testing.T) {
 }
 
 func TestPageConfigReader_ReadConfig(t *testing.T) {
-	graph := testutils.OpenTestGraph(t, "..")
-	reader := backlog.NewPageConfigReader(graph, "mybacklog")
+	graph := testutils.OpenTestGraph(t)
+	config := "config"
+	reader := backlog.NewPageConfigReader(graph, config)
 
 	result, err := reader.ReadConfig()
 	require.NoError(t, err)
@@ -36,17 +37,17 @@ func TestPageConfigReader_ReadConfig(t *testing.T) {
 			{
 				Icon:       "",
 				InputPages: []string{"computer", "Android", "iOS"},
-				OutputPage: "mybacklog/computer",
+				OutputPage: config + "/computer",
 			},
 			{
 				Icon:       "",
 				InputPages: []string{"house"},
-				OutputPage: "mybacklog/house",
+				OutputPage: config + "/house",
 			},
 			{
 				Icon:       "",
 				InputPages: []string{"work", "office"},
-				OutputPage: "mybacklog/work",
+				OutputPage: config + "/work",
 			},
 		},
 	}

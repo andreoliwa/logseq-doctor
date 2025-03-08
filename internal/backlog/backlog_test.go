@@ -7,7 +7,7 @@ import (
 )
 
 func TestProcessBacklog(t *testing.T) {
-	graph := testutils.OpenTestGraph(t, "..")
+	graph := testutils.OpenTestGraph(t)
 	backlog := &backlogImpl{
 		graph:        graph,
 		configReader: NewPageConfigReader(graph, "backlog"),
