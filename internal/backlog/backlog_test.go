@@ -6,11 +6,11 @@ import (
 	"testing"
 )
 
-func TestProcessBacklog(t *testing.T) {
-	graph := testutils.OpenTestGraph(t)
+func TestProcessEmptyBacklog(t *testing.T) {
+	graph := testutils.OpenExampleGraph(t)
 	backlog := &backlogImpl{
 		graph:        graph,
-		configReader: NewPageConfigReader(graph, "backlog"),
+		configReader: NewPageConfigReader(graph, "non-existent"),
 	}
 
 	tests := []struct {

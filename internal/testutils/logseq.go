@@ -9,7 +9,8 @@ import (
 	"testing"
 )
 
-func OpenTestGraph(t *testing.T) *logseq.Graph {
+// OpenExampleGraph opens the example graph under "testdata" for testing.
+func OpenExampleGraph(t *testing.T) *logseq.Graph {
 	t.Helper()
 
 	dir, err := filepath.Abs(filepath.Join("testdata", "example-graph"))
