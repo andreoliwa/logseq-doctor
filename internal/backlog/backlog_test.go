@@ -2,12 +2,13 @@ package backlog_test
 
 import (
 	"github.com/andreoliwa/lsd/internal/testutils"
+	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
 )
 
-func TestBacklogImpl_ProcessEmptyBacklog(t *testing.T) {
-	back := testutils.FakeBacklog(t, "non-existent")
+func TestEmpty(t *testing.T) {
+	back := testutils.StubBacklog(t, "non-existent", &testutils.StubAPIResponses{}) //nolint: exhaustruct
 
 	tests := []struct {
 		name     string
@@ -39,9 +40,16 @@ func TestBacklogImpl_ProcessEmptyBacklog(t *testing.T) {
 	}
 }
 
-// TODO: mock API
-// func TestBacklogImpl_ProcessAll(t *testing.T) {
-//	b := testutils.FakeBacklog(t, "config")
-//	err := b.ProcessAll([]string{})
-//	require.NoError(t, err)
-//}
+func TestSimple(t *testing.T) {
+	back := testutils.StubBacklog(t, "simple", &testutils.StubAPIResponses{
+		Queries: []testutils.QueryArg{
+			{Contains: "house"},
+			{Contains: "phone"},
+		},
+	})
+
+	// TODO: assert files don't exist before processing
+	// TODO: assert files were created after processing
+	err := back.ProcessAll([]string{})
+	require.NoError(t, err)
+}

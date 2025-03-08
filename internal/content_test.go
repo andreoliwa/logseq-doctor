@@ -49,7 +49,7 @@ func TestIsValidMarkdownFile(t *testing.T) {
 }
 
 func TestAppendRawMarkdownToJournal(t *testing.T) {
-	graph := testutils.FakeGraph(t)
+	graph := testutils.StubGraph(t)
 
 	now := time.Now()
 

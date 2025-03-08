@@ -1,0 +1,183 @@
+[
+  {
+    "properties": {
+      "id": "67c48e4d-c8a7-4976-b54f-6a640b14ef0a"
+    },
+    "parent": {
+      "id": 42
+    },
+    "id": 40,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      },
+      {
+        "id": 31
+      },
+      {
+        "id": 44
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48e4d-c8a7-4976-b54f-6a640b14ef0a"
+    },
+    "uuid": "67c48e4d-c8a7-4976-b54f-6a640b14ef0a",
+    "content": "TODO Go to the supermarket and refill fridge\nid:: 67c48e4d-c8a7-4976-b54f-6a640b14ef0a\n:LOGBOOK:\nCLOCK: [2025-03-03 Mon 19:31:12]--[2025-03-03 Mon 19:31:16] =>  00:00:04\nCLOCK: [2025-03-03 Mon 19:31:18]--[2025-03-03 Mon 19:31:19] =>  00:00:01\nCLOCK: [2025-03-03 Mon 19:31:20]--[2025-03-03 Mon 19:31:21] =>  00:00:01\n:END:",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250301,
+      "name": "saturday, 01-03-2025",
+      "originalName": "Saturday, 01-03-2025",
+      "id": 31
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 42
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c48e65-63c0-41cf-8e9e-b6ae5107c0e5"
+    },
+    "parent": {
+      "id": 42
+    },
+    "id": 43,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      },
+      {
+        "id": 31
+      },
+      {
+        "id": 44
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48e65-63c0-41cf-8e9e-b6ae5107c0e5"
+    },
+    "uuid": "67c48e65-63c0-41cf-8e9e-b6ae5107c0e5",
+    "content": "TODO Unfreeze meat for my recipe\nid:: 67c48e65-63c0-41cf-8e9e-b6ae5107c0e5",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250301,
+      "name": "saturday, 01-03-2025",
+      "originalName": "Saturday, 01-03-2025",
+      "id": 31
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 40
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c48e8a-29bf-4202-924c-925406e9f06d"
+    },
+    "deadline": 20250322,
+    "parent": {
+      "id": 42
+    },
+    "id": 45,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      },
+      {
+        "id": 31
+      },
+      {
+        "id": 44
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48e8a-29bf-4202-924c-925406e9f06d"
+    },
+    "uuid": "67c48e8a-29bf-4202-924c-925406e9f06d",
+    "content": "TODO Clean the oven (future deadline)\nid:: 67c48e8a-29bf-4202-924c-925406e9f06d\nDEADLINE: <2025-03-22 Sat>",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250301,
+      "name": "saturday, 01-03-2025",
+      "originalName": "Saturday, 01-03-2025",
+      "id": 31
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 43
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c491e6-aa14-463d-9dfc-327e974c2349"
+    },
+    "parent": {
+      "id": 102
+    },
+    "id": 103,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 44
+      },
+      {
+        "id": 102
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c491e6-aa14-463d-9dfc-327e974c2349"
+    },
+    "uuid": "67c491e6-aa14-463d-9dfc-327e974c2349",
+    "content": "TODO #kitchen Buy a new frying pan\nid:: 67c491e6-aa14-463d-9dfc-327e974c2349",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250225,
+      "name": "tuesday, 25-02-2025",
+      "originalName": "Tuesday, 25-02-2025",
+      "id": 102
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 102
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 44
+      }
+    ]
+  }
+]

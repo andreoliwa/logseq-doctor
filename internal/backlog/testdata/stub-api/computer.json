@@ -1,0 +1,48 @@
+[
+  {
+    "properties": {
+      "id": "67c48cb3-ddf4-468f-a5ab-31115994f458"
+    },
+    "scheduled": 20250305,
+    "parent": {
+      "id": 20
+    },
+    "id": 24,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 20
+      },
+      {
+        "id": 30
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48cb3-ddf4-468f-a5ab-31115994f458"
+    },
+    "uuid": "67c48cb3-ddf4-468f-a5ab-31115994f458",
+    "content": "TODO #computer Backup my files\nid:: 67c48cb3-ddf4-468f-a5ab-31115994f458\nSCHEDULED: <2025-03-05 Wed>",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250302,
+      "name": "sunday, 02-03-2025",
+      "originalName": "Sunday, 02-03-2025",
+      "id": 20
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 23
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 30
+      }
+    ]
+  }
+]

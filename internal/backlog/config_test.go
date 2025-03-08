@@ -12,7 +12,7 @@ import (
 )
 
 func TestPageConfigReader_emptyBacklog(t *testing.T) {
-	graph := testutils.FakeGraph(t)
+	graph := testutils.StubGraph(t)
 	reader := backlog.NewPageConfigReader(graph, "non-existing")
 
 	result, err := reader.ReadConfig()
@@ -25,7 +25,7 @@ func TestPageConfigReader_emptyBacklog(t *testing.T) {
 }
 
 func TestPageConfigReader_ReadConfig(t *testing.T) {
-	graph := testutils.FakeGraph(t)
+	graph := testutils.StubGraph(t)
 	config := "config"
 	reader := backlog.NewPageConfigReader(graph, config)
 

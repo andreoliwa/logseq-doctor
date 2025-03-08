@@ -1,0 +1,47 @@
+[
+  {
+    "properties": {
+      "id": "67c48e28-84c8-4061-9451-42beddd5a2df"
+    },
+    "parent": {
+      "id": 32
+    },
+    "id": 37,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 32
+      },
+      {
+        "id": 38
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48e28-84c8-4061-9451-42beddd5a2df"
+    },
+    "uuid": "67c48e28-84c8-4061-9451-42beddd5a2df",
+    "content": "TODO #phone Backup my mobile photos to the cloud\nid:: 67c48e28-84c8-4061-9451-42beddd5a2df",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250228,
+      "name": "friday, 28-02-2025",
+      "originalName": "Friday, 28-02-2025",
+      "id": 32
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 35
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 38
+      }
+    ]
+  }
+]

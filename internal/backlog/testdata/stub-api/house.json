@@ -1,0 +1,276 @@
+[
+  {
+    "properties": {
+      "id": "67c48cb3-ee20-48fe-9a2b-3f63dff412ff"
+    },
+    "deadline": 20250401,
+    "parent": {
+      "id": 20
+    },
+    "id": 23,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 20
+      },
+      {
+        "id": 21
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48cb3-ee20-48fe-9a2b-3f63dff412ff"
+    },
+    "uuid": "67c48cb3-ee20-48fe-9a2b-3f63dff412ff",
+    "content": "TODO **17:48** #house Clean windows before spring\nid:: 67c48cb3-ee20-48fe-9a2b-3f63dff412ff\nDEADLINE: <2025-04-01 Tue>",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250302,
+      "name": "sunday, 02-03-2025",
+      "originalName": "Sunday, 02-03-2025",
+      "id": 20
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 20
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c48dc4-c4f6-4983-96f9-8eca408399e2"
+    },
+    "parent": {
+      "id": 32
+    },
+    "id": 33,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      },
+      {
+        "id": 32
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48dc4-c4f6-4983-96f9-8eca408399e2"
+    },
+    "uuid": "67c48dc4-c4f6-4983-96f9-8eca408399e2",
+    "content": "TODO #house Vacuum carpets and couch\nid:: 67c48dc4-c4f6-4983-96f9-8eca408399e2",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250228,
+      "name": "friday, 28-02-2025",
+      "originalName": "Friday, 28-02-2025",
+      "id": 32
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 32
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c48e4d-c8a7-4976-b54f-6a640b14ef0a"
+    },
+    "parent": {
+      "id": 42
+    },
+    "id": 40,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      },
+      {
+        "id": 31
+      },
+      {
+        "id": 44
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48e4d-c8a7-4976-b54f-6a640b14ef0a"
+    },
+    "uuid": "67c48e4d-c8a7-4976-b54f-6a640b14ef0a",
+    "content": "TODO Go to the supermarket and refill fridge\nid:: 67c48e4d-c8a7-4976-b54f-6a640b14ef0a\n:LOGBOOK:\nCLOCK: [2025-03-03 Mon 19:31:12]--[2025-03-03 Mon 19:31:16] =>  00:00:04\nCLOCK: [2025-03-03 Mon 19:31:18]--[2025-03-03 Mon 19:31:19] =>  00:00:01\nCLOCK: [2025-03-03 Mon 19:31:20]--[2025-03-03 Mon 19:31:21] =>  00:00:01\n:END:",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250301,
+      "name": "saturday, 01-03-2025",
+      "originalName": "Saturday, 01-03-2025",
+      "id": 31
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 42
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c48e65-63c0-41cf-8e9e-b6ae5107c0e5"
+    },
+    "parent": {
+      "id": 42
+    },
+    "id": 43,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      },
+      {
+        "id": 31
+      },
+      {
+        "id": 44
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48e65-63c0-41cf-8e9e-b6ae5107c0e5"
+    },
+    "uuid": "67c48e65-63c0-41cf-8e9e-b6ae5107c0e5",
+    "content": "TODO Unfreeze meat for my recipe\nid:: 67c48e65-63c0-41cf-8e9e-b6ae5107c0e5",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250301,
+      "name": "saturday, 01-03-2025",
+      "originalName": "Saturday, 01-03-2025",
+      "id": 31
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 40
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c48e8a-29bf-4202-924c-925406e9f06d"
+    },
+    "deadline": 20250322,
+    "parent": {
+      "id": 42
+    },
+    "id": 45,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      },
+      {
+        "id": 31
+      },
+      {
+        "id": 44
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48e8a-29bf-4202-924c-925406e9f06d"
+    },
+    "uuid": "67c48e8a-29bf-4202-924c-925406e9f06d",
+    "content": "TODO Clean the oven (future deadline)\nid:: 67c48e8a-29bf-4202-924c-925406e9f06d\nDEADLINE: <2025-03-22 Sat>",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250301,
+      "name": "saturday, 01-03-2025",
+      "originalName": "Saturday, 01-03-2025",
+      "id": 31
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 43
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c5e302-29d1-4116-b83f-b064b18102f4"
+    },
+    "deadline": 20250309,
+    "repeated?": true,
+    "parent": {
+      "id": 118
+    },
+    "id": 119,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      },
+      {
+        "id": 118
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c5e302-29d1-4116-b83f-b064b18102f4"
+    },
+    "uuid": "67c5e302-29d1-4116-b83f-b064b18102f4",
+    "content": "TODO **18:48** #house Tidy up office papers\nDEADLINE: <2025-03-09 Sun ++1w>\nid:: 67c5e302-29d1-4116-b83f-b064b18102f4\n:LOGBOOK:\n* State \"DONE\" from \"TODO\" [2025-03-03 Mon 19:03]\n* State \"DONE\" from \"TODO\" [2025-03-03 Mon 19:04]\n:END:",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250303,
+      "name": "monday, 03-03-2025",
+      "originalName": "Monday, 03-03-2025",
+      "id": 118
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 118
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      }
+    ]
+  }
+]

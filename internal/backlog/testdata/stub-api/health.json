@@ -1,0 +1,92 @@
+[
+  {
+    "properties": {
+      "id": "67c48ea4-92cd-4b27-8202-ec1f4fe4ec59"
+    },
+    "parent": {
+      "id": 47
+    },
+    "id": 48,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 47
+      },
+      {
+        "id": 49
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48ea4-92cd-4b27-8202-ec1f4fe4ec59"
+    },
+    "uuid": "67c48ea4-92cd-4b27-8202-ec1f4fe4ec59",
+    "content": "TODO #health Scheduled appointment with doctor\nid:: 67c48ea4-92cd-4b27-8202-ec1f4fe4ec59",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250227,
+      "name": "thursday, 27-02-2025",
+      "originalName": "Thursday, 27-02-2025",
+      "id": 47
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 47
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 49
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c490ad-f00e-480f-bead-0dcab66c3173"
+    },
+    "parent": {
+      "id": 84
+    },
+    "id": 85,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 49
+      },
+      {
+        "id": 84
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c490ad-f00e-480f-bead-0dcab66c3173"
+    },
+    "uuid": "67c490ad-f00e-480f-bead-0dcab66c3173",
+    "content": "TODO **18:09** #health Go to the dentist\nid:: 67c490ad-f00e-480f-bead-0dcab66c3173",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250226,
+      "name": "wednesday, 26-02-2025",
+      "originalName": "Wednesday, 26-02-2025",
+      "id": 84
+    },
+    "propertiesOrder": ["id"],
+    "left": {
+      "id": 84
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 49
+      }
+    ]
+  }
+]
