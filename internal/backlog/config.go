@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
+	"strings"
 )
 
 type SingleBacklogConfig struct {
@@ -33,6 +34,7 @@ func NewPageConfigReader(graph *logseq.Graph, rootPage string) ConfigReader {
 	}
 }
 
+// ReadConfig reads the backlog configuration from a Logseq page.
 func (p *pageConfigReader) ReadConfig() (*Config, error) {
 	rootPage, err := p.graph.OpenPage(p.rootPage)
 	if err != nil {
@@ -41,6 +43,8 @@ func (p *pageConfigReader) ReadConfig() (*Config, error) {
 
 	var backlogs []SingleBacklogConfig
 
+	prefix := p.rootPage + "/"
+
 	for _, block := range rootPage.Blocks() {
 		var inputPages []string
 
@@ -48,20 +52,27 @@ func (p *pageConfigReader) ReadConfig() (*Config, error) {
 
 		// TODO: simplify and replace by FilterDeep after a test is added
 		block.Children().FindDeep(func(n content.Node) bool {
-			inputPage := ""
+			link := ""
 			if pageLink, ok := n.(*content.PageLink); ok {
-				inputPage = pageLink.To
+				link = pageLink.To
 			} else if tag, ok := n.(*content.Hashtag); ok {
-				inputPage = tag.To
+				link = tag.To
 			}
 
-			if inputPage != "" {
-				if firstPage == "" {
-					firstPage = p.rootPage + "/" + inputPage
-				}
-
-				inputPages = append(inputPages, inputPage)
+			if link == "" {
+				return false
 			}
+
+			// Skip this page if it's a link to a backlog
+			if strings.HasPrefix(link, prefix) {
+				return false
+			}
+
+			if firstPage == "" {
+				firstPage = prefix + link
+			}
+
+			inputPages = append(inputPages, link)
 
 			return false
 		})

@@ -1,5 +1,5 @@
-- One for the [[computer]], [[Android]] and #iOS
-- Separator
+- [backlog][config/computer] One for the [[computer]], [[Android]] and #iOS
+- Separator [link to some backlog][config/some-backlog]
 - For my [[house]]
-- #work and [[office]] related
+- #work and [[office]] related, [here's another link to any backlog][config/any-backlog]
 - End
