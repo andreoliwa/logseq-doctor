@@ -21,8 +21,12 @@ Tasks are retrieved from all provided pages or tags.
 This setup enables users to rearrange tasks using the arrow keys and manage task states (start/stop)
 directly within the interface.`,
 	Run: func(_ *cobra.Command, args []string) {
-		graph := internal.OpenGraphFromDirOrEnv("")
-		proc := backlog.NewBacklog(graph, backlog.NewPageConfigReader(graph, "backlog"))
+		path := os.Getenv("LOGSEQ_GRAPH_PATH")
+		api := internal.NewLogseqAPI(path,
+			os.Getenv("LOGSEQ_HOST_URL"), os.Getenv("LOGSEQ_API_TOKEN"))
+		graph := internal.OpenGraphFromPath(path)
+		reader := backlog.NewPageConfigReader(graph, "backlog")
+		proc := backlog.NewBacklog(graph, api, reader)
 
 		err := proc.ProcessAll(args)
 		if err != nil {

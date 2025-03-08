@@ -27,11 +27,12 @@ type Backlog interface {
 
 type backlogImpl struct {
 	graph        *logseq.Graph
+	api          internal.LogseqAPI
 	configReader ConfigReader
 }
 
-func NewBacklog(graph *logseq.Graph, reader ConfigReader) Backlog {
-	return &backlogImpl{graph: graph, configReader: reader}
+func NewBacklog(graph *logseq.Graph, api internal.LogseqAPI, reader ConfigReader) Backlog {
+	return &backlogImpl{graph: graph, api: api, configReader: reader}
 }
 
 func (b *backlogImpl) ProcessAll(partialNames []string) error {
@@ -66,7 +67,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error {
 
 		focusRefsFromPage, err := b.ProcessOne(backlogConfig.OutputPage,
 			func() (*internal.CategorizedTasks, error) {
-				return queryTasksFromPages(b.graph, backlogConfig.InputPages)
+				return queryTasksFromPages(b.graph, b.api, backlogConfig.InputPages)
 			})
 		if err != nil {
 			return err
@@ -132,7 +133,8 @@ func blockRefsFromPages(page logseq.Page) *utils.Set[string] {
 	return existingRefs
 }
 
-func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*internal.CategorizedTasks, error) {
+func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
+	pageTitles []string) (*internal.CategorizedTasks, error) {
 	tasks := internal.NewCategorizedTasks()
 
 	for _, pageTitle := range pageTitles {
@@ -153,7 +155,7 @@ func queryTasksFromPages(graph *logseq.Graph, pageTitles []string) (*internal.Ca
 
 		fmt.Printf(" query %s", query)
 
-		jsonStr, err := internal.QueryLogseqAPI(query)
+		jsonStr, err := api.PostQuery(query)
 		if err != nil {
 			return nil, fmt.Errorf("failed to query Logseq API: %w", err)
 		}

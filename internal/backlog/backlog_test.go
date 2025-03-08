@@ -1,4 +1,4 @@
-package backlog //nolint:testpackage
+package backlog_test
 
 import (
 	"github.com/andreoliwa/lsd/internal/testutils"
@@ -6,12 +6,8 @@ import (
 	"testing"
 )
 
-func TestProcessEmptyBacklog(t *testing.T) {
-	graph := testutils.OpenExampleGraph(t)
-	backlog := &backlogImpl{
-		graph:        graph,
-		configReader: NewPageConfigReader(graph, "non-existent"),
-	}
+func TestBacklogImpl_ProcessEmptyBacklog(t *testing.T) {
+	back := testutils.FakeBacklog(t, "non-existent")
 
 	tests := []struct {
 		name     string
@@ -33,7 +29,7 @@ func TestProcessEmptyBacklog(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			output := testutils.CaptureOutput(func() {
-				_ = backlog.ProcessAll(test.input) // Ignore error handling for now
+				_ = back.ProcessAll(test.input) // Ignore error handling for now
 			})
 
 			if !strings.Contains(output, test.expected) {
@@ -42,3 +38,10 @@ func TestProcessEmptyBacklog(t *testing.T) {
 		})
 	}
 }
+
+// TODO: mock API
+// func TestBacklogImpl_ProcessAll(t *testing.T) {
+//	b := testutils.FakeBacklog(t, "config")
+//	err := b.ProcessAll([]string{})
+//	require.NoError(t, err)
+//}

@@ -18,7 +18,7 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 - Check for double spaces`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
-		graph := internal.OpenGraphFromDirOrEnv("")
+		graph := internal.OpenGraphFromPath(os.Getenv("LOGSEQ_GRAPH_PATH"))
 
 		exitCode := 0
 		for _, path := range args {

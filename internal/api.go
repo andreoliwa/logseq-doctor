@@ -8,24 +8,39 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 )
 
-// OpenGraphFromDirOrEnv opens a Logseq graph from a directory or environment variable.
+type LogseqAPI interface {
+	PostQuery(query string) (string, error)
+}
+
+type logseqAPIImpl struct {
+	path     string
+	hostURL  string
+	apiToken string
+}
+
+// NewLogseqAPI creates a new LogseqAPI instance.
+func NewLogseqAPI(path, hostURL, apiToken string) LogseqAPI {
+	return &logseqAPIImpl{
+		path:     path,
+		hostURL:  hostURL,
+		apiToken: apiToken,
+	}
+}
+
+// OpenGraphFromPath opens a Logseq graph (from the path provided when the instance was created).
 // It doesn't return an error and aborts the program if it fails because it's an internal function.
 // This is done on purpose to avoid error handling boilerplate code throughout the package.
-func OpenGraphFromDirOrEnv(dir string) *logseq.Graph {
-	if dir == "" {
-		dir = os.Getenv("LOGSEQ_GRAPH_PATH")
-		if dir == "" {
-			log.Fatalln("the LOGSEQ_GRAPH_PATH environment variable is not set.")
-		}
+func OpenGraphFromPath(path string) *logseq.Graph {
+	if path == "" {
+		log.Fatalln("the LOGSEQ_GRAPH_PATH environment variable is not set.")
 	}
 
 	ctx := context.Background()
 
-	graph, err := logseq.Open(ctx, dir)
+	graph, err := logseq.Open(ctx, path)
 	if err != nil {
 		log.Fatalln("error opening graph: %w", err)
 	}
@@ -33,12 +48,9 @@ func OpenGraphFromDirOrEnv(dir string) *logseq.Graph {
 	return graph
 }
 
-// QueryLogseqAPI sends a query to the Logseq API and returns the result as JSON.
-func QueryLogseqAPI(query string) (string, error) {
-	apiToken := os.Getenv("LOGSEQ_API_TOKEN")
-
-	hostURL := os.Getenv("LOGSEQ_HOST_URL")
-	if apiToken == "" || hostURL == "" {
+// PostQuery sends a query to the Logseq API and returns the result as JSON.
+func (l *logseqAPIImpl) PostQuery(query string) (string, error) {
+	if l.apiToken == "" || l.hostURL == "" {
 		return "", ErrMissingConfig
 	}
 
@@ -52,12 +64,12 @@ func QueryLogseqAPI(query string) (string, error) {
 	ctx := context.Background()
 	payload := fmt.Sprintf(`{"method":"logseq.db.q","args":[%s]}`, string(jsonQuery))
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, hostURL+"/api", strings.NewReader(payload))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, l.hostURL+"/api", strings.NewReader(payload))
 	if err != nil {
 		return "", fmt.Errorf("failed to create new request: %w", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+apiToken)
+	req.Header.Set("Authorization", "Bearer "+l.apiToken)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
