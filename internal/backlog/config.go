@@ -43,8 +43,6 @@ func (p *pageConfigReader) ReadConfig() (*Config, error) {
 
 	var backlogs []SingleBacklogConfig
 
-	prefix := p.rootPage + "/"
-
 	for _, block := range rootPage.Blocks() {
 		var inputPages []string
 
@@ -64,12 +62,12 @@ func (p *pageConfigReader) ReadConfig() (*Config, error) {
 			}
 
 			// Skip this page if it's a link to a backlog
-			if strings.HasPrefix(link, prefix) {
+			if strings.HasPrefix(link, p.rootPage) {
 				return false
 			}
 
 			if firstPage == "" {
-				firstPage = prefix + link
+				firstPage = p.rootPage + "/" + link
 			}
 
 			inputPages = append(inputPages, link)

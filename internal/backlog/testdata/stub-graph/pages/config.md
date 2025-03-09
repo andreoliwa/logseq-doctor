@@ -1,5 +1,6 @@
-- [backlog][config/computer] One for the [[computer]], [[Android]] and #iOS
-- Separator [link to some backlog][config/some-backlog]
+- [Markdown links are ignored](config/computer) One for the [[computer]], [[Android]] and #iOS
+- Separator [[config/some-backlog]]
 - For my [[house]]
-- #work and [[office]] related, [here's another link to any backlog][config/any-backlog]
+- #work and [[office]] related, #config/any-backlog
 - End
+- Also skip the [[config]] itself
