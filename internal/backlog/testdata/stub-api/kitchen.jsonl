@@ -12,9 +12,6 @@
         "id": 4
       },
       {
-        "id": 21
-      },
-      {
         "id": 31
       },
       {
@@ -33,7 +30,9 @@
       "originalName": "Saturday, 01-03-2025",
       "id": 31
     },
-    "propertiesOrder": ["id"],
+    "propertiesOrder": [
+      "id"
+    ],
     "left": {
       "id": 42
     },
@@ -57,9 +56,6 @@
         "id": 4
       },
       {
-        "id": 21
-      },
-      {
         "id": 31
       },
       {
@@ -78,7 +74,9 @@
       "originalName": "Saturday, 01-03-2025",
       "id": 31
     },
-    "propertiesOrder": ["id"],
+    "propertiesOrder": [
+      "id"
+    ],
     "left": {
       "id": 40
     },
@@ -103,9 +101,6 @@
         "id": 4
       },
       {
-        "id": 21
-      },
-      {
         "id": 31
       },
       {
@@ -124,7 +119,9 @@
       "originalName": "Saturday, 01-03-2025",
       "id": 31
     },
-    "propertiesOrder": ["id"],
+    "propertiesOrder": [
+      "id"
+    ],
     "left": {
       "id": 43
     },
@@ -166,7 +163,9 @@
       "originalName": "Tuesday, 25-02-2025",
       "id": 102
     },
-    "propertiesOrder": ["id"],
+    "propertiesOrder": [
+      "id"
+    ],
     "left": {
       "id": 102
     },

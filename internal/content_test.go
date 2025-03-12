@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"gotest.tools/v3/golden"
 )
 
 func TestIsValidMarkdownFile(t *testing.T) {
@@ -38,11 +37,11 @@ func TestIsValidMarkdownFile(t *testing.T) {
 	// Update the file path for the valid markdown file test case
 	tests[4].filePath = validFilePath
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			result := internal.IsValidMarkdownFile(test.filePath)
-			if result != test.expected {
-				t.Errorf("For %q, expected %v, got %v", test.filePath, test.expected, result)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := internal.IsValidMarkdownFile(tt.filePath)
+			if result != tt.expected {
+				t.Errorf("For %q, expected %v, got %v", tt.filePath, tt.expected, result)
 			}
 		})
 	}
@@ -67,11 +66,7 @@ func TestAppendRawMarkdownToJournal(t *testing.T) {
 			_, err = internal.AppendRawMarkdownToJournal(graph, date, string(contentToAppend))
 			require.NoError(t, err)
 
-			modifiedContents, err := os.ReadFile(filepath.Join(graph.Directory(), "journals",
-				expectedFilename+".md"))
-			require.NoError(t, err)
-			golden.Assert(t, string(modifiedContents), filepath.Join(graph.Directory(), "journals",
-				expectedFilename+".md.golden"))
+			testutils.AssertGoldenJournals(t, graph, []string{expectedFilename})
 		}
 	}
 

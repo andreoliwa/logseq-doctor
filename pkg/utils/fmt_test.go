@@ -15,10 +15,10 @@ func TestFormatCount(t *testing.T) {
 		plural   string
 		expected string
 	}{
-		{"Singular case", 1, "apple", "apples", "1 apple"},
-		{"Plural case", 2, "apple", "apples", "2 apples"},
-		{"Zero case", 0, "apple", "apples", "0 apples"},
-		{"Negative case", -1, "apple", "apples", "-1 apples"},
+		{"singular case", 1, "apple", "apples", "1 apple"},
+		{"plural case", 2, "apple", "apples", "2 apples"},
+		{"zero case", 0, "apple", "apples", "0 apples"},
+		{"negative case", -1, "apple", "apples", "-1 apples"},
 	}
 
 	for _, tt := range tests {

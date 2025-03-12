@@ -67,7 +67,7 @@ func (m *mockLogseqAPI) PostQuery(query string) (string, error) {
 func stubJSONResponse(t *testing.T, basename string) (string, error) {
 	t.Helper()
 
-	path, err := filepath.Abs(filepath.Join("testdata", "stub-api", basename+".json"))
+	path, err := filepath.Abs(filepath.Join("testdata", "stub-api", basename+".jsonl"))
 	require.NoError(t, err)
 
 	data, err := os.ReadFile(path)

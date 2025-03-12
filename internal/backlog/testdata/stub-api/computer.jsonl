@@ -31,7 +31,9 @@
       "originalName": "Sunday, 02-03-2025",
       "id": 20
     },
-    "propertiesOrder": ["id"],
+    "propertiesOrder": [
+      "id"
+    ],
     "left": {
       "id": 23
     },

@@ -3,6 +3,7 @@ package internal_test
 import (
 	"context"
 	"github.com/andreoliwa/lsd/internal"
+	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -30,11 +31,11 @@ func TestSortAndRemoveDuplicates(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			result := internal.SortAndRemoveDuplicates(test.input)
-			if !reflect.DeepEqual(result, test.expected) {
-				t.Errorf("Expected %v, got %v", test.expected, result)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := internal.SortAndRemoveDuplicates(tt.input)
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
 			}
 		})
 	}
@@ -70,9 +71,7 @@ func setupFileContents(t *testing.T, name string) resultSetupFileContents {
 	path := filepath.Join("testdata", subdir)
 
 	bytes, err := os.ReadFile(path)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	return resultSetupFileContents{string(bytes), subdir + ".golden"}
 }

@@ -1,0 +1,127 @@
+[
+  {
+    "properties": {
+      "id": "67c48e28-84c8-4061-9451-42beddd5a2df"
+    },
+    "parent": {
+      "id": 32
+    },
+    "id": 37,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 32
+      },
+      {
+        "id": 38
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48e28-84c8-4061-9451-42beddd5a2df"
+    },
+    "uuid": "67c48e28-84c8-4061-9451-42beddd5a2df",
+    "content": "TODO #phone Backup my mobile photos to the cloud\nid:: 67c48e28-84c8-4061-9451-42beddd5a2df",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250228,
+      "name": "friday, 28-02-2025",
+      "originalName": "Friday, 28-02-2025",
+      "id": 32
+    },
+    "propertiesOrder": [
+      "id"
+    ],
+    "left": {
+      "id": 35
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 38
+      }
+    ]
+  },
+  {
+    "properties": {},
+    "parent": {
+      "id": 187
+    },
+    "id": 188,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 38
+      },
+      {
+        "id": 187
+      }
+    ],
+    "uuid": "67cbf35b-332d-4fe7-89b0-767d54f5daae",
+    "content": "TODO #phone Remove unused apps to save space",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250308,
+      "name": "saturday, 08-03-2025",
+      "originalName": "Saturday, 08-03-2025",
+      "id": 187
+    },
+    "left": {
+      "id": 187
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 38
+      }
+    ]
+  },
+  {
+    "properties": {},
+    "parent": {
+      "id": 202
+    },
+    "id": 203,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 38
+      },
+      {
+        "id": 202
+      }
+    ],
+    "uuid": "67cfe045-8ddb-48ba-a3d0-ccc5241c63a7",
+    "content": "TODO Change mobile [[phone]] provider to a cheaper one",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250305,
+      "name": "wednesday, 05-03-2025",
+      "originalName": "Wednesday, 05-03-2025",
+      "id": 202
+    },
+    "left": {
+      "id": 202
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 38
+      }
+    ]
+  }
+]

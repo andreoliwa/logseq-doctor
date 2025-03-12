@@ -1,2 +1,2 @@
-- [[house]]
+- [[home]]
 - [[phone]]

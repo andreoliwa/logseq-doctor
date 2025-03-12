@@ -1,0 +1,175 @@
+[
+  {
+    "properties": {
+      "id": "67c48cb3-ee20-48fe-9a2b-3f63dff412ff"
+    },
+    "deadline": 20250401,
+    "parent": {
+      "id": 20
+    },
+    "id": 23,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 20
+      },
+      {
+        "id": 21
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48cb3-ee20-48fe-9a2b-3f63dff412ff"
+    },
+    "uuid": "67c48cb3-ee20-48fe-9a2b-3f63dff412ff",
+    "content": "TODO **17:48** #home Clean windows before spring\nid:: 67c48cb3-ee20-48fe-9a2b-3f63dff412ff\nDEADLINE: <2025-04-01 Tue>",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250302,
+      "name": "sunday, 02-03-2025",
+      "originalName": "Sunday, 02-03-2025",
+      "id": 20
+    },
+    "propertiesOrder": [
+      "id"
+    ],
+    "left": {
+      "id": 20
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c48dc4-c4f6-4983-96f9-8eca408399e2"
+    },
+    "parent": {
+      "id": 32
+    },
+    "id": 33,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      },
+      {
+        "id": 32
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48dc4-c4f6-4983-96f9-8eca408399e2"
+    },
+    "uuid": "67c48dc4-c4f6-4983-96f9-8eca408399e2",
+    "content": "TODO #home Vacuum carpets and couch\nid:: 67c48dc4-c4f6-4983-96f9-8eca408399e2",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250228,
+      "name": "friday, 28-02-2025",
+      "originalName": "Friday, 28-02-2025",
+      "id": 32
+    },
+    "propertiesOrder": [
+      "id"
+    ],
+    "left": {
+      "id": 32
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      }
+    ]
+  },
+  {
+    "properties": {},
+    "parent": {
+      "id": 205
+    },
+    "id": 206,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      },
+      {
+        "id": 205
+      }
+    ],
+    "uuid": "67cfe084-41b0-4cd3-9a46-f8858662b8f6",
+    "content": "TODO #home Wash and replace bed sheets",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250223,
+      "name": "sunday, 23-02-2025",
+      "originalName": "Sunday, 23-02-2025",
+      "id": 205
+    },
+    "left": {
+      "id": 205
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      }
+    ]
+  },
+  {
+    "properties": {},
+    "parent": {
+      "id": 210
+    },
+    "id": 211,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      },
+      {
+        "id": 210
+      }
+    ],
+    "uuid": "67cfe0d5-e1c6-40c0-aac2-20e36bb460dc",
+    "content": "TODO #home Clean up the basement",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250220,
+      "name": "thursday, 20-02-2025",
+      "originalName": "Thursday, 20-02-2025",
+      "id": 210
+    },
+    "left": {
+      "id": 210
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      }
+    ]
+  }
+]

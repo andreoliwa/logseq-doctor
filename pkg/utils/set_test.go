@@ -57,12 +57,22 @@ func TestSet_Size(t *testing.T) {
 
 func TestSet_Values(t *testing.T) {
 	set := utils.NewSet[int]()
-	set.Add(5)
 	set.Add(10)
+	set.Add(5)
 	set.Add(15)
 
 	values := set.Values()
 	assert.ElementsMatch(t, []int{5, 10, 15}, values)
+}
+
+func TestOrderedSet_ValuesSorted(t *testing.T) {
+	set := utils.NewSet[int]()
+	set.Add(10)
+	set.Add(5)
+	set.Add(15)
+
+	sortedValues := set.ValuesSorted()
+	assert.Equal(t, []int{5, 10, 15}, sortedValues)
 }
 
 func TestSet_Diff(t *testing.T) {

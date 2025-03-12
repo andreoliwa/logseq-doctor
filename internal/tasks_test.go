@@ -44,12 +44,12 @@ func TestOverdue(t *testing.T) {
 		task     internal.TaskJSON
 		expected bool
 	}{
-		{"Future task", newTask(currentDate+1, currentDate+2), false},
-		{"Overdue by deadline", newTask(currentDate-1, 0), true},
-		{"Overdue by schedule", newTask(0, currentDate-1), true},
-		{"Overdue by today", newTask(currentDate, 0), true},
-		{"Overdue by scheduled today", newTask(0, currentDate), true},
-		{"No deadline or scheduled", newTask(0, 0), false},
+		{"future task", newTask(currentDate+1, currentDate+2), false},
+		{"overdue by deadline", newTask(currentDate-1, 0), true},
+		{"overdue by schedule", newTask(0, currentDate-1), true},
+		{"overdue by today", newTask(currentDate, 0), true},
+		{"overdue by scheduled today", newTask(0, currentDate), true},
+		{"no deadline or scheduled", newTask(0, 0), false},
 	}
 
 	for _, tt := range tests {

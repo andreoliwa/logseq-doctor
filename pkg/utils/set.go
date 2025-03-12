@@ -1,12 +1,17 @@
 package utils
 
+import (
+	"cmp"
+	"sort"
+)
+
 // Set is a simple implementation of a set using a map.
-type Set[T comparable] struct {
+type Set[T cmp.Ordered] struct {
 	data map[T]struct{}
 }
 
 // NewSet creates and returns a new set.
-func NewSet[T comparable]() *Set[T] {
+func NewSet[T cmp.Ordered]() *Set[T] {
 	return &Set[T]{data: make(map[T]struct{})}
 }
 
@@ -38,6 +43,16 @@ func (s *Set[T]) Values() []T {
 	for key := range s.data {
 		keys = append(keys, key)
 	}
+
+	return keys
+}
+
+// ValuesSorted returns all elements in the set as a sorted slice.
+func (s *Set[T]) ValuesSorted() []T {
+	keys := s.Values()
+	sort.SliceStable(keys, func(i, j int) bool {
+		return keys[i] < keys[j]
+	})
 
 	return keys
 }

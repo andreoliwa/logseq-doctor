@@ -16,12 +16,12 @@ func TestEmpty(t *testing.T) {
 		expected string
 	}{
 		{
-			name:     "All pages processed",
+			name:     "all pages processed",
 			input:    []string{}, // Empty slice means process all pages
 			expected: "Processing all pages in the backlog",
 		},
 		{
-			name:     "Processing specific pages",
+			name:     "processing specific pages",
 			input:    []string{"foo", "bar"},
 			expected: "Processing pages with partial names: foo, bar\nSkipping focus page because not all pages were processed",
 		},
@@ -40,16 +40,47 @@ func TestEmpty(t *testing.T) {
 	}
 }
 
-func TestSimple(t *testing.T) {
-	back := testutils.StubBacklog(t, "simple", &testutils.StubAPIResponses{
-		Queries: []testutils.QueryArg{
-			{Contains: "house"},
-			{Contains: "phone"},
+func TestNewTasks(t *testing.T) {
+	tests := []struct {
+		name     string
+		rootPage string
+		empty    bool
+	}{
+		{
+			name:     "empty backlog pages",
+			rootPage: "new-empty",
+			empty:    true,
 		},
-	})
+		{
+			name:     "existing backlog with tasks and divider",
+			rootPage: "new-with-divider",
+			empty:    false,
+		},
+		{
+			name:     "existing backlog with tasks and no divider",
+			rootPage: "new-without-divider",
+			empty:    false,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			back := testutils.StubBacklog(t, test.rootPage, &testutils.StubAPIResponses{
+				Queries: []testutils.QueryArg{
+					{Contains: "home"},
+					{Contains: "phone"},
+				},
+			})
 
-	// TODO: assert files don't exist before processing
-	// TODO: assert files were created after processing
-	err := back.ProcessAll([]string{})
-	require.NoError(t, err)
+			pages := []string{test.rootPage + "___home", test.rootPage + "___phone"}
+
+			if test.empty {
+				testutils.AssertPagesDontExist(t, back.Graph(), pages)
+			}
+
+			err := back.ProcessAll([]string{})
+			require.NoError(t, err)
+
+			testutils.AssertGoldenPages(t, back.Graph(), pages)
+		})
+	}
 }

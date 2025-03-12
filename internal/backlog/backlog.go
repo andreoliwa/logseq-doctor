@@ -10,17 +10,8 @@ import (
 	"strings"
 )
 
-var dividerNewTasksContent = content.NewBlock(content.NewParagraph( //nolint:gochecknoglobals
-	content.NewPageLink("quick capture"),
-	content.NewText(" New tasks above this line"),
-))
-var dividerNewTasksHash = dividerNewTasksContent.GomegaString()  //nolint:gochecknoglobals
-var dividerFocusContent = content.NewBlock(content.NewParagraph( //nolint:gochecknoglobals
-	content.NewText("Focus"),
-))
-var dividerFocusHash = dividerFocusContent.GomegaString() //nolint:gochecknoglobals
-
 type Backlog interface {
+	Graph() *logseq.Graph
 	ProcessAll(partialNames []string) error
 	ProcessOne(pageTitle string, funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error)
 }
@@ -33,6 +24,10 @@ type backlogImpl struct {
 
 func NewBacklog(graph *logseq.Graph, api internal.LogseqAPI, reader ConfigReader) Backlog {
 	return &backlogImpl{graph: graph, api: api, configReader: reader}
+}
+
+func (b *backlogImpl) Graph() *logseq.Graph {
+	return b.graph
 }
 
 func (b *backlogImpl) ProcessAll(partialNames []string) error {
@@ -242,21 +237,16 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 			firstBlock = block
 		}
 
-		// TODO: add AsMarkdown() or ContentHash() or Hash() to content.Block, to make it possible to compare blocks
-		//  Or fix the message "the operator == is not defined on NodeList"
-		blockHash := block.GomegaString()
-		if blockHash == dividerNewTasksHash {
-			dividerNewTasks = block
-
-			continue
-		} else if blockHash == dividerFocusHash {
-			dividerFocus = block
-
-			continue
-		}
-
 		// Remove refs marked for deletion or overdue tasks
 		block.Children().FindDeep(func(node content.Node) bool {
+			if text, ok := node.(*content.Text); ok {
+				if strings.Contains(text.Value, "New tasks") {
+					dividerNewTasks = block
+				} else if text.Value == "Focus" {
+					dividerFocus = block
+				}
+			}
+
 			if blockRef, ok := node.(*content.BlockRef); ok {
 				shouldDelete := false
 
@@ -295,11 +285,6 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 
 	//  Sections: Focus / Overdue / New tasks
 
-	// Will only add a divider block if there are new tasks to add
-	if dividerNewTasks == nil && newBlockRefs.Size() > 0 {
-		insertOrAddBlock(page, firstBlock, dividerFocus, dividerNewTasksContent)
-	}
-
 	// Insert (new and moved) overdue tasks after the focus section and before the new ones
 	//  If they are moved to the top, all overdue tasks will go to the focus page, and this misses the point.
 	//  The user should decide manually which tasks should have focus.
@@ -318,19 +303,27 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		insertOrAddBlock(page, firstBlock, dividerFocus, overdueTask)
 	}
 
-	// Insert new tasks
-	for _, blockRef := range newBlockRefs.Values() {
-		if overdueBlockRefs.Contains(blockRef) {
-			// Don't add overdue tasks again
-			continue
-		}
-
-		insertOrAddBlock(page, firstBlock, dividerFocus, content.NewBlock(content.NewBlockRef(blockRef)))
-	}
-
 	save := false
 
+	// Insert new tasks
 	if newBlockRefs.Size() > 0 {
+		if dividerNewTasks == nil {
+			dividerNewTasks = content.NewBlock(content.NewParagraph(
+				content.NewPageLink("inbox"),
+				content.NewText(" New tasks"),
+			))
+			insertOrAddBlock(page, firstBlock, dividerFocus, dividerNewTasks)
+		}
+
+		for _, blockRef := range newBlockRefs.ValuesSorted() {
+			if overdueBlockRefs.Contains(blockRef) {
+				// Don't add overdue tasks again
+				continue
+			}
+
+			dividerNewTasks.AddChild(content.NewBlock(content.NewBlockRef(blockRef)))
+		}
+
 		color.Green("  %s", utils.FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
 
 		save = true
@@ -375,11 +368,14 @@ func nextChildHasPin(node content.Node) bool {
 	return false
 }
 
-func insertOrAddBlock(page logseq.Page, firstBlock *content.Block, dividerFocus *content.Block,
-	newTask *content.Block) {
+func insertOrAddBlock(page logseq.Page, firstBlock *content.Block, focus *content.Block, newTask *content.Block) {
+	if newTask == nil {
+		return
+	}
+
 	switch {
-	case dividerFocus != nil:
-		page.InsertBlockAfter(newTask, dividerFocus)
+	case focus != nil:
+		page.InsertBlockAfter(newTask, focus)
 	case firstBlock != nil:
 		page.InsertBlockBefore(newTask, firstBlock)
 	default:
