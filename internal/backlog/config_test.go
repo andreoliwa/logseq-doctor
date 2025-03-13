@@ -19,7 +19,8 @@ func TestPageConfigReader_emptyBacklog(t *testing.T) {
 	require.NoError(t, err)
 
 	expected := backlog.Config{
-		Backlogs: nil,
+		FocusPage: "non-existing/Focus",
+		Backlogs:  nil,
 	}
 	assert.Equal(t, &expected, result)
 }
@@ -33,6 +34,7 @@ func TestPageConfigReader_ReadConfig(t *testing.T) {
 	require.NoError(t, err)
 
 	expected := backlog.Config{
+		FocusPage: "config/Focus",
 		Backlogs: []backlog.SingleBacklogConfig{
 			{
 				Icon:       "",

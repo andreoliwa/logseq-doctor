@@ -44,22 +44,22 @@ func TestNewTasks(t *testing.T) {
 	tests := []struct {
 		name     string
 		rootPage string
-		empty    bool
 	}{
 		{
 			name:     "empty backlog pages",
 			rootPage: "new-empty",
-			empty:    true,
 		},
 		{
 			name:     "existing backlog with tasks and divider",
 			rootPage: "new-with-divider",
-			empty:    false,
 		},
 		{
 			name:     "existing backlog with tasks and no divider",
 			rootPage: "new-without-divider",
-			empty:    false,
+		},
+		{
+			name:     "existing backlogs have a focus divider",
+			rootPage: "new-with-focus",
 		},
 	}
 	for _, test := range tests {
@@ -73,7 +73,44 @@ func TestNewTasks(t *testing.T) {
 
 			pages := []string{test.rootPage + "___home", test.rootPage + "___phone"}
 
-			if test.empty {
+			if strings.Contains(test.rootPage, "empty") {
+				testutils.AssertPagesDontExist(t, back.Graph(), pages)
+			}
+
+			err := back.ProcessAll([]string{})
+			require.NoError(t, err)
+
+			testutils.AssertGoldenPages(t, back.Graph(), pages)
+		})
+	}
+}
+
+func TestFocus(t *testing.T) {
+	tests := []struct {
+		name     string
+		rootPage string
+	}{
+		{
+			name:     "empty focus page is created",
+			rootPage: "focus-empty",
+		},
+		{
+			name:     "focus page already exists",
+			rootPage: "focus-exists",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			back := testutils.StubBacklog(t, test.rootPage, &testutils.StubAPIResponses{
+				Queries: []testutils.QueryArg{
+					{Contains: "home"},
+					{Contains: "phone"},
+				},
+			})
+
+			pages := []string{test.rootPage + "___Focus"}
+
+			if strings.Contains(test.rootPage, "empty") {
 				testutils.AssertPagesDontExist(t, back.Graph(), pages)
 			}
 

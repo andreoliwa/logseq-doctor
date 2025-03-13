@@ -14,7 +14,8 @@ type SingleBacklogConfig struct {
 }
 
 type Config struct {
-	Backlogs []SingleBacklogConfig
+	FocusPage string
+	Backlogs  []SingleBacklogConfig
 }
 
 type ConfigReader interface {
@@ -88,5 +89,5 @@ func (p *pageConfigReader) ReadConfig() (*Config, error) {
 		fmt.Println("no pages found in the backlog")
 	}
 
-	return &Config{Backlogs: backlogs}, nil
+	return &Config{FocusPage: p.rootPage + "/Focus", Backlogs: backlogs}, nil
 }

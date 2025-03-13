@@ -59,6 +59,8 @@ repos:
       - id: prettier
         stages:
           - pre-commit
+        args:
+          - --no-error-on-unmatched-pattern
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.4.1
     hooks:

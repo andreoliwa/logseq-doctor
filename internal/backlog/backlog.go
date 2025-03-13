@@ -77,7 +77,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error {
 		return nil
 	}
 
-	_, err = b.ProcessOne("backlog/Focus", func() (*internal.CategorizedTasks, error) {
+	_, err = b.ProcessOne(config.FocusPage, func() (*internal.CategorizedTasks, error) {
 		return &allFocusTasks, nil
 	})
 
