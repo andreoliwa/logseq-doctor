@@ -131,13 +131,14 @@ func blockRefsFromPages(page logseq.Page) *utils.Set[string] {
 func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
 	pageTitles []string) (*internal.CategorizedTasks, error) {
 	tasks := internal.NewCategorizedTasks()
+	finder := internal.NewLogseqFinder(graph)
 
 	for _, pageTitle := range pageTitles {
 		fmt.Printf("  %s: ", internal.PageColor(pageTitle))
 
-		query, err := findFirstQuery(graph, pageTitle)
+		query, err := finder.FindFirstQuery(pageTitle)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to find first query: %w", err)
 		}
 
 		if query == "" {
@@ -172,43 +173,6 @@ func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
 	}
 
 	return &tasks, nil
-}
-
-func findFirstQuery(graph *logseq.Graph, pageTitle string) (string, error) {
-	var query string
-
-	page, err := graph.OpenPage(pageTitle)
-	if err != nil {
-		return "", fmt.Errorf("failed to open page: %w", err)
-	}
-
-	for _, block := range page.Blocks() {
-		block.Children().FindDeep(func(n content.Node) bool {
-			if q, ok := n.(*content.Query); ok {
-				query = q.Query
-			} else if qc, ok := n.(*content.QueryCommand); ok {
-				query = qc.Query
-			}
-
-			if query != "" {
-				// Stop after finding one query
-				return true
-			}
-
-			return false
-		})
-	}
-
-	if query == "" {
-		return "", nil
-	}
-
-	return replaceCurrentPage(query, pageTitle), nil
-}
-
-// replaceCurrentPage replaces the current page placeholder in the query with the actual page name.
-func replaceCurrentPage(query, pageTitle string) string {
-	return strings.ReplaceAll(query, "<% current page %>", "[["+pageTitle+"]]")
 }
 
 func defaultQuery(pageTitle string) string {

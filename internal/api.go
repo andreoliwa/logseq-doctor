@@ -35,7 +35,7 @@ func NewLogseqAPI(path, hostURL, apiToken string) LogseqAPI {
 // This is done on purpose to avoid error handling boilerplate code throughout the package.
 func OpenGraphFromPath(path string) *logseq.Graph {
 	if path == "" {
-		log.Fatalln("the LOGSEQ_GRAPH_PATH environment variable is not set.")
+		log.Fatalln("path is empty, maybe the LOGSEQ_GRAPH_PATH environment variable is not set")
 	}
 
 	ctx := context.Background()

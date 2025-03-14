@@ -1,0 +1,3 @@
+- Home items
+- {{query (and (or [[home]] [[phone]]) (task TODO DOING WAITING)) }}
+- {{query [[phone]]}}
