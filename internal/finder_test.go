@@ -4,7 +4,6 @@ import (
 	"github.com/andreoliwa/lsd/internal"
 	"github.com/andreoliwa/lsd/internal/testutils"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -36,8 +35,7 @@ func TestFindFirstQuery(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			query, err := finder.FindFirstQuery(test.pageTitle)
-			require.NoError(t, err)
+			query := finder.FindFirstQuery(test.pageTitle)
 
 			assert.Equal(t, test.expected, query)
 		})

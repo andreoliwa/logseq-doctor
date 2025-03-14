@@ -1,14 +1,13 @@
 package internal
 
 import (
-	"fmt"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 	"strings"
 )
 
 type LogseqFinder interface {
-	FindFirstQuery(pageTitle string) (string, error)
+	FindFirstQuery(pageTitle string) string
 }
 
 type logseqFinderImpl struct {
@@ -19,13 +18,10 @@ func NewLogseqFinder(graph *logseq.Graph) LogseqFinder {
 	return &logseqFinderImpl{graph: graph}
 }
 
-func (f logseqFinderImpl) FindFirstQuery(pageTitle string) (string, error) {
+func (f logseqFinderImpl) FindFirstQuery(pageTitle string) string {
 	var query string
 
-	page, err := f.graph.OpenPage(pageTitle)
-	if err != nil {
-		return "", fmt.Errorf("failed to open page: %w", err)
-	}
+	page := OpenPage(f.graph, pageTitle)
 
 	for _, block := range page.Blocks() {
 		block.Children().FindDeep(func(n content.Node) bool {
@@ -45,10 +41,10 @@ func (f logseqFinderImpl) FindFirstQuery(pageTitle string) (string, error) {
 	}
 
 	if query == "" {
-		return "", nil
+		return ""
 	}
 
-	return replaceCurrentPage(query, pageTitle), nil
+	return replaceCurrentPage(query, pageTitle)
 }
 
 // replaceCurrentPage replaces the current page placeholder in the query with the actual page name.

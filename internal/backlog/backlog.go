@@ -86,10 +86,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error {
 
 func (b *backlogImpl) ProcessOne(pageTitle string,
 	funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error) {
-	page, err := b.graph.OpenPage(pageTitle)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open page: %w", err)
-	}
+	page := internal.OpenPage(b.graph, pageTitle)
 
 	existingBlockRefs := blockRefsFromPages(page)
 
@@ -136,10 +133,7 @@ func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
 	for _, pageTitle := range pageTitles {
 		fmt.Printf("  %s: ", internal.PageColor(pageTitle))
 
-		query, err := finder.FindFirstQuery(pageTitle)
-		if err != nil {
-			return nil, fmt.Errorf("failed to find first query: %w", err)
-		}
+		query := finder.FindFirstQuery(pageTitle)
 
 		if query == "" {
 			query = defaultQuery(pageTitle)

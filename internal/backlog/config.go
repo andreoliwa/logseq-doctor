@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
+	"github.com/andreoliwa/lsd/internal"
 	"strings"
 )
 
@@ -37,10 +38,7 @@ func NewPageConfigReader(graph *logseq.Graph, rootPage string) ConfigReader {
 
 // ReadConfig reads the backlog configuration from a Logseq page.
 func (p *pageConfigReader) ReadConfig() (*Config, error) {
-	rootPage, err := p.graph.OpenPage(p.rootPage)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open backlog page: %w", err)
-	}
+	rootPage := internal.OpenPage(p.graph, p.rootPage)
 
 	var backlogs []SingleBacklogConfig
 

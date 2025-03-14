@@ -89,3 +89,15 @@ func (l *logseqAPIImpl) PostQuery(query string) (string, error) {
 
 	return string(body), nil
 }
+
+// OpenPage opens a page in the Logseq graph.
+// It aborts the program in case of error because it's an internal function.
+// Also, it's not common to have errors when opening a page.
+func OpenPage(graph *logseq.Graph, pageTitle string) logseq.Page {
+	page, err := graph.OpenPage(pageTitle)
+	if err != nil {
+		log.Fatalf("error opening page: %v", err)
+	}
+
+	return page
+}

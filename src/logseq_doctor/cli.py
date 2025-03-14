@@ -62,7 +62,7 @@ def outline(text_file: typer.FileText) -> None:
 
 
 def _call_golang_exe(command: str, markdown_file: Path) -> int:
-    display_errors = not bool(os.environ.get("LOGSEQ_GO_IGNORE_ERRORS", False))
+    display_errors = not bool(os.environ.get("LOGSEQ_GO_IGNORE_ERRORS", None))
 
     exe_str = os.environ.get("LOGSEQ_GO_EXE_PATH", "~/go/bin/lsd")
     if not exe_str:
@@ -107,7 +107,7 @@ def tasks(  # noqa: PLR0913
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
 ) -> None:
     """List tasks in Logseq."""
-    logseq = Logseq(logseq_host_url, logseq_api_token, cast(GlobalOptions, ctx.obj).logseq_graph_path)
+    logseq = Logseq(logseq_host_url, logseq_api_token, cast("GlobalOptions", ctx.obj).logseq_graph_path)
     condition = ""
     if tag_or_page:
         if len(tag_or_page) == 1:
