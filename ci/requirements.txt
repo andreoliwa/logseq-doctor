@@ -1,5 +1,5 @@
 virtualenv==20.29.3
 pip==25.0.1
-setuptools==78.0.2
+setuptools==78.1.0
 six==1.17.0
 tox
