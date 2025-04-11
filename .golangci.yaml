@@ -1,18 +1,34 @@
 # https://golangci-lint.run/usage/configuration/
+# https://golangci-lint.run/product/migration-guide/
+version: "2"
 linters:
-  enable-all: true
+  default: all
   disable:
     # keep-sorted start
     - copyloopvar
     - depguard
     - forbidigo
-    - gci
     - gochecknoinits
     - godox
-    - gofmt
-    - gofumpt
-    - goimports
     - intrange
     - ireturn
     - paralleltest
     # keep-sorted end
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
