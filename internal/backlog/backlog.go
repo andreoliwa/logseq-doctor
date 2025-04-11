@@ -2,12 +2,13 @@ package backlog
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 	"github.com/andreoliwa/lsd/internal"
 	"github.com/andreoliwa/lsd/pkg/utils"
 	"github.com/fatih/color"
-	"strings"
 )
 
 type Backlog interface {
@@ -90,7 +91,7 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 
 	existingBlockRefs := blockRefsFromPages(page)
 
-	fmt.Printf("%s: %s\n", internal.PageColor(pageTitle), utils.FormatCount(existingBlockRefs.Size(), "task", "tasks"))
+	fmt.Printf("%s: %s", internal.PageColor(pageTitle), utils.FormatCount(existingBlockRefs.Size(), "task", "tasks"))
 
 	blockRefsFromQuery, err := funcQueryRefs()
 	if err != nil {
@@ -131,19 +132,13 @@ func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
 	finder := internal.NewLogseqFinder(graph)
 
 	for _, pageTitle := range pageTitles {
-		fmt.Printf("  %s: ", internal.PageColor(pageTitle))
+		fmt.Printf(" %s: ", internal.PageColor(pageTitle))
 
 		query := finder.FindFirstQuery(pageTitle)
 
 		if query == "" {
 			query = defaultQuery(pageTitle)
-
-			fmt.Print("default")
-		} else {
-			fmt.Print("found")
 		}
-
-		fmt.Printf(" query %s", query)
 
 		jsonStr, err := api.PostQuery(query)
 		if err != nil {
@@ -155,7 +150,7 @@ func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
 			return nil, fmt.Errorf("failed to extract tasks: %w", err)
 		}
 
-		fmt.Printf(", queried %s\n", utils.FormatCount(len(jsonTasks), "task", "tasks"))
+		fmt.Print(utils.FormatCount(len(jsonTasks), "task", "tasks"))
 
 		for _, t := range jsonTasks {
 			if t.Overdue() {
@@ -282,19 +277,19 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 			dividerNewTasks.AddChild(content.NewBlock(content.NewBlockRef(blockRef)))
 		}
 
-		color.Green("  %s", utils.FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
+		color.Green(" %s", utils.FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
 
 		save = true
 	}
 
 	if deletedCount > 0 {
-		color.Red("  %s removed (completed or unreferenced)", utils.FormatCount(deletedCount, "task was", "tasks were"))
+		color.Red(" %s removed (completed or unreferenced)", utils.FormatCount(deletedCount, "task was", "tasks were"))
 
 		save = true
 	}
 
 	if movedCount > 0 {
-		color.Magenta("  %s moved around", utils.FormatCount(movedCount, "task was", "tasks were"))
+		color.Magenta(" %s moved around", utils.FormatCount(movedCount, "task was", "tasks were"))
 
 		save = true
 	}
@@ -305,7 +300,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 			return nil, fmt.Errorf("failed to save transaction: %w", err)
 		}
 	} else {
-		color.Yellow("  no new/deleted/moved tasks")
+		color.Yellow(" no new/deleted/moved tasks")
 	}
 
 	if dividerFocus == nil {
