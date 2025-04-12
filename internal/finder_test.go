@@ -1,14 +1,15 @@
 package internal_test
 
 import (
+	"testing"
+
 	"github.com/andreoliwa/lsd/internal"
 	"github.com/andreoliwa/lsd/internal/testutils"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestFindFirstQuery(t *testing.T) {
-	graph := testutils.StubGraph(t)
+	graph := testutils.StubGraph(t, "")
 	finder := internal.NewLogseqFinder(graph)
 
 	tests := []struct {

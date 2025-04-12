@@ -18,33 +18,41 @@ func AssertPagesDontExist(t *testing.T, graph *logseq.Graph, pages []string) {
 	}
 }
 
-func assertGoldenContent(t *testing.T, graph *logseq.Graph, journals bool, pages []string) {
+func assertGoldenContent(t *testing.T, graph *logseq.Graph, journals bool, caseDirName string, pages []string) {
 	t.Helper()
 
 	// Uses the Windows line ending because the golden file package normalizes line endings to \n
 	// Search for GOTESTTOOLS_GOLDEN_NormalizeCRLFToLF in this repo.
 	newLine := "\r\n"
-	subdir := "pages"
+	pagesOrJournalsDir := "pages"
 
 	if journals {
 		newLine = ""
-		subdir = "journals"
+		pagesOrJournalsDir = "journals"
 	}
 
 	for _, page := range pages {
 		filename := page + ".md"
-		newContents, err := os.ReadFile(filepath.Join(graph.Directory(), subdir, filename))
+		newContents, err := os.ReadFile(filepath.Join(graph.Directory(), pagesOrJournalsDir, filename))
 		require.NoError(t, err)
-		golden.Assert(t, string(newContents)+newLine, filepath.Join("stub-graph", subdir, filename+".golden"))
+
+		var subDir string
+		if caseDirName != "" {
+			subDir = filepath.Join("pages-cases", caseDirName)
+		} else {
+			subDir = pagesOrJournalsDir
+		}
+
+		golden.Assert(t, string(newContents)+newLine, filepath.Join("stub-graph", subDir, filename+".golden"))
 	}
 }
 
-func AssertGoldenJournals(t *testing.T, graph *logseq.Graph, pages []string) {
+func AssertGoldenJournals(t *testing.T, graph *logseq.Graph, caseDirName string, pages []string) {
 	t.Helper()
-	assertGoldenContent(t, graph, true, pages)
+	assertGoldenContent(t, graph, true, caseDirName, pages)
 }
 
-func AssertGoldenPages(t *testing.T, graph *logseq.Graph, pages []string) {
+func AssertGoldenPages(t *testing.T, graph *logseq.Graph, caseDirName string, pages []string) {
 	t.Helper()
-	assertGoldenContent(t, graph, false, pages)
+	assertGoldenContent(t, graph, false, caseDirName, pages)
 }

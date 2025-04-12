@@ -1,13 +1,14 @@
 package internal_test
 
 import (
-	"github.com/andreoliwa/lsd/internal"
-	"github.com/andreoliwa/lsd/internal/testutils"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/andreoliwa/lsd/internal"
+	"github.com/andreoliwa/lsd/internal/testutils"
+	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -48,7 +49,7 @@ func TestIsValidMarkdownFile(t *testing.T) {
 }
 
 func TestAppendRawMarkdownToJournal(t *testing.T) {
-	graph := testutils.StubGraph(t)
+	graph := testutils.StubGraph(t, "")
 
 	now := time.Now()
 
@@ -66,7 +67,7 @@ func TestAppendRawMarkdownToJournal(t *testing.T) {
 			_, err = internal.AppendRawMarkdownToJournal(graph, date, string(contentToAppend))
 			require.NoError(t, err)
 
-			testutils.AssertGoldenJournals(t, graph, []string{expectedFilename})
+			testutils.AssertGoldenJournals(t, graph, "", []string{expectedFilename})
 		}
 	}
 

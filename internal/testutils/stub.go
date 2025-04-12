@@ -1,29 +1,39 @@
 package testutils
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/lsd/internal"
 	"github.com/andreoliwa/lsd/internal/backlog"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/fs"
-	"os"
-	"path/filepath"
-	"strings"
-	"testing"
 )
 
 // StubGraph opens the example graph under "testdata" for testing.
-func StubGraph(t *testing.T) *logseq.Graph {
+func StubGraph(t *testing.T, caseDirName string) *logseq.Graph {
 	t.Helper()
 
-	dir, err := filepath.Abs(filepath.Join("testdata", "stub-graph"))
+	stubGraphDir, err := filepath.Abs(filepath.Join("testdata", "stub-graph"))
 	require.NoError(t, err)
 
+	pagesOps := []fs.PathOp{fs.FromDir(filepath.Join(stubGraphDir, "pages"))}
+
+	if caseDirName != "" {
+		caseDir, err := filepath.Abs(filepath.Join(stubGraphDir, "pages-cases", caseDirName))
+		require.NoError(t, err)
+
+		pagesOps = append(pagesOps, fs.FromDir(caseDir))
+	}
+
 	tempDir := fs.NewDir(t, "append-raw",
-		fs.WithDir("logseq", fs.FromDir(filepath.Join(dir, "logseq"))),
-		fs.WithDir("journals", fs.FromDir(filepath.Join(dir, "journals"))),
-		fs.WithDir("pages", fs.FromDir(filepath.Join(dir, "pages"))),
+		fs.WithDir("logseq", fs.FromDir(filepath.Join(stubGraphDir, "logseq"))),
+		fs.WithDir("journals", fs.FromDir(filepath.Join(stubGraphDir, "journals"))),
+		fs.WithDir("pages", pagesOps...),
 	)
 
 	return internal.OpenGraphFromPath(tempDir.Path())
@@ -76,12 +86,12 @@ func stubJSONResponse(t *testing.T, basename string) (string, error) {
 	return string(data), nil
 }
 
-func StubBacklog(t *testing.T, rootPage string, apiResponses *StubAPIResponses) backlog.Backlog {
+func StubBacklog(t *testing.T, configPage, caseDirName string, apiResponses *StubAPIResponses) backlog.Backlog {
 	t.Helper()
 
-	graph := StubGraph(t)
+	graph := StubGraph(t, caseDirName)
 	api := newMockLogseqAPI(t, *apiResponses)
-	reader := backlog.NewPageConfigReader(graph, rootPage)
+	reader := backlog.NewPageConfigReader(graph, configPage)
 
 	return backlog.NewBacklog(graph, api, reader)
 }

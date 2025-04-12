@@ -1,13 +1,14 @@
 package internal_test
 
 import (
-	"github.com/andreoliwa/lsd/internal"
-	"github.com/andreoliwa/lsd/internal/testutils"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/andreoliwa/lsd/internal"
+	"github.com/andreoliwa/lsd/internal/testutils"
+	"github.com/stretchr/testify/require"
 
 	"github.com/andreoliwa/logseq-go"
 	"github.com/stretchr/testify/assert"
@@ -44,7 +45,7 @@ func TestSortAndRemoveDuplicates(t *testing.T) {
 func setupPage(t *testing.T, name string) logseq.Page {
 	t.Helper()
 
-	graph := testutils.StubGraph(t)
+	graph := testutils.StubGraph(t, "")
 	page := internal.OpenPage(graph, name)
 
 	return page

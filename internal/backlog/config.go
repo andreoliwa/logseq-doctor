@@ -24,25 +24,25 @@ type ConfigReader interface {
 }
 
 type pageConfigReader struct {
-	graph    *logseq.Graph
-	rootPage string
+	graph      *logseq.Graph
+	configPage string
 }
 
 // NewPageConfigReader creates a new ConfigReader that reads the backlog configuration from a Logseq page.
-func NewPageConfigReader(graph *logseq.Graph, rootPage string) ConfigReader {
+func NewPageConfigReader(graph *logseq.Graph, configPage string) ConfigReader {
 	return &pageConfigReader{
-		graph:    graph,
-		rootPage: rootPage,
+		graph:      graph,
+		configPage: configPage,
 	}
 }
 
 // ReadConfig reads the backlog configuration from a Logseq page.
 func (p *pageConfigReader) ReadConfig() (*Config, error) {
-	rootPage := internal.OpenPage(p.graph, p.rootPage)
+	configPage := internal.OpenPage(p.graph, p.configPage)
 
 	var backlogs []SingleBacklogConfig
 
-	for _, block := range rootPage.Blocks() {
+	for _, block := range configPage.Blocks() {
 		var inputPages []string
 
 		firstPage := ""
@@ -61,12 +61,12 @@ func (p *pageConfigReader) ReadConfig() (*Config, error) {
 			}
 
 			// Skip this page if it's a link to a backlog
-			if strings.HasPrefix(link, p.rootPage) {
+			if strings.HasPrefix(link, p.configPage) {
 				return false
 			}
 
 			if firstPage == "" {
-				firstPage = p.rootPage + "/" + link
+				firstPage = p.configPage + "/" + link
 			}
 
 			inputPages = append(inputPages, link)
@@ -87,5 +87,5 @@ func (p *pageConfigReader) ReadConfig() (*Config, error) {
 		fmt.Println("no pages found in the backlog")
 	}
 
-	return &Config{FocusPage: p.rootPage + "/Focus", Backlogs: backlogs}, nil
+	return &Config{FocusPage: p.configPage + "/Focus", Backlogs: backlogs}, nil
 }
