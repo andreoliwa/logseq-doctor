@@ -1,10 +1,11 @@
 package backlog_test
 
 import (
-	"github.com/andreoliwa/lsd/internal/testutils"
-	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
+
+	"github.com/andreoliwa/lsd/internal/testutils"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEmpty(t *testing.T) {
@@ -113,6 +114,39 @@ func TestFocus(t *testing.T) {
 			if strings.Contains(test.caseDirName, "empty") {
 				testutils.AssertPagesDontExist(t, back.Graph(), pages)
 			}
+
+			err := back.ProcessAll([]string{})
+			require.NoError(t, err)
+
+			testutils.AssertGoldenPages(t, back.Graph(), test.caseDirName, pages)
+		})
+	}
+}
+
+func TestDeletedTasks(t *testing.T) {
+	tests := []struct {
+		name        string
+		caseDirName string
+	}{
+		{
+			name:        "deleted root task",
+			caseDirName: "deleted-root",
+		},
+		{
+			name:        "deleted nested task",
+			caseDirName: "deleted-nested",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			back := testutils.StubBacklog(t, "bk", test.caseDirName, &testutils.StubAPIResponses{
+				Queries: []testutils.QueryArg{
+					{Contains: "home"},
+					{Contains: "phone"},
+				},
+			})
+
+			pages := []string{"bk___home", "bk___phone"}
 
 			err := back.ProcessAll([]string{})
 			require.NoError(t, err)
