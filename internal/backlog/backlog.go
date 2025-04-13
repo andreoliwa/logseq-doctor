@@ -179,7 +179,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		return nil, fmt.Errorf("failed to open page for transaction: %w", err)
 	}
 
-	var firstBlock, dividerNewTasks, dividerFocus *content.Block
+	var firstBlock, dividerNewTasks, dividerOverdue, dividerFocus *content.Block
 
 	deletedCount := 0
 	movedCount := 0
@@ -193,9 +193,12 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		// Remove refs marked for deletion or overdue tasks
 		block.Children().FindDeep(func(node content.Node) bool {
 			if text, ok := node.(*content.Text); ok {
-				if strings.Contains(text.Value, "New tasks") {
+				switch {
+				case strings.Contains(text.Value, "New tasks"):
 					dividerNewTasks = block
-				} else if text.Value == "Focus" {
+				case strings.Contains(text.Value, "Overdue tasks"):
+					dividerOverdue = block
+				case text.Value == "Focus":
 					dividerFocus = block
 				}
 			}
@@ -246,32 +249,37 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 			continue
 		}
 
+		if dividerOverdue == nil {
+			dividerOverdue = content.NewBlock(content.NewParagraph(
+				content.NewText("📅 Overdue tasks "),
+				content.NewPageLink("inbox"),
+			))
+			insertOrAddBlock(page, firstBlock, dividerFocus, dividerOverdue)
+		}
+
 		overdueTask := content.NewBlock(content.NewParagraph(
-			content.NewText("📅 "),
-			content.NewStrong(content.NewText("overdue")),
-			content.NewText(" "),
 			content.NewBlockRef(blockRef),
-			content.NewText(" 📌"),
+			content.NewText("📅📌"),
 		))
-		insertOrAddBlock(page, firstBlock, dividerFocus, overdueTask)
+		dividerOverdue.AddChild(overdueTask)
 	}
 
 	save := false
 
 	// Insert new tasks
 	if newBlockRefs.Size() > 0 {
-		if dividerNewTasks == nil {
-			dividerNewTasks = content.NewBlock(content.NewParagraph(
-				content.NewPageLink("inbox"),
-				content.NewText(" New tasks"),
-			))
-			insertOrAddBlock(page, firstBlock, dividerFocus, dividerNewTasks)
-		}
-
 		for _, blockRef := range newBlockRefs.ValuesSorted() {
 			if overdueBlockRefs.Contains(blockRef) {
-				// Don't add overdue tasks again
+				// Don't add overdue tasks again as new tasks
 				continue
+			}
+
+			if dividerNewTasks == nil {
+				dividerNewTasks = content.NewBlock(content.NewParagraph(
+					content.NewPageLink("inbox"),
+					content.NewText(" New tasks"),
+				))
+				insertOrAddBlock(page, firstBlock, dividerFocus, dividerNewTasks)
 			}
 
 			dividerNewTasks.AddChild(content.NewBlock(content.NewBlockRef(blockRef)))
@@ -283,7 +291,8 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	}
 
 	if deletedCount > 0 {
-		color.Red(" %s removed (completed or unreferenced)", utils.FormatCount(deletedCount, "task was", "tasks were"))
+		// Remove completed or unreferenced tasks
+		color.Red(" %s removed", utils.FormatCount(deletedCount, "task was", "tasks were"))
 
 		save = true
 	}
@@ -321,17 +330,17 @@ func nextChildHasPin(node content.Node) bool {
 	return false
 }
 
-func insertOrAddBlock(page logseq.Page, firstBlock *content.Block, focus *content.Block, newTask *content.Block) {
-	if newTask == nil {
+func insertOrAddBlock(page logseq.Page, before, after, newBlock *content.Block) {
+	if newBlock == nil {
 		return
 	}
 
 	switch {
-	case focus != nil:
-		page.InsertBlockAfter(newTask, focus)
-	case firstBlock != nil:
-		page.InsertBlockBefore(newTask, firstBlock)
+	case after != nil:
+		page.InsertBlockAfter(newBlock, after)
+	case before != nil:
+		page.InsertBlockBefore(newBlock, before)
 	default:
-		page.AddBlock(newTask)
+		page.AddBlock(newBlock)
 	}
 }
