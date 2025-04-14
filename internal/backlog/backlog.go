@@ -101,7 +101,7 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 	newBlockRefs := blockRefsFromQuery.All.Diff(existingBlockRefs)
 	obsoleteBlockRefs := existingBlockRefs.Diff(blockRefsFromQuery.All)
 
-	focusRefsFromPage, err := insertAndRemoveRefs(b.graph, pageTitle, existingBlockRefs, newBlockRefs, obsoleteBlockRefs,
+	focusRefsFromPage, err := insertAndRemoveRefs(b.graph, pageTitle, newBlockRefs, obsoleteBlockRefs,
 		blockRefsFromQuery.Overdue)
 	if err != nil {
 		return nil, err
@@ -169,7 +169,7 @@ func defaultQuery(pageTitle string) string {
 }
 
 func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
-	graph *logseq.Graph, pageTitle string, existingBlockRefs, newBlockRefs, obsoleteBlockRefs,
+	graph *logseq.Graph, pageTitle string, newBlockRefs, obsoleteBlockRefs,
 	overdueBlockRefs *utils.Set[string],
 ) (*utils.Set[string], error) {
 	transaction := graph.NewTransaction()
@@ -183,7 +183,8 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 
 	deletedCount := 0
 	movedCount := 0
-	focusRefs := utils.NewSet[string]()
+	focusBlockRefs := utils.NewSet[string]()
+	pinnedBlockRefs := utils.NewSet[string]()
 
 	for i, block := range page.Blocks() {
 		if i == 0 {
@@ -212,10 +213,10 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 
 					deletedCount++
 				case overdueBlockRefs.Contains(blockRef.ID):
-					if !nextChildHasPin(node) {
+					if nextChildHasPin(node) {
+						pinnedBlockRefs.Add(blockRef.ID)
+					} else {
 						shouldDelete = true
-
-						existingBlockRefs.Remove(blockRef.ID)
 
 						movedCount++
 					}
@@ -229,7 +230,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 					blockRef.Parent().Parent().RemoveSelf()
 				} else if dividerFocus == nil {
 					// Keep adding tasks to the focus section until the divider is found
-					focusRefs.Add(blockRef.ID)
+					focusBlockRefs.Add(blockRef.ID)
 				}
 
 				return false
@@ -245,7 +246,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	//  If they are moved to the top, all overdue tasks will go to the focus page, and this misses the point.
 	//  The user should decide manually which tasks should have focus.
 	for _, blockRef := range overdueBlockRefs.ValuesSorted() {
-		if existingBlockRefs.Contains(blockRef) {
+		if pinnedBlockRefs.Contains(blockRef) {
 			continue
 		}
 
@@ -313,10 +314,10 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	}
 
 	if dividerFocus == nil {
-		focusRefs.Clear()
+		focusBlockRefs.Clear()
 	}
 
-	return focusRefs, nil
+	return focusBlockRefs, nil
 }
 
 func nextChildHasPin(node content.Node) bool {
@@ -331,10 +332,6 @@ func nextChildHasPin(node content.Node) bool {
 }
 
 func AddSibling(page logseq.Page, newBlock, before *content.Block, after ...*content.Block) {
-	if newBlock == nil {
-		return
-	}
-
 	for _, a := range after {
 		if a != nil {
 			page.InsertBlockAfter(newBlock, a)

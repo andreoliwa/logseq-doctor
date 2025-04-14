@@ -181,6 +181,10 @@ func TestOverdueTasks(t *testing.T) {
 			name:        "overdue tasks moved to existing divider",
 			caseDirName: "overdue-divider",
 		},
+		{
+			name:        "pinned overdue tasks should not be touched",
+			caseDirName: "overdue-pinned",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
