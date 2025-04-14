@@ -46,5 +46,118 @@
         "id": 30
       }
     ]
+  },
+  {
+    "properties": {},
+    "deadline": 20250412,
+    "parent": {
+      "id": 226
+    },
+    "id": 230,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 30
+      },
+      {
+        "id": 226
+      }
+    ],
+    "uuid": "67fd8167-a4d5-4cb0-914b-852d296d81a3",
+    "content": "TODO #computer Delete big files taking up space\nDEADLINE: <2025-04-12 Sat>",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250405,
+      "name": "saturday, 05-04-2025",
+      "originalName": "Saturday, 05-04-2025",
+      "id": 226
+    },
+    "left": {
+      "id": 226
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 30
+      }
+    ]
+  },
+  {
+    "properties": {},
+    "parent": {
+      "id": 237
+    },
+    "id": 234,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 30
+      },
+      {
+        "id": 233
+      }
+    ],
+    "uuid": "67fd81ae-278f-46a3-aac3-3fa117ca3851",
+    "content": "TODO Clean up desktop files",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250330,
+      "name": "sunday, 30-03-2025",
+      "originalName": "Sunday, 30-03-2025",
+      "id": 233
+    },
+    "left": {
+      "id": 237
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      }
+    ]
+  },
+  {
+    "properties": {},
+    "deadline": 20280401,
+    "parent": {
+      "id": 237
+    },
+    "id": 236,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 30
+      },
+      {
+        "id": 233
+      }
+    ],
+    "uuid": "67fd81d4-b3d9-4746-81e9-e827075a70e1",
+    "content": "TODO But a new laptop in a few years\nDEADLINE: <2028-04-01 Sat>",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250330,
+      "name": "sunday, 30-03-2025",
+      "originalName": "Sunday, 30-03-2025",
+      "id": 233
+    },
+    "left": {
+      "id": 234
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      }
+    ]
   }
 ]

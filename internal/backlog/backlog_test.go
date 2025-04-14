@@ -155,3 +155,43 @@ func TestDeletedTasks(t *testing.T) {
 		})
 	}
 }
+
+func TestOverdueTasks(t *testing.T) {
+	tests := []struct {
+		name        string
+		caseDirName string
+	}{
+		{
+			name:        "overdue tasks before new tasks",
+			caseDirName: "overdue-before-new",
+		},
+		{
+			name:        "overdue tasks moved from new section",
+			caseDirName: "overdue-moved-from-new",
+		},
+		{
+			name:        "overdue tasks appear on top",
+			caseDirName: "overdue-on-top",
+		},
+		{
+			name:        "overdue tasks after focus section",
+			caseDirName: "overdue-after-focus",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			back := testutils.StubBacklog(t, "ov", test.caseDirName, &testutils.StubAPIResponses{
+				Queries: []testutils.QueryArg{
+					{Contains: "computer"},
+				},
+			})
+
+			pages := []string{"ov___computer"}
+
+			err := back.ProcessAll([]string{})
+			require.NoError(t, err)
+
+			testutils.AssertGoldenPages(t, back.Graph(), test.caseDirName, pages)
+		})
+	}
+}

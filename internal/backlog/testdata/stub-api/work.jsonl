@@ -1,0 +1,90 @@
+[
+  {
+    "properties": {},
+    "parent": {
+      "id": 32
+    },
+    "id": 35,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 32
+      },
+      {
+        "id": 36
+      }
+    ],
+    "uuid": "67c48e06-efe8-47b1-8972-806e7b0d6d77",
+    "content": "TODO #work Prepare monthly report",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250228,
+      "name": "friday, 28-02-2025",
+      "originalName": "Friday, 28-02-2025",
+      "id": 32
+    },
+    "left": {
+      "id": 33
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 36
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c5e302-29d1-4116-b83f-b064b18102f4"
+    },
+    "deadline": 20250309,
+    "repeated?": true,
+    "parent": {
+      "id": 118
+    },
+    "id": 119,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 36
+      },
+      {
+        "id": 118
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c5e302-29d1-4116-b83f-b064b18102f4"
+    },
+    "uuid": "67c5e302-29d1-4116-b83f-b064b18102f4",
+    "content": "TODO **18:48** #work Tidy up office papers\nDEADLINE: <2025-03-09 Sun ++1w>\nid:: 67c5e302-29d1-4116-b83f-b064b18102f4\n:LOGBOOK:\n* State \"DONE\" from \"TODO\" [2025-03-03 Mon 19:03]\n* State \"DONE\" from \"TODO\" [2025-03-03 Mon 19:04]\n:END:",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250303,
+      "name": "monday, 03-03-2025",
+      "originalName": "Monday, 03-03-2025",
+      "id": 118
+    },
+    "propertiesOrder": [
+      "id"
+    ],
+    "left": {
+      "id": 118
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 36
+      }
+    ]
+  }
+]

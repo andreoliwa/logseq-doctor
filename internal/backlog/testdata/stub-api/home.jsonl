@@ -3,7 +3,6 @@
     "properties": {
       "id": "67c48cb3-ee20-48fe-9a2b-3f63dff412ff"
     },
-    "deadline": 20260401,
     "parent": {
       "id": 20
     },
@@ -23,7 +22,7 @@
       "id": "67c48cb3-ee20-48fe-9a2b-3f63dff412ff"
     },
     "uuid": "67c48cb3-ee20-48fe-9a2b-3f63dff412ff",
-    "content": "TODO **17:48** #home Clean windows before spring\nid:: 67c48cb3-ee20-48fe-9a2b-3f63dff412ff\nDEADLINE: <2025-04-01 Tue>",
+    "content": "TODO **17:48** #home Clean windows before spring\nid:: 67c48cb3-ee20-48fe-9a2b-3f63dff412ff",
     "marker": "TODO",
     "page": {
       "journalDay": 20250302,

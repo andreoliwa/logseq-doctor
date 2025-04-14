@@ -232,7 +232,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 					focusRefs.Add(blockRef.ID)
 				}
 
-				return true
+				return false
 			}
 
 			return false
@@ -244,7 +244,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	// Insert (new and moved) overdue tasks after the focus section and before the new ones
 	//  If they are moved to the top, all overdue tasks will go to the focus page, and this misses the point.
 	//  The user should decide manually which tasks should have focus.
-	for _, blockRef := range overdueBlockRefs.Values() {
+	for _, blockRef := range overdueBlockRefs.ValuesSorted() {
 		if existingBlockRefs.Contains(blockRef) {
 			continue
 		}
@@ -254,7 +254,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 				content.NewText("📅 Overdue tasks "),
 				content.NewPageLink("inbox"),
 			))
-			insertOrAddBlock(page, firstBlock, dividerFocus, dividerOverdue)
+			AddSibling(page, dividerOverdue, firstBlock, dividerFocus)
 		}
 
 		overdueTask := content.NewBlock(content.NewParagraph(
@@ -276,10 +276,10 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 
 			if dividerNewTasks == nil {
 				dividerNewTasks = content.NewBlock(content.NewParagraph(
+					content.NewText("New tasks "),
 					content.NewPageLink("inbox"),
-					content.NewText(" New tasks"),
 				))
-				insertOrAddBlock(page, firstBlock, dividerFocus, dividerNewTasks)
+				AddSibling(page, dividerNewTasks, firstBlock, dividerOverdue, dividerFocus)
 			}
 
 			dividerNewTasks.AddChild(content.NewBlock(content.NewBlockRef(blockRef)))
@@ -330,17 +330,24 @@ func nextChildHasPin(node content.Node) bool {
 	return false
 }
 
-func insertOrAddBlock(page logseq.Page, before, after, newBlock *content.Block) {
+func AddSibling(page logseq.Page, newBlock, before *content.Block, after ...*content.Block) {
 	if newBlock == nil {
 		return
 	}
 
-	switch {
-	case after != nil:
-		page.InsertBlockAfter(newBlock, after)
-	case before != nil:
-		page.InsertBlockBefore(newBlock, before)
-	default:
-		page.AddBlock(newBlock)
+	for _, a := range after {
+		if a != nil {
+			page.InsertBlockAfter(newBlock, a)
+
+			return
+		}
 	}
+
+	if before != nil {
+		page.InsertBlockBefore(newBlock, before)
+
+		return
+	}
+
+	page.AddBlock(newBlock)
 }
