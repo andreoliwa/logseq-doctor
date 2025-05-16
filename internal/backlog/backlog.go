@@ -183,6 +183,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 
 	deletedCount := 0
 	movedCount := 0
+	unpinnedCount := 0
 	focusBlockRefs := utils.NewSet[string]()
 	pinnedBlockRefs := utils.NewSet[string]()
 
@@ -204,7 +205,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 				}
 			}
 
-			if blockRef, ok := node.(*content.BlockRef); ok {
+			if blockRef, ok := node.(*content.BlockRef); ok { //nolint:nestif
 				shouldDelete := false
 
 				switch {
@@ -219,6 +220,17 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 						shouldDelete = true
 
 						movedCount++
+					}
+				default:
+					// Here we have an existing task that's not overdue.
+					// Find the pin text node and remove it.
+					if nextChildHasPin(node) {
+						nextChild := node.NextSibling()
+						if nextChild != nil {
+							nextChild.RemoveSelf()
+
+							unpinnedCount++
+						}
 					}
 				}
 
@@ -300,6 +312,12 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 
 	if movedCount > 0 {
 		color.Magenta(" %s moved around", utils.FormatCount(movedCount, "task was", "tasks were"))
+
+		save = true
+	}
+
+	if unpinnedCount > 0 {
+		color.Cyan(" %s unpinned", utils.FormatCount(unpinnedCount, "task was", "tasks were"))
 
 		save = true
 	}
