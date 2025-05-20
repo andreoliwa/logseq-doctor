@@ -62,7 +62,7 @@ repos:
         args:
           - --no-error-on-unmatched-pattern
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.7.2
+    rev: v4.8.0
     hooks:
       - id: commitizen
         stages:
