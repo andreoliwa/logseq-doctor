@@ -2,6 +2,7 @@ package backlog
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/andreoliwa/logseq-go"
@@ -11,10 +12,15 @@ import (
 	"github.com/fatih/color"
 )
 
+type Result struct {
+	FocusRefsFromPage *utils.Set[string]
+	ShowInbox         bool
+}
+
 type Backlog interface {
 	Graph() *logseq.Graph
 	ProcessAll(partialNames []string) error
-	ProcessOne(pageTitle string, funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error)
+	ProcessOne(pageTitle string, funcQueryRefs func() (*internal.CategorizedTasks, error)) (*Result, error)
 }
 
 type backlogImpl struct {
@@ -31,7 +37,7 @@ func (b *backlogImpl) Graph() *logseq.Graph {
 	return b.graph
 }
 
-func (b *backlogImpl) ProcessAll(partialNames []string) error {
+func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 	config, err := b.configReader.ReadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to read config: %w", err)
@@ -39,6 +45,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error {
 
 	allFocusTasks := internal.NewCategorizedTasks()
 	processAllPages := len(partialNames) == 0
+	showInbox := false
 
 	if processAllPages {
 		fmt.Println("Processing all pages in the backlog")
@@ -61,7 +68,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error {
 			continue
 		}
 
-		focusRefsFromPage, err := b.ProcessOne(backlogConfig.OutputPage,
+		result, err := b.ProcessOne(backlogConfig.OutputPage,
 			func() (*internal.CategorizedTasks, error) {
 				return queryTasksFromPages(b.graph, b.api, backlogConfig.InputPages)
 			})
@@ -69,7 +76,18 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error {
 			return err
 		}
 
-		allFocusTasks.All.Update(focusRefsFromPage)
+		allFocusTasks.All.Update(result.FocusRefsFromPage)
+
+		if result.ShowInbox {
+			showInbox = true
+		}
+	}
+
+	if showInbox {
+		// The original idea was to wait for a keypress while the user checks the inbox,
+		// so they can move tasks to the focus section. But new focus tasks would not be detected at this point,
+		// we would have to refresh the list of focus tasks after the keypress.
+		defer printInboxURL(b.graph)
 	}
 
 	if !processAllPages {
@@ -85,8 +103,15 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error {
 	return err
 }
 
+func printInboxURL(graph *logseq.Graph) {
+	basename := filepath.Base(graph.Directory())
+
+	fmt.Print("\nCheck your inbox: ")
+	color.Red("logseq://graph/%s?page=inbox\n", basename)
+}
+
 func (b *backlogImpl) ProcessOne(pageTitle string,
-	funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error) {
+	funcQueryRefs func() (*internal.CategorizedTasks, error)) (*Result, error) {
 	page := internal.OpenPage(b.graph, pageTitle)
 
 	existingBlockRefs := blockRefsFromPages(page)
@@ -101,13 +126,13 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 	newBlockRefs := blockRefsFromQuery.All.Diff(existingBlockRefs)
 	obsoleteBlockRefs := existingBlockRefs.Diff(blockRefsFromQuery.All)
 
-	focusRefsFromPage, err := insertAndRemoveRefs(b.graph, pageTitle, newBlockRefs, obsoleteBlockRefs,
+	result, err := insertAndRemoveRefs(b.graph, pageTitle, newBlockRefs, obsoleteBlockRefs,
 		blockRefsFromQuery.Overdue)
 	if err != nil {
 		return nil, err
 	}
 
-	return focusRefsFromPage, nil
+	return result, nil
 }
 
 func blockRefsFromPages(page logseq.Page) *utils.Set[string] {
@@ -171,7 +196,7 @@ func defaultQuery(pageTitle string) string {
 func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	graph *logseq.Graph, pageTitle string, newBlockRefs, obsoleteBlockRefs,
 	overdueBlockRefs *utils.Set[string],
-) (*utils.Set[string], error) {
+) (*Result, error) {
 	transaction := graph.NewTransaction()
 
 	page, err := transaction.OpenPage(pageTitle)
@@ -184,7 +209,10 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	deletedCount := 0
 	movedCount := 0
 	unpinnedCount := 0
-	focusBlockRefs := utils.NewSet[string]()
+	result := &Result{
+		FocusRefsFromPage: utils.NewSet[string](),
+		ShowInbox:         false,
+	}
 	pinnedBlockRefs := utils.NewSet[string]()
 
 	for i, block := range page.Blocks() {
@@ -242,7 +270,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 					blockRef.Parent().Parent().RemoveSelf()
 				} else if dividerFocus == nil {
 					// Keep adding tasks to the focus section until the divider is found
-					focusBlockRefs.Add(blockRef.ID)
+					result.FocusRefsFromPage.Add(blockRef.ID)
 				}
 
 				return false
@@ -301,6 +329,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		color.Green(" %s", utils.FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
 
 		save = true
+		result.ShowInbox = true
 	}
 
 	if deletedCount > 0 {
@@ -314,6 +343,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		color.Magenta(" %s moved around", utils.FormatCount(movedCount, "task was", "tasks were"))
 
 		save = true
+		result.ShowInbox = true
 	}
 
 	if unpinnedCount > 0 {
@@ -328,14 +358,14 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 			return nil, fmt.Errorf("failed to save transaction: %w", err)
 		}
 	} else {
-		color.Yellow(" no new/deleted/moved tasks")
+		color.Yellow(" no changes")
 	}
 
 	if dividerFocus == nil {
-		focusBlockRefs.Clear()
+		result.FocusRefsFromPage.Clear()
 	}
 
-	return focusBlockRefs, nil
+	return result, nil
 }
 
 func nextChildHasPin(node content.Node) bool {
