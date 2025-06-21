@@ -332,6 +332,8 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		result.ShowInbox = true
 	}
 
+	save = removeEmptyDividers(save, dividerNewTasks, dividerOverdue)
+
 	if deletedCount > 0 {
 		// Remove completed or unreferenced tasks
 		color.Red(" %s removed", utils.FormatCount(deletedCount, "task was", "tasks were"))
@@ -395,4 +397,17 @@ func AddSibling(page logseq.Page, newBlock, before *content.Block, after ...*con
 	}
 
 	page.AddBlock(newBlock)
+}
+
+// removeEmptyDividers removes empty dividers (no blocks under it) and returns true if any were removed.
+func removeEmptyDividers(save bool, dividers ...*content.Block) bool {
+	for _, divider := range dividers {
+		if divider != nil && len(divider.Blocks()) == 0 {
+			divider.RemoveSelf()
+
+			save = true
+		}
+	}
+
+	return save
 }
