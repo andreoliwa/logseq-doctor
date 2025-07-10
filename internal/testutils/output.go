@@ -28,6 +28,7 @@ func CaptureOutput(function func()) string {
 	// Start a goroutine to read output
 	go func() {
 		var buf bytes.Buffer
+
 		_, _ = io.Copy(&buf, read)
 		outC <- buf.String()
 	}()

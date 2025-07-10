@@ -41,6 +41,7 @@ func StubGraph(t *testing.T, caseDirName string) *logseq.Graph {
 
 type mockLogseqAPI struct {
 	mock.Mock
+
 	t         *testing.T
 	responses *StubAPIResponses
 }

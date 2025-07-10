@@ -17,7 +17,8 @@ func ReadFromStdin() string {
 		stdin += scanner.Text() + "\n"
 	}
 
-	if err := scanner.Err(); err != nil {
+	err := scanner.Err()
+	if err != nil {
 		log.Fatalln("error reading input from stdin:", err)
 	}
 

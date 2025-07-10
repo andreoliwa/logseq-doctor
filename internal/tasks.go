@@ -22,7 +22,9 @@ type pageJSON struct {
 
 func ExtractTasksFromJSON(jsonStr string) ([]TaskJSON, error) {
 	var tasks []TaskJSON
-	if err := json.Unmarshal([]byte(jsonStr), &tasks); err != nil {
+
+	err := json.Unmarshal([]byte(jsonStr), &tasks)
+	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal JSON: %w", err)
 	}
 
