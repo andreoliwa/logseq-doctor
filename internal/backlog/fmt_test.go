@@ -1,7 +1,7 @@
-package utils_test
+package backlog_test
 
 import (
-	"github.com/andreoliwa/lsd/pkg/utils"
+	"github.com/andreoliwa/lsd/internal/backlog"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,7 +23,7 @@ func TestFormatCount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := utils.FormatCount(tt.count, tt.singular, tt.plural)
+			result := backlog.FormatCount(tt.count, tt.singular, tt.plural)
 			assert.Equal(t, tt.expected, result)
 		})
 	}

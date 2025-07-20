@@ -3,7 +3,7 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/andreoliwa/lsd/pkg/utils"
+	"github.com/andreoliwa/lsd/pkg/set"
 	"time"
 )
 
@@ -44,15 +44,15 @@ func (t TaskJSON) Doing() bool {
 }
 
 type CategorizedTasks struct {
-	All     *utils.Set[string]
-	Overdue *utils.Set[string]
-	Doing   *utils.Set[string]
+	All     *set.Set[string]
+	Overdue *set.Set[string]
+	Doing   *set.Set[string]
 }
 
 func NewCategorizedTasks() CategorizedTasks {
 	return CategorizedTasks{
-		All:     utils.NewSet[string](),
-		Overdue: utils.NewSet[string](),
-		Doing:   utils.NewSet[string](),
+		All:     set.NewSet[string](),
+		Overdue: set.NewSet[string](),
+		Doing:   set.NewSet[string](),
 	}
 }

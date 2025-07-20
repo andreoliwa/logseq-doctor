@@ -8,12 +8,12 @@ import (
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 	"github.com/andreoliwa/lsd/internal"
-	"github.com/andreoliwa/lsd/pkg/utils"
+	"github.com/andreoliwa/lsd/pkg/set"
 	"github.com/fatih/color"
 )
 
 type Result struct {
-	FocusRefsFromPage *utils.Set[string]
+	FocusRefsFromPage *set.Set[string]
 	ShowInbox         bool
 }
 
@@ -116,7 +116,7 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 
 	existingBlockRefs := blockRefsFromPages(page)
 
-	fmt.Printf("%s: %s", internal.PageColor(pageTitle), utils.FormatCount(existingBlockRefs.Size(), "task", "tasks"))
+	fmt.Printf("%s: %s", internal.PageColor(pageTitle), FormatCount(existingBlockRefs.Size(), "task", "tasks"))
 
 	blockRefsFromQuery, err := funcQueryRefs()
 	if err != nil {
@@ -127,7 +127,7 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 
 	// Calculate obsolete refs, but exclude DOING tasks from removal
 	// DOING tasks should be preserved even if they're not in the All set
-	allValidRefs := utils.NewSet[string]()
+	allValidRefs := set.NewSet[string]()
 	allValidRefs.Update(blockRefsFromQuery.All)
 	allValidRefs.Update(blockRefsFromQuery.Doing)
 	obsoleteBlockRefs := existingBlockRefs.Diff(allValidRefs)
@@ -141,8 +141,8 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 	return result, nil
 }
 
-func blockRefsFromPages(page logseq.Page) *utils.Set[string] {
-	existingRefs := utils.NewSet[string]()
+func blockRefsFromPages(page logseq.Page) *set.Set[string] {
+	existingRefs := set.NewSet[string]()
 
 	for _, block := range page.Blocks() {
 		block.Children().FindDeep(func(n content.Node) bool {
@@ -181,7 +181,7 @@ func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
 			return nil, fmt.Errorf("failed to extract tasks: %w", err)
 		}
 
-		fmt.Print(utils.FormatCount(len(jsonTasks), "task", "tasks"))
+		fmt.Print(FormatCount(len(jsonTasks), "task", "tasks"))
 
 		for _, task := range jsonTasks {
 			if task.Overdue() {
@@ -207,7 +207,7 @@ func defaultQuery(pageTitle string) string {
 
 func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	graph *logseq.Graph, pageTitle string, newBlockRefs, obsoleteBlockRefs,
-	overdueBlockRefs *utils.Set[string],
+	overdueBlockRefs *set.Set[string],
 ) (*Result, error) {
 	transaction := graph.NewTransaction()
 
@@ -222,10 +222,10 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	movedCount := 0
 	unpinnedCount := 0
 	result := &Result{
-		FocusRefsFromPage: utils.NewSet[string](),
+		FocusRefsFromPage: set.NewSet[string](),
 		ShowInbox:         false,
 	}
-	pinnedBlockRefs := utils.NewSet[string]()
+	pinnedBlockRefs := set.NewSet[string]()
 
 	for i, block := range page.Blocks() {
 		if i == 0 {
@@ -338,7 +338,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 			dividerNewTasks.AddChild(content.NewBlock(content.NewBlockRef(blockRef)))
 		}
 
-		color.Green(" %s", utils.FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
+		color.Green(" %s", FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
 
 		save = true
 		result.ShowInbox = true
@@ -348,20 +348,20 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 
 	if deletedCount > 0 {
 		// Remove completed or unreferenced tasks
-		color.Red(" %s removed", utils.FormatCount(deletedCount, "task was", "tasks were"))
+		color.Red(" %s removed", FormatCount(deletedCount, "task was", "tasks were"))
 
 		save = true
 	}
 
 	if movedCount > 0 {
-		color.Magenta(" %s moved around", utils.FormatCount(movedCount, "task was", "tasks were"))
+		color.Magenta(" %s moved around", FormatCount(movedCount, "task was", "tasks were"))
 
 		save = true
 		result.ShowInbox = true
 	}
 
 	if unpinnedCount > 0 {
-		color.Cyan(" %s unpinned", utils.FormatCount(unpinnedCount, "task was", "tasks were"))
+		color.Cyan(" %s unpinned", FormatCount(unpinnedCount, "task was", "tasks were"))
 
 		save = true
 	}

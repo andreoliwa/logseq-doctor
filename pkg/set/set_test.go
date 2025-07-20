@@ -1,14 +1,14 @@
-package utils_test
+package set_test
 
 import (
-	"github.com/andreoliwa/lsd/pkg/utils"
+	"github.com/andreoliwa/lsd/pkg/set"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSet_Add(t *testing.T) {
-	set := utils.NewSet[int]()
+	set := set.NewSet[int]()
 	set.Add(1)
 	set.Add(2)
 	set.Add(1) // Duplicate should not be added
@@ -20,7 +20,7 @@ func TestSet_Add(t *testing.T) {
 }
 
 func TestSet_Remove(t *testing.T) {
-	set := utils.NewSet[int]()
+	set := set.NewSet[int]()
 	set.Add(1)
 	set.Add(2)
 
@@ -34,7 +34,7 @@ func TestSet_Remove(t *testing.T) {
 }
 
 func TestSet_Contains(t *testing.T) {
-	set := utils.NewSet[string]()
+	set := set.NewSet[string]()
 	set.Add("hello")
 	set.Add("world")
 
@@ -44,7 +44,7 @@ func TestSet_Contains(t *testing.T) {
 }
 
 func TestSet_Size(t *testing.T) {
-	set := utils.NewSet[int]()
+	set := set.NewSet[int]()
 	assert.Equal(t, 0, set.Size())
 
 	set.Add(10)
@@ -56,7 +56,7 @@ func TestSet_Size(t *testing.T) {
 }
 
 func TestSet_Values(t *testing.T) {
-	set := utils.NewSet[int]()
+	set := set.NewSet[int]()
 	set.Add(10)
 	set.Add(5)
 	set.Add(15)
@@ -66,7 +66,7 @@ func TestSet_Values(t *testing.T) {
 }
 
 func TestOrderedSet_ValuesSorted(t *testing.T) {
-	set := utils.NewSet[int]()
+	set := set.NewSet[int]()
 	set.Add(10)
 	set.Add(5)
 	set.Add(15)
@@ -76,16 +76,16 @@ func TestOrderedSet_ValuesSorted(t *testing.T) {
 }
 
 func TestSet_Diff(t *testing.T) {
-	setA := utils.NewSet[int]()
+	setA := set.NewSet[int]()
 	setA.Add(1)
 	setA.Add(2)
 	setA.Add(3)
 
-	setB := utils.NewSet[int]()
+	setB := set.NewSet[int]()
 	setB.Add(2)
 	setB.Add(4)
 
-	setC := utils.NewSet[int]()
+	setC := set.NewSet[int]()
 	setC.Add(3)
 	setC.Add(5)
 
@@ -94,15 +94,15 @@ func TestSet_Diff(t *testing.T) {
 }
 
 func TestSet_Update(t *testing.T) {
-	setA := utils.NewSet[int]()
+	setA := set.NewSet[int]()
 	setA.Add(1)
 	setA.Add(2)
 
-	setB := utils.NewSet[int]()
+	setB := set.NewSet[int]()
 	setB.Add(3)
 	setB.Add(4)
 
-	setC := utils.NewSet[int]()
+	setC := set.NewSet[int]()
 	setC.Add(4)
 	setC.Add(5)
 
@@ -111,7 +111,7 @@ func TestSet_Update(t *testing.T) {
 }
 
 func TestSet_Clear(t *testing.T) {
-	set := utils.NewSet[int]()
+	set := set.NewSet[int]()
 	set.Add(1)
 	set.Add(2)
 	set.Add(3)
