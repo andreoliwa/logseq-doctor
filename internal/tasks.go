@@ -38,14 +38,21 @@ func (t TaskJSON) Overdue() bool {
 	return (t.Deadline > 0 && t.Deadline <= currentDate) || (t.Scheduled > 0 && t.Scheduled <= currentDate)
 }
 
+// Doing checks if the task has the DOING marker.
+func (t TaskJSON) Doing() bool {
+	return t.Marker == "DOING"
+}
+
 type CategorizedTasks struct {
 	All     *utils.Set[string]
 	Overdue *utils.Set[string]
+	Doing   *utils.Set[string]
 }
 
 func NewCategorizedTasks() CategorizedTasks {
 	return CategorizedTasks{
 		All:     utils.NewSet[string](),
 		Overdue: utils.NewSet[string](),
+		Doing:   utils.NewSet[string](),
 	}
 }

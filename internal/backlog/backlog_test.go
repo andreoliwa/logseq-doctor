@@ -220,3 +220,47 @@ func TestOverdueTasks(t *testing.T) {
 		})
 	}
 }
+
+func TestDoingTasks(t *testing.T) {
+	tests := []struct {
+		name        string
+		caseDirName string
+		pagesExist  bool
+	}{
+		{
+			name:        "DOING tasks not added to empty page",
+			caseDirName: "doing-not-added-empty",
+			pagesExist:  false,
+		},
+		{
+			name:        "DOING tasks not added to existing page",
+			caseDirName: "doing-not-added-existing",
+			pagesExist:  true,
+		},
+		{
+			name:        "DOING tasks preserved in existing page",
+			caseDirName: "doing-preserved",
+			pagesExist:  true,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			back := testutils.StubBacklog(t, "dt", test.caseDirName, &testutils.StubAPIResponses{
+				Queries: []testutils.QueryArg{
+					{Contains: "health"},
+				},
+			})
+
+			pages := []string{"dt___health"}
+
+			if !test.pagesExist {
+				testutils.AssertPagesDontExist(t, back.Graph(), pages)
+			}
+
+			err := back.ProcessAll([]string{})
+			require.NoError(t, err)
+
+			testutils.AssertGoldenPages(t, back.Graph(), test.caseDirName, pages)
+		})
+	}
+}

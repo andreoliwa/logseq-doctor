@@ -124,7 +124,13 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 	}
 
 	newBlockRefs := blockRefsFromQuery.All.Diff(existingBlockRefs)
-	obsoleteBlockRefs := existingBlockRefs.Diff(blockRefsFromQuery.All)
+
+	// Calculate obsolete refs, but exclude DOING tasks from removal
+	// DOING tasks should be preserved even if they're not in the All set
+	allValidRefs := utils.NewSet[string]()
+	allValidRefs.Update(blockRefsFromQuery.All)
+	allValidRefs.Update(blockRefsFromQuery.Doing)
+	obsoleteBlockRefs := existingBlockRefs.Diff(allValidRefs)
 
 	result, err := insertAndRemoveRefs(b.graph, pageTitle, newBlockRefs, obsoleteBlockRefs,
 		blockRefsFromQuery.Overdue)
@@ -177,12 +183,18 @@ func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
 
 		fmt.Print(utils.FormatCount(len(jsonTasks), "task", "tasks"))
 
-		for _, t := range jsonTasks {
-			if t.Overdue() {
-				tasks.Overdue.Add(t.UUID)
+		for _, task := range jsonTasks {
+			if task.Overdue() {
+				tasks.Overdue.Add(task.UUID)
 			}
 
-			tasks.All.Add(t.UUID)
+			if task.Doing() {
+				tasks.Doing.Add(task.UUID)
+			} else {
+				// Only add non-DOING tasks to All set
+				// DOING tasks should not be added to backlog as new tasks
+				tasks.All.Add(task.UUID)
+			}
 		}
 	}
 
