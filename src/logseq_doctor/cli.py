@@ -105,6 +105,7 @@ def tasks(  # noqa: PLR0913
     logseq_api_token: str = typer.Option(..., "--token", "-t", help="Logseq API token", envvar="LOGSEQ_API_TOKEN"),
     json_: bool = typer.Option(False, "--json", help="Output in JSON format"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
+    completed: bool = typer.Option(False, "--completed", "-c", help="Include canceled and done tasks"),
 ) -> None:
     """List tasks in Logseq."""
     logseq = Logseq(logseq_host_url, logseq_api_token, cast("GlobalOptions", ctx.obj).logseq_graph_path)
@@ -115,7 +116,12 @@ def tasks(  # noqa: PLR0913
         else:
             pages = " ".join([f"[[{tp}]]" for tp in tag_or_page])
             condition = f" (or {pages})"
-    query = f"(and{condition} (task TODO DOING WAITING NOW LATER))"
+
+    task_statuses = "TODO DOING WAITING NOW LATER"
+    if completed:
+        task_statuses += " CANCELED DONE"
+
+    query = f"(and{condition} (task {task_statuses}))"
     if verbose:
         typer.echo(f"Query: {query}")
 
