@@ -3,7 +3,7 @@ module github.com/andreoliwa/lsd
 go 1.23.0
 
 require (
-	github.com/andreoliwa/logseq-go v0.1.5
+	github.com/andreoliwa/logseq-go v0.2.0
 	github.com/fatih/color v1.18.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
