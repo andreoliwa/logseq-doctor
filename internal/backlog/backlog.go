@@ -14,7 +14,7 @@ import (
 
 type Result struct {
 	FocusRefsFromPage *set.Set[string]
-	ShowInbox         bool
+	ShowQuickCapture  bool
 }
 
 type Backlog interface {
@@ -45,7 +45,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 
 	allFocusTasks := internal.NewCategorizedTasks()
 	processAllPages := len(partialNames) == 0
-	showInbox := false
+	showQuickCapture := false
 
 	if processAllPages {
 		fmt.Println("Processing all pages in the backlog")
@@ -78,16 +78,16 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 
 		allFocusTasks.All.Update(result.FocusRefsFromPage)
 
-		if result.ShowInbox {
-			showInbox = true
+		if result.ShowQuickCapture {
+			showQuickCapture = true
 		}
 	}
 
-	if showInbox {
-		// The original idea was to wait for a keypress while the user checks the inbox,
+	if showQuickCapture {
+		// The original idea was to wait for a keypress while the user checks the quick capture page,
 		// so they can move tasks to the focus section. But new focus tasks would not be detected at this point,
 		// we would have to refresh the list of focus tasks after the keypress.
-		defer printInboxURL(b.graph)
+		defer printQuickCaptureURL(b.graph)
 	}
 
 	if !processAllPages {
@@ -103,11 +103,11 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 	return err
 }
 
-func printInboxURL(graph *logseq.Graph) {
+func printQuickCaptureURL(graph *logseq.Graph) {
 	basename := filepath.Base(graph.Directory())
 
-	fmt.Print("\nCheck your inbox: ")
-	color.Red("logseq://graph/%s?page=inbox\n", basename)
+	fmt.Print("\nCheck new content: ")
+	color.Red("logseq://graph/%s?page=quick+capture\n", basename)
 }
 
 func (b *backlogImpl) ProcessOne(pageTitle string,
@@ -223,7 +223,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 	unpinnedCount := 0
 	result := &Result{
 		FocusRefsFromPage: set.NewSet[string](),
-		ShowInbox:         false,
+		ShowQuickCapture:  false,
 	}
 	pinnedBlockRefs := set.NewSet[string]()
 
@@ -305,7 +305,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		if dividerOverdue == nil {
 			dividerOverdue = content.NewBlock(content.NewParagraph(
 				content.NewText("📅 Overdue tasks "),
-				content.NewPageLink("inbox"),
+				content.NewPageLink("quick capture"),
 			))
 			AddSibling(page, dividerOverdue, firstBlock, dividerFocus)
 		}
@@ -330,7 +330,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 			if dividerNewTasks == nil {
 				dividerNewTasks = content.NewBlock(content.NewParagraph(
 					content.NewText("New tasks "),
-					content.NewPageLink("inbox"),
+					content.NewPageLink("quick capture"),
 				))
 				AddSibling(page, dividerNewTasks, firstBlock, dividerOverdue, dividerFocus)
 			}
@@ -341,7 +341,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		color.Green(" %s", FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
 
 		save = true
-		result.ShowInbox = true
+		result.ShowQuickCapture = true
 	}
 
 	save = removeEmptyDividers(save, dividerNewTasks, dividerOverdue)
@@ -357,7 +357,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		color.Magenta(" %s moved around", FormatCount(movedCount, "task was", "tasks were"))
 
 		save = true
-		result.ShowInbox = true
+		result.ShowQuickCapture = true
 	}
 
 	if unpinnedCount > 0 {
