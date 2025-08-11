@@ -100,7 +100,7 @@ jobs:
             tox_env: "py312"
             os: "macos-latest"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         with:
           fetch-depth: 0

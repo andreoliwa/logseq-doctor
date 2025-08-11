@@ -28,7 +28,7 @@ jobs:
     if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v5
         with:
           go-version: "stable"
@@ -57,7 +57,7 @@ jobs:
     #            normalize_crlf_to_lf: true
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
       - uses: actions/setup-go@v5
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
