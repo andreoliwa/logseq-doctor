@@ -5,18 +5,29 @@ import (
 	"os"
 	"time"
 
+	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/lsd/internal"
 	"github.com/spf13/cobra"
 )
 
-// InsertMarkdownToJournalFunc is a function type for inserting markdown to journal.
-type InsertMarkdownToJournalFunc func(*internal.InsertMarkdownOptions) error
+// MdDependencies holds all the dependencies for the md command.
+type MdDependencies struct {
+	InsertFn  func(*internal.InsertMarkdownOptions) error
+	OpenGraph func(string) *logseq.Graph
+	ReadStdin func() string
+	TimeNow   func() time.Time
+}
 
-// NewMdCmd creates a new md command with the specified insert function.
-// If insertFn is nil, it defaults to internal.InsertMarkdownToJournal.
-func NewMdCmd(insertFn InsertMarkdownToJournalFunc) *cobra.Command {
-	if insertFn == nil {
-		insertFn = internal.InsertMarkdownToJournal
+// NewMdCmd creates a new md command with the specified dependencies.
+// If deps is nil, it uses default implementations.
+func NewMdCmd(deps *MdDependencies) *cobra.Command {
+	if deps == nil {
+		deps = &MdDependencies{
+			InsertFn:  internal.InsertMarkdownToJournal,
+			OpenGraph: internal.OpenGraphFromPath,
+			ReadStdin: internal.ReadFromStdin,
+			TimeNow:   time.Now,
+		}
 	}
 
 	var journalFlag, parentFlag string
@@ -36,8 +47,8 @@ Examples:
   echo "Another task" | lsd md -p "meeting notes"`,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			graphPath := os.Getenv("LOGSEQ_GRAPH_PATH")
-			stdin := internal.ReadFromStdin()
-			graph := internal.OpenGraphFromPath(graphPath)
+			stdin := deps.ReadStdin()
+			graph := deps.OpenGraph(graphPath)
 
 			var targetDate time.Time
 			if journalFlag != "" {
@@ -47,7 +58,7 @@ Examples:
 				}
 				targetDate = parsedDate
 			} else {
-				targetDate = time.Now()
+				targetDate = deps.TimeNow()
 			}
 
 			opts := &internal.InsertMarkdownOptions{
@@ -57,7 +68,7 @@ Examples:
 				ParentText: parentFlag,
 			}
 
-			return insertFn(opts)
+			return deps.InsertFn(opts)
 		},
 	}
 
@@ -68,7 +79,7 @@ Examples:
 	return cmd
 }
 
-// mdCmd represents the md command using the default insert function.
+// mdCmd represents the md command using the default dependencies.
 var mdCmd = NewMdCmd(nil) //nolint:gochecknoglobals
 
 func init() {
