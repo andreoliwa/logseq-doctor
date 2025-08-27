@@ -104,7 +104,8 @@ func addContent(page logseq.Page, parentBlock *content.Block, contentText string
 	if len(parsedBlock.Children()) > 0 {
 		newBlock := content.NewBlock()
 
-		for child := parsedBlock.FirstChild(); child != nil; child = child.NextSibling() {
+		children := parsedBlock.Children()
+		for _, child := range children {
 			newBlock.AddChild(child)
 		}
 

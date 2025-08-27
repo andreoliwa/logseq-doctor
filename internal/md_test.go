@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestInsertMarkdownToJournal(t *testing.T) {
+func TestInsertMarkdownToJournal(t *testing.T) { //nolint:funlen
 	tests := []struct {
 		name           string
 		date           time.Time
@@ -51,6 +51,13 @@ func TestInsertMarkdownToJournal(t *testing.T) {
 			content:        "Line 1\nLine 2\nLine 3",
 			parentText:     "header", // This text doesn't exist in the journal
 			expectedGolden: "2025_01_02",
+		},
+		{
+			name:           "insert multiline task with property and logbook",
+			date:           time.Date(2025, 1, 3, 0, 0, 0, 0, time.UTC),
+			content:        "DOING 21:12 Some task\ncollapsed:: true\n:LOGBOOK:\nCLOCK: [2025-08-27 Wed 21:12:50]\n:END:",
+			parentText:     "work",
+			expectedGolden: "2025_01_03",
 		},
 	}
 
