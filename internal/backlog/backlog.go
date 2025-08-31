@@ -157,48 +157,111 @@ func blockRefsFromPages(page logseq.Page) *set.Set[string] {
 	return existingRefs
 }
 
+// queryTasksFromPages queries Logseq API for tasks from specified pages.
+// It uses concurrent processing for multiple pages and sequential processing for a single page.
 func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
 	pageTitles []string) (*internal.CategorizedTasks, error) {
 	tasks := internal.NewCategorizedTasks()
 	finder := internal.NewLogseqFinder(graph)
 
-	for _, pageTitle := range pageTitles {
-		fmt.Printf(" %s: ", internal.PageColor(pageTitle))
-
-		query := finder.FindFirstQuery(pageTitle)
-
-		if query == "" {
-			query = defaultQuery(pageTitle)
-		}
-
-		jsonStr, err := api.PostQuery(query)
-		if err != nil {
-			return nil, fmt.Errorf("failed to query Logseq API: %w", err)
-		}
-
-		jsonTasks, err := internal.ExtractTasksFromJSON(jsonStr)
-		if err != nil {
-			return nil, fmt.Errorf("failed to extract tasks: %w", err)
-		}
-
-		fmt.Print(FormatCount(len(jsonTasks), "task", "tasks"))
-
-		for _, task := range jsonTasks {
-			if task.Overdue() {
-				tasks.Overdue.Add(task.UUID)
-			}
-
-			if task.Doing() {
-				tasks.Doing.Add(task.UUID)
-			} else {
-				// Only add non-DOING tasks to All set
-				// DOING tasks should not be added to backlog as new tasks
-				tasks.All.Add(task.UUID)
-			}
-		}
+	if len(pageTitles) <= 1 {
+		return queryTasksFromPagesSequential(api, pageTitles, &tasks, finder)
 	}
 
-	return &tasks, nil
+	return queryTasksFromPagesConcurrent(api, pageTitles, &tasks, finder)
+}
+
+// queryTasksFromPagesSequential processes pages sequentially (original implementation).
+func queryTasksFromPagesSequential(api internal.LogseqAPI,
+	pageTitles []string, tasks *internal.CategorizedTasks,
+	finder internal.LogseqFinder) (*internal.CategorizedTasks, error) {
+	for _, pageTitle := range pageTitles {
+		jsonTasks, err := queryTasksFromSinglePage(api, pageTitle, finder)
+		if err != nil {
+			return nil, err
+		}
+
+		fmt.Printf(" %s: ", internal.PageColor(pageTitle))
+		fmt.Print(FormatCount(len(jsonTasks), "task", "tasks"))
+
+		addTasksToCategories(jsonTasks, tasks)
+	}
+
+	return tasks, nil
+}
+
+// queryTasksFromPagesConcurrent processes pages concurrently using goroutines.
+func queryTasksFromPagesConcurrent(api internal.LogseqAPI,
+	pageTitles []string, tasks *internal.CategorizedTasks,
+	finder internal.LogseqFinder) (*internal.CategorizedTasks, error) {
+	type pageResult struct {
+		pageTitle string
+		jsonTasks []internal.TaskJSON
+		err       error
+	}
+
+	resultChan := make(chan pageResult, len(pageTitles))
+
+	for _, pageTitle := range pageTitles {
+		go func(title string) {
+			jsonTasks, err := queryTasksFromSinglePage(api, title, finder)
+			resultChan <- pageResult{pageTitle: title, jsonTasks: jsonTasks, err: err}
+		}(pageTitle)
+	}
+
+	for i := 0; i < len(pageTitles); i++ {
+		result := <-resultChan
+
+		if result.err != nil {
+			return nil, result.err
+		}
+
+		// Print results in the order they complete (may be different from input order)
+		fmt.Printf(" %s: ", internal.PageColor(result.pageTitle))
+		fmt.Print(FormatCount(len(result.jsonTasks), "task", "tasks"))
+
+		addTasksToCategories(result.jsonTasks, tasks)
+	}
+
+	return tasks, nil
+}
+
+// queryTasksFromSinglePage queries tasks from a single page and returns the JSON tasks.
+func queryTasksFromSinglePage(api internal.LogseqAPI, pageTitle string,
+	finder internal.LogseqFinder) ([]internal.TaskJSON, error) {
+	query := finder.FindFirstQuery(pageTitle)
+	if query == "" {
+		query = defaultQuery(pageTitle)
+	}
+
+	jsonStr, err := api.PostQuery(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query Logseq API: %w", err)
+	}
+
+	jsonTasks, err := internal.ExtractTasksFromJSON(jsonStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to extract tasks: %w", err)
+	}
+
+	return jsonTasks, nil
+}
+
+// addTasksToCategories adds tasks to the appropriate categories in CategorizedTasks.
+func addTasksToCategories(jsonTasks []internal.TaskJSON, tasks *internal.CategorizedTasks) {
+	for _, task := range jsonTasks {
+		if task.Overdue() {
+			tasks.Overdue.Add(task.UUID)
+		}
+
+		if task.Doing() {
+			tasks.Doing.Add(task.UUID)
+		} else {
+			// Only add non-DOING tasks to All set
+			// DOING tasks should not be added to backlog as new tasks
+			tasks.All.Add(task.UUID)
+		}
+	}
 }
 
 func defaultQuery(pageTitle string) string {
