@@ -57,7 +57,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 		processThisPage := processAllPages
 
 		for _, partialName := range partialNames {
-			if strings.Contains(strings.ToLower(backlogConfig.OutputPage), strings.ToLower(partialName)) {
+			if strings.Contains(strings.ToLower(backlogConfig.BacklogPage), strings.ToLower(partialName)) {
 				processThisPage = true
 
 				break
@@ -68,7 +68,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 			continue
 		}
 
-		result, err := b.ProcessOne(backlogConfig.OutputPage,
+		result, err := b.ProcessOne(backlogConfig.BacklogPage,
 			func() (*internal.CategorizedTasks, error) {
 				return queryTasksFromPages(b.graph, b.api, backlogConfig.InputPages)
 			})

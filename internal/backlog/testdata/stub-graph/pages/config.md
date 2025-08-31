@@ -1,6 +1,16 @@
 - [Markdown links are ignored](config/computer) One for the [[computer]], [[Android]] and #iOS
-- Separator [[config/some-backlog]]
+- Separator
 - For my [[house]]
-- #work and [[office]] related, #config/any-backlog
+- #work and [[office]] related
 - End
-- Also skip the [[config]] itself
+- Also skip the [[config]] itself in any form: #config or [some link text](config)
+- [A backlog link](config/start) will be used as output even if there are other [[pages]] on the [[same]] #line
+- The [[link]] to the [custom backlog page](config/middle) can appear #anywhere in the middle of the [[line]]
+- And the [[link]] can #also be the [[last one]] in the [end of the line](config/end)
+- [[config/start-again]] [[page]] word #tag bla
+- [[page-again]] word [[config/middle-again]] #tag bla
+- word #tag word [[page]] bla [[config/end-again]]
+- [normal URLs should be ignored](https://example.com)
+- [Link to block should also be ignored](((68b2c84a-6813-4942-a6f2-d404d9b4d4a2)))
+- [Link to somethins else](blabla) other than backlog pages should also be ignored
+- A [[config/custom]] without any page or tag doesn't make sense and will be ignored too

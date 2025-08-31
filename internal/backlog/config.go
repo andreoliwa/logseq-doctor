@@ -2,16 +2,17 @@ package backlog
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 	"github.com/andreoliwa/lsd/internal"
-	"strings"
 )
 
 type SingleBacklogConfig struct {
-	Icon       string
-	InputPages []string
-	OutputPage string
+	BacklogPage string
+	Icon        string
+	InputPages  []string
 }
 
 type Config struct {
@@ -37,7 +38,7 @@ func NewPageConfigReader(graph *logseq.Graph, configPage string) ConfigReader {
 }
 
 // ReadConfig reads the backlog configuration from a Logseq page.
-func (p *pageConfigReader) ReadConfig() (*Config, error) {
+func (p *pageConfigReader) ReadConfig() (*Config, error) { //nolint:cyclop,funlen
 	configPage := internal.OpenPage(p.graph, p.configPage)
 
 	var backlogs []SingleBacklogConfig
@@ -45,40 +46,59 @@ func (p *pageConfigReader) ReadConfig() (*Config, error) {
 	for _, block := range configPage.Blocks() {
 		var inputPages []string
 
-		firstPage := ""
+		firstRegularPage := ""
+		backlogPage := ""
 
 		// TODO: simplify and replace by FilterDeep after a test is added
-		block.Children().FindDeep(func(n content.Node) bool {
-			link := ""
-			if pageLink, ok := n.(*content.PageLink); ok {
-				link = pageLink.To
-			} else if tag, ok := n.(*content.Hashtag); ok {
-				link = tag.To
+		block.Children().FindDeep(func(node content.Node) bool {
+			target := ""
+			isLink := false
+
+			if pageLink, ok := node.(*content.PageLink); ok {
+				target = pageLink.To
+			} else if tag, ok := node.(*content.Hashtag); ok {
+				target = tag.To
+			} else if link, ok := node.(*content.Link); ok {
+				target = link.URL
+				isLink = true
 			}
 
-			if link == "" {
+			if target == "" {
 				return false
 			}
 
-			// Skip this page if it's a link to a backlog
-			if strings.HasPrefix(link, p.configPage) {
+			if target == p.configPage {
 				return false
 			}
 
-			if firstPage == "" {
-				firstPage = p.configPage + "/" + link
+			if strings.HasPrefix(target+"/", p.configPage) {
+				backlogPage = target
+
+				return false
+			} else if isLink {
+				// Ignore links to real URLs or any link that doesn't start with the config page
+				return false
 			}
 
-			inputPages = append(inputPages, link)
+			if firstRegularPage == "" {
+				firstRegularPage = p.configPage + "/" + target
+			}
+
+			inputPages = append(inputPages, target)
 
 			return false
 		})
 
 		if len(inputPages) > 0 {
+			chosenPage := backlogPage
+			if chosenPage == "" {
+				chosenPage = firstRegularPage
+			}
+
 			backlogs = append(backlogs, SingleBacklogConfig{
-				Icon:       "",
-				InputPages: inputPages,
-				OutputPage: firstPage,
+				BacklogPage: chosenPage,
+				Icon:        "",
+				InputPages:  inputPages,
 			})
 		}
 	}
