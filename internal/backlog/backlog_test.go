@@ -221,6 +221,47 @@ func TestOverdueTasks(t *testing.T) {
 	}
 }
 
+func TestFutureScheduledTasks(t *testing.T) {
+	tests := []struct {
+		name        string
+		caseDirName string
+	}{
+		{
+			name:        "existing scheduled divider",
+			caseDirName: "scheduled-existing-divider",
+		},
+		{
+			name:        "non-existing scheduled divider",
+			caseDirName: "scheduled-non-existing-divider",
+		},
+		{
+			name:        "existing future scheduled task moved to scheduled divider",
+			caseDirName: "scheduled-existing-task-moved",
+		},
+		{
+			name:        "new scheduled task added directly to scheduled divider",
+			caseDirName: "scheduled-new-task-direct",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			back := testutils.StubBacklog(t, "sch", test.caseDirName, &testutils.StubAPIResponses{
+				Queries: []testutils.QueryArg{
+					{Contains: "kitchen"},
+					{Contains: "work"},
+				},
+			})
+
+			pages := []string{"sch___kitchen", "sch___work"}
+
+			err := back.ProcessAll([]string{})
+			require.NoError(t, err)
+
+			testutils.AssertGoldenPages(t, back.Graph(), test.caseDirName, pages)
+		})
+	}
+}
+
 func TestDoingTasks(t *testing.T) {
 	tests := []struct {
 		name        string

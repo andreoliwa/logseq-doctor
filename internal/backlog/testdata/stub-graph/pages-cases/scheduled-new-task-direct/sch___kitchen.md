@@ -1,0 +1,5 @@
+- New tasks [[quick capture]]
+	- ((67c48e4d-c8a7-4976-b54f-6a640b14ef0a))
+	- ((67c48e65-63c0-41cf-8e9e-b6ae5107c0e5))
+- ((67c48e8a-29bf-4202-924c-925406e9f06d))
+- ((67c491e6-aa14-463d-9dfc-327e974c2349))

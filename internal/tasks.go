@@ -3,8 +3,9 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/andreoliwa/lsd/pkg/set"
 	"time"
+
+	"github.com/andreoliwa/lsd/pkg/set"
 )
 
 type TaskJSON struct {
@@ -32,8 +33,8 @@ func ExtractTasksFromJSON(jsonStr string) ([]TaskJSON, error) {
 }
 
 // Overdue checks if the task is overdue based on deadline or scheduled date.
-func (t TaskJSON) Overdue() bool {
-	currentDate := DateYYYYMMDD(time.Now())
+func (t TaskJSON) Overdue(currentTime func() time.Time) bool {
+	currentDate := DateYYYYMMDD(currentTime())
 
 	return (t.Deadline > 0 && t.Deadline <= currentDate) || (t.Scheduled > 0 && t.Scheduled <= currentDate)
 }
@@ -43,16 +44,25 @@ func (t TaskJSON) Doing() bool {
 	return t.Marker == "DOING"
 }
 
+// FutureScheduled checks if the task is scheduled for the future (tomorrow onwards) and it's not overdue.
+func (t TaskJSON) FutureScheduled(currentTime func() time.Time) bool {
+	currentDate := DateYYYYMMDD(currentTime())
+
+	return t.Scheduled > currentDate && !t.Overdue(currentTime)
+}
+
 type CategorizedTasks struct {
-	All     *set.Set[string]
-	Overdue *set.Set[string]
-	Doing   *set.Set[string]
+	All             *set.Set[string]
+	Overdue         *set.Set[string]
+	Doing           *set.Set[string]
+	FutureScheduled *set.Set[string]
 }
 
 func NewCategorizedTasks() CategorizedTasks {
 	return CategorizedTasks{
-		All:     set.NewSet[string](),
-		Overdue: set.NewSet[string](),
-		Doing:   set.NewSet[string](),
+		All:             set.NewSet[string](),
+		Overdue:         set.NewSet[string](),
+		Doing:           set.NewSet[string](),
+		FutureScheduled: set.NewSet[string](),
 	}
 }

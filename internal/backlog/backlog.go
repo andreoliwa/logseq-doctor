@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
@@ -27,10 +28,12 @@ type backlogImpl struct {
 	graph        *logseq.Graph
 	api          internal.LogseqAPI
 	configReader ConfigReader
+	currentTime  func() time.Time
 }
 
-func NewBacklog(graph *logseq.Graph, api internal.LogseqAPI, reader ConfigReader) Backlog {
-	return &backlogImpl{graph: graph, api: api, configReader: reader}
+func NewBacklog(graph *logseq.Graph, api internal.LogseqAPI, reader ConfigReader,
+	currentTime func() time.Time) Backlog {
+	return &backlogImpl{graph: graph, api: api, configReader: reader, currentTime: currentTime}
 }
 
 func (b *backlogImpl) Graph() *logseq.Graph {
@@ -70,7 +73,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 
 		result, err := b.ProcessOne(backlogConfig.BacklogPage,
 			func() (*internal.CategorizedTasks, error) {
-				return queryTasksFromPages(b.graph, b.api, backlogConfig.InputPages)
+				return queryTasksFromPages(b.graph, b.api, backlogConfig.InputPages, b.currentTime)
 			})
 		if err != nil {
 			return err
@@ -130,10 +133,11 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 	allValidRefs := set.NewSet[string]()
 	allValidRefs.Update(blockRefsFromQuery.All)
 	allValidRefs.Update(blockRefsFromQuery.Doing)
+	allValidRefs.Update(blockRefsFromQuery.FutureScheduled)
 	obsoleteBlockRefs := existingBlockRefs.Diff(allValidRefs)
 
 	result, err := insertAndRemoveRefs(b.graph, pageTitle, newBlockRefs, obsoleteBlockRefs,
-		blockRefsFromQuery.Overdue)
+		blockRefsFromQuery.Overdue, blockRefsFromQuery.FutureScheduled)
 	if err != nil {
 		return nil, err
 	}
@@ -160,21 +164,21 @@ func blockRefsFromPages(page logseq.Page) *set.Set[string] {
 // queryTasksFromPages queries Logseq API for tasks from specified pages.
 // It uses concurrent processing for multiple pages and sequential processing for a single page.
 func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
-	pageTitles []string) (*internal.CategorizedTasks, error) {
+	pageTitles []string, currentTime func() time.Time) (*internal.CategorizedTasks, error) {
 	tasks := internal.NewCategorizedTasks()
 	finder := internal.NewLogseqFinder(graph)
 
 	if len(pageTitles) <= 1 {
-		return queryTasksFromPagesSequential(api, pageTitles, &tasks, finder)
+		return queryTasksFromPagesSequential(api, pageTitles, &tasks, finder, currentTime)
 	}
 
-	return queryTasksFromPagesConcurrent(api, pageTitles, &tasks, finder)
+	return queryTasksFromPagesConcurrent(api, pageTitles, &tasks, finder, currentTime)
 }
 
 // queryTasksFromPagesSequential processes pages sequentially (original implementation).
 func queryTasksFromPagesSequential(api internal.LogseqAPI,
 	pageTitles []string, tasks *internal.CategorizedTasks,
-	finder internal.LogseqFinder) (*internal.CategorizedTasks, error) {
+	finder internal.LogseqFinder, currentTime func() time.Time) (*internal.CategorizedTasks, error) {
 	for _, pageTitle := range pageTitles {
 		jsonTasks, err := queryTasksFromSinglePage(api, pageTitle, finder)
 		if err != nil {
@@ -184,7 +188,7 @@ func queryTasksFromPagesSequential(api internal.LogseqAPI,
 		fmt.Printf(" %s: ", internal.PageColor(pageTitle))
 		fmt.Print(FormatCount(len(jsonTasks), "task", "tasks"))
 
-		addTasksToCategories(jsonTasks, tasks)
+		addTasksToCategories(jsonTasks, tasks, currentTime)
 	}
 
 	return tasks, nil
@@ -193,7 +197,7 @@ func queryTasksFromPagesSequential(api internal.LogseqAPI,
 // queryTasksFromPagesConcurrent processes pages concurrently using goroutines.
 func queryTasksFromPagesConcurrent(api internal.LogseqAPI,
 	pageTitles []string, tasks *internal.CategorizedTasks,
-	finder internal.LogseqFinder) (*internal.CategorizedTasks, error) {
+	finder internal.LogseqFinder, currentTime func() time.Time) (*internal.CategorizedTasks, error) {
 	type pageResult struct {
 		pageTitle string
 		jsonTasks []internal.TaskJSON
@@ -220,7 +224,7 @@ func queryTasksFromPagesConcurrent(api internal.LogseqAPI,
 		fmt.Printf(" %s: ", internal.PageColor(result.pageTitle))
 		fmt.Print(FormatCount(len(result.jsonTasks), "task", "tasks"))
 
-		addTasksToCategories(result.jsonTasks, tasks)
+		addTasksToCategories(result.jsonTasks, tasks, currentTime)
 	}
 
 	return tasks, nil
@@ -248,10 +252,15 @@ func queryTasksFromSinglePage(api internal.LogseqAPI, pageTitle string,
 }
 
 // addTasksToCategories adds tasks to the appropriate categories in CategorizedTasks.
-func addTasksToCategories(jsonTasks []internal.TaskJSON, tasks *internal.CategorizedTasks) {
+func addTasksToCategories(jsonTasks []internal.TaskJSON, tasks *internal.CategorizedTasks,
+	currentTime func() time.Time) {
 	for _, task := range jsonTasks {
-		if task.Overdue() {
+		if task.Overdue(currentTime) {
 			tasks.Overdue.Add(task.UUID)
+		}
+
+		if task.FutureScheduled(currentTime) {
+			tasks.FutureScheduled.Add(task.UUID)
 		}
 
 		if task.Doing() {
@@ -268,10 +277,11 @@ func defaultQuery(pageTitle string) string {
 	return fmt.Sprintf("(and [[%s]] (task TODO LATER DOING NOW WAITING))", pageTitle)
 }
 
-func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
+func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit,gocyclo,maintidx
 	graph *logseq.Graph, pageTitle string, newBlockRefs, obsoleteBlockRefs,
-	overdueBlockRefs *set.Set[string],
+	overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
 ) (*Result, error) {
+	// TODO: refactor: break this big function in smaller functions
 	transaction := graph.NewTransaction()
 
 	page, err := transaction.OpenPage(pageTitle)
@@ -279,10 +289,11 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		return nil, fmt.Errorf("failed to open page for transaction: %w", err)
 	}
 
-	var firstBlock, dividerNewTasks, dividerOverdue, dividerFocus *content.Block
+	var firstBlock, dividerNewTasks, dividerOverdue, dividerFocus, dividerScheduled *content.Block
 
 	deletedCount := 0
 	movedCount := 0
+	movedScheduledCount := 0
 	unpinnedCount := 0
 	result := &Result{
 		FocusRefsFromPage: set.NewSet[string](),
@@ -305,6 +316,8 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 					dividerOverdue = block
 				case text.Value == "Focus":
 					dividerFocus = block
+				case strings.Contains(text.Value, "Scheduled tasks"):
+					dividerScheduled = block
 				}
 			}
 
@@ -323,6 +336,12 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 						shouldDelete = true
 
 						movedCount++
+					}
+				case futureScheduledBlockRefs.Contains(blockRef.ID):
+					shouldDelete = true
+
+					if dividerScheduled == nil || !internal.IsAncestor(block, dividerScheduled) {
+						movedScheduledCount++
 					}
 				default:
 					// Here we have an existing task that's not overdue.
@@ -355,7 +374,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		})
 	}
 
-	//  Sections: Focus / Overdue / New tasks
+	//  Sections: Focus / Overdue / New tasks / all other tasks / Scheduled tasks
 
 	// Insert (new and moved) overdue tasks after the focus section and before the new ones
 	//  If they are moved to the top, all overdue tasks will go to the focus page, and this misses the point.
@@ -390,6 +409,13 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 				continue
 			}
 
+			if futureScheduledBlockRefs.Contains(blockRef) {
+				// Don't add future scheduled tasks as new tasks but count them as moved
+				movedScheduledCount++
+
+				continue
+			}
+
 			if dividerNewTasks == nil {
 				dividerNewTasks = content.NewBlock(content.NewParagraph(
 					content.NewText("New tasks "),
@@ -407,7 +433,23 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		result.ShowQuickCapture = true
 	}
 
-	save = removeEmptyDividers(save, dividerNewTasks, dividerOverdue)
+	// Move future scheduled tasks to the bottom of the backlog page
+	if futureScheduledBlockRefs.Size() > 0 {
+		for _, blockRef := range futureScheduledBlockRefs.ValuesSorted() {
+			if dividerScheduled == nil {
+				dividerScheduled = content.NewBlock(content.NewParagraph(
+					content.NewText("⏰ Scheduled tasks "),
+					content.NewPageLink("quick capture"),
+				))
+				page.AddBlock(dividerScheduled)
+			}
+
+			scheduledTask := content.NewBlock(content.NewBlockRef(blockRef))
+			dividerScheduled.AddChild(scheduledTask)
+		}
+	}
+
+	save = removeEmptyDividers(save, dividerNewTasks, dividerOverdue, dividerScheduled)
 
 	if deletedCount > 0 {
 		// Remove completed or unreferenced tasks
@@ -421,6 +463,12 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 
 		save = true
 		result.ShowQuickCapture = true
+	}
+
+	if movedScheduledCount > 0 {
+		color.Blue(" %s moved to scheduled tasks", FormatCount(movedScheduledCount, "task was", "tasks were"))
+
+		save = true
 	}
 
 	if unpinnedCount > 0 {

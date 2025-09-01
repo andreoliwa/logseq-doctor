@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/lsd/internal"
@@ -87,6 +88,15 @@ func stubJSONResponse(t *testing.T, basename string) (string, error) {
 	return string(data), nil
 }
 
+var testStartTime = time.Now()                                   //nolint:gochecknoglobals
+var baselineTime = time.Date(2025, 4, 13, 3, 33, 0, 0, time.UTC) //nolint:gochecknoglobals
+
+func RelativeTime() time.Time {
+	elapsed := time.Since(testStartTime)
+
+	return baselineTime.Add(elapsed)
+}
+
 func StubBacklog(t *testing.T, configPage, caseDirName string, apiResponses *StubAPIResponses) backlog.Backlog {
 	t.Helper()
 
@@ -94,5 +104,5 @@ func StubBacklog(t *testing.T, configPage, caseDirName string, apiResponses *Stu
 	api := newMockLogseqAPI(t, *apiResponses)
 	reader := backlog.NewPageConfigReader(graph, configPage)
 
-	return backlog.NewBacklog(graph, api, reader)
+	return backlog.NewBacklog(graph, api, reader, RelativeTime)
 }

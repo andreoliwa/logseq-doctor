@@ -42,7 +42,7 @@
     "properties": {
       "id": "67c5e302-29d1-4116-b83f-b064b18102f4"
     },
-    "deadline": 20250309,
+    "deadline": 20250509,
     "repeated?": true,
     "parent": {
       "id": 118
@@ -63,7 +63,7 @@
       "id": "67c5e302-29d1-4116-b83f-b064b18102f4"
     },
     "uuid": "67c5e302-29d1-4116-b83f-b064b18102f4",
-    "content": "TODO **18:48** #work Tidy up office papers\nDEADLINE: <2025-03-09 Sun ++1w>\nid:: 67c5e302-29d1-4116-b83f-b064b18102f4\n:LOGBOOK:\n* State \"DONE\" from \"TODO\" [2025-03-03 Mon 19:03]\n* State \"DONE\" from \"TODO\" [2025-03-03 Mon 19:04]\n:END:",
+    "content": "TODO **18:48** #work Tidy up office papers\nDEADLINE: <2025-05-09 Fri ++1w>\nid:: 67c5e302-29d1-4116-b83f-b064b18102f4\n:LOGBOOK:\n* State \"DONE\" from \"TODO\" [2025-03-03 Mon 19:03]\n* State \"DONE\" from \"TODO\" [2025-03-03 Mon 19:04]\n:END:",
     "marker": "TODO",
     "page": {
       "journalDay": 20250303,
@@ -76,6 +76,102 @@
     ],
     "left": {
       "id": 118
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 36
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c48f03-1234-4567-8901-234567890125"
+    },
+    "scheduled": 20250715,
+    "parent": {
+      "id": 32
+    },
+    "id": 37,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 32
+      },
+      {
+        "id": 36
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48f03-1234-4567-8901-234567890125"
+    },
+    "uuid": "67c48f03-1234-4567-8901-234567890125",
+    "content": "TODO #work Prepare quarterly review\nid:: 67c48f03-1234-4567-8901-234567890125\nSCHEDULED: <2025-07-15 Tue>",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250228,
+      "name": "friday, 28-02-2025",
+      "originalName": "Friday, 28-02-2025",
+      "id": 32
+    },
+    "propertiesOrder": [
+      "id"
+    ],
+    "left": {
+      "id": 119
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 36
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c48f04-1234-4567-8901-234567890126"
+    },
+    "scheduled": 20250825,
+    "parent": {
+      "id": 32
+    },
+    "id": 38,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 32
+      },
+      {
+        "id": 36
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48f04-1234-4567-8901-234567890126"
+    },
+    "uuid": "67c48f04-1234-4567-8901-234567890126",
+    "content": "TODO #work Plan team building event\nid:: 67c48f04-1234-4567-8901-234567890126\nSCHEDULED: <2025-08-25 Mon>",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250228,
+      "name": "friday, 28-02-2025",
+      "originalName": "Friday, 28-02-2025",
+      "id": 32
+    },
+    "propertiesOrder": [
+      "id"
+    ],
+    "left": {
+      "id": 37
     },
     "format": "markdown",
     "refs": [

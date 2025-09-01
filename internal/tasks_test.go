@@ -1,14 +1,14 @@
 package internal_test
 
 import (
-	"github.com/andreoliwa/lsd/internal"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
+	"github.com/andreoliwa/lsd/internal"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestExtractTasksFromJSON(t *testing.T) {
@@ -54,7 +54,7 @@ func TestOverdue(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, tt.task.Overdue(), "Overdue check failed for %s", tt.name)
+			assert.Equal(t, tt.expected, tt.task.Overdue(time.Now), "Overdue check failed for %s", tt.name)
 		})
 	}
 }

@@ -91,7 +91,7 @@
     "properties": {
       "id": "67c48e8a-29bf-4202-924c-925406e9f06d"
     },
-    "deadline": 20250322,
+    "deadline": 20250522,
     "parent": {
       "id": 42
     },
@@ -111,7 +111,7 @@
       "id": "67c48e8a-29bf-4202-924c-925406e9f06d"
     },
     "uuid": "67c48e8a-29bf-4202-924c-925406e9f06d",
-    "content": "TODO Clean the oven (future deadline)\nid:: 67c48e8a-29bf-4202-924c-925406e9f06d\nDEADLINE: <2025-03-22 Sat>",
+    "content": "TODO Clean the oven (future deadline)\nid:: 67c48e8a-29bf-4202-924c-925406e9f06d\nDEADLINE: <2025-05-22 Thu>",
     "marker": "TODO",
     "page": {
       "journalDay": 20250301,
@@ -168,6 +168,102 @@
     ],
     "left": {
       "id": 102
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 44
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c48f01-1234-4567-8901-234567890123"
+    },
+    "scheduled": 20250515,
+    "parent": {
+      "id": 31
+    },
+    "id": 46,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 31
+      },
+      {
+        "id": 44
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48f01-1234-4567-8901-234567890123"
+    },
+    "uuid": "67c48f01-1234-4567-8901-234567890123",
+    "content": "TODO #kitchen Plan summer menu\nid:: 67c48f01-1234-4567-8901-234567890123\nSCHEDULED: <2025-05-15 Thu>",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250301,
+      "name": "saturday, 01-03-2025",
+      "originalName": "Saturday, 01-03-2025",
+      "id": 31
+    },
+    "propertiesOrder": [
+      "id"
+    ],
+    "left": {
+      "id": 45
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 44
+      }
+    ]
+  },
+  {
+    "properties": {
+      "id": "67c48f02-1234-4567-8901-234567890124"
+    },
+    "scheduled": 20250620,
+    "parent": {
+      "id": 31
+    },
+    "id": 47,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 31
+      },
+      {
+        "id": 44
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48f02-1234-4567-8901-234567890124"
+    },
+    "uuid": "67c48f02-1234-4567-8901-234567890124",
+    "content": "TODO #kitchen Organize spice cabinet\nid:: 67c48f02-1234-4567-8901-234567890124\nSCHEDULED: <2025-06-20 Fri>",
+    "marker": "TODO",
+    "page": {
+      "journalDay": 20250301,
+      "name": "saturday, 01-03-2025",
+      "originalName": "Saturday, 01-03-2025",
+      "id": 31
+    },
+    "propertiesOrder": [
+      "id"
+    ],
+    "left": {
+      "id": 46
     },
     "format": "markdown",
     "refs": [
