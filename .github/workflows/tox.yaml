@@ -104,7 +104,7 @@ jobs:
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         with:
           python-version: ${{ matrix.python }}
