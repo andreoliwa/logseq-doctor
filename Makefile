@@ -112,3 +112,7 @@ release: # Create a GitHub release for the Go package only
 smoke: rehash test which # Run simple tests to make sure the package is working
 	uv run lsdpy --help
 .PHONY: smoke
+
+docs: # Generate documentation (Go and Python)
+	tox -e docs
+.PHONY: docs

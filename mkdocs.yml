@@ -64,6 +64,9 @@ nav:
   - Getting Started:
       - Installation: installation.md
       - Usage: usage.md
+  - API Reference:
+      - Go API: reference/go.md
+      - Python API: reference/python.md
   - Reference:
       - CLI Commands: reference/cli.md
       - README: readme.md
@@ -75,8 +78,27 @@ extra_css:
   - stylesheets/extra.css
 
 plugins:
-  - glightbox
   - search
+  - glightbox
+  - gen-files:
+      scripts:
+        - docs/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
+            heading_level: 2
 
 extra:
   social:

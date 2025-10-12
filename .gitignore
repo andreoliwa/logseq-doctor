@@ -63,6 +63,10 @@ docs/_build
 site/
 .cache/
 
+# Generated documentation
+docs/go-api/
+docs/reference/python/
+
 .DS_Store
 *~
 .*.sw[po]

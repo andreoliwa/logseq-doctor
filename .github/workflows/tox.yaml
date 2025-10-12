@@ -32,11 +32,6 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - name: "docs"
-            python: "3.11"
-            toxpython: "python3.11"
-            tox_env: "docs"
-            os: "ubuntu-latest"
           - name: "py310 (ubuntu) + coverage"
             python: "3.10"
             toxpython: "python3.10"

@@ -7,6 +7,10 @@ on:
     paths:
       - "docs/**"
       - "mkdocs.yml"
+      - "cmd/**"
+      - "pkg/**"
+      - "internal/**"
+      - "src/**"
       - ".github/workflows/docs.yaml"
   workflow_dispatch:
 
@@ -25,9 +29,17 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Install dependencies
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: Install tox
         run: |
-          pip install -r docs/requirements.txt
+          pip install tox
+
+      - name: Build documentation with tox
+        run: |
+          tox -e docs
 
       - name: Configure Git
         run: |
