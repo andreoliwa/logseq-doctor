@@ -1,6 +1,6 @@
 {
-  // https://docs.renovatebot.com/configuration-options/#automerge
   extends: ["config:recommended"],
+  // https://docs.renovatebot.com/configuration-options/#automerge
   automerge: true,
   // https://docs.renovatebot.com/configuration-options/#automergetype
   automergeType: "branch",
