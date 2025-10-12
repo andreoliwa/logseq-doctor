@@ -44,7 +44,7 @@ keywords = [
 ]
 license = {file = "LICENSE"}
 name = "logseq-doctor"
-readme = "README.md"
+readme = "docs/readme.md"
 requires-python = ">=3.9"
 version = "0.3.0"
 

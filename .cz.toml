@@ -15,8 +15,7 @@ tag_format = "v$version"
 update_changelog_on_bump = true
 version = "0.3.0"
 version_files = [
-  "docs/conf.py:version = release",
+  "docs/readme.md:github",
   "pyproject.toml:version =",
-  "README.md:github",
   "src/logseq_doctor/__init__.py",
 ]

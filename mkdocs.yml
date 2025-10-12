@@ -1,0 +1,86 @@
+site_name: Logseq Doctor
+site_url: https://andreoliwa.github.io/logseq-doctor/
+site_description: >-
+  Heal your flat old Markdown files before importing them to Logseq.
+
+repo_name: andreoliwa/logseq-doctor
+repo_url: https://github.com/andreoliwa/logseq-doctor
+edit_uri: edit/master/docs
+
+theme:
+  name: material
+  icon:
+    logo: fontawesome/solid/stethoscope
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.footnote.tooltips
+    - navigation.indexes
+    - navigation.path
+    - navigation.sections
+    - navigation.tracking
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - footnotes
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      auto_title: true
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: installation.md
+      - Usage: usage.md
+  - Reference:
+      - CLI Commands: reference/cli.md
+      - README: readme.md
+  - Development:
+      - Contributing: contributing.md
+      - Changelog: changelog.md
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - glightbox
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/andreoliwa/logseq-doctor
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/logseq-doctor/
