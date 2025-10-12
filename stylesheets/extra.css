@@ -1,0 +1,40 @@
+/* Custom styles for Logseq Doctor documentation */
+
+:root {
+    --md-primary-fg-color: #2196f3;
+    --md-accent-fg-color: #00bcd4;
+}
+
+/* Improve code block styling */
+.highlight {
+    border-radius: 4px;
+}
+
+/* Add some spacing to admonitions */
+.admonition {
+    margin: 1.5em 0;
+}
+
+/* Style for inline code */
+code {
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+/* Improve table styling */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+
+table th,
+table td {
+    padding: 0.75em;
+    border: 1px solid var(--md-default-fg-color--lightest);
+}
+
+table th {
+    font-weight: 600;
+    background-color: var(--md-default-fg-color--lightest);
+}
