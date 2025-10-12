@@ -7,26 +7,28 @@
       
       
       
-        <link rel="canonical" href="https://andreoliwa.github.io/logseq-doctor/changelog/">
+        <link rel="canonical" href="https://andreoliwa.github.io/logseq-doctor/reference/go/">
       
       
-        <link rel="prev" href="../contributing/">
+        <link rel="prev" href="../../usage/">
       
       
+        <link rel="next" href="../python/">
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
     
     
       
-        <title>Changelog - Logseq Doctor</title>
+        <title>Go API - Logseq Doctor</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.2a3383ac.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2a3383ac.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -45,18 +47,18 @@
       
     
     
-      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
     
     
     
-  <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+  <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
             html.glightbox-open { overflow: initial; height: 100%; }
             .gslide-title { margin-top: 0px; user-select: text; }
             .gslide-desc { color: #666; user-select: text; }
@@ -85,7 +87,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#changelog" class="md-skip">
+        <a href="#go-api-reference" class="md-skip">
           Skip to content
         </a>
       
@@ -101,7 +103,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Logseq Doctor" class="md-header__button md-logo" aria-label="Logseq Doctor" data-md-component="logo">
+    <a href="../.." title="Logseq Doctor" class="md-header__button md-logo" aria-label="Logseq Doctor" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M32 48C32 21.5 53.5 0 80 0h48c17.7 0 32 14.3 32 32s-14.3 32-32 32H96v128c0 53 43 96 96 96s96-43 96-96V64h-32c-17.7 0-32-14.3-32-32s14.3-32 32-32h48c26.5 0 48 21.5 48 48v144c0 77.4-55 142-128 156.8V368c0 61.9 50.1 112 112 112s112-50.1 112-112v-85.5c-37.3-13.2-64-48.7-64-90.5 0-53 43-96 96-96s96 43 96 96c0 41.8-26.7 77.4-64 90.5V368c0 97.2-78.8 176-176 176s-176-78.8-176-176v-19.2C87 334 32 269.4 32 192zm448 176a32 32 0 1 0 0-64 32 32 0 1 0 0 64"></path></svg>
@@ -121,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Changelog
+              Go API
             
           </span>
         </div>
@@ -237,7 +239,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Logseq Doctor" class="md-nav__button md-logo" aria-label="Logseq Doctor" data-md-component="logo">
+    <a href="../.." title="Logseq Doctor" class="md-nav__button md-logo" aria-label="Logseq Doctor" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M32 48C32 21.5 53.5 0 80 0h48c17.7 0 32 14.3 32 32s-14.3 32-32 32H96v128c0 53 43 96 96 96s96-43 96-96V64h-32c-17.7 0-32-14.3-32-32s14.3-32 32-32h48c26.5 0 48 21.5 48 48v144c0 77.4-55 142-128 156.8V368c0 61.9 50.1 112 112 112s112-50.1 112-112v-85.5c-37.3-13.2-64-48.7-64-90.5 0-53 43-96 96-96s96 43 96 96c0 41.8-26.7 77.4-64 90.5V368c0 97.2-78.8 176-176 176s-176-78.8-176-176v-19.2C87 334 32 269.4 32 192zm448 176a32 32 0 1 0 0-64 32 32 0 1 0 0 64"></path></svg>
@@ -267,7 +269,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -338,7 +340,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../installation/" class="md-nav__link">
+      <a href="../../installation/" class="md-nav__link">
         
   
   
@@ -361,7 +363,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
+      <a href="../../usage/" class="md-nav__link">
         
   
   
@@ -388,8 +390,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -406,11 +410,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3">
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
@@ -426,7 +430,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             API Reference
@@ -437,10 +441,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../reference/go/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Go API
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -451,6 +477,86 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Packages
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Packages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-line-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command-line Interface
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#public-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Public Packages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internal-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Internal Packages
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -463,7 +569,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/python/" class="md-nav__link">
+      <a href="../python/" class="md-nav__link">
         
   
   
@@ -542,7 +648,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/cli/" class="md-nav__link">
+      <a href="../cli/" class="md-nav__link">
         
   
   
@@ -565,7 +671,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../readme/" class="md-nav__link">
+      <a href="../../readme/" class="md-nav__link">
         
   
   
@@ -592,10 +698,8 @@
       
   
   
-    
   
   
-  
     
     
       
@@ -612,11 +716,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5">
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
@@ -632,7 +736,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Development
@@ -646,7 +750,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../contributing/" class="md-nav__link">
+      <a href="../../contributing/" class="md-nav__link">
         
   
   
@@ -666,19 +770,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../changelog/" class="md-nav__link">
         
   
   
@@ -689,7 +784,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -722,6 +816,74 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Packages
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Packages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-line-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command-line Interface
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#public-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Public Packages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internal-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Internal Packages
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -736,7 +898,7 @@
 
 
   
-    <a href="https://github.com/andreoliwa/logseq-doctor/edit/master/docs/changelog.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/andreoliwa/logseq-doctor/edit/master/docs/reference/go.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
     </a>
@@ -745,124 +907,58 @@
     
       
     
-    <a href="https://github.com/andreoliwa/logseq-doctor/raw/master/docs/changelog.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/andreoliwa/logseq-doctor/raw/master/docs/reference/go.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
     </a>
   
 
 
-<h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">¶</a></h1>
-<p>All notable changes to this project will be documented in this file.</p>
-<p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
-and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<h1 id="050-2025-02-13"><a href="https://github.com/andreoliwa/logseq-doctor/compare/v0.4.0...v0.5.0">0.5.0</a> (2025-02-13)<a class="headerlink" href="#050-2025-02-13" title="Permanent link">¶</a></h1>
-<h3 id="features">Features<a class="headerlink" href="#features" title="Permanent link">¶</a></h3>
+<h1 id="go-api-reference">Go API Reference<a class="headerlink" href="#go-api-reference" title="Permanent link">¶</a></h1>
+<p>This section contains the API documentation for the Go implementation of Logseq Doctor.</p>
+<p><strong><a href="https://pkg.go.dev/github.com/andreoliwa/logseq-doctor">View on pkg.go.dev</a></strong></p>
+<div class="admonition tip">
+<p class="admonition-title">Documentation</p>
+</div>
+<p>The documentation below is automatically generated from the Go source code using <a href="https://github.com/princjef/gomarkdoc">gomarkdoc</a> and includes detailed API reference for all packages, <strong>including internal packages</strong>.</p>
+<h2 id="packages">Packages<a class="headerlink" href="#packages" title="Permanent link">¶</a></h2>
+<p>Browse the documentation for each package:</p>
+<h3 id="command-line-interface">Command-line Interface<a class="headerlink" href="#command-line-interface" title="Permanent link">¶</a></h3>
 <ul>
-<li><strong>tasks:</strong> JSON format (<a href="https://github.com/andreoliwa/logseq-doctor/issues/121">#121</a>) (<a href="https://github.com/andreoliwa/logseq-doctor/commit/07da841b4f64e5a72f9edb6f578f91dd47e53ed4">07da841</a>)</li>
+<li><strong><a href="cmd/">cmd</a></strong> - CLI implementation using Cobra</li>
 </ul>
-<h1 id="040-2025-02-11"><a href="https://github.com/andreoliwa/logseq-doctor/compare/v0.3.0...v0.4.0">0.4.0</a> (2025-02-11)<a class="headerlink" href="#040-2025-02-11" title="Permanent link">¶</a></h1>
-<h3 id="bug-fixes">Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permanent link">¶</a></h3>
+<h3 id="public-packages">Public Packages<a class="headerlink" href="#public-packages" title="Permanent link">¶</a></h3>
 <ul>
-<li><strong>deps:</strong> update github.com/andreoliwa/logseq-go digest to 276dc3d (<a href="https://github.com/andreoliwa/logseq-doctor/commit/62aa9ec0ab9adfd92d5b99cc5223f88cd387b6e6">62aa9ec</a>)</li>
-<li><strong>deps:</strong> update github.com/andreoliwa/logseq-go digest to 3b9f58b (<a href="https://github.com/andreoliwa/logseq-doctor/commit/13e6274ea8861e0c1267e90d91a09037f738ecac">13e6274</a>)</li>
-<li><strong>deps:</strong> update module github.com/stretchr/testify to v1.10.0 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/f737ea4de9d4aa70d219cbf3da8389ed992568da">f737ea4</a>)</li>
-<li><strong>deps:</strong> update module gotest.tools/v3 to v3.5.2 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/7ee8efc30b64081a54872a361129b968b513c874">7ee8efc</a>)</li>
-<li><strong>deps:</strong> update rust crate anyhow to 1.0.80 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/3938baa83d3968c4784aa2787a4dd6da36b90669">3938baa</a>)</li>
-<li><strong>deps:</strong> update rust crate anyhow to 1.0.81 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/d5e9425467c225ac82e9107de63817bfbabd9f4e">d5e9425</a>)</li>
-<li><strong>deps:</strong> update rust crate anyhow to v1.0.95 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/a0bdcf705708f31edba418144c404e9a8acf23be">a0bdcf7</a>)</li>
-<li><strong>deps:</strong> update rust crate assert_fs to v1.1.2 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/b55d65439b39b27afd1b67fa9b2c254d6905cab6">b55d654</a>)</li>
-<li><strong>deps:</strong> update rust crate chrono to 0.4.34 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/8903b294c690ecb1a21da999dad5f16f6089e3ef">8903b29</a>)</li>
-<li><strong>deps:</strong> update rust crate chrono to 0.4.35 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/4001ea5e722d04300f94cc343d1d4c9a9d99d6a5">4001ea5</a>)</li>
-<li><strong>deps:</strong> update rust crate chrono to 0.4.37 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/8ff6a0b647efed6bbe0efc2362109f381dc28eae">8ff6a0b</a>)</li>
-<li><strong>deps:</strong> update rust crate pyo3 to 0.20.3 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/c0a566af231f249ed833efc7a8f1295f11f98b3e">c0a566a</a>)</li>
-<li><strong>deps:</strong> update rust crate pyo3 to 0.21.0 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/5a755180b2a9d845a6ee11e1991aa9f43f86fc47">5a75518</a>)</li>
-<li><strong>deps:</strong> update rust crate pyo3 to 0.21.1 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/4f9b6b5dcf7e4fa07464485705ef26e290a85ec2">4f9b6b5</a>)</li>
-<li><strong>deps:</strong> update rust crate regex to 1.10.4 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/fc033da8061b6efdc29c8e2cb7c60c08fcc1c567">fc033da</a>)</li>
-<li><strong>deps:</strong> update rust crate regex to v1.11.1 (<a href="https://github.com/andreoliwa/logseq-doctor/commit/61ed7764359adf711ab73abda595398efa649374">61ed776</a>)</li>
-<li>don't remove double spaces in tables (<a href="https://github.com/andreoliwa/logseq-doctor/commit/253a1d07b72671227804245f366c08d2f366ec4e">253a1d0</a>)</li>
-<li>make Journal properties public (<a href="https://github.com/andreoliwa/logseq-doctor/commit/78b18a23a8835c8ae1eb00ce2f03acaba6bf4948">78b18a2</a>)</li>
-<li>one transaction per file, to avoid touching unmodified files (<a href="https://github.com/andreoliwa/logseq-doctor/commit/b66410b3cbca0549cfbe72541e6bfdabbf2e48e4">b66410b</a>)</li>
-<li><strong>tasks:</strong> use § as column separator, to parse with fzf (<a href="https://github.com/andreoliwa/logseq-doctor/commit/ccd12e74a3dd70edabdba5645a10fc5889362003">ccd12e7</a>)</li>
+<li><strong><a href="pkg/set/">pkg/set</a></strong> - Generic set data structure</li>
 </ul>
-<h3 id="features_1">Features<a class="headerlink" href="#features_1" title="Permanent link">¶</a></h3>
+<h3 id="internal-packages">Internal Packages<a class="headerlink" href="#internal-packages" title="Permanent link">¶</a></h3>
 <ul>
-<li>append raw Markdown from sdtin to a journal (<a href="https://github.com/andreoliwa/logseq-doctor/commit/545b17be5217e2d74a974ba4f7160215a16f440a">545b17b</a>)</li>
-<li>check for running tasks (<a href="https://github.com/andreoliwa/logseq-doctor/commit/0bfef8f3b0a56c5fc61929ebe39d19c56986e85c">0bfef8f</a>)</li>
-<li>check references to forbidden pages (<a href="https://github.com/andreoliwa/logseq-doctor/commit/58f9f26d2a885ae26040d2f6d0617e5c4a215792">58f9f26</a>)</li>
-<li>Python calling a Go executable with a simple function (<a href="https://github.com/andreoliwa/logseq-doctor/commit/902e54df5cf3e39043a58d6f90d2508df1afeb78">902e54d</a>)</li>
-<li>tidy-up command accepting Markdown files (<a href="https://github.com/andreoliwa/logseq-doctor/commit/0f2e54919fb732010c64a9d30005fc5ee7c50ebd">0f2e549</a>)</li>
-<li><strong>tidy-up:</strong> check consecutive spaces in Go (<a href="https://github.com/andreoliwa/logseq-doctor/issues/115">#115</a>) (<a href="https://github.com/andreoliwa/logseq-doctor/commit/32a02d889e7a6945f24cdebba77b8993e33fa1c0">32a02d8</a>)</li>
-<li><strong>tidy-up:</strong> remove double spaces and save Markdown file (<a href="https://github.com/andreoliwa/logseq-doctor/commit/212014af48f0585ca0e31aea0b75966efccdc432">212014a</a>)</li>
-<li><strong>tidy-up:</strong> remove empty bullets in Go, remove Python command (<a href="https://github.com/andreoliwa/logseq-doctor/commit/a472b30ab0fdeaa744866af69ab7dca14e340a2e">a472b30</a>)</li>
-<li><strong>tidy-up:</strong> remove unnecessary brackets from tags (<a href="https://github.com/andreoliwa/logseq-doctor/commit/d887e58421132f941686966c3f9ac057f4232e14">d887e58</a>)</li>
-<li><strong>tidy-up:</strong> remove unnecessary brackets from tags in Go (<a href="https://github.com/andreoliwa/logseq-doctor/commit/f01fffd6ee75148a78d8b7c709537c3a841e9b5d">f01fffd</a>)</li>
+<li><strong><a href="internal/">internal</a></strong> - Internal implementation details</li>
+<li><strong><a href="internal/backlog/">internal/backlog</a></strong> - Backlog management</li>
+<li><strong><a href="internal/testutils/">internal/testutils</a></strong> - Testing utilities</li>
 </ul>
-<h2 id="v030-2024-02-07">v0.3.0 (2024-02-07)<a class="headerlink" href="#v030-2024-02-07" title="Permanent link">¶</a></h2>
-<h3 id="feat">Feat<a class="headerlink" href="#feat" title="Permanent link">¶</a></h3>
-<ul>
-<li><strong>journal</strong>: option to prepend content</li>
-<li><strong>journal</strong>: choose the date (with natural language)</li>
-<li><strong>journal</strong>: output content to stdout</li>
-<li><strong>journal</strong>: option to convert to outline (#17)</li>
-<li><strong>journal</strong>: pipe content from stdin (#17)</li>
-<li><strong>journal</strong>: append content to the current journal page (#17)</li>
-</ul>
-<h2 id="v021-2024-02-04">v0.2.1 (2024-02-04)<a class="headerlink" href="#v021-2024-02-04" title="Permanent link">¶</a></h2>
-<h3 id="fix">Fix<a class="headerlink" href="#fix" title="Permanent link">¶</a></h3>
-<ul>
-<li>automated release with "make release" from local computer</li>
-</ul>
-<h2 id="v020-2024-02-04">v0.2.0 (2024-02-04)<a class="headerlink" href="#v020-2024-02-04" title="Permanent link">¶</a></h2>
-<h3 id="feat_1">Feat<a class="headerlink" href="#feat_1" title="Permanent link">¶</a></h3>
-<ul>
-<li>"logseq" crate for reusable functions</li>
-<li>remove double spaces</li>
-<li>remove Python 3.7</li>
-<li>list tasks, add Kanban board (#78)</li>
-<li>tidy up files by removing empty bullets (#63)</li>
-<li>rich CLI with Typer</li>
-</ul>
-<h3 id="fix_1">Fix<a class="headerlink" href="#fix_1" title="Permanent link">¶</a></h3>
-<ul>
-<li>remove Python 3.8 support</li>
-<li>preserve line break at the end</li>
-<li><strong>deps</strong>: update dependency mistletoe to v1.3.0</li>
-<li>remove --format kanban</li>
-<li><strong>deps</strong>: update dependency mistletoe to v1.2.1</li>
-<li><strong>deps</strong>: update dependency mistletoe to v1.2.0</li>
-<li><strong>deps</strong>: update dependency click to v8.1.7</li>
-<li>Typer needs some imports, UP006 ignores target-version=py38</li>
-<li>don't print "Done" on success</li>
-<li><strong>deps</strong>: update dependency click to v8.1.6</li>
-<li><strong>deps</strong>: update dependency click to v8.1.5</li>
-<li><strong>deps</strong>: update dependency click to v8.1.4</li>
-<li><strong>deps</strong>: update dependency mistletoe to v1.1.0</li>
-<li><strong>deps</strong>: update dependency requests to v2.31.0</li>
-<li><strong>deps</strong>: update dependency requests to v2.30.0</li>
-<li><strong>deps</strong>: update dependency typer to v0.9.0</li>
-<li><strong>deps</strong>: update dependency typer to v0.8.0</li>
-<li>add Ruff and adjust code</li>
-<li><strong>deps</strong>: update dependency mistletoe to v1</li>
-<li><strong>deps</strong>: upgrade shelligham and pre-commit hooks, fix tox</li>
-<li><strong>tidy-up</strong>: display file name that was fixed</li>
-<li>handle thematic breaks and setext headers</li>
-<li>handle nested lists with single or multiple levels (#47)</li>
-</ul>
-<h3 id="refactor">Refactor<a class="headerlink" href="#refactor" title="Permanent link">¶</a></h3>
-<ul>
-<li>rename Python module</li>
-</ul>
-<h2 id="v011-2022-08-21">v0.1.1 (2022-08-21)<a class="headerlink" href="#v011-2022-08-21" title="Permanent link">¶</a></h2>
-<h3 id="fix_2">Fix<a class="headerlink" href="#fix_2" title="Permanent link">¶</a></h3>
-<ul>
-<li>ImportError on lsd --help</li>
-</ul>
-<h2 id="v010-2022-03-26">v0.1.0 (2022-03-26)<a class="headerlink" href="#v010-2022-03-26" title="Permanent link">¶</a></h2>
-<h3 id="feat_2">Feat<a class="headerlink" href="#feat_2" title="Permanent link">¶</a></h3>
-<ul>
-<li>convert headers and flat paragraphs to an outline</li>
-</ul>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>go<span class="w"> </span>get<span class="w"> </span>github.com/andreoliwa/logseq-doctor
+</code></pre></div>
+<p>Or install the binary:</p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Using Homebrew</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>brew<span class="w"> </span>install<span class="w"> </span>andreoliwa/formulae/logseq-doctor
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Or download from releases</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>gh<span class="w"> </span>release<span class="w"> </span>download<span class="w"> </span>-R<span class="w"> </span>andreoliwa/logseq-doctor
+</code></pre></div>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="s">"github.com/andreoliwa/logseq-doctor/pkg/set"</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">)</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1">// Use the set package</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nx">s</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">set</span><span class="p">.</span><span class="nx">NewSet</span><span class="p">[</span><span class="kt">string</span><span class="p">]()</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nx">s</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="s">"item"</span><span class="p">)</span>
+</code></pre></div>
+<p>Or use the CLI:</p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>lsd<span class="w"> </span>--help
+</code></pre></div>
 
 
 
@@ -938,10 +1034,10 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
     
     
       
-      <script id="__config" type="application/json">{"base": "..", "features": ["content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.footnote.tooltips", "navigation.indexes", "navigation.path", "navigation.sections", "navigation.tracking", "toc.follow"], "search": "../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.footnote.tooltips", "navigation.indexes", "navigation.path", "navigation.sections", "navigation.tracking", "toc.follow"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
       
     
   
