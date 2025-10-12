@@ -1,0 +1,4 @@
+- All are already here, including the DOING task, and they should be preserved
+- ((67c48ea4-92cd-4b27-8202-ec1f4fe4ec59))
+- ((67c490ad-f00e-480f-bead-0dcab66c3173))
+- ((67c48cb3-ee20-48fe-9a2b-3f63dff412aa))

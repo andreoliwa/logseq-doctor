@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/andreoliwa/lsd/internal"
 	"github.com/andreoliwa/lsd/internal/backlog"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 var backlogCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
@@ -26,7 +28,7 @@ directly within the interface.`,
 			os.Getenv("LOGSEQ_HOST_URL"), os.Getenv("LOGSEQ_API_TOKEN"))
 		graph := internal.OpenGraphFromPath(path)
 		reader := backlog.NewPageConfigReader(graph, "backlog")
-		proc := backlog.NewBacklog(graph, api, reader)
+		proc := backlog.NewBacklog(graph, api, reader, time.Now)
 
 		err := proc.ProcessAll(args)
 		if err != nil {

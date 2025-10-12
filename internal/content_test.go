@@ -31,7 +31,9 @@ func TestIsValidMarkdownFile(t *testing.T) {
 
 	// Create a valid markdown file
 	validFilePath := filepath.Join(dir, "valid_markdown_file.md")
-	if err := os.WriteFile(validFilePath, []byte("# Test"), 0o600); err != nil {
+
+	err := os.WriteFile(validFilePath, []byte("# Test"), 0o600)
+	if err != nil {
 		t.Fatalf("Failed to create test file: %v", err)
 	}
 

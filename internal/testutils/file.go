@@ -7,6 +7,7 @@ import (
 	"gotest.tools/v3/golden"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -21,13 +22,9 @@ func AssertPagesDontExist(t *testing.T, graph *logseq.Graph, pages []string) {
 func assertGoldenContent(t *testing.T, graph *logseq.Graph, journals bool, caseDirName string, pages []string) {
 	t.Helper()
 
-	// Uses the Windows line ending because the golden file package normalizes line endings to \n
-	// Search for GOTESTTOOLS_GOLDEN_NormalizeCRLFToLF in this repo.
-	newLine := "\r\n"
 	pagesOrJournalsDir := "pages"
 
 	if journals {
-		newLine = ""
 		pagesOrJournalsDir = "journals"
 	}
 
@@ -43,7 +40,20 @@ func assertGoldenContent(t *testing.T, graph *logseq.Graph, journals bool, caseD
 			subDir = pagesOrJournalsDir
 		}
 
-		golden.Assert(t, string(newContents)+newLine, filepath.Join("stub-graph", subDir, filename+".golden"))
+		content := string(newContents)
+
+		// The end-of-file-fixer hook in .pre-commit-config.yaml adds a trailing newline to all files,
+		// including golden files. The backlog system also ensures files end with a newline when it writes them.
+		// However, when the backlog system doesn't modify a file (save=false), the original file is preserved as-is.
+		// We need to handle both cases: files that already end with newlines and files that don't.
+		// For pages (not journals), ensure content ends with exactly one newline to match
+		// what the end-of-file-fixer hook expects in golden files
+		if !journals {
+			// Remove any existing trailing newlines, then add exactly one
+			content = strings.TrimRight(content, "\r\n") + "\r\n"
+		}
+
+		golden.Assert(t, content, filepath.Join("stub-graph", subDir, filename+".golden"))
 	}
 }
 

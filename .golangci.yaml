@@ -3,6 +3,11 @@
 version: "2"
 linters:
   default: all
+  settings:
+    wsl_v5:
+      allow-first-in-block: true
+      allow-whole-block: false
+      branch-max-lines: 2
   disable:
     # keep-sorted start
     - copyloopvar
@@ -13,6 +18,7 @@ linters:
     - intrange
     - ireturn
     - paralleltest
+    - wsl # replaced by wsl_v5
     # keep-sorted end
   exclusions:
     generated: lax

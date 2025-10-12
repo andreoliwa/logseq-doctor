@@ -16,25 +16,27 @@ default_language_version:
 exclude: '^(\.tox|ci/templates|\.bumpversion\.cfg)(/|$)'
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
+        exclude: '\.golden$'
       - id: debug-statements
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.2
+    rev: v0.24.3
     hooks:
       - id: toml-sort-fix
         exclude: '.*\.lock$'
   - repo: https://github.com/google/keep-sorted
-    rev: v0.6.1
+    rev: v0.7.1
     hooks:
       - id: keep-sorted
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.5
+    rev: v0.14.0
     hooks:
       - id: ruff-format
-      - id: ruff
+      - id: ruff-check
+        args: [--fix]
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:
@@ -46,7 +48,7 @@ repos:
       - id: bashate
         args: [-i, E006]
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.10.0.1
+    rev: v0.11.0.1
     hooks:
       - id: shellcheck
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
@@ -62,7 +64,7 @@ repos:
         args:
           - --no-error-on-unmatched-pattern
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.6.0
+    rev: v4.9.1
     hooks:
       - id: commitizen
         stages:
@@ -72,7 +74,7 @@ repos:
     hooks:
       - id: sync-pre-commit-deps
   - repo: https://github.com/golangci/golangci-lint
-    rev: v2.1.2
+    rev: v2.5.0
     hooks:
       - id: golangci-lint
         name: golangci-lint

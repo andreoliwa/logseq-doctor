@@ -1,5 +1,9 @@
 # https://docs.astral.sh/uv/concepts/projects/init/#packaged-applications
 
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=61.0", "wheel"]
+
 [dependency-groups]
 dev = [
   "pytest-cov>=6.0.0",
@@ -44,7 +48,7 @@ keywords = [
 ]
 license = {file = "LICENSE"}
 name = "logseq-doctor"
-readme = "README.md"
+readme = "docs/readme.md"
 requires-python = ">=3.9"
 version = "0.3.0"
 
@@ -172,6 +176,12 @@ max-complexity = 10
 "python/logseq_doctor/cli.py" = ["B008", "PLR0913", "UP006"]
 "tests/**" = ["D100", "D103", "INP001", "PLR0913", "S101", "S105", "T201", "T203", "TCH003"]
 "tests/data/**" = ["INP001"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.tomlsort]
 all = true

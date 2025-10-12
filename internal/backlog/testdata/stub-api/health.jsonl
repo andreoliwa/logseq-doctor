@@ -92,5 +92,52 @@
         "id": 49
       }
     ]
+  },
+  {
+    "properties": {
+      "id": "67c48cb3-ee20-48fe-9a2b-3f63dff412aa"
+    },
+    "parent": {
+      "id": 20
+    },
+    "id": 23,
+    "pathRefs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 20
+      },
+      {
+        "id": 21
+      }
+    ],
+    "propertiesTextValues": {
+      "id": "67c48cb3-ee20-48fe-9a2b-3f63dff412aa"
+    },
+    "uuid": "67c48cb3-ee20-48fe-9a2b-3f63dff412aa",
+    "content": "DOING Taking care of my [[health]]\nid:: 67c48cb3-ee20-48fe-9a2b-3f63dff412aa",
+    "marker": "DOING",
+    "page": {
+      "journalDay": 20250302,
+      "name": "sunday, 02-03-2025",
+      "originalName": "Sunday, 02-03-2025",
+      "id": 20
+    },
+    "propertiesOrder": [
+      "id"
+    ],
+    "left": {
+      "id": 20
+    },
+    "format": "markdown",
+    "refs": [
+      {
+        "id": 4
+      },
+      {
+        "id": 21
+      }
+    ]
   }
 ]

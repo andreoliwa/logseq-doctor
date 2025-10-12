@@ -56,15 +56,27 @@ def blocks_sorted_by_date_content(unsorted_blocks: list[Block]) -> list[Block]:
 
 
 @pytest.mark.parametrize(
-    ("tags", "expected_query"),
+    ("tags", "completed_flag", "expected_query"),
     [
-        ([], "(and (task TODO DOING WAITING NOW LATER))"),
-        (["tag1"], "(and [[tag1]] (task TODO DOING WAITING NOW LATER))"),
-        (["tag1", "page2"], "(and (or [[tag1]] [[page2]]) (task TODO DOING WAITING NOW LATER))"),
+        # Without --completed flag
+        ([], False, "(and (task TODO DOING WAITING NOW LATER))"),
+        (["tag1"], False, "(and [[tag1]] (task TODO DOING WAITING NOW LATER))"),
+        (["tag1", "page2"], False, "(and (or [[tag1]] [[page2]]) (task TODO DOING WAITING NOW LATER))"),
+        # With --completed flag
+        ([], True, "(and (task TODO DOING WAITING NOW LATER CANCELED DONE))"),
+        (["tag1"], True, "(and [[tag1]] (task TODO DOING WAITING NOW LATER CANCELED DONE))"),
+        (["tag1", "page2"], True, "(and (or [[tag1]] [[page2]]) (task TODO DOING WAITING NOW LATER CANCELED DONE))"),
     ],
 )
-def test_search_with_tags(mock_logseq_query_blocks: Mock, tags: list[str], expected_query: str) -> None:
-    result = CliRunner().invoke(app, ["tasks", *tags])
+def test_search_with_tags(
+    mock_logseq_query_blocks: Mock, tags: list[str], completed_flag: bool, expected_query: str
+) -> None:
+    args = ["tasks"]
+    if completed_flag:
+        args.append("--completed")
+    args.extend(tags)
+
+    result = CliRunner().invoke(app, args)
     assert result.exit_code == 0
     assert mock_logseq_query_blocks.call_count == 1
     mock_logseq_query_blocks.assert_called_once_with(expected_query)

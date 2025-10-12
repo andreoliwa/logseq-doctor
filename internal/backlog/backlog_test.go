@@ -45,22 +45,32 @@ func TestNewTasks(t *testing.T) {
 	tests := []struct {
 		name        string
 		caseDirName string
+		pagesExist  bool
 	}{
 		{
 			name:        "empty backlog pages",
-			caseDirName: "new-empty",
+			caseDirName: "new-empty-backlog",
+			pagesExist:  false,
 		},
 		{
 			name:        "existing backlog with tasks and divider",
 			caseDirName: "new-with-divider",
+			pagesExist:  true,
 		},
 		{
 			name:        "existing backlog with tasks and no divider",
 			caseDirName: "new-without-divider",
+			pagesExist:  true,
 		},
 		{
 			name:        "existing backlogs have a focus divider",
 			caseDirName: "new-with-focus",
+			pagesExist:  true,
+		},
+		{
+			name:        "remove empty divider",
+			caseDirName: "new-remove-empty-divider",
+			pagesExist:  true,
 		},
 	}
 	for _, test := range tests {
@@ -74,7 +84,7 @@ func TestNewTasks(t *testing.T) {
 
 			pages := []string{"bk___home", "bk___phone"}
 
-			if strings.Contains(test.caseDirName, "empty") {
+			if !test.pagesExist {
 				testutils.AssertPagesDontExist(t, back.Graph(), pages)
 			}
 
@@ -90,14 +100,17 @@ func TestFocus(t *testing.T) {
 	tests := []struct {
 		name        string
 		caseDirName string
+		pagesExist  bool
 	}{
 		{
 			name:        "empty focus page is created",
 			caseDirName: "focus-empty",
+			pagesExist:  false,
 		},
 		{
 			name:        "focus page already exists",
 			caseDirName: "focus-exists",
+			pagesExist:  true,
 		},
 	}
 	for _, test := range tests {
@@ -111,7 +124,7 @@ func TestFocus(t *testing.T) {
 
 			pages := []string{"bk___Focus"}
 
-			if strings.Contains(test.caseDirName, "empty") {
+			if !test.pagesExist {
 				testutils.AssertPagesDontExist(t, back.Graph(), pages)
 			}
 
@@ -185,6 +198,10 @@ func TestOverdueTasks(t *testing.T) {
 			name:        "pinned overdue tasks should not be touched",
 			caseDirName: "overdue-pinned",
 		},
+		{
+			name:        "remove empty divider",
+			caseDirName: "overdue-remove-empty-divider",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -195,6 +212,91 @@ func TestOverdueTasks(t *testing.T) {
 			})
 
 			pages := []string{"ov___computer"}
+
+			err := back.ProcessAll([]string{})
+			require.NoError(t, err)
+
+			testutils.AssertGoldenPages(t, back.Graph(), test.caseDirName, pages)
+		})
+	}
+}
+
+func TestFutureScheduledTasks(t *testing.T) {
+	tests := []struct {
+		name        string
+		caseDirName string
+	}{
+		{
+			name:        "existing scheduled divider",
+			caseDirName: "scheduled-existing-divider",
+		},
+		{
+			name:        "non-existing scheduled divider",
+			caseDirName: "scheduled-non-existing-divider",
+		},
+		{
+			name:        "existing future scheduled task moved to scheduled divider",
+			caseDirName: "scheduled-existing-task-moved",
+		},
+		{
+			name:        "new scheduled task added directly to scheduled divider",
+			caseDirName: "scheduled-new-task-direct",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			back := testutils.StubBacklog(t, "sch", test.caseDirName, &testutils.StubAPIResponses{
+				Queries: []testutils.QueryArg{
+					{Contains: "kitchen"},
+					{Contains: "work"},
+				},
+			})
+
+			pages := []string{"sch___kitchen", "sch___work"}
+
+			err := back.ProcessAll([]string{})
+			require.NoError(t, err)
+
+			testutils.AssertGoldenPages(t, back.Graph(), test.caseDirName, pages)
+		})
+	}
+}
+
+func TestDoingTasks(t *testing.T) {
+	tests := []struct {
+		name        string
+		caseDirName string
+		pagesExist  bool
+	}{
+		{
+			name:        "DOING tasks not added to empty page",
+			caseDirName: "doing-not-added-empty",
+			pagesExist:  false,
+		},
+		{
+			name:        "DOING tasks not added to existing page",
+			caseDirName: "doing-not-added-existing",
+			pagesExist:  true,
+		},
+		{
+			name:        "DOING tasks preserved in existing page",
+			caseDirName: "doing-preserved",
+			pagesExist:  true,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			back := testutils.StubBacklog(t, "dt", test.caseDirName, &testutils.StubAPIResponses{
+				Queries: []testutils.QueryArg{
+					{Contains: "health"},
+				},
+			})
+
+			pages := []string{"dt___health"}
+
+			if !test.pagesExist {
+				testutils.AssertPagesDontExist(t, back.Graph(), pages)
+			}
 
 			err := back.ProcessAll([]string{})
 			require.NoError(t, err)

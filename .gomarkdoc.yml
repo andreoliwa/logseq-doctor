@@ -1,0 +1,17 @@
+# gomarkdoc configuration
+# See https://github.com/princjef/gomarkdoc for more options
+
+# Output format (github, azure-devops, or plain)
+format: github
+
+# Include unexported symbols (internal packages)
+includeUnexported: true
+
+# Output file pattern
+output: "docs/reference/go/{{.Dir}}/README.md"
+
+# Repository configuration for consistent link generation
+repository:
+  url: "https://github.com/andreoliwa/logseq-doctor"
+  defaultBranch: "master"
+  path: "/"

@@ -25,8 +25,8 @@ func TestPageConfigReader_emptyBacklog(t *testing.T) {
 
 func TestPageConfigReader_ReadConfig(t *testing.T) {
 	graph := testutils.StubGraph(t, "")
-	config := "config"
-	reader := backlog.NewPageConfigReader(graph, config)
+	prefix := "config"
+	reader := backlog.NewPageConfigReader(graph, prefix)
 
 	result, err := reader.ReadConfig()
 	require.NoError(t, err)
@@ -35,19 +35,49 @@ func TestPageConfigReader_ReadConfig(t *testing.T) {
 		FocusPage: "config/Focus",
 		Backlogs: []backlog.SingleBacklogConfig{
 			{
-				Icon:       "",
-				InputPages: []string{"computer", "Android", "iOS"},
-				OutputPage: config + "/computer",
+				BacklogPage: prefix + "/computer",
+				Icon:        "",
+				InputPages:  []string{"computer", "Android", "iOS"},
 			},
 			{
-				Icon:       "",
-				InputPages: []string{"house"},
-				OutputPage: config + "/house",
+				BacklogPage: prefix + "/house",
+				Icon:        "",
+				InputPages:  []string{"house"},
 			},
 			{
-				Icon:       "",
-				InputPages: []string{"work", "office"},
-				OutputPage: config + "/work",
+				BacklogPage: prefix + "/work",
+				Icon:        "",
+				InputPages:  []string{"work", "office"},
+			},
+			{
+				BacklogPage: prefix + "/start",
+				Icon:        "",
+				InputPages:  []string{"pages", "same", "line"},
+			},
+			{
+				BacklogPage: prefix + "/middle",
+				Icon:        "",
+				InputPages:  []string{"link", "anywhere", "line"},
+			},
+			{
+				BacklogPage: prefix + "/end",
+				Icon:        "",
+				InputPages:  []string{"link", "also", "last one"},
+			},
+			{
+				BacklogPage: prefix + "/start-again",
+				Icon:        "",
+				InputPages:  []string{"page", "tag"},
+			},
+			{
+				BacklogPage: prefix + "/middle-again",
+				Icon:        "",
+				InputPages:  []string{"page-again", "tag"},
+			},
+			{
+				BacklogPage: prefix + "/end-again",
+				Icon:        "",
+				InputPages:  []string{"tag", "page"},
 			},
 		},
 	}

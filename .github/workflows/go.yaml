@@ -28,11 +28,11 @@ jobs:
     if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: "stable"
-      - uses: golangci/golangci-lint-action@v7
+      - uses: golangci/golangci-lint-action@v8
         with:
           version: "latest"
 
@@ -45,21 +45,21 @@ jobs:
             os: "ubuntu-latest"
             go: "stable"
             codecov: true
-            normalize_crlf_to_lf: "true"
+            normalize_crlf_to_lf: true
           - name: "macos"
             os: "macos-latest"
             go: "stable"
-            normalize_crlf_to_lf: "true"
+            normalize_crlf_to_lf: true
             # TODO: fix backlog tests on Windows, the line endings are different
     #          - name: "windows"
     #            os: "windows-latest"
     #            go: "stable"
-    #            normalize_crlf_to_lf: "false"
+    #            normalize_crlf_to_lf: true
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         with:
           go-version: ${{ matrix.go }}

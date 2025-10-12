@@ -2,36 +2,45 @@ package backlog
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 	"github.com/andreoliwa/lsd/internal"
-	"github.com/andreoliwa/lsd/pkg/utils"
+	"github.com/andreoliwa/lsd/pkg/set"
 	"github.com/fatih/color"
 )
+
+type Result struct {
+	FocusRefsFromPage *set.Set[string]
+	ShowQuickCapture  bool
+}
 
 type Backlog interface {
 	Graph() *logseq.Graph
 	ProcessAll(partialNames []string) error
-	ProcessOne(pageTitle string, funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error)
+	ProcessOne(pageTitle string, funcQueryRefs func() (*internal.CategorizedTasks, error)) (*Result, error)
 }
 
 type backlogImpl struct {
 	graph        *logseq.Graph
 	api          internal.LogseqAPI
 	configReader ConfigReader
+	currentTime  func() time.Time
 }
 
-func NewBacklog(graph *logseq.Graph, api internal.LogseqAPI, reader ConfigReader) Backlog {
-	return &backlogImpl{graph: graph, api: api, configReader: reader}
+func NewBacklog(graph *logseq.Graph, api internal.LogseqAPI, reader ConfigReader,
+	currentTime func() time.Time) Backlog {
+	return &backlogImpl{graph: graph, api: api, configReader: reader, currentTime: currentTime}
 }
 
 func (b *backlogImpl) Graph() *logseq.Graph {
 	return b.graph
 }
 
-func (b *backlogImpl) ProcessAll(partialNames []string) error {
+func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 	config, err := b.configReader.ReadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to read config: %w", err)
@@ -39,6 +48,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error {
 
 	allFocusTasks := internal.NewCategorizedTasks()
 	processAllPages := len(partialNames) == 0
+	showQuickCapture := false
 
 	if processAllPages {
 		fmt.Println("Processing all pages in the backlog")
@@ -50,7 +60,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error {
 		processThisPage := processAllPages
 
 		for _, partialName := range partialNames {
-			if strings.Contains(strings.ToLower(backlogConfig.OutputPage), strings.ToLower(partialName)) {
+			if strings.Contains(strings.ToLower(backlogConfig.BacklogPage), strings.ToLower(partialName)) {
 				processThisPage = true
 
 				break
@@ -61,15 +71,26 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error {
 			continue
 		}
 
-		focusRefsFromPage, err := b.ProcessOne(backlogConfig.OutputPage,
+		result, err := b.ProcessOne(backlogConfig.BacklogPage,
 			func() (*internal.CategorizedTasks, error) {
-				return queryTasksFromPages(b.graph, b.api, backlogConfig.InputPages)
+				return queryTasksFromPages(b.graph, b.api, backlogConfig.InputPages, b.currentTime)
 			})
 		if err != nil {
 			return err
 		}
 
-		allFocusTasks.All.Update(focusRefsFromPage)
+		allFocusTasks.All.Update(result.FocusRefsFromPage)
+
+		if result.ShowQuickCapture {
+			showQuickCapture = true
+		}
+	}
+
+	if showQuickCapture {
+		// The original idea was to wait for a keypress while the user checks the quick capture page,
+		// so they can move tasks to the focus section. But new focus tasks would not be detected at this point,
+		// we would have to refresh the list of focus tasks after the keypress.
+		defer printQuickCaptureURL(b.graph)
 	}
 
 	if !processAllPages {
@@ -85,13 +106,20 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error {
 	return err
 }
 
+func printQuickCaptureURL(graph *logseq.Graph) {
+	basename := filepath.Base(graph.Directory())
+
+	fmt.Print("\nCheck new content: ")
+	color.Red("logseq://graph/%s?page=quick+capture\n", basename)
+}
+
 func (b *backlogImpl) ProcessOne(pageTitle string,
-	funcQueryRefs func() (*internal.CategorizedTasks, error)) (*utils.Set[string], error) {
+	funcQueryRefs func() (*internal.CategorizedTasks, error)) (*Result, error) {
 	page := internal.OpenPage(b.graph, pageTitle)
 
 	existingBlockRefs := blockRefsFromPages(page)
 
-	fmt.Printf("%s: %s", internal.PageColor(pageTitle), utils.FormatCount(existingBlockRefs.Size(), "task", "tasks"))
+	fmt.Printf("%s: %s", internal.PageColor(pageTitle), FormatCount(existingBlockRefs.Size(), "task", "tasks"))
 
 	blockRefsFromQuery, err := funcQueryRefs()
 	if err != nil {
@@ -99,19 +127,26 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 	}
 
 	newBlockRefs := blockRefsFromQuery.All.Diff(existingBlockRefs)
-	obsoleteBlockRefs := existingBlockRefs.Diff(blockRefsFromQuery.All)
 
-	focusRefsFromPage, err := insertAndRemoveRefs(b.graph, pageTitle, newBlockRefs, obsoleteBlockRefs,
-		blockRefsFromQuery.Overdue)
+	// Calculate obsolete refs, but exclude DOING tasks from removal
+	// DOING tasks should be preserved even if they're not in the All set
+	allValidRefs := set.NewSet[string]()
+	allValidRefs.Update(blockRefsFromQuery.All)
+	allValidRefs.Update(blockRefsFromQuery.Doing)
+	allValidRefs.Update(blockRefsFromQuery.FutureScheduled)
+	obsoleteBlockRefs := existingBlockRefs.Diff(allValidRefs)
+
+	result, err := insertAndRemoveRefs(b.graph, pageTitle, newBlockRefs, obsoleteBlockRefs,
+		blockRefsFromQuery.Overdue, blockRefsFromQuery.FutureScheduled)
 	if err != nil {
 		return nil, err
 	}
 
-	return focusRefsFromPage, nil
+	return result, nil
 }
 
-func blockRefsFromPages(page logseq.Page) *utils.Set[string] {
-	existingRefs := utils.NewSet[string]()
+func blockRefsFromPages(page logseq.Page) *set.Set[string] {
+	existingRefs := set.NewSet[string]()
 
 	for _, block := range page.Blocks() {
 		block.Children().FindDeep(func(n content.Node) bool {
@@ -126,52 +161,127 @@ func blockRefsFromPages(page logseq.Page) *utils.Set[string] {
 	return existingRefs
 }
 
+// queryTasksFromPages queries Logseq API for tasks from specified pages.
+// It uses concurrent processing for multiple pages and sequential processing for a single page.
 func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
-	pageTitles []string) (*internal.CategorizedTasks, error) {
+	pageTitles []string, currentTime func() time.Time) (*internal.CategorizedTasks, error) {
 	tasks := internal.NewCategorizedTasks()
 	finder := internal.NewLogseqFinder(graph)
 
-	for _, pageTitle := range pageTitles {
-		fmt.Printf(" %s: ", internal.PageColor(pageTitle))
-
-		query := finder.FindFirstQuery(pageTitle)
-
-		if query == "" {
-			query = defaultQuery(pageTitle)
-		}
-
-		jsonStr, err := api.PostQuery(query)
-		if err != nil {
-			return nil, fmt.Errorf("failed to query Logseq API: %w", err)
-		}
-
-		jsonTasks, err := internal.ExtractTasksFromJSON(jsonStr)
-		if err != nil {
-			return nil, fmt.Errorf("failed to extract tasks: %w", err)
-		}
-
-		fmt.Print(utils.FormatCount(len(jsonTasks), "task", "tasks"))
-
-		for _, t := range jsonTasks {
-			if t.Overdue() {
-				tasks.Overdue.Add(t.UUID)
-			}
-
-			tasks.All.Add(t.UUID)
-		}
+	if len(pageTitles) <= 1 {
+		return queryTasksFromPagesSequential(api, pageTitles, &tasks, finder, currentTime)
 	}
 
-	return &tasks, nil
+	return queryTasksFromPagesConcurrent(api, pageTitles, &tasks, finder, currentTime)
+}
+
+// queryTasksFromPagesSequential processes pages sequentially (original implementation).
+func queryTasksFromPagesSequential(api internal.LogseqAPI,
+	pageTitles []string, tasks *internal.CategorizedTasks,
+	finder internal.LogseqFinder, currentTime func() time.Time) (*internal.CategorizedTasks, error) {
+	for _, pageTitle := range pageTitles {
+		jsonTasks, err := queryTasksFromSinglePage(api, pageTitle, finder)
+		if err != nil {
+			return nil, err
+		}
+
+		fmt.Printf(" %s: ", internal.PageColor(pageTitle))
+		fmt.Print(FormatCount(len(jsonTasks), "task", "tasks"))
+
+		addTasksToCategories(jsonTasks, tasks, currentTime)
+	}
+
+	return tasks, nil
+}
+
+// queryTasksFromPagesConcurrent processes pages concurrently using goroutines.
+func queryTasksFromPagesConcurrent(api internal.LogseqAPI,
+	pageTitles []string, tasks *internal.CategorizedTasks,
+	finder internal.LogseqFinder, currentTime func() time.Time) (*internal.CategorizedTasks, error) {
+	type pageResult struct {
+		pageTitle string
+		jsonTasks []internal.TaskJSON
+		err       error
+	}
+
+	resultChan := make(chan pageResult, len(pageTitles))
+
+	for _, pageTitle := range pageTitles {
+		go func(title string) {
+			jsonTasks, err := queryTasksFromSinglePage(api, title, finder)
+			resultChan <- pageResult{pageTitle: title, jsonTasks: jsonTasks, err: err}
+		}(pageTitle)
+	}
+
+	for i := 0; i < len(pageTitles); i++ {
+		result := <-resultChan
+
+		if result.err != nil {
+			return nil, result.err
+		}
+
+		// Print results in the order they complete (may be different from input order)
+		fmt.Printf(" %s: ", internal.PageColor(result.pageTitle))
+		fmt.Print(FormatCount(len(result.jsonTasks), "task", "tasks"))
+
+		addTasksToCategories(result.jsonTasks, tasks, currentTime)
+	}
+
+	return tasks, nil
+}
+
+// queryTasksFromSinglePage queries tasks from a single page and returns the JSON tasks.
+func queryTasksFromSinglePage(api internal.LogseqAPI, pageTitle string,
+	finder internal.LogseqFinder) ([]internal.TaskJSON, error) {
+	query := finder.FindFirstQuery(pageTitle)
+	if query == "" {
+		query = defaultQuery(pageTitle)
+	}
+
+	jsonStr, err := api.PostQuery(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query Logseq API: %w", err)
+	}
+
+	jsonTasks, err := internal.ExtractTasksFromJSON(jsonStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to extract tasks: %w", err)
+	}
+
+	return jsonTasks, nil
+}
+
+// addTasksToCategories adds tasks to the appropriate categories in CategorizedTasks.
+func addTasksToCategories(jsonTasks []internal.TaskJSON, tasks *internal.CategorizedTasks,
+	currentTime func() time.Time) {
+	for _, task := range jsonTasks {
+		if task.Overdue(currentTime) {
+			tasks.Overdue.Add(task.UUID)
+		}
+
+		if task.FutureScheduled(currentTime) {
+			tasks.FutureScheduled.Add(task.UUID)
+		}
+
+		if task.Doing() {
+			tasks.Doing.Add(task.UUID)
+		} else {
+			// Only add non-DOING tasks to All set
+			// DOING tasks should not be added to backlog as new tasks
+			tasks.All.Add(task.UUID)
+		}
+	}
 }
 
 func defaultQuery(pageTitle string) string {
 	return fmt.Sprintf("(and [[%s]] (task TODO LATER DOING NOW WAITING))", pageTitle)
 }
 
-func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
+func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit,gocyclo,maintidx
 	graph *logseq.Graph, pageTitle string, newBlockRefs, obsoleteBlockRefs,
-	overdueBlockRefs *utils.Set[string],
-) (*utils.Set[string], error) {
+	overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
+) (*Result, error) {
+	// TODO: refactor: break this big function in smaller functions
 	transaction := graph.NewTransaction()
 
 	page, err := transaction.OpenPage(pageTitle)
@@ -179,12 +289,17 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		return nil, fmt.Errorf("failed to open page for transaction: %w", err)
 	}
 
-	var firstBlock, dividerNewTasks, dividerOverdue, dividerFocus *content.Block
+	var firstBlock, dividerNewTasks, dividerOverdue, dividerFocus, dividerScheduled *content.Block
 
 	deletedCount := 0
 	movedCount := 0
-	focusBlockRefs := utils.NewSet[string]()
-	pinnedBlockRefs := utils.NewSet[string]()
+	movedScheduledCount := 0
+	unpinnedCount := 0
+	result := &Result{
+		FocusRefsFromPage: set.NewSet[string](),
+		ShowQuickCapture:  false,
+	}
+	pinnedBlockRefs := set.NewSet[string]()
 
 	for i, block := range page.Blocks() {
 		if i == 0 {
@@ -201,10 +316,12 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 					dividerOverdue = block
 				case text.Value == "Focus":
 					dividerFocus = block
+				case strings.Contains(text.Value, "Scheduled tasks"):
+					dividerScheduled = block
 				}
 			}
 
-			if blockRef, ok := node.(*content.BlockRef); ok {
+			if blockRef, ok := node.(*content.BlockRef); ok { //nolint:nestif
 				shouldDelete := false
 
 				switch {
@@ -220,6 +337,23 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 
 						movedCount++
 					}
+				case futureScheduledBlockRefs.Contains(blockRef.ID):
+					shouldDelete = true
+
+					if dividerScheduled == nil || !internal.IsAncestor(block, dividerScheduled) {
+						movedScheduledCount++
+					}
+				default:
+					// Here we have an existing task that's not overdue.
+					// Find the pin text node and remove it.
+					if nextChildHasPin(node) {
+						nextChild := node.NextSibling()
+						if nextChild != nil {
+							nextChild.RemoveSelf()
+
+							unpinnedCount++
+						}
+					}
 				}
 
 				if shouldDelete {
@@ -230,7 +364,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 					blockRef.Parent().Parent().RemoveSelf()
 				} else if dividerFocus == nil {
 					// Keep adding tasks to the focus section until the divider is found
-					focusBlockRefs.Add(blockRef.ID)
+					result.FocusRefsFromPage.Add(blockRef.ID)
 				}
 
 				return false
@@ -240,7 +374,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		})
 	}
 
-	//  Sections: Focus / Overdue / New tasks
+	//  Sections: Focus / Overdue / New tasks / all other tasks / Scheduled tasks
 
 	// Insert (new and moved) overdue tasks after the focus section and before the new ones
 	//  If they are moved to the top, all overdue tasks will go to the focus page, and this misses the point.
@@ -253,7 +387,7 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 		if dividerOverdue == nil {
 			dividerOverdue = content.NewBlock(content.NewParagraph(
 				content.NewText("📅 Overdue tasks "),
-				content.NewPageLink("inbox"),
+				content.NewPageLink("quick capture"),
 			))
 			AddSibling(page, dividerOverdue, firstBlock, dividerFocus)
 		}
@@ -275,10 +409,17 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 				continue
 			}
 
+			if futureScheduledBlockRefs.Contains(blockRef) {
+				// Don't add future scheduled tasks as new tasks but count them as moved
+				movedScheduledCount++
+
+				continue
+			}
+
 			if dividerNewTasks == nil {
 				dividerNewTasks = content.NewBlock(content.NewParagraph(
 					content.NewText("New tasks "),
-					content.NewPageLink("inbox"),
+					content.NewPageLink("quick capture"),
 				))
 				AddSibling(page, dividerNewTasks, firstBlock, dividerOverdue, dividerFocus)
 			}
@@ -286,20 +427,52 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 			dividerNewTasks.AddChild(content.NewBlock(content.NewBlockRef(blockRef)))
 		}
 
-		color.Green(" %s", utils.FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
+		color.Green(" %s", FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
 
 		save = true
+		result.ShowQuickCapture = true
 	}
+
+	// Move future scheduled tasks to the bottom of the backlog page
+	if futureScheduledBlockRefs.Size() > 0 {
+		for _, blockRef := range futureScheduledBlockRefs.ValuesSorted() {
+			if dividerScheduled == nil {
+				dividerScheduled = content.NewBlock(content.NewParagraph(
+					content.NewText("⏰ Scheduled tasks "),
+					content.NewPageLink("quick capture"),
+				))
+				page.AddBlock(dividerScheduled)
+			}
+
+			scheduledTask := content.NewBlock(content.NewBlockRef(blockRef))
+			dividerScheduled.AddChild(scheduledTask)
+		}
+	}
+
+	save = removeEmptyDividers(save, dividerNewTasks, dividerOverdue, dividerScheduled)
 
 	if deletedCount > 0 {
 		// Remove completed or unreferenced tasks
-		color.Red(" %s removed", utils.FormatCount(deletedCount, "task was", "tasks were"))
+		color.Red(" %s removed", FormatCount(deletedCount, "task was", "tasks were"))
 
 		save = true
 	}
 
 	if movedCount > 0 {
-		color.Magenta(" %s moved around", utils.FormatCount(movedCount, "task was", "tasks were"))
+		color.Magenta(" %s moved around", FormatCount(movedCount, "task was", "tasks were"))
+
+		save = true
+		result.ShowQuickCapture = true
+	}
+
+	if movedScheduledCount > 0 {
+		color.Blue(" %s moved to scheduled tasks", FormatCount(movedScheduledCount, "task was", "tasks were"))
+
+		save = true
+	}
+
+	if unpinnedCount > 0 {
+		color.Cyan(" %s unpinned", FormatCount(unpinnedCount, "task was", "tasks were"))
 
 		save = true
 	}
@@ -310,14 +483,14 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit
 			return nil, fmt.Errorf("failed to save transaction: %w", err)
 		}
 	} else {
-		color.Yellow(" no new/deleted/moved tasks")
+		color.Yellow(" no changes")
 	}
 
 	if dividerFocus == nil {
-		focusBlockRefs.Clear()
+		result.FocusRefsFromPage.Clear()
 	}
 
-	return focusBlockRefs, nil
+	return result, nil
 }
 
 func nextChildHasPin(node content.Node) bool {
@@ -347,4 +520,17 @@ func AddSibling(page logseq.Page, newBlock, before *content.Block, after ...*con
 	}
 
 	page.AddBlock(newBlock)
+}
+
+// removeEmptyDividers removes empty dividers (no blocks under it) and returns true if any were removed.
+func removeEmptyDividers(save bool, dividers ...*content.Block) bool {
+	for _, divider := range dividers {
+		if divider != nil && len(divider.Blocks()) == 0 {
+			divider.RemoveSelf()
+
+			save = true
+		}
+	}
+
+	return save
 }

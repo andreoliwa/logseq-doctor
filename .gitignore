@@ -59,6 +59,14 @@ output/*/index.html
 # Sphinx
 docs/_build
 
+# MkDocs
+site/
+.cache/
+
+# Generated documentation
+docs/reference/go/
+docs/reference/python/
+
 .DS_Store
 *~
 .*.sw[po]
