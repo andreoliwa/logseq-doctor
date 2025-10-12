@@ -37,19 +37,13 @@ jobs:
             toxpython: "python3.11"
             tox_env: "docs"
             os: "ubuntu-latest"
-          - name: "py39 (ubuntu) + coverage"
-            python: "3.9"
-            toxpython: "python3.9"
+          - name: "py310 (ubuntu) + coverage"
+            python: "3.10"
+            toxpython: "python3.10"
             python_arch: "x64"
-            tox_env: "clean,py39,report"
+            tox_env: "clean,py310,report"
             os: "ubuntu-latest"
             codecov: true
-          #          - name: 'py39 (windows)'
-          #            python: '3.9'
-          #            toxpython: 'python3.9'
-          #            python_arch: 'x64'
-          #            tox_env: 'py39'
-          #            os: 'windows-latest'
           - name: "py310 (ubuntu)"
             python: "3.10"
             toxpython: "python3.10"
@@ -98,6 +92,30 @@ jobs:
             toxpython: "python3.12"
             python_arch: "x64"
             tox_env: "py312"
+            os: "macos-latest"
+          - name: "py313 (ubuntu)"
+            python: "3.13"
+            toxpython: "python3.13"
+            python_arch: "x64"
+            tox_env: "py313"
+            os: "ubuntu-latest"
+          - name: "py313 (macos)"
+            python: "3.13"
+            toxpython: "python3.13"
+            python_arch: "x64"
+            tox_env: "py313"
+            os: "macos-latest"
+          - name: "py314 (ubuntu)"
+            python: "3.14"
+            toxpython: "python3.14"
+            python_arch: "x64"
+            tox_env: "py314"
+            os: "ubuntu-latest"
+          - name: "py314 (macos)"
+            python: "3.14"
+            toxpython: "python3.14"
+            python_arch: "x64"
+            tox_env: "py314"
             os: "macos-latest"
     steps:
       - uses: actions/checkout@v5
