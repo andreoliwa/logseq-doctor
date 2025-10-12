@@ -40,6 +40,7 @@ func TestIsAncestor(t *testing.T) { //nolint:funlen
 				grandparent := content.NewBlock(content.NewText("grandparent"))
 				parent := content.NewBlock(content.NewText("parent"))
 				child := content.NewBlock(content.NewText("child"))
+
 				grandparent.AddChild(parent)
 				parent.AddChild(child)
 
@@ -54,6 +55,7 @@ func TestIsAncestor(t *testing.T) { //nolint:funlen
 				grandparent := content.NewBlock(content.NewText("grandparent"))
 				parent := content.NewBlock(content.NewText("parent"))
 				child := content.NewBlock(content.NewText("child"))
+
 				greatGrandparent.AddChild(grandparent)
 				grandparent.AddChild(parent)
 				parent.AddChild(child)
@@ -87,6 +89,7 @@ func TestIsAncestor(t *testing.T) { //nolint:funlen
 				parent := content.NewBlock(content.NewText("parent"))
 				sibling1 := content.NewBlock(content.NewText("sibling1"))
 				sibling2 := content.NewBlock(content.NewText("sibling2"))
+
 				parent.AddChild(sibling1)
 				parent.AddChild(sibling2)
 

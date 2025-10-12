@@ -56,6 +56,7 @@ Examples:
 				if err != nil {
 					return fmt.Errorf("invalid journal date format. Use YYYY-MM-DD: %w", err)
 				}
+
 				targetDate = parsedDate
 			} else {
 				targetDate = deps.TimeNow()
