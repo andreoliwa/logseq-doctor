@@ -46,7 +46,7 @@ keywords = [
   "logseq-plugin",
   "markdown",
 ]
-license = {file = "LICENSE"}
+license = "MIT"
 name = "logseq-doctor"
 readme = "docs/readme.md"
 requires-python = ">=3.9"
