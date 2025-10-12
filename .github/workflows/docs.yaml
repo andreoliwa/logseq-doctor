@@ -37,15 +37,11 @@ jobs:
         run: |
           pip install tox
 
-      - name: Build documentation with tox
-        run: |
-          tox -e docs
-
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Deploy documentation
+      - name: Build and deploy documentation
         run: |
-          mkdocs gh-deploy --force
+          tox -e docs -- mkdocs gh-deploy --force

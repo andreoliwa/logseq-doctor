@@ -64,7 +64,7 @@ site/
 .cache/
 
 # Generated documentation
-docs/go-api/
+docs/reference/go/
 docs/reference/python/
 
 .DS_Store

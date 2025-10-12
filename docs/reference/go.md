@@ -2,46 +2,33 @@
 
 This section contains the API documentation for the Go implementation of Logseq Doctor.
 
-**[📚 Browse Local Go Documentation](../go-api/index.html)** | **[View on pkg.go.dev](https://pkg.go.dev/github.com/andreoliwa/logseq-doctor)**
+**[View on pkg.go.dev](https://pkg.go.dev/github.com/andreoliwa/logseq-doctor)**
 
-!!! tip "Local Documentation"
-The local Go documentation is generated with [doc2go](https://github.com/abhinav/doc2go) and provides detailed API reference for all packages, **including internal packages**. Click the link above to browse the interactive documentation.
+!!! tip "Documentation"
+The documentation below is automatically generated from the Go source code using [gomarkdoc](https://github.com/princjef/gomarkdoc) and includes detailed API reference for all packages, **including internal packages**.
 
-## Package Overview
+## Packages
 
-### `cmd` - Command-line Interface
+Browse the documentation for each package:
 
-The `cmd` package contains the CLI implementation using Cobra:
+### Command-line Interface
 
-- **root.go** - Root command and CLI entry point
-- **md.go** - Markdown processing commands
-- **tidy_up.go** - Tidy up commands
-- **content.go** - Content manipulation commands
-- **backlog.go** - Backlog management commands
+- **[cmd](go/cmd/README.md)** - CLI implementation using Cobra
 
-### `internal` - Internal Packages
+### Public Packages
 
-The `internal` package contains implementation details not meant for external use:
+- **[pkg/set](go/pkg/set/README.md)** - Generic set data structure
 
-- **api.go** - Logseq API client implementation
-- **content.go** - Content parsing and manipulation
-- **md.go** - Markdown processing utilities
-- **tasks.go** - Task management
-- **nodes.go** - AST node handling
-- **finder.go** - File and content discovery
+### Internal Packages
 
-### `pkg/set` - Public Utilities
-
-The `pkg/set` package provides a generic set implementation:
-
-- Generic set data structure using Go generics
-- Type-safe operations (Add, Remove, Contains)
-- Sorted value retrieval
+- **[internal](go/internal/README.md)** - Internal implementation details
+- **[internal/backlog](go/internal/backlog/README.md)** - Backlog management
+- **[internal/testutils](go/internal/testutils/README.md)** - Testing utilities
 
 ## Installation
 
 ```bash
-go get github.com/andreoliwa/lsd
+go get github.com/andreoliwa/logseq-doctor
 ```
 
 Or install the binary:
@@ -58,8 +45,7 @@ gh release download -R andreoliwa/logseq-doctor
 
 ```go
 import (
-    "github.com/andreoliwa/lsd/pkg/set"
-    "github.com/andreoliwa/lsd/internal"
+    "github.com/andreoliwa/logseq-doctor/pkg/set"
 )
 
 // Use the set package
