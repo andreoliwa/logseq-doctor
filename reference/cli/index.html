@@ -10,10 +10,10 @@
         <link rel="canonical" href="https://andreoliwa.github.io/logseq-doctor/reference/cli/">
       
       
-        <link rel="prev" href="../python/">
+        <link rel="prev" href="../../usage/">
       
       
-        <link rel="next" href="../../readme/">
+        <link rel="next" href="../go/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -21,7 +21,7 @@
     
     
       
-        <title>CLI Commands - Logseq Doctor</title>
+        <title>Overview - Logseq Doctor</title>
       
     
     
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              CLI Commands
+              Overview
             
           </span>
         </div>
@@ -390,6 +390,498 @@
       
   
   
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    CLI Commands
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            CLI Commands
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backlog" class="md-nav__link">
+    <span class="md-ellipsis">
+      backlog
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#completion" class="md-nav__link">
+    <span class="md-ellipsis">
+      completion
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#content" class="md-nav__link">
+    <span class="md-ellipsis">
+      content
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#md" class="md-nav__link">
+    <span class="md-ellipsis">
+      md
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#outline" class="md-nav__link">
+    <span class="md-ellipsis">
+      outline
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task" class="md-nav__link">
+    <span class="md-ellipsis">
+      task
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="task">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      task add
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      tasks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tidy-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      tidy-up
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      Global Flags
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#logseq_graph_path" class="md-nav__link">
+    <span class="md-ellipsis">
+      LOGSEQ_GRAPH_PATH
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logseq_host_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      LOGSEQ_HOST_URL
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logseq_api_token" class="md-nav__link">
+    <span class="md-ellipsis">
+      LOGSEQ_API_TOKEN
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exit Code
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tips
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#backlog" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    backlog
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#completion" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    completion
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#content" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    content
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    md
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#outline" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    outline
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#task" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    task
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#tasks" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    tasks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#tidy-up" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    tidy-up
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
   
   
     
@@ -412,15 +904,15 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3">
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4">
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
   <span class="md-ellipsis">
-    API Reference
+    Internal API Reference
     
   </span>
   
@@ -428,10 +920,10 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
-            API Reference
+            Internal API Reference
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -471,335 +963,6 @@
   
   <span class="md-ellipsis">
     Python API
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-    
-    
-    
-      
-        
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    Reference
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4">
-            <span class="md-nav__icon md-icon"></span>
-            Reference
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    CLI Commands
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    CLI Commands
-    
-  </span>
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#python-cli-lsdpy" class="md-nav__link">
-    <span class="md-ellipsis">
-      Python CLI (lsdpy)
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Python CLI (lsdpy)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#global-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      Global Options
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      Commands
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Commands">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#outline" class="md-nav__link">
-    <span class="md-ellipsis">
-      outline
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tasks" class="md-nav__link">
-    <span class="md-ellipsis">
-      tasks
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#shell-completion" class="md-nav__link">
-    <span class="md-ellipsis">
-      Shell Completion
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#go-cli-lsd" class="md-nav__link">
-    <span class="md-ellipsis">
-      Go CLI (lsd)
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Go CLI (lsd)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#global-flags" class="md-nav__link">
-    <span class="md-ellipsis">
-      Global Flags
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#commands_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Commands
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Commands">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#content" class="md-nav__link">
-    <span class="md-ellipsis">
-      content
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tidy-up" class="md-nav__link">
-    <span class="md-ellipsis">
-      tidy-up
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#completion" class="md-nav__link">
-    <span class="md-ellipsis">
-      completion
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#help" class="md-nav__link">
-    <span class="md-ellipsis">
-      help
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#environment-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      Environment Variables
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Environment Variables">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#logseq_graph_path" class="md-nav__link">
-    <span class="md-ellipsis">
-      LOGSEQ_GRAPH_PATH
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#exit-codes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Exit Codes
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tips" class="md-nav__link">
-    <span class="md-ellipsis">
-      Tips
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../readme/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    README
     
   </span>
   
@@ -946,25 +1109,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#python-cli-lsdpy" class="md-nav__link">
-    <span class="md-ellipsis">
-      Python CLI (lsdpy)
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Python CLI (lsdpy)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#global-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      Global Options
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#commands" class="md-nav__link">
     <span class="md-ellipsis">
       Commands
@@ -975,84 +1119,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#outline" class="md-nav__link">
+  <a href="#backlog" class="md-nav__link">
     <span class="md-ellipsis">
-      outline
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tasks" class="md-nav__link">
-    <span class="md-ellipsis">
-      tasks
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#shell-completion" class="md-nav__link">
-    <span class="md-ellipsis">
-      Shell Completion
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#go-cli-lsd" class="md-nav__link">
-    <span class="md-ellipsis">
-      Go CLI (lsd)
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Go CLI (lsd)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#global-flags" class="md-nav__link">
-    <span class="md-ellipsis">
-      Global Flags
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#commands_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Commands
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Commands">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#content" class="md-nav__link">
-    <span class="md-ellipsis">
-      content
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tidy-up" class="md-nav__link">
-    <span class="md-ellipsis">
-      tidy-up
+      backlog
     </span>
   </a>
   
@@ -1068,9 +1137,46 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#help" class="md-nav__link">
+  <a href="#content" class="md-nav__link">
     <span class="md-ellipsis">
-      help
+      content
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#md" class="md-nav__link">
+    <span class="md-ellipsis">
+      md
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#outline" class="md-nav__link">
+    <span class="md-ellipsis">
+      outline
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task" class="md-nav__link">
+    <span class="md-ellipsis">
+      task
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="task">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      task add
     </span>
   </a>
   
@@ -1081,8 +1187,35 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      tasks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tidy-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      tidy-up
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      Global Flags
+    </span>
+  </a>
   
 </li>
       
@@ -1105,15 +1238,33 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#logseq_host_url" class="md-nav__link">
+    <span class="md-ellipsis">
+      LOGSEQ_HOST_URL
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logseq_api_token" class="md-nav__link">
+    <span class="md-ellipsis">
+      LOGSEQ_API_TOKEN
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#exit-codes" class="md-nav__link">
+  <a href="#exit-code" class="md-nav__link">
     <span class="md-ellipsis">
-      Exit Codes
+      Exit Code
     </span>
   </a>
   
@@ -1162,17 +1313,122 @@
 
 <h1 id="cli-reference">CLI Reference<a class="headerlink" href="#cli-reference" title="Permanent link">¶</a></h1>
 <p>This page provides detailed reference documentation for all CLI commands in Logseq Doctor.</p>
-<h2 id="python-cli-lsdpy">Python CLI (<code>lsdpy</code>)<a class="headerlink" href="#python-cli-lsdpy" title="Permanent link">¶</a></h2>
-<h3 id="global-options">Global Options<a class="headerlink" href="#global-options" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>-g, --graph DIRECTORY
+<h2 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">¶</a></h2>
+<h3 id="backlog"><code>backlog</code><a class="headerlink" href="#backlog" title="Permanent link">¶</a></h3>
+<p>Aggregate tasks from multiple pages into a unified backlog.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>lsd<span class="w"> </span>backlog<span class="w"> </span><span class="o">[</span>partial<span class="w"> </span>page<span class="w"> </span>names<span class="o">]</span>
 </code></pre></div>
-<p>Path to your Logseq graph directory. Can also be set via the <code>LOGSEQ_GRAPH_PATH</code> environment variable.</p>
-<p><strong>Required:</strong> Yes (for most commands)</p>
-<h3 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">¶</a></h3>
-<h4 id="outline"><code>outline</code><a class="headerlink" href="#outline" title="Permanent link">¶</a></h4>
+<p><strong>Description:</strong></p>
+<p>This command aggregates tasks from one or more pages into a unified backlog page. It reads configuration from a "backlog" page in your graph, where each line with page references or tags defines a separate backlog.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li><strong>Automatic task aggregation</strong>: Queries tasks from specified pages using the Logseq API</li>
+<li><strong>Smart categorization</strong>: Organizes tasks into sections (Focus, Overdue, New tasks, Scheduled)</li>
+<li><strong>Concurrent processing</strong>: Processes multiple pages in parallel for better performance</li>
+<li><strong>Obsolete task removal</strong>: Automatically removes tasks that no longer exist in source pages</li>
+<li><strong>Pin support</strong>: Tasks marked with 📌 emoji are preserved and not removed</li>
+<li><strong>Overdue detection</strong>: Identifies and highlights tasks past their deadline or scheduled date</li>
+<li><strong>Focus page</strong>: Aggregates focus tasks from all backlogs into a central focus page</li>
+</ul>
+<p><strong>Configuration:</strong></p>
+<p>Create a page named "backlog" with lines containing page references or tags. The first page reference determines the backlog page name, and all referenced pages/tags are used as input sources.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Process all backlogs</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>lsd<span class="w"> </span>backlog
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Process only backlogs matching "work"</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>lsd<span class="w"> </span>backlog<span class="w"> </span>work
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Process multiple specific backlogs</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>lsd<span class="w"> </span>backlog<span class="w"> </span>computer<span class="w"> </span>house
+</code></pre></div>
+<p><strong>Environment Variables:</strong></p>
+<p>This command uses the following <a href="#environment-variables">environment variables</a>: <code>LOGSEQ_GRAPH_PATH</code>, <code>LOGSEQ_HOST_URL</code>, and <code>LOGSEQ_API_TOKEN</code>.</p>
+<h3 id="completion"><code>completion</code><a class="headerlink" href="#completion" title="Permanent link">¶</a></h3>
+<p>Generate shell completion scripts.</p>
+<p><strong>Usage (Go CLI):</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>lsd<span class="w"> </span>completion<span class="w"> </span><span class="o">[</span>bash<span class="p">|</span>zsh<span class="p">|</span>fish<span class="p">|</span>powershell<span class="o">]</span>
+</code></pre></div>
+<p><strong>Description:</strong></p>
+<p>Generate autocompletion scripts for your shell. This enables tab completion for commands and options.</p>
+<p><strong>Examples:</strong></p>
+<p><strong>Bash:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>lsd<span class="w"> </span>completion<span class="w"> </span>bash<span class="w"> </span>&gt;<span class="w"> </span>/etc/bash_completion.d/lsd
+</code></pre></div>
+<p><strong>Zsh:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>lsd<span class="w"> </span>completion<span class="w"> </span>zsh<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">fpath</span><span class="p">[1]</span><span class="si">}</span><span class="s2">/_lsd"</span>
+</code></pre></div>
+<p><strong>Fish:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>lsd<span class="w"> </span>completion<span class="w"> </span>fish<span class="w"> </span>&gt;<span class="w"> </span>~/.config/fish/completions/lsd.fish
+</code></pre></div>
+<p><strong>PowerShell:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>lsd<span class="w"> </span>completion<span class="w"> </span>powershell<span class="w"> </span>&gt;<span class="w"> </span>lsd.ps1
+</code></pre></div>
+<p><strong>Usage (Python CLI):</strong></p>
+<p>Install shell completion for easier command-line usage:</p>
+<p><strong>Bash:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>lsdpy<span class="w"> </span>--install-completion<span class="w"> </span>bash
+</code></pre></div>
+<p><strong>Zsh:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>lsdpy<span class="w"> </span>--install-completion<span class="w"> </span>zsh
+</code></pre></div>
+<p><strong>Fish:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>lsdpy<span class="w"> </span>--install-completion<span class="w"> </span>fish
+</code></pre></div>
+<p><strong>PowerShell:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>lsdpy<span class="w"> </span>--install-completion<span class="w"> </span>powershell
+</code></pre></div>
+<h3 id="content"><code>content</code><a class="headerlink" href="#content" title="Permanent link">¶</a></h3>
+<p>Append raw Markdown content to your Logseq graph.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>lsd<span class="w"> </span>content<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
+<p><strong>Description:</strong></p>
+<p>This command allows you to programmatically add content to your Logseq pages. It's useful for automation and scripting workflows where you want to append content to your knowledge base.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"- New note"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>lsd<span class="w"> </span>content
+</code></pre></div>
+<h3 id="md"><code>md</code><a class="headerlink" href="#md" title="Permanent link">¶</a></h3>
+<p>Add Markdown content to Logseq using the DOM.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>lsd<span class="w"> </span>md<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
+<p><strong>Description:</strong></p>
+<p>This command reads Markdown content from stdin and adds it to your Logseq graph by parsing and manipulating the document object model (DOM). Unlike the <code>content</code> command which appends raw text, <code>md</code> parses the Markdown structure and properly integrates it into Logseq's outline format.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li><strong>Markdown parsing</strong>: Parses input as Markdown and converts it to Logseq's block structure</li>
+<li><strong>Parent block support</strong>: Can add content as a child of a specific block using <code>--parent</code></li>
+<li><strong>Journal targeting</strong>: Supports adding to specific journal dates with <code>--journal</code></li>
+<li><strong>Multi-line content</strong>: Handles complex Markdown including tasks with properties and logbooks</li>
+<li><strong>Smart placement</strong>: Adds to journal page by default, or under a parent block if specified</li>
+</ul>
+<p><strong>Flags:</strong></p>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>-j, --journal YYYY-MM-DD    Journal date (default: today)
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>-p, --parent TEXT           Partial text of a block to use as parent
+</code></pre></div>
+<p><strong>Examples:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Add a simple note to today's journal</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"New task"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>lsd<span class="w"> </span>md
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Add content under a specific parent block</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"Child task"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>lsd<span class="w"> </span>md<span class="w"> </span>--parent<span class="w"> </span><span class="s2">"Project A"</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="c1"># Add to a specific journal date</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"Meeting notes"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>lsd<span class="w"> </span>md<span class="w"> </span>--journal<span class="w"> </span><span class="m">2024</span>-12-25
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="c1"># Add a task with properties and logbook</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"DOING Some task</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="s2">collapsed:: true</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="s2">:LOGBOOK:</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="s2">CLOCK: [2025-08-27 Wed 21:12:50]</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="s2">:END:"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>lsd<span class="w"> </span>md<span class="w"> </span>--parent<span class="w"> </span><span class="s2">"work"</span>
+</code></pre></div>
+<h3 id="outline"><code>outline</code><a class="headerlink" href="#outline" title="Permanent link">¶</a></h3>
 <p>Convert flat Markdown files to Logseq's outline format.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>outline<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>INPUT_FILE
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>outline<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>INPUT_FILE
 </code></pre></div>
 <p><strong>Arguments:</strong></p>
 <ul>
@@ -1181,55 +1437,69 @@
 <p><strong>Description:</strong></p>
 <p>This command reads a flat Markdown file and converts it to Logseq's indented outline structure. It processes headings and content to create a hierarchical outline that works well with Logseq's outliner interface.</p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>~/logseq/my-graph<span class="w"> </span>outline<span class="w"> </span>notes.md
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>~/logseq/my-graph<span class="w"> </span>outline<span class="w"> </span>notes.md
 </code></pre></div>
-<h4 id="tasks"><code>tasks</code><a class="headerlink" href="#tasks" title="Permanent link">¶</a></h4>
+<h3 id="task"><code>task</code><a class="headerlink" href="#task" title="Permanent link">¶</a></h3>
+<p>Manage tasks in your Logseq graph.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>lsd<span class="w"> </span>task<span class="w"> </span><span class="o">[</span>subcommand<span class="o">]</span>
+</code></pre></div>
+<p><strong>Description:</strong></p>
+<p>Parent command for task management operations. Use subcommands to add, list, or modify tasks in your Logseq graph.</p>
+<p><strong>Subcommands:</strong></p>
+<h4 id="task-add"><code>task add</code><a class="headerlink" href="#task-add" title="Permanent link">¶</a></h4>
+<p>Add a new task to Logseq or update an existing one.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>lsd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="o">[</span>task<span class="w"> </span>description<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
+<p><strong>Description:</strong></p>
+<p>Adds a new TODO task to your Logseq graph. By default, tasks are added to today's journal page. You can specify a different target using flags.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li><strong>Key-based updates</strong>: Use <code>--key</code> to search for and update existing tasks (case-insensitive)</li>
+<li><strong>Flexible targeting</strong>: Add to journal pages, regular pages, or under specific blocks</li>
+<li><strong>Smart search</strong>: When using <code>--key</code>, searches within the specified page/journal or block scope</li>
+<li><strong>Preserve structure</strong>: When updating tasks, preserves children, properties, and logbook entries</li>
+</ul>
+<p><strong>Flags:</strong></p>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>-j, --journal YYYY-MM-DD    Journal date (default: today)
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>-p, --page NAME             Page name to add the task to
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>-b, --block TEXT            Partial text of a block to use as parent
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>-k, --key TEXT              Unique key to search for existing task
+</code></pre></div>
+<p><strong>Examples:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Add a task to today's journal</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>lsd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Review pull request"</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># Add a task to a specific page</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>lsd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Call client"</span><span class="w"> </span>--page<span class="w"> </span><span class="s2">"Work"</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="c1"># Add a task to a specific journal date</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>lsd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Buy groceries"</span><span class="w"> </span>--journal<span class="w"> </span><span class="m">2024</span>-12-25
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="c1"># Update an existing task by key (preserves children and properties)</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>lsd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Water plants in living room"</span><span class="w"> </span>--key<span class="w"> </span><span class="s2">"water plants"</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="c1"># Add a task under a specific block</span>
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>lsd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Meeting notes"</span><span class="w"> </span>--block<span class="w"> </span><span class="s2">"Project A"</span>
+<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>
+<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="c1"># Update a task within a specific block scope</span>
+<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>lsd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Updated task name"</span><span class="w"> </span>--block<span class="w"> </span><span class="s2">"Project A"</span><span class="w"> </span>--key<span class="w"> </span><span class="s2">"task"</span>
+</code></pre></div>
+<h3 id="tasks"><code>tasks</code><a class="headerlink" href="#tasks" title="Permanent link">¶</a></h3>
 <p>List all tasks in your Logseq graph.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>tasks<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>tasks<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </code></pre></div>
 <p><strong>Description:</strong></p>
 <p>This command scans your Logseq graph and lists all tasks found in your pages. It helps you get an overview of your TODO items across all your notes.</p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>~/logseq/my-graph<span class="w"> </span>tasks
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>~/logseq/my-graph<span class="w"> </span>tasks
 </code></pre></div>
-<h3 id="shell-completion">Shell Completion<a class="headerlink" href="#shell-completion" title="Permanent link">¶</a></h3>
-<p>Install shell completion for easier command-line usage:</p>
-<p><strong>Bash:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>lsdpy<span class="w"> </span>--install-completion<span class="w"> </span>bash
-</code></pre></div>
-<p><strong>Zsh:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>lsdpy<span class="w"> </span>--install-completion<span class="w"> </span>zsh
-</code></pre></div>
-<p><strong>Fish:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>lsdpy<span class="w"> </span>--install-completion<span class="w"> </span>fish
-</code></pre></div>
-<p><strong>PowerShell:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>lsdpy<span class="w"> </span>--install-completion<span class="w"> </span>powershell
-</code></pre></div>
-<h2 id="go-cli-lsd">Go CLI (<code>lsd</code>)<a class="headerlink" href="#go-cli-lsd" title="Permanent link">¶</a></h2>
-<h3 id="global-flags">Global Flags<a class="headerlink" href="#global-flags" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>-h, --help
-</code></pre></div>
-<p>Show help information for any command.</p>
-<h3 id="commands_1">Commands<a class="headerlink" href="#commands_1" title="Permanent link">¶</a></h3>
-<h4 id="content"><code>content</code><a class="headerlink" href="#content" title="Permanent link">¶</a></h4>
-<p>Append raw Markdown content to your Logseq graph.</p>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>lsd<span class="w"> </span>content<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-</code></pre></div>
-<p><strong>Description:</strong></p>
-<p>This command allows you to programmatically add content to your Logseq pages. It's useful for automation and scripting workflows where you want to append content to your knowledge base.</p>
-<p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"- New note"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>lsd<span class="w"> </span>content
-</code></pre></div>
-<p><strong>Get detailed help:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>lsd<span class="w"> </span>content<span class="w"> </span>--help
-</code></pre></div>
-<h4 id="tidy-up"><code>tidy-up</code><a class="headerlink" href="#tidy-up" title="Permanent link">¶</a></h4>
+<h3 id="tidy-up"><code>tidy-up</code><a class="headerlink" href="#tidy-up" title="Permanent link">¶</a></h3>
 <p>Clean up and standardize your Markdown files.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>lsd<span class="w"> </span>tidy-up<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[</span>FILES...<span class="o">]</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>lsd<span class="w"> </span>tidy-up<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[</span>FILES...<span class="o">]</span>
 </code></pre></div>
 <p><strong>Description:</strong></p>
 <p>This command helps ensure your Markdown files follow consistent formatting rules. It performs various cleanup operations:</p>
@@ -1240,47 +1510,39 @@
 <li>Standardizes formatting</li>
 </ul>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>lsd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/markdown/files/*.md
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>lsd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/markdown/files/*.md
 </code></pre></div>
-<p><strong>Get detailed help:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>lsd<span class="w"> </span>tidy-up<span class="w"> </span>--help
+<h2 id="global-flags">Global Flags<a class="headerlink" href="#global-flags" title="Permanent link">¶</a></h2>
+<p><strong>Go CLI (<code>lsd</code>):</strong></p>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>-h, --help
 </code></pre></div>
-<h4 id="completion"><code>completion</code><a class="headerlink" href="#completion" title="Permanent link">¶</a></h4>
-<p>Generate shell completion scripts.</p>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>lsd<span class="w"> </span>completion<span class="w"> </span><span class="o">[</span>bash<span class="p">|</span>zsh<span class="p">|</span>fish<span class="p">|</span>powershell<span class="o">]</span>
+<p>Show help information for any command.</p>
+<p><strong>Python CLI (<code>lsdpy</code>):</strong></p>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>-g, --graph DIRECTORY
 </code></pre></div>
-<p><strong>Description:</strong></p>
-<p>Generate autocompletion scripts for your shell. This enables tab completion for commands and options.</p>
-<p><strong>Examples:</strong></p>
-<p><strong>Bash:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>lsd<span class="w"> </span>completion<span class="w"> </span>bash<span class="w"> </span>&gt;<span class="w"> </span>/etc/bash_completion.d/lsd
-</code></pre></div>
-<p><strong>Zsh:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>lsd<span class="w"> </span>completion<span class="w"> </span>zsh<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">fpath</span><span class="p">[1]</span><span class="si">}</span><span class="s2">/_lsd"</span>
-</code></pre></div>
-<p><strong>Fish:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>lsd<span class="w"> </span>completion<span class="w"> </span>fish<span class="w"> </span>&gt;<span class="w"> </span>~/.config/fish/completions/lsd.fish
-</code></pre></div>
-<p><strong>PowerShell:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>lsd<span class="w"> </span>completion<span class="w"> </span>powershell<span class="w"> </span>&gt;<span class="w"> </span>lsd.ps1
-</code></pre></div>
-<h4 id="help"><code>help</code><a class="headerlink" href="#help" title="Permanent link">¶</a></h4>
-<p>Get help about any command.</p>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>lsd<span class="w"> </span><span class="nb">help</span><span class="w"> </span><span class="o">[</span>COMMAND<span class="o">]</span>
-</code></pre></div>
-<p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>lsd<span class="w"> </span><span class="nb">help</span><span class="w"> </span>tidy-up
-</code></pre></div>
+<p>Path to your Logseq graph directory. Can also be set via the <code>LOGSEQ_GRAPH_PATH</code> environment variable.</p>
+<p><strong>Required:</strong> Yes (for most commands)</p>
 <h2 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">¶</a></h2>
 <h3 id="logseq_graph_path"><code>LOGSEQ_GRAPH_PATH</code><a class="headerlink" href="#logseq_graph_path" title="Permanent link">¶</a></h3>
-<p>Path to your Logseq graph directory. Used by the Python CLI (<code>lsdpy</code>) as the default value for the <code>-g</code> flag.</p>
+<p>Path to your Logseq graph directory. Used by the Python CLI (<code>lsdpy</code>) as the default value for the <code>-g</code> flag, and by the <code>backlog</code> command to locate your graph.</p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_GRAPH_PATH</span><span class="o">=</span>~/logseq/my-graph
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>lsdpy<span class="w"> </span>tasks<span class="w">  </span><span class="c1"># No need to specify -g flag</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_GRAPH_PATH</span><span class="o">=</span>~/logseq/my-graph
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>lsdpy<span class="w"> </span>tasks<span class="w">  </span><span class="c1"># No need to specify -g flag</span>
 </code></pre></div>
-<h2 id="exit-codes">Exit Codes<a class="headerlink" href="#exit-codes" title="Permanent link">¶</a></h2>
+<h3 id="logseq_host_url"><code>LOGSEQ_HOST_URL</code><a class="headerlink" href="#logseq_host_url" title="Permanent link">¶</a></h3>
+<p>Logseq API host URL. Used by the <code>backlog</code> command to connect to the Logseq API.</p>
+<p><strong>Default:</strong> <code>http://localhost:12315</code></p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_HOST_URL</span><span class="o">=</span>http://localhost:12315
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>lsd<span class="w"> </span>backlog
+</code></pre></div>
+<h3 id="logseq_api_token"><code>LOGSEQ_API_TOKEN</code><a class="headerlink" href="#logseq_api_token" title="Permanent link">¶</a></h3>
+<p>Logseq API authentication token. Required by the <code>backlog</code> command to authenticate with the Logseq API.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_API_TOKEN</span><span class="o">=</span>your-api-token-here
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>lsd<span class="w"> </span>backlog
+</code></pre></div>
+<h2 id="exit-code">Exit Code<a class="headerlink" href="#exit-code" title="Permanent link">¶</a></h2>
 <p>Both CLIs use standard exit codes:</p>
 <ul>
 <li><code>0</code>: Success</li>
