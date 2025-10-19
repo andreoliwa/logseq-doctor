@@ -1168,7 +1168,7 @@
 </code></pre></div>
 <p>Execute adds all child commands to the root command and sets flags appropriately. This is called by main.main(). It only needs to happen once to the rootCmd.</p>
 <p><a name="NewMdCmd"></a></p>
-<h2 id="func-newmdcmd">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/md.go#L23">NewMdCmd</a><a class="headerlink" href="#func-newmdcmd" title="Permanent link">¶</a></h2>
+<h2 id="func-newmdcmd">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/md.go#L22">NewMdCmd</a><a class="headerlink" href="#func-newmdcmd" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NewMdCmd</span><span class="p">(</span><span class="nx">deps</span><span class="w"> </span><span class="o">*</span><span class="nx">MdDependencies</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span>
 </code></pre></div>
 <p>NewMdCmd creates a new md command with the specified dependencies. If deps is nil, it uses default implementations.</p>
@@ -1203,11 +1203,11 @@
 </code></pre></div>
 <p>addPageFlag adds a --page/-p flag to the command with customizable help text.</p>
 <p><a name="init"></a></p>
-<h2 id="func-init">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/tidy_up.go#L33">init</a><a class="headerlink" href="#func-init" title="Permanent link">¶</a></h2>
+<h2 id="func-init">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/root.go#L34">init</a><a class="headerlink" href="#func-init" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">init</span><span class="p">()</span>
 </code></pre></div>
 <p><a name="MdDependencies"></a></p>
-<h2 id="type-mddependencies">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/md.go#L14-L19">MdDependencies</a><a class="headerlink" href="#type-mddependencies" title="Permanent link">¶</a></h2>
+<h2 id="type-mddependencies">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/md.go#L13-L18">MdDependencies</a><a class="headerlink" href="#type-mddependencies" title="Permanent link">¶</a></h2>
 <p>MdDependencies holds all the dependencies for the md command.</p>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">MdDependencies</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="nx">InsertFn</span><span class="w">  </span><span class="kd">func</span><span class="p">(</span><span class="o">*</span><span class="nx">internal</span><span class="p">.</span><span class="nx">InsertMarkdownOptions</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
