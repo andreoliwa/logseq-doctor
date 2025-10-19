@@ -38,7 +38,7 @@ func NewTaskAddCmd(deps *TaskAddDependencies) *cobra.Command {
 		}
 	}
 
-	var journalFlag, blockFlag, pageFlag, keyFlag, nameFlag string
+	var journalFlag, blockFlag, pageFlag, keyFlag string
 
 	cmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "add [task description]",
@@ -53,14 +53,12 @@ Examples:
   lsd task add "Review pull request"
   lsd task add "Call client" --page "Work"
   lsd task add "Buy groceries" --journal "2024-12-25"
-  lsd task add "Water plants" --key "water plants" --name "Water plants in living room"
+  lsd task add "Water plants in living room" --key "water plants"
   lsd task add "Meeting notes" --block "Project A"`,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
 			graphPath := os.Getenv("LOGSEQ_GRAPH_PATH")
 			graph := deps.OpenGraph(graphPath)
-
-			taskDescription := args[0]
 
 			targetDate, err := ParseDateFromJournalFlag(journalFlag, deps.TimeNow)
 			if err != nil {
@@ -68,13 +66,12 @@ Examples:
 			}
 
 			opts := &internal.AddTaskOptions{
-				Graph:       graph,
-				Date:        targetDate,
-				Description: taskDescription,
-				Page:        pageFlag,
-				BlockText:   blockFlag,
-				Key:         keyFlag,
-				Name:        nameFlag,
+				Graph:     graph,
+				Date:      targetDate,
+				Page:      pageFlag,
+				BlockText: blockFlag,
+				Key:       keyFlag,
+				Name:      args[0],
 			}
 
 			return deps.AddTaskFn(opts)
@@ -87,8 +84,6 @@ Examples:
 
 	cmd.Flags().StringVarP(&keyFlag, "key", "k", "",
 		"Unique key, will be used to update an existing task")
-	cmd.Flags().StringVarP(&nameFlag, "name", "n", "",
-		"Short description of the task")
 
 	return cmd
 }

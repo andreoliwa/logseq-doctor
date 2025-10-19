@@ -70,13 +70,12 @@ func NewCategorizedTasks() CategorizedTasks {
 
 // AddTaskOptions contains options for adding a task to Logseq.
 type AddTaskOptions struct {
-	Graph       *logseq.Graph
-	Date        time.Time
-	Description string // Task description/content
-	Page        string // Page name to add the task to (empty = journal)
-	BlockText   string // Partial text to search for in parent blocks
-	Key         string // Unique key to search for existing task (case-insensitive)
-	Name        string // Short description of the task
+	Graph     *logseq.Graph
+	Date      time.Time
+	Page      string // Page name to add the task to (empty = journal)
+	BlockText string // Partial text to search for in parent blocks
+	Key       string // Unique key to search for existing task (case-insensitive)
+	Name      string // Short name of the task
 }
 
 // AddTask adds a task to Logseq.

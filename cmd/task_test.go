@@ -24,7 +24,7 @@ func TestNewTaskCmd(t *testing.T) {
 	assert.Contains(t, cmd.Long, "Manage tasks in your Logseq graph")
 }
 
-func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,maintidx
+func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 	graphPath := "/test/graph"
 	frozenTime := time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
 
@@ -35,7 +35,6 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 		blockFlag      string
 		pageFlag       string
 		keyFlag        string
-		nameFlag       string
 		expectedOpts   *internal.AddTaskOptions
 		addTaskError   error
 		expectError    bool
@@ -48,15 +47,13 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			blockFlag:   "",
 			pageFlag:    "",
 			keyFlag:     "",
-			nameFlag:    "",
 			expectedOpts: &internal.AddTaskOptions{
-				Graph:       nil, // Will be set to mockGraph in test
-				Date:        frozenTime,
-				Description: "Review pull request",
-				Page:        "",
-				BlockText:   "",
-				Key:         "",
-				Name:        "",
+				Graph:     nil, // Will be set to mockGraph in test
+				Date:      frozenTime,
+				Page:      "",
+				BlockText: "",
+				Key:       "",
+				Name:      "Review pull request",
 			},
 			addTaskError:   nil,
 			expectError:    false,
@@ -69,15 +66,13 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			blockFlag:   "",
 			pageFlag:    "Work",
 			keyFlag:     "",
-			nameFlag:    "",
 			expectedOpts: &internal.AddTaskOptions{
-				Graph:       nil, // Will be set to mockGraph in test
-				Date:        frozenTime,
-				Description: "Call client",
-				Page:        "Work",
-				BlockText:   "",
-				Key:         "",
-				Name:        "",
+				Graph:     nil, // Will be set to mockGraph in test
+				Date:      frozenTime,
+				Page:      "Work",
+				BlockText: "",
+				Key:       "",
+				Name:      "Call client",
 			},
 			addTaskError:   nil,
 			expectError:    false,
@@ -90,15 +85,13 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			blockFlag:   "",
 			pageFlag:    "",
 			keyFlag:     "",
-			nameFlag:    "",
 			expectedOpts: &internal.AddTaskOptions{
-				Graph:       nil, // Will be set to mockGraph in test
-				Date:        time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC),
-				Description: "Buy groceries",
-				Page:        "",
-				BlockText:   "",
-				Key:         "",
-				Name:        "",
+				Graph:     nil, // Will be set to mockGraph in test
+				Date:      time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC),
+				Page:      "",
+				BlockText: "",
+				Key:       "",
+				Name:      "Buy groceries",
 			},
 			addTaskError:   nil,
 			expectError:    false,
@@ -111,36 +104,32 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			blockFlag:   "Project A",
 			pageFlag:    "",
 			keyFlag:     "",
-			nameFlag:    "",
 			expectedOpts: &internal.AddTaskOptions{
-				Graph:       nil, // Will be set to mockGraph in test
-				Date:        frozenTime,
-				Description: "Meeting notes",
-				Page:        "",
-				BlockText:   "Project A",
-				Key:         "",
-				Name:        "",
+				Graph:     nil, // Will be set to mockGraph in test
+				Date:      frozenTime,
+				Page:      "",
+				BlockText: "Project A",
+				Key:       "",
+				Name:      "Meeting notes",
 			},
 			addTaskError:   nil,
 			expectError:    false,
 			expectedErrMsg: "",
 		},
 		{
-			name:        "command with key and name flags",
-			args:        []string{"Water plants"},
+			name:        "command with key flag",
+			args:        []string{"Water plants in living room"},
 			journalFlag: "",
 			blockFlag:   "",
 			pageFlag:    "",
 			keyFlag:     "water plants",
-			nameFlag:    "Water plants in living room",
 			expectedOpts: &internal.AddTaskOptions{
-				Graph:       nil, // Will be set to mockGraph in test
-				Date:        frozenTime,
-				Description: "Water plants",
-				Page:        "",
-				BlockText:   "",
-				Key:         "water plants",
-				Name:        "Water plants in living room",
+				Graph:     nil, // Will be set to mockGraph in test
+				Date:      frozenTime,
+				Page:      "",
+				BlockText: "",
+				Key:       "water plants",
+				Name:      "Water plants in living room",
 			},
 			addTaskError:   nil,
 			expectError:    false,
@@ -148,20 +137,18 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 		},
 		{
 			name:        "command with all flags",
-			args:        []string{"Complete task"},
+			args:        []string{"Complete the feature"},
 			journalFlag: "2024-03-10",
 			blockFlag:   "Sprint 1",
 			pageFlag:    "Development",
 			keyFlag:     "task-123",
-			nameFlag:    "Complete the feature",
 			expectedOpts: &internal.AddTaskOptions{
-				Graph:       nil, // Will be set to mockGraph in test
-				Date:        time.Date(2024, 3, 10, 0, 0, 0, 0, time.UTC),
-				Description: "Complete task",
-				Page:        "Development",
-				BlockText:   "Sprint 1",
-				Key:         "task-123",
-				Name:        "Complete the feature",
+				Graph:     nil, // Will be set to mockGraph in test
+				Date:      time.Date(2024, 3, 10, 0, 0, 0, 0, time.UTC),
+				Page:      "Development",
+				BlockText: "Sprint 1",
+				Key:       "task-123",
+				Name:      "Complete the feature",
 			},
 			addTaskError:   nil,
 			expectError:    false,
@@ -174,7 +161,6 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			blockFlag:      "",
 			pageFlag:       "",
 			keyFlag:        "",
-			nameFlag:       "",
 			expectedOpts:   nil, // Should not be called due to error
 			addTaskError:   nil,
 			expectError:    true,
@@ -187,15 +173,13 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			blockFlag:   "",
 			pageFlag:    "",
 			keyFlag:     "",
-			nameFlag:    "",
 			expectedOpts: &internal.AddTaskOptions{
-				Graph:       nil, // Will be set to mockGraph in test
-				Date:        frozenTime,
-				Description: "Task with error",
-				Page:        "",
-				BlockText:   "",
-				Key:         "",
-				Name:        "",
+				Graph:     nil, // Will be set to mockGraph in test
+				Date:      frozenTime,
+				Page:      "",
+				BlockText: "",
+				Key:       "",
+				Name:      "Task with error",
 			},
 			addTaskError:   assert.AnError,
 			expectError:    true,
@@ -248,10 +232,6 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 				args = append(args, "--key", testCase.keyFlag)
 			}
 
-			if testCase.nameFlag != "" {
-				args = append(args, "--name", testCase.nameFlag)
-			}
-
 			err := command.ParseFlags(args[1:]) // Skip the task description arg
 			require.NoError(t, err)
 
@@ -276,7 +256,6 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 
 				// Verify the AddTask function was called with expected options
 				require.NotNil(t, capturedOpts, "AddTask function should have been called")
-				assert.Equal(t, testCase.expectedOpts.Description, capturedOpts.Description)
 				assert.Equal(t, testCase.expectedOpts.Page, capturedOpts.Page)
 				assert.Equal(t, testCase.expectedOpts.BlockText, capturedOpts.BlockText)
 				assert.Equal(t, testCase.expectedOpts.Key, capturedOpts.Key)
