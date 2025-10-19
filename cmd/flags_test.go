@@ -87,16 +87,16 @@ func TestParseDateFromJournalFlag(t *testing.T) { //nolint:funlen
 		},
 	}
 
-	for _, testCase := range tests {
-		t.Run(testCase.name, func(t *testing.T) {
-			result, err := cmd.ParseDateFromJournalFlag(testCase.journalFlag, timeNow)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result, err := cmd.ParseDateFromJournalFlag(test.journalFlag, timeNow)
 
-			if testCase.expectError {
+			if test.expectError {
 				require.Error(t, err)
-				assert.Contains(t, err.Error(), testCase.expectedErrMsg)
+				assert.Contains(t, err.Error(), test.expectedErrMsg)
 			} else {
 				require.NoError(t, err)
-				assert.Equal(t, testCase.expectedDate, result)
+				assert.Equal(t, test.expectedDate, result)
 			}
 		})
 	}

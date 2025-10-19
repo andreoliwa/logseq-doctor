@@ -167,11 +167,11 @@ func TestIsAncestor(t *testing.T) { //nolint:funlen
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			block, ancestor := tt.setup()
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			block, ancestor := test.setup()
 			result := internal.IsAncestor(block, ancestor)
-			assert.Equal(t, tt.expected, result, "IsAncestor result mismatch for test case: %s", tt.name)
+			assert.Equal(t, test.expected, result, "IsAncestor result mismatch for test case: %s", test.name)
 		})
 	}
 }

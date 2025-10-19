@@ -158,3 +158,124 @@ func TestAddTaskToPageOrJournal(t *testing.T) { //nolint:funlen
 		})
 	}
 }
+
+func TestAddTaskUnderBlock(t *testing.T) {
+	frozenTime := time.Date(2025, 1, 4, 0, 0, 0, 0, time.UTC)
+
+	tests := []struct {
+		name         string
+		taskName     string
+		page         string
+		blockText    string
+		expectedFile string
+	}{
+		{
+			name:         "--block provided, and it doesn't exist",
+			taskName:     "Clean the room",
+			page:         "block-not-found",
+			blockText:    "non-existent block",
+			expectedFile: "block-not-found",
+		},
+		{
+			name:         "--block provided, and it exists with children",
+			taskName:     "Clean the room",
+			page:         "block-with-children",
+			blockText:    "Parent block with children",
+			expectedFile: "block-with-children",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			graph := testutils.StubGraph(t, "")
+
+			opts := &internal.AddTaskOptions{
+				Graph:     graph,
+				Date:      frozenTime,
+				Page:      test.page,
+				BlockText: test.blockText,
+				Key:       "",
+				Name:      test.taskName,
+			}
+
+			err := internal.AddTask(opts)
+			require.NoError(t, err)
+
+			testutils.AssertGoldenPages(t, graph, "", []string{test.expectedFile})
+		})
+	}
+}
+
+func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
+	frozenTime := time.Date(2025, 1, 4, 0, 0, 0, 0, time.UTC)
+
+	tests := []struct {
+		name         string
+		taskName     string
+		page         string
+		blockText    string
+		key          string
+		expectedFile string
+	}{
+		{
+			name:         "--key provided, and it doesn't exist",
+			taskName:     "Clean the room",
+			page:         "key-not-found",
+			blockText:    "",
+			key:          "groceries",
+			expectedFile: "key-not-found",
+		},
+		{
+			name:         "--key provided, and task exists with children, properties and log book",
+			taskName:     "Clean the room",
+			page:         "key-exists-with-children",
+			blockText:    "",
+			key:          "groceries",
+			expectedFile: "key-exists-with-children",
+		},
+		{
+			name:         "--key provided but --block is not provided",
+			taskName:     "Clean the room",
+			page:         "key-search-entire-page",
+			blockText:    "",
+			key:          "groceries",
+			expectedFile: "key-search-entire-page",
+		},
+		{
+			name:         "--key and --block provided: search for key within block and its children",
+			taskName:     "Clean the room",
+			page:         "key-search-within-block",
+			blockText:    "Parent block",
+			key:          "groceries",
+			expectedFile: "key-search-within-block",
+		},
+		{
+			name:         "--key and --block provided, task is deeply nested",
+			taskName:     "Clean the room",
+			page:         "key-deeply-nested",
+			blockText:    "Parent block",
+			key:          "groceries",
+			expectedFile: "key-deeply-nested",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			graph := testutils.StubGraph(t, "")
+
+			opts := &internal.AddTaskOptions{
+				Graph:     graph,
+				Date:      frozenTime,
+				Page:      test.page,
+				BlockText: test.blockText,
+				Key:       test.key,
+				Name:      test.taskName,
+			}
+
+			err := internal.AddTask(opts)
+			require.NoError(t, err)
+
+			testutils.AssertGoldenPages(t, graph, "", []string{test.expectedFile})
+		})
+	}
+}

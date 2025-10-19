@@ -116,8 +116,8 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 		},
 	}
 
-	for _, testCase := range tests {
-		t.Run(testCase.name, func(t *testing.T) {
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
 			mockGraph := &logseq.Graph{} // Empty graph for testing
 
 			var capturedOpts *internal.InsertMarkdownOptions
@@ -130,7 +130,7 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 				InsertFn: func(opts *internal.InsertMarkdownOptions) error {
 					capturedOpts = opts
 
-					return testCase.insertError
+					return test.insertError
 				},
 				OpenGraph: func(path string) *logseq.Graph {
 					capturedGraphPath = path
@@ -138,9 +138,9 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 					return mockGraph
 				},
 				ReadStdin: func() string {
-					capturedStdin = testCase.stdin
+					capturedStdin = test.stdin
 
-					return testCase.stdin
+					return test.stdin
 				},
 				TimeNow: func() time.Time {
 					return frozenTime
@@ -152,12 +152,12 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 			t.Setenv("LOGSEQ_GRAPH_PATH", graphPath)
 
 			args := []string{}
-			if testCase.journalFlag != "" {
-				args = append(args, "--journal", testCase.journalFlag)
+			if test.journalFlag != "" {
+				args = append(args, "--journal", test.journalFlag)
 			}
 
-			if testCase.parentFlag != "" {
-				args = append(args, "--parent", testCase.parentFlag)
+			if test.parentFlag != "" {
+				args = append(args, "--parent", test.parentFlag)
 			}
 
 			err := command.ParseFlags(args)
@@ -165,15 +165,15 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 
 			err = command.RunE(command, []string{})
 
-			if testCase.expectError {
+			if test.expectError {
 				require.Error(t, err)
 
-				if testCase.expectedErrMsg != "" {
-					assert.Contains(t, err.Error(), testCase.expectedErrMsg)
+				if test.expectedErrMsg != "" {
+					assert.Contains(t, err.Error(), test.expectedErrMsg)
 				}
 
 				// If we expect an error due to invalid date format, the insert function shouldn't be called
-				if testCase.expectedOpts == nil {
+				if test.expectedOpts == nil {
 					assert.Nil(t, capturedOpts, "Insert function should not be called when date parsing fails")
 				}
 			} else {
@@ -181,13 +181,13 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 
 				// Verify all dependencies were called correctly
 				assert.Equal(t, graphPath, capturedGraphPath, "OpenGraph should be called with correct path")
-				assert.Equal(t, testCase.stdin, capturedStdin, "ReadStdin should return expected content")
+				assert.Equal(t, test.stdin, capturedStdin, "ReadStdin should return expected content")
 
 				// Verify the insert function was called with expected options
 				require.NotNil(t, capturedOpts, "Insert function should have been called")
-				assert.Equal(t, testCase.expectedOpts.Content, capturedOpts.Content)
-				assert.Equal(t, testCase.expectedOpts.ParentText, capturedOpts.ParentText)
-				assert.Equal(t, testCase.expectedOpts.Date, capturedOpts.Date)
+				assert.Equal(t, test.expectedOpts.Content, capturedOpts.Content)
+				assert.Equal(t, test.expectedOpts.ParentText, capturedOpts.ParentText)
+				assert.Equal(t, test.expectedOpts.Date, capturedOpts.Date)
 				assert.Equal(t, mockGraph, capturedOpts.Graph, "Graph should be the mocked graph")
 			}
 		})

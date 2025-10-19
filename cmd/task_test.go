@@ -16,12 +16,12 @@ import (
 // the actual external dependencies.
 
 func TestNewTaskCmd(t *testing.T) {
-	cmd := cmd.NewTaskCmd()
+	taskCmd := cmd.NewTaskCmd()
 
-	require.NotNil(t, cmd)
-	assert.Equal(t, "task", cmd.Use)
-	assert.Equal(t, "Manage tasks in Logseq", cmd.Short)
-	assert.Contains(t, cmd.Long, "Manage tasks in your Logseq graph")
+	require.NotNil(t, taskCmd)
+	assert.Equal(t, "task", taskCmd.Use)
+	assert.Equal(t, "Manage tasks in Logseq", taskCmd.Short)
+	assert.Contains(t, taskCmd.Long, "Manage tasks in your Logseq graph")
 }
 
 func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
@@ -187,8 +187,8 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 		},
 	}
 
-	for _, testCase := range tests {
-		t.Run(testCase.name, func(t *testing.T) {
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
 			mockGraph := &logseq.Graph{} // Empty graph for testing
 
 			var capturedOpts *internal.AddTaskOptions
@@ -199,7 +199,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 				AddTaskFn: func(opts *internal.AddTaskOptions) error {
 					capturedOpts = opts
 
-					return testCase.addTaskError
+					return test.addTaskError
 				},
 				OpenGraph: func(path string) *logseq.Graph {
 					capturedGraphPath = path
@@ -215,21 +215,21 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 
 			t.Setenv("LOGSEQ_GRAPH_PATH", graphPath)
 
-			args := testCase.args
-			if testCase.journalFlag != "" {
-				args = append(args, "--journal", testCase.journalFlag)
+			args := test.args
+			if test.journalFlag != "" {
+				args = append(args, "--journal", test.journalFlag)
 			}
 
-			if testCase.blockFlag != "" {
-				args = append(args, "--block", testCase.blockFlag)
+			if test.blockFlag != "" {
+				args = append(args, "--block", test.blockFlag)
 			}
 
-			if testCase.pageFlag != "" {
-				args = append(args, "--page", testCase.pageFlag)
+			if test.pageFlag != "" {
+				args = append(args, "--page", test.pageFlag)
 			}
 
-			if testCase.keyFlag != "" {
-				args = append(args, "--key", testCase.keyFlag)
+			if test.keyFlag != "" {
+				args = append(args, "--key", test.keyFlag)
 			}
 
 			err := command.ParseFlags(args[1:]) // Skip the task description arg
@@ -237,15 +237,15 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 
 			err = command.RunE(command, args[:1]) // Pass only the task description
 
-			if testCase.expectError {
+			if test.expectError {
 				require.Error(t, err)
 
-				if testCase.expectedErrMsg != "" {
-					assert.Contains(t, err.Error(), testCase.expectedErrMsg)
+				if test.expectedErrMsg != "" {
+					assert.Contains(t, err.Error(), test.expectedErrMsg)
 				}
 
 				// If we expect an error due to invalid date format, the AddTask function shouldn't be called
-				if testCase.expectedOpts == nil {
+				if test.expectedOpts == nil {
 					assert.Nil(t, capturedOpts, "AddTask function should not be called when date parsing fails")
 				}
 			} else {
@@ -256,11 +256,11 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 
 				// Verify the AddTask function was called with expected options
 				require.NotNil(t, capturedOpts, "AddTask function should have been called")
-				assert.Equal(t, testCase.expectedOpts.Page, capturedOpts.Page)
-				assert.Equal(t, testCase.expectedOpts.BlockText, capturedOpts.BlockText)
-				assert.Equal(t, testCase.expectedOpts.Key, capturedOpts.Key)
-				assert.Equal(t, testCase.expectedOpts.Name, capturedOpts.Name)
-				assert.Equal(t, testCase.expectedOpts.Date, capturedOpts.Date)
+				assert.Equal(t, test.expectedOpts.Page, capturedOpts.Page)
+				assert.Equal(t, test.expectedOpts.BlockText, capturedOpts.BlockText)
+				assert.Equal(t, test.expectedOpts.Key, capturedOpts.Key)
+				assert.Equal(t, test.expectedOpts.Name, capturedOpts.Name)
+				assert.Equal(t, test.expectedOpts.Date, capturedOpts.Date)
 				assert.Equal(t, mockGraph, capturedOpts.Graph, "Graph should be the mocked graph")
 			}
 		})
@@ -269,12 +269,12 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 
 func TestTaskAddCommand_WithNilDependencies(t *testing.T) {
 	// Test that NewTaskAddCmd works with nil dependencies (uses defaults)
-	cmd := cmd.NewTaskAddCmd(nil)
+	taskAddCmd := cmd.NewTaskAddCmd(nil)
 
-	require.NotNil(t, cmd)
-	assert.Equal(t, "add [task description]", cmd.Use)
-	assert.Equal(t, "Add a new task to Logseq", cmd.Short)
-	assert.Contains(t, cmd.Long, "Add a new task to your Logseq graph")
+	require.NotNil(t, taskAddCmd)
+	assert.Equal(t, "add [task description]", taskAddCmd.Use)
+	assert.Equal(t, "Add a new task to Logseq", taskAddCmd.Short)
+	assert.Contains(t, taskAddCmd.Long, "Add a new task to your Logseq graph")
 }
 
 func TestTaskAddCommand_RequiresArgument(t *testing.T) {

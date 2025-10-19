@@ -1,9 +1,10 @@
 package internal_test
 
 import (
-	"github.com/andreoliwa/lsd/internal"
 	"testing"
 	"time"
+
+	"github.com/andreoliwa/lsd/internal"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -19,10 +20,10 @@ func TestDateYYYYMMDD(t *testing.T) {
 		{"Dec 31, 2023", time.Date(2023, time.December, 31, 0, 0, 0, 0, time.UTC), 20231231},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := internal.DateYYYYMMDD(tt.input)
-			assert.Equal(t, tt.expected, result, "Date conversion failed for %s", tt.name)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := internal.DateYYYYMMDD(test.input)
+			assert.Equal(t, test.expected, result, "Date conversion failed for %s", test.name)
 		})
 	}
 }

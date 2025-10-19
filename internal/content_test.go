@@ -40,40 +40,60 @@ func TestIsValidMarkdownFile(t *testing.T) {
 	// Update the file path for the valid markdown file test case
 	tests[4].filePath = validFilePath
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := internal.IsValidMarkdownFile(tt.filePath)
-			if result != tt.expected {
-				t.Errorf("For %q, expected %v, got %v", tt.filePath, tt.expected, result)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := internal.IsValidMarkdownFile(test.filePath)
+			if result != test.expected {
+				t.Errorf("For %q, expected %v, got %v", test.filePath, test.expected, result)
 			}
 		})
 	}
 }
 
 func TestAppendRawMarkdownToJournal(t *testing.T) {
-	graph := testutils.StubGraph(t, "")
+	t.Run("empty content should be a no-op", func(t *testing.T) {
+		graph := testutils.StubGraph(t, "")
+		now := time.Now()
 
-	now := time.Now()
-
-	size, err := internal.AppendRawMarkdownToJournal(graph, now, "")
-	require.NoError(t, err)
-	assert.Equal(t, 0, size)
+		size, err := internal.AppendRawMarkdownToJournal(graph, now, "")
+		require.NoError(t, err)
+		assert.Equal(t, 0, size)
+	})
 
 	contentToAppend, err := os.ReadFile(filepath.Join("testdata", "append-raw-journal.md"))
 	require.NoError(t, err)
 
-	testCase := func(day int, expectedFilename string) func(*testing.T) {
-		return func(*testing.T) {
-			date := time.Date(2024, 12, day, 0, 0, 0, 0, time.UTC)
-
-			_, err = internal.AppendRawMarkdownToJournal(graph, date, string(contentToAppend))
-			require.NoError(t, err)
-
-			testutils.AssertGoldenJournals(t, graph, "", []string{expectedFilename})
-		}
+	tests := []struct {
+		name             string
+		day              int
+		expectedFilename string
+	}{
+		{
+			name:             "Journal exists and has content",
+			day:              24,
+			expectedFilename: "2024_12_24",
+		},
+		{
+			name:             "Journal doesn't exist",
+			day:              25,
+			expectedFilename: "2024_12_25",
+		},
+		{
+			name:             "Journal exists but it's an empty file",
+			day:              26,
+			expectedFilename: "2024_12_26",
+		},
 	}
 
-	t.Run("Journal exists and has content", testCase(24, "2024_12_24"))
-	t.Run("Journal doesn't exist", testCase(25, "2024_12_25"))
-	t.Run("Journal exists but it's an empty file", testCase(26, "2024_12_25"))
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			graph := testutils.StubGraph(t, "")
+			date := time.Date(2024, 12, test.day, 0, 0, 0, 0, time.UTC)
+
+			_, err := internal.AppendRawMarkdownToJournal(graph, date, string(contentToAppend))
+			require.NoError(t, err)
+
+			testutils.AssertGoldenJournals(t, graph, "", []string{test.expectedFilename})
+		})
+	}
 }

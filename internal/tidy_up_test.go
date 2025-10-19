@@ -32,11 +32,11 @@ func TestSortAndRemoveDuplicates(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := internal.SortAndRemoveDuplicates(tt.input)
-			if !reflect.DeepEqual(result, tt.expected) {
-				t.Errorf("Expected %v, got %v", tt.expected, result)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := internal.SortAndRemoveDuplicates(test.input)
+			if !reflect.DeepEqual(result, test.expected) {
+				t.Errorf("Expected %v, got %v", test.expected, result)
 			}
 		})
 	}
