@@ -38,7 +38,7 @@ func InsertMarkdownToJournal(opts *InsertMarkdownOptions) error {
 
 	var parentBlock *content.Block
 	if opts.ParentText != "" {
-		parentBlock = findBlockContainingText(journalTx, opts.ParentText)
+		parentBlock = FindBlockContainingText(journalTx, opts.ParentText)
 		// If parent not found, parentBlock will be nil and content will be added to top level
 	}
 
@@ -53,35 +53,6 @@ func InsertMarkdownToJournal(opts *InsertMarkdownOptions) error {
 	}
 
 	return nil
-}
-
-// findBlockContainingText searches for the first block containing the specified text using FindDeep.
-func findBlockContainingText(page logseq.Page, searchText string) *content.Block {
-	if page == nil || searchText == "" {
-		return nil
-	}
-
-	searchTextLower := strings.ToLower(searchText)
-
-	return page.Blocks().FindDeep(func(block *content.Block) bool {
-		textNode := block.Children().FindDeep(func(node content.Node) bool {
-			if text, ok := node.(*content.Text); ok {
-				return strings.Contains(strings.ToLower(text.Value), searchTextLower)
-			}
-
-			if pageLink, ok := node.(*content.PageLink); ok {
-				return strings.Contains(strings.ToLower(pageLink.To), searchTextLower)
-			}
-
-			if hashtag, ok := node.(*content.Hashtag); ok {
-				return strings.Contains(strings.ToLower(hashtag.To), searchTextLower)
-			}
-
-			return false
-		})
-
-		return textNode != nil
-	})
 }
 
 // addContent adds content either as a child block to the specified parent or as a top-level block to the page.

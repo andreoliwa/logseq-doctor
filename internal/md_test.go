@@ -61,21 +61,21 @@ func TestInsertMarkdownToJournal(t *testing.T) { //nolint:funlen
 		},
 	}
 
-	for _, testCase := range tests {
-		t.Run(testCase.name, func(t *testing.T) {
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
 			graph := testutils.StubGraph(t, "")
 
 			opts := &internal.InsertMarkdownOptions{
 				Graph:      graph,
-				Date:       testCase.date,
-				Content:    testCase.content,
-				ParentText: testCase.parentText,
+				Date:       test.date,
+				Content:    test.content,
+				ParentText: test.parentText,
 			}
 			err := internal.InsertMarkdownToJournal(opts)
 			require.NoError(t, err)
 
-			if testCase.expectedGolden != "" {
-				testutils.AssertGoldenJournals(t, graph, "", []string{testCase.expectedGolden})
+			if test.expectedGolden != "" {
+				testutils.AssertGoldenJournals(t, graph, "", []string{test.expectedGolden})
 			}
 		})
 	}

@@ -1,8 +1,9 @@
 package backlog_test
 
 import (
-	"github.com/andreoliwa/lsd/internal/backlog"
 	"testing"
+
+	"github.com/andreoliwa/lsd/internal/backlog"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -21,10 +22,10 @@ func TestFormatCount(t *testing.T) {
 		{"negative case", -1, "apple", "apples", "-1 apples"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := backlog.FormatCount(tt.count, tt.singular, tt.plural)
-			assert.Equal(t, tt.expected, result)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := backlog.FormatCount(test.count, test.singular, test.plural)
+			assert.Equal(t, test.expected, result)
 		})
 	}
 }

@@ -1,0 +1,24 @@
+- Line before 1
+- Line before 2
+- Line before 3
+- Parent block with tasks at first level
+  - TODO First task
+  - Some regular paragraph with a #tag should be skipped
+  - DOING Second task
+  - DONE Third task
+  - WAITING Fourth task with a #tag
+- Parent block with nested tasks
+  - Nested block
+    - Another level
+      - Yet another level
+        - TODO First nested task
+        - DOING Second nested task
+        - A regular block with a [[page link]] should be ignored
+        - DONE Third nested task
+        - WAITING Fourth nested task with [[page link]]
+- TODO Single task at root level
+- Line after 1
+  - Item with a [[page]]
+  - Item with a #tag
+- Line after 2
+- Line after 3
