@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/lsd/internal"
+	"github.com/andreoliwa/lqd/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -50,11 +50,11 @@ If --key is provided, searches for an existing task containing that key (case-in
 and updates it. Otherwise, creates a new task.
 
 Examples:
-  lsd task add "Review pull request"
-  lsd task add "Call client" --page "Work"
-  lsd task add "Buy groceries" --journal "2024-12-25"
-  lsd task add "Water plants in living room" --key "water plants"
-  lsd task add "Meeting notes" --block "Project A"`,
+  lqd task add "Review pull request"
+  lqd task add "Call client" --page "Work"
+  lqd task add "Buy groceries" --journal "2024-12-25"
+  lqd task add "Water plants in living room" --key "water plants"
+  lqd task add "Meeting notes" --block "Project A"`,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
 			graphPath := os.Getenv("LOGSEQ_GRAPH_PATH")

@@ -10,7 +10,7 @@ before:
 
 builds:
   - main: ./main.go
-    binary: lsd
+    binary: lqd
     ldflags:
       - -s -w -X main.version={{.Version}}
     env:
@@ -65,9 +65,9 @@ brews:
     license: "MIT"
     # https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md#bininstall-foo
     install: |
-      bin.install "lsd"
+      bin.install "lqd"
     test: |
-      assert_match "Logseq Doctor (Go) heals your Markdown files for Logseq.", shell_output("#{bin}/lsd")
+      assert_match "Logseq Doctor heals your Markdown files for Logseq.", shell_output("#{bin}/lqd")
     # Repository to push the generated files to.
     repository:
       pull_request:

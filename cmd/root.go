@@ -8,14 +8,14 @@ import (
 
 // rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
-	Use:   "lsd",
-	Short: "Logseq Doctor (Go) heals your Markdown files for Logseq",
-	Long: `Logseq Doctor (Go) heals your Markdown files for Logseq.
+	Use:   "lqd",
+	Short: "Logseq Doctor heals your Markdown files for Logseq",
+	Long: `Logseq Doctor heals your Markdown files for Logseq.
 
 Convert flat Markdown to Logseq outline, clean up Markdown,
 prevent invalid content, and more stuff to come.
 
-"lsdpy" is the CLI tool originally written in Python; "lsd" is the Go version.
+"lqdpy" is the CLI tool originally written in Python; "lqd" is the Go version.
 The intention is to slowly convert everything to Go.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:

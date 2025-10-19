@@ -1,24 +1,24 @@
 # Usage
 
-Logseq Doctor provides two CLI tools: `lsdpy` (Python) and `lsd` (Go). This guide covers both.
+Logseq Doctor provides two CLI tools: `lqdpy` (Python) and `lqd` (Go). This guide covers both.
 
 !!! info
-The Go CLI (`lsd`) is the recommended version for new features. The Python CLI (`lsdpy`) is maintained for backward compatibility but new features will only be added to the Go version.
+The Go CLI (`lqd`) is the recommended version for new features. The Python CLI (`lqdpy`) is maintained for backward compatibility but new features will only be added to the Go version.
 
-## Python CLI (`lsdpy`)
+## Python CLI (`lqdpy`)
 
 ### Overview
 
-Type `lsdpy` without arguments to check the current commands and options:
+Type `lqdpy` without arguments to check the current commands and options:
 
 ```bash
-lsdpy --help
+lqdpy --help
 ```
 
 Output:
 
 ```
-Usage: lsdpy [OPTIONS] COMMAND [ARGS]...
+Usage: lqdpy [OPTIONS] COMMAND [ARGS]...
 
 Logseq Doctor: heal your flat old Markdown files before importing them.
 
@@ -43,14 +43,14 @@ Most commands require you to specify your Logseq graph directory. You can do thi
 1. **Using the `-g` flag:**
 
 ```bash
-lsdpy -g /path/to/your/logseq/graph outline input.md
+lqdpy -g /path/to/your/logseq/graph outline input.md
 ```
 
 2. **Using the environment variable:**
 
 ```bash
 export LOGSEQ_GRAPH_PATH=/path/to/your/logseq/graph
-lsdpy outline input.md
+lqdpy outline input.md
 ```
 
 ### Commands
@@ -60,7 +60,7 @@ lsdpy outline input.md
 Convert flat Markdown files to Logseq's outline format:
 
 ```bash
-lsdpy -g /path/to/graph outline input.md
+lqdpy -g /path/to/graph outline input.md
 ```
 
 This command reads a flat Markdown file and converts it to Logseq's indented outline structure.
@@ -70,34 +70,34 @@ This command reads a flat Markdown file and converts it to Logseq's indented out
 List all tasks in your Logseq graph:
 
 ```bash
-lsdpy -g /path/to/graph tasks
+lqdpy -g /path/to/graph tasks
 ```
 
 This will display all tasks found in your Logseq pages.
 
-## Go CLI (`lsd`)
+## Go CLI (`lqd`)
 
 ### Overview
 
-Type `lsd` without arguments to check the current commands and options:
+Type `lqd` without arguments to check the current commands and options:
 
 ```bash
-lsd --help
+lqd --help
 ```
 
 Output:
 
 ```
-Logseq Doctor (Go) heals your Markdown files for Logseq.
+Logseq Doctor heals your Markdown files for Logseq.
 
 Convert flat Markdown to Logseq outline, clean up Markdown,
 prevent invalid content, and more stuff to come.
 
-"lsdpy" is the CLI tool originally written in Python; "lsd" is the Go version.
+"lqdpy" is the CLI tool originally written in Python; "lqd" is the Go version.
 The intention is to slowly convert everything to Go.
 
 Usage:
-  lsd [command]
+  lqd [command]
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
@@ -106,9 +106,9 @@ Available Commands:
   tidy-up     Tidy up your Markdown files.
 
 Flags:
-  -h, --help   help for lsd
+  -h, --help   help for lqd
 
-Use "lsd [command] --help" for more information about a command.
+Use "lqd [command] --help" for more information about a command.
 ```
 
 ### Commands
@@ -118,7 +118,7 @@ Use "lsd [command] --help" for more information about a command.
 Append raw Markdown content to your Logseq graph:
 
 ```bash
-lsd content --help
+lqd content --help
 ```
 
 This command allows you to add content to your Logseq pages programmatically.
@@ -128,7 +128,7 @@ This command allows you to add content to your Logseq pages programmatically.
 Clean up and standardize your Markdown files:
 
 ```bash
-lsd tidy-up --help
+lqd tidy-up --help
 ```
 
 This command helps ensure your Markdown files follow consistent formatting rules.
@@ -139,13 +139,13 @@ Generate autocompletion scripts for your shell:
 
 ```bash
 # For bash
-lsd completion bash > /etc/bash_completion.d/lsd
+lqd completion bash > /etc/bash_completion.d/lqd
 
 # For zsh
-lsd completion zsh > "${fpath[1]}/_lsd"
+lqd completion zsh > "${fpath[1]}/_lqd"
 
 # For fish
-lsd completion fish > ~/.config/fish/completions/lsd.fish
+lqd completion fish > ~/.config/fish/completions/lqd.fish
 ```
 
 ## Examples
@@ -171,7 +171,7 @@ Details.
 You can convert it to Logseq's outline format:
 
 ```bash
-lsdpy -g /path/to/graph outline my-notes.md
+lqdpy -g /path/to/graph outline my-notes.md
 ```
 
 ### Tidying Up Markdown Files
@@ -179,7 +179,7 @@ lsdpy -g /path/to/graph outline my-notes.md
 To clean up and standardize your Markdown files:
 
 ```bash
-lsd tidy-up /path/to/your/markdown/files
+lqd tidy-up /path/to/your/markdown/files
 ```
 
 ## Tips
@@ -209,7 +209,7 @@ If you get a "command not found" error:
 
 If you get a "permission denied" error:
 
-1. Make sure the executable has execute permissions: `chmod +x /path/to/lsd`
+1. Make sure the executable has execute permissions: `chmod +x /path/to/lqd`
 2. Check that you have write permissions to your Logseq graph directory
 
 ## Next Steps

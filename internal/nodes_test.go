@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/andreoliwa/logseq-go/content"
-	"github.com/andreoliwa/lsd/internal"
+	"github.com/andreoliwa/lqd/internal"
 	"github.com/stretchr/testify/assert"
 )
 

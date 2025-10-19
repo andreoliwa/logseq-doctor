@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/andreoliwa/lsd/internal"
+	"github.com/andreoliwa/lqd/internal"
 	"github.com/spf13/cobra"
 )
 

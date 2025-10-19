@@ -76,9 +76,9 @@ Or you can install manually:
 
 Confirm if it's in your path:
 
-    which lsd
+    which lqd
     # or
-    ls -l $(go env GOPATH)/bin/lsd
+    ls -l $(go env GOPATH)/bin/lqd
 
 ### Python executable
 
@@ -91,7 +91,7 @@ You can also install the development version with:
 
     pipx install git+https://github.com/andreoliwa/logseq-doctor
 
-You will then have the `lsdpy` command available globally in your system.
+You will then have the `lqdpy` command available globally in your system.
 
 ### Build from source
 
@@ -105,18 +105,18 @@ To build and install from the source (both Python and Go executables), clone the
 
 ## Quick start
 
-Type `lsd` (the Go executable) without arguments to check the current commands and options:
+Type `lqd` (the Go executable) without arguments to check the current commands and options:
 
-    Logseq Doctor (Go) heals your Markdown files for Logseq.
+    Logseq Doctor heals your Markdown files for Logseq.
 
     Convert flat Markdown to Logseq outline, clean up Markdown,
     prevent invalid content, and more stuff to come.
 
-    "lsdpy" is the CLI tool originally written in Python; "lsd" is the Go version.
+    "lqdpy" is the CLI tool originally written in Python; "lqd" is the Go version.
     The intention is to slowly convert everything to Go.
 
     Usage:
-    lsd [command]
+    lqd [command]
 
     Available Commands:
     backlog     Aggregate tasks from multiple pages into a unified backlog
@@ -128,13 +128,13 @@ Type `lsd` (the Go executable) without arguments to check the current commands a
     tidy-up     Tidy up your Markdown files
 
     Flags:
-    -h, --help   help for lsd
+    -h, --help   help for lqd
 
-    Use "lsd [command] --help" for more information about a command.
+    Use "lqd [command] --help" for more information about a command.
 
-Type `lsdpy` without arguments to check the current commands and options:
+Type `lqdpy` without arguments to check the current commands and options:
 
-    Usage: lsdpy [OPTIONS] COMMAND [ARGS]...
+    Usage: lqdpy [OPTIONS] COMMAND [ARGS]...
 
     Logseq Doctor: heal your flat old Markdown files before importing them.
 

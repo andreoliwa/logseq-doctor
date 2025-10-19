@@ -56,5 +56,5 @@ s.Add("item")
 Or use the CLI:
 
 ```bash
-lsd --help
+lqd --help
 ```

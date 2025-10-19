@@ -23,9 +23,9 @@ go install github.com/andreoliwa/logseq-doctor@latest
 Confirm if it's in your path:
 
 ```bash
-which lsd
+which lqd
 # or
-ls -l $(go env GOPATH)/bin/lsd
+ls -l $(go env GOPATH)/bin/lqd
 ```
 
 !!! tip
@@ -49,7 +49,7 @@ You can also install the development version with:
 pipx install git+https://github.com/andreoliwa/logseq-doctor
 ```
 
-You will then have the `lsdpy` command available globally in your system.
+You will then have the `lqdpy` command available globally in your system.
 
 ### Alternative: pip
 
@@ -86,13 +86,13 @@ This will:
 ### Go CLI
 
 ```bash
-lsd --help
+lqd --help
 ```
 
 You should see the help message with available commands.
 
 ```bash
-lsdpy --help
+lqdpy --help
 ```
 
 You should see the help message with available commands.

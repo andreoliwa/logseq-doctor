@@ -22,7 +22,7 @@ THE SOFTWARE.
 package main
 
 import (
-	"github.com/andreoliwa/lsd/cmd"
+	"github.com/andreoliwa/lqd/cmd"
 )
 
 func main() {

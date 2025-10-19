@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/lsd/internal"
+	"github.com/andreoliwa/lqd/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -41,9 +41,9 @@ If --block is provided, the content will be added as a child block under the fir
 containing the specified text. Otherwise, it will be appended at the end of the journal page.
 
 Examples:
-  echo "New task" | lsd md
-  echo "Child task" | lsd md --block "Project A"
-  echo "Another task" | lsd md -b "meeting notes"`,
+  echo "New task" | lqd md
+  echo "Child task" | lqd md --block "Project A"
+  echo "Another task" | lqd md -b "meeting notes"`,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			graphPath := os.Getenv("LOGSEQ_GRAPH_PATH")
 			stdin := deps.ReadStdin()

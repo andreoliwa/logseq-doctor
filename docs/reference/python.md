@@ -38,5 +38,5 @@ client = LogseqClient(path="/path/to/graph")
 Or use the CLI:
 
 ```bash
-lsdpy --help
+lqdpy --help
 ```

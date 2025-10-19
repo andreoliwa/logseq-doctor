@@ -2,7 +2,7 @@
 - id: tidy-up
   name: "logseq-doctor tidy-up"
   description: "Tidy up your Markdown files by removing empty bullets in any block"
-  entry: lsd tidy-up
+  entry: lqd tidy-up
   language: python
   types:
     - markdown

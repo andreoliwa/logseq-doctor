@@ -8,8 +8,8 @@ import (
 
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
-	"github.com/andreoliwa/lsd/internal"
-	"github.com/andreoliwa/lsd/pkg/set"
+	"github.com/andreoliwa/lqd/internal"
+	"github.com/andreoliwa/lqd/pkg/set"
 	"github.com/fatih/color"
 )
 

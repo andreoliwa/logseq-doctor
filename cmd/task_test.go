@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/lsd/cmd"
-	"github.com/andreoliwa/lsd/internal"
+	"github.com/andreoliwa/lqd/cmd"
+	"github.com/andreoliwa/lqd/internal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

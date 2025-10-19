@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/andreoliwa/lsd/internal/testutils"
+	"github.com/andreoliwa/lqd/internal/testutils"
 	"github.com/stretchr/testify/require"
 )
 

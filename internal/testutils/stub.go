@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/lsd/internal"
-	"github.com/andreoliwa/lsd/internal/backlog"
+	"github.com/andreoliwa/lqd/internal"
+	"github.com/andreoliwa/lqd/internal/backlog"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/fs"

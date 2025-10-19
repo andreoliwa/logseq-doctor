@@ -6,7 +6,7 @@ import (
 
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
-	"github.com/andreoliwa/lsd/internal"
+	"github.com/andreoliwa/lqd/internal"
 )
 
 type SingleBacklogConfig struct {

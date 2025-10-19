@@ -31,7 +31,7 @@ default_context:
     codeclimate:               'no'
     codecov:                   'yes'
     command_line_interface:    'click'
-    command_line_interface_bin_name: 'lsdpy'
+    command_line_interface_bin_name: 'lqdpy'
     coveralls:                 'no'
     distribution_name:         'logseq-doctor'
     email:                     'andreoliwa@.gmail.com'
