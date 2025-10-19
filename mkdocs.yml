@@ -52,7 +52,8 @@ markdown_extensions:
       auto_title: true
   - pymdownx.inlinehilite
   - pymdownx.magiclink
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      base_path: [docs]
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
@@ -64,12 +65,21 @@ nav:
   - Getting Started:
       - Installation: installation.md
       - Usage: usage.md
-  - API Reference:
+  - CLI Commands:
+      - Overview: reference/cli.md
+      # keep-sorted start
+      - backlog: reference/cli/#backlog
+      - completion: reference/cli/#completion
+      - content: reference/cli/#content
+      - md: reference/cli/#md
+      - outline: reference/cli/#outline
+      - task: reference/cli/#task
+      - tasks: reference/cli/#tasks
+      - tidy-up: reference/cli/#tidy-up
+      # keep-sorted end
+  - Internal API Reference:
       - Go API: reference/go.md
       - Python API: reference/python.md
-  - Reference:
-      - CLI Commands: reference/cli.md
-      - README: readme.md
   - Development:
       - Contributing: contributing.md
       - Changelog: changelog.md

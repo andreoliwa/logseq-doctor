@@ -1,17 +1,27 @@
-# Overview
+# Logseq Doctor
 
-|         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| docs    | [![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://andreoliwa.github.io/logseq-doctor/)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| tests   | [![Go Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/go.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions) [![Tox Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/tox.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions) [![Coverage Status](https://codecov.io/gh/andreoliwa/logseq-doctor/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/github/andreoliwa/logseq-doctor)                                                                                                                                                                                                 |
-| package | [![PyPI Package latest release](https://img.shields.io/pypi/v/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![PyPI Wheel](https://img.shields.io/pypi/wheel/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![Supported versions](https://img.shields.io/pypi/pyversions/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![Supported implementations](https://img.shields.io/pypi/implementation/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor) [![Commits since latest release](https://img.shields.io/github/commits-since/andreoliwa/logseq-doctor/v0.3.0.svg)](https://github.com/andreoliwa/logseq-doctor/compare/v0.3.0...master) |
+<!-- --8<-- [start:badges] -->
 
-Logseq Doctor: heal your flat old Markdown files before importing them.
+[![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://andreoliwa.github.io/logseq-doctor/)
+[![Go Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/go.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions)
+[![Tox Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/tox.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions)
+[![Coverage Status](https://codecov.io/gh/andreoliwa/logseq-doctor/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/github/andreoliwa/logseq-doctor)
+[![PyPI Package](https://img.shields.io/pypi/v/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor)
+
+<!-- --8<-- [end:badges] -->
+
+<!-- --8<-- [start:tagline] -->
+
+**Logseq Doctor: heal your flat old Markdown files before importing them to Logseq.**
+
+<!-- --8<-- [end:tagline] -->
 
 📚 **[Read the full documentation](https://andreoliwa.github.io/logseq-doctor/)**
 
+<!-- --8<-- [start:status] -->
+
 > [!NOTE]
-> This project is still alpha, so it\'s very rough on the edges
+> This project is still alpha, so it's very rough on the edges
 > (documentation and feature-wise).
 >
 > At the moment, it has both a Python and Go CLI.
@@ -19,7 +29,56 @@ Logseq Doctor: heal your flat old Markdown files before importing them.
 > The long-term plan is to convert it to Go and slowly remove Python.
 > New features will be added to the Go CLI only.
 
+<!-- --8<-- [end:status] -->
+
+<!-- --8<-- [start:description] -->
+
+## What is Logseq Doctor?
+
+Logseq Doctor is a command-line tool with commands to manipulate your [Logseq](https://logseq.com/) Markdown files. It provides utilities to:
+
+- Convert flat Markdown to Logseq's outline format
+- Append content to pages and journals
+- Create task backlogs that are easily viewed and prioritized in the mobile app
+- Manage tasks in Logseq
+- Clean up and tidy Markdown files
+- Prevent invalid content to be committed
+- And more stuff to come...
+<!-- --8<-- [end:description] -->
+
+<!-- --8<-- [start:features] -->
+
+## Features
+
+- **Backlog Management** (`backlog`): Aggregate tasks from multiple pages into unified backlogs with smart categorization, overdue detection, and focus page generation
+- **Content Management** (`content`): Append raw Markdown content to Logseq pages or journals
+- **Markdown Integration** (`md`): Parse and add Markdown content using DOM manipulation with support for parent blocks and journal targeting
+- **Task Management** (`task add`): Add new tasks or update existing ones with key-based search, preserving children and properties
+- **Tidy Up** (`tidy-up`): Clean up and standardize your Markdown files
+- **Fast Performance**: Written in Go for speed and efficiency
+- **Outline Conversion** (`outline`): Convert flat Markdown files to Logseq's outline format
+- **Task Listing** (`tasks`): List and manage tasks in your Logseq graph
+<!-- --8<-- [end:features] -->
+
+<!-- --8<-- [start:installation] -->
+
 ## Installation
+
+### Go binary executable
+
+The recommended way for macOS and Linux is to install with Homebrew:
+
+    brew install andreoliwa/formulae/logseq-doctor
+
+Or you can install manually:
+
+    go install github.com/andreoliwa/logseq-doctor@latest
+
+Confirm if it's in your path:
+
+    which lsd
+    # or
+    ls -l $(go env GOPATH)/bin/lsd
 
 ### Python executable
 
@@ -34,29 +93,44 @@ You can also install the development version with:
 
 You will then have the `lsdpy` command available globally in your system.
 
-### Go binary executable
-
-The recommended way for macOS and Linux is to install with Homebrew:
-
-    brew install andreoliwa/formulae/logseq-doctor
-
-Or you can install manually:
-
-    go install github.com/andreoliwa/logseq-doctor@latest
-
-Confirm if it\'s in your path:
-
-    which lsd
-    # or
-    ls -l $(go env GOPATH)/bin/lsd
-
 ### Build from source
 
 To build and install from the source (both Python and Go executables), clone the repository and run:
 
     make install
 
+<!-- --8<-- [end:installation] -->
+
+<!-- --8<-- [start:quickstart] -->
+
 ## Quick start
+
+Type `lsd` (the Go executable) without arguments to check the current commands and options:
+
+    Logseq Doctor (Go) heals your Markdown files for Logseq.
+
+    Convert flat Markdown to Logseq outline, clean up Markdown,
+    prevent invalid content, and more stuff to come.
+
+    "lsdpy" is the CLI tool originally written in Python; "lsd" is the Go version.
+    The intention is to slowly convert everything to Go.
+
+    Usage:
+    lsd [command]
+
+    Available Commands:
+    backlog     Aggregate tasks from multiple pages into a unified backlog
+    completion  Generate the autocompletion script for the specified shell
+    content     Append raw Markdown content to Logseq
+    help        Help about any command
+    md          Add Markdown content to Logseq using the DOM
+    task        Manage tasks in Logseq (subcommands: add)
+    tidy-up     Tidy up your Markdown files
+
+    Flags:
+    -h, --help   help for lsd
+
+    Use "lsd [command] --help" for more information about a command.
 
 Type `lsdpy` without arguments to check the current commands and options:
 
@@ -78,29 +152,9 @@ Type `lsdpy` without arguments to check the current commands and options:
     outline  Convert flat Markdown to outline.
     tasks    List tasks in Logseq.
 
-Type `lsd` (the Go executable) without arguments to check the current commands and options:
+<!-- --8<-- [end:quickstart] -->
 
-    Logseq Doctor (Go) heals your Markdown files for Logseq.
-
-    Convert flat Markdown to Logseq outline, clean up Markdown,
-    prevent invalid content, and more stuff to come.
-
-    "lsdpy"" is the CLI tool originally written in Python; "lsd"" is the Go version.
-    The intention is to slowly convert everything to Go.
-
-    Usage:
-    lsd [command]
-
-    Available Commands:
-    completion  Generate the autocompletion script for the specified shell
-    content     Append raw Markdown content to Logseq
-    help        Help about any command
-    tidy-up     Tidy up your Markdown files.
-
-    Flags:
-    -h, --help   help for lsd
-
-    Use "lsd [command] --help" for more information about a command.
+<!-- --8<-- [start:development] -->
 
 ## Development
 
@@ -122,3 +176,5 @@ Note, to combine the coverage data from all the tox environments run:
 | ------- | ----------------------------------- |
 | Windows | set PYTEST_ADDOPTS=--cov-append tox |
 | Other   | PYTEST_ADDOPTS=--cov-append tox     |
+
+<!-- --8<-- [end:development] -->

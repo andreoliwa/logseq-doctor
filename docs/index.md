@@ -1,12 +1,8 @@
 # Logseq Doctor
 
-[![Documentation Status](https://img.shields.io/badge/docs-mkdocs-blue)](https://andreoliwa.github.io/logseq-doctor/)
-[![Go Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/go.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions)
-[![Tox Build Status](https://github.com/andreoliwa/logseq-doctor/actions/workflows/tox.yaml/badge.svg)](https://github.com/andreoliwa/logseq-doctor/actions)
-[![Coverage Status](https://codecov.io/gh/andreoliwa/logseq-doctor/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/github/andreoliwa/logseq-doctor)
-[![PyPI Package](https://img.shields.io/pypi/v/logseq-doctor.svg)](https://pypi.org/project/logseq-doctor)
+--8<-- "readme.md:badges"
 
-**Logseq Doctor: heal your flat old Markdown files before importing them to Logseq.**
+--8<-- "readme.md:tagline"
 
 !!! note "Project Status"
 This project is still in alpha, so it's very rough on the edges (documentation and feature-wise).
@@ -16,28 +12,9 @@ This project is still in alpha, so it's very rough on the edges (documentation a
     The long-term plan is to convert it to Go and slowly remove Python.
     New features will be added to the Go CLI only.
 
-## What is Logseq Doctor?
+--8<-- "readme.md:description"
 
-Logseq Doctor is a command-line tool that helps you prepare your Markdown files for import into [Logseq](https://logseq.com/). It provides utilities to:
-
-- Convert flat Markdown to Logseq's outline format
-- Clean up and tidy Markdown files
-- Prevent invalid content
-- Manage tasks in Logseq
-- Append content to your Logseq graph
-
-## Features
-
-### Python CLI (`lsdpy`)
-
-- **Outline Conversion**: Convert flat Markdown files to Logseq's outline format
-- **Task Management**: List and manage tasks in your Logseq graph
-
-### Go CLI (`lsd`)
-
-- **Content Management**: Append raw Markdown content to Logseq
-- **Tidy Up**: Clean up and standardize your Markdown files
-- **Fast Performance**: Written in Go for speed and efficiency
+--8<-- "readme.md:features"
 
 ## Quick Links
 
@@ -45,6 +22,14 @@ Logseq Doctor is a command-line tool that helps you prepare your Markdown files 
 - [Usage Guide](usage.md) - Learn how to use the CLI tools
 - [Contributing](contributing.md) - Help improve Logseq Doctor
 - [GitHub Repository](https://github.com/andreoliwa/logseq-doctor)
+
+## Installation
+
+--8<-- "readme.md:installation"
+
+## Quick Start
+
+--8<-- "readme.md:quickstart"
 
 ## Project Goals
 

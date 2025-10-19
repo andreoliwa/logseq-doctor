@@ -1,33 +1,6 @@
 # Installation
 
-Logseq Doctor provides both Python and Go implementations. You can install either or both depending on your needs.
-
-## Python Executable
-
-The recommended way is to install `logseq-doctor` globally with [pipx](https://github.com/pypa/pipx):
-
-```bash
-pipx install logseq-doctor
-```
-
-You can also install the development version with:
-
-```bash
-pipx install git+https://github.com/andreoliwa/logseq-doctor
-```
-
-You will then have the `lsdpy` command available globally in your system.
-
-### Alternative: pip
-
-If you prefer to use pip:
-
-```bash
-pip install logseq-doctor
-```
-
-!!! warning
-Installing with pip may conflict with other Python packages in your system. We recommend using pipx instead.
+Logseq Doctor provides both Go and Python implementations. You can install either or both depending on your needs.
 
 ## Go Binary Executable
 
@@ -62,6 +35,33 @@ Make sure your `GOPATH/bin` directory is in your system's PATH. You can add it t
     export PATH="$PATH:$(go env GOPATH)/bin"
     ```
 
+## Python Executable
+
+The recommended way is to install `logseq-doctor` globally with [pipx](https://github.com/pypa/pipx):
+
+```bash
+pipx install logseq-doctor
+```
+
+You can also install the development version with:
+
+```bash
+pipx install git+https://github.com/andreoliwa/logseq-doctor
+```
+
+You will then have the `lsdpy` command available globally in your system.
+
+### Alternative: pip
+
+If you prefer to use pip:
+
+```bash
+pip install logseq-doctor
+```
+
+!!! warning
+Installing with pip may conflict with other Python packages in your system. We recommend using pipx instead.
+
 ## Build from Source
 
 To build and install from the source (both Python and Go executables), clone the repository and run:
@@ -83,16 +83,16 @@ This will:
 
 ### Python CLI
 
-```bash
-lsdpy --help
-```
-
-You should see the help message with available commands.
-
 ### Go CLI
 
 ```bash
 lsd --help
+```
+
+You should see the help message with available commands.
+
+```bash
+lsdpy --help
 ```
 
 You should see the help message with available commands.
