@@ -22,7 +22,7 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 	tests := []struct {
 		name           string
 		journalFlag    string
-		parentFlag     string
+		blockFlag      string
 		stdin          string
 		expectedOpts   *internal.InsertMarkdownOptions
 		insertError    error
@@ -32,7 +32,7 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 		{
 			name:        "basic command with no flags",
 			journalFlag: "",
-			parentFlag:  "",
+			blockFlag:   "",
 			stdin:       "test content",
 			expectedOpts: &internal.InsertMarkdownOptions{
 				Graph:      nil, // Will be set to mockGraph in test
@@ -45,9 +45,9 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 			expectedErrMsg: "",
 		},
 		{
-			name:        "command with parent flag",
+			name:        "command with block flag",
 			journalFlag: "",
-			parentFlag:  "Project A",
+			blockFlag:   "Project A",
 			stdin:       "child task",
 			expectedOpts: &internal.InsertMarkdownOptions{
 				Graph:      nil, // Will be set to mockGraph in test
@@ -62,7 +62,7 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 		{
 			name:        "command with journal flag",
 			journalFlag: "2024-12-25",
-			parentFlag:  "",
+			blockFlag:   "",
 			stdin:       "journal entry",
 			expectedOpts: &internal.InsertMarkdownOptions{
 				Graph:      nil, // Will be set to mockGraph in test
@@ -77,7 +77,7 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 		{
 			name:        "command with both flags",
 			journalFlag: "2024-03-10",
-			parentFlag:  "meeting notes",
+			blockFlag:   "meeting notes",
 			stdin:       "action item",
 			expectedOpts: &internal.InsertMarkdownOptions{
 				Graph:      nil, // Will be set to mockGraph in test
@@ -92,7 +92,7 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 		{
 			name:           "invalid journal date format",
 			journalFlag:    "2024/01/15",
-			parentFlag:     "",
+			blockFlag:      "",
 			stdin:          "content",
 			expectedOpts:   nil, // Should not be called due to error
 			insertError:    nil,
@@ -102,7 +102,7 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 		{
 			name:        "insert function returns error",
 			journalFlag: "",
-			parentFlag:  "",
+			blockFlag:   "",
 			stdin:       "content",
 			expectedOpts: &internal.InsertMarkdownOptions{
 				Graph:      nil, // Will be set to mockGraph in test
@@ -156,8 +156,8 @@ func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 				args = append(args, "--journal", testCase.journalFlag)
 			}
 
-			if testCase.parentFlag != "" {
-				args = append(args, "--parent", testCase.parentFlag)
+			if testCase.blockFlag != "" {
+				args = append(args, "--block", testCase.blockFlag)
 			}
 
 			err := command.ParseFlags(args)

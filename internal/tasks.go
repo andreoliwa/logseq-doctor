@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/lsd/pkg/set"
 )
 
@@ -65,4 +66,26 @@ func NewCategorizedTasks() CategorizedTasks {
 		Doing:           set.NewSet[string](),
 		FutureScheduled: set.NewSet[string](),
 	}
+}
+
+// AddTaskOptions contains options for adding a task to Logseq.
+type AddTaskOptions struct {
+	Graph       *logseq.Graph
+	Date        time.Time
+	Description string // Task description/content
+	Page        string // Page name to add the task to (empty = journal)
+	BlockText   string // Partial text to search for in parent blocks
+	Key         string // Unique key to search for existing task (case-insensitive)
+	Name        string // Short description of the task
+}
+
+// AddTask adds a task to Logseq.
+// If Key is provided, it searches for an existing task containing that key (case-insensitive)
+// and updates it. Otherwise, creates a new task.
+// If Page is provided, adds to that page. Otherwise, adds to journal for Date.
+// If BlockText is provided, adds as a child of the first block containing that text.
+func AddTask(_ *AddTaskOptions) error {
+	// TODO: Implement task addition logic
+	// This is a placeholder for the command structure
+	panic("AddTask not yet implemented")
 }
