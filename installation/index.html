@@ -1197,9 +1197,9 @@
 <div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>go<span class="w"> </span>install<span class="w"> </span>github.com/andreoliwa/logseq-doctor@latest
 </code></pre></div>
 <p>Confirm if it's in your path:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>which<span class="w"> </span>lsd
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>which<span class="w"> </span>lqd
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># or</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>ls<span class="w"> </span>-l<span class="w"> </span><span class="k">$(</span>go<span class="w"> </span>env<span class="w"> </span>GOPATH<span class="k">)</span>/bin/lsd
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>ls<span class="w"> </span>-l<span class="w"> </span><span class="k">$(</span>go<span class="w"> </span>env<span class="w"> </span>GOPATH<span class="k">)</span>/bin/lqd
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -1216,7 +1216,7 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 <p>You can also install the development version with:</p>
 <div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pipx<span class="w"> </span>install<span class="w"> </span>git+https://github.com/andreoliwa/logseq-doctor
 </code></pre></div>
-<p>You will then have the <code>lsdpy</code> command available globally in your system.</p>
+<p>You will then have the <code>lqdpy</code> command available globally in your system.</p>
 <h3 id="alternative-pip">Alternative: pip<a class="headerlink" href="#alternative-pip" title="Permanent link">¶</a></h3>
 <p>If you prefer to use pip:</p>
 <div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pip<span class="w"> </span>install<span class="w"> </span>logseq-doctor
@@ -1241,10 +1241,10 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 <h2 id="verify-installation">Verify Installation<a class="headerlink" href="#verify-installation" title="Permanent link">¶</a></h2>
 <h3 id="python-cli">Python CLI<a class="headerlink" href="#python-cli" title="Permanent link">¶</a></h3>
 <h3 id="go-cli">Go CLI<a class="headerlink" href="#go-cli" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>lsd<span class="w"> </span>--help
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>lqd<span class="w"> </span>--help
 </code></pre></div>
 <p>You should see the help message with available commands.</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>lsdpy<span class="w"> </span>--help
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>lqdpy<span class="w"> </span>--help
 </code></pre></div>
 <p>You should see the help message with available commands.</p>
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">¶</a></h2>

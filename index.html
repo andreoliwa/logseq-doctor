@@ -1248,9 +1248,9 @@ New features will be added to the Go CLI only.
 <div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>go install github.com/andreoliwa/logseq-doctor@latest
 </code></pre></div>
 <p>Confirm if it's in your path:</p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>which lsd
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>which lqd
 # or
-ls -l $(go env GOPATH)/bin/lsd
+ls -l $(go env GOPATH)/bin/lqd
 </code></pre></div>
 <h3 id="python-executable">Python executable<a class="headerlink" href="#python-executable" title="Permanent link">¶</a></h3>
 <p>The recommended way is to install <code>logseq-doctor</code> globally with
@@ -1260,24 +1260,24 @@ ls -l $(go env GOPATH)/bin/lsd
 <p>You can also install the development version with:</p>
 <div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>pipx install git+https://github.com/andreoliwa/logseq-doctor
 </code></pre></div>
-<p>You will then have the <code>lsdpy</code> command available globally in your system.</p>
+<p>You will then have the <code>lqdpy</code> command available globally in your system.</p>
 <h3 id="build-from-source">Build from source<a class="headerlink" href="#build-from-source" title="Permanent link">¶</a></h3>
 <p>To build and install from the source (both Python and Go executables), clone the repository and run:</p>
 <div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>make install
 </code></pre></div>
 <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">¶</a></h2>
 <h2 id="quick-start_1">Quick start<a class="headerlink" href="#quick-start_1" title="Permanent link">¶</a></h2>
-<p>Type <code>lsd</code> (the Go executable) without arguments to check the current commands and options:</p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>Logseq Doctor (Go) heals your Markdown files for Logseq.
+<p>Type <code>lqd</code> (the Go executable) without arguments to check the current commands and options:</p>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>Logseq Doctor heals your Markdown files for Logseq.
 
 Convert flat Markdown to Logseq outline, clean up Markdown,
 prevent invalid content, and more stuff to come.
 
-"lsdpy" is the CLI tool originally written in Python; "lsd" is the Go version.
+"lqdpy" is the CLI tool originally written in Python; "lqd" is the Go version.
 The intention is to slowly convert everything to Go.
 
 Usage:
-lsd [command]
+lqd [command]
 
 Available Commands:
 backlog     Aggregate tasks from multiple pages into a unified backlog
@@ -1289,12 +1289,12 @@ task        Manage tasks in Logseq (subcommands: add)
 tidy-up     Tidy up your Markdown files
 
 Flags:
--h, --help   help for lsd
+-h, --help   help for lqd
 
-Use "lsd [command] --help" for more information about a command.
+Use "lqd [command] --help" for more information about a command.
 </code></pre></div>
-<p>Type <code>lsdpy</code> without arguments to check the current commands and options:</p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>Usage: lsdpy [OPTIONS] COMMAND [ARGS]...
+<p>Type <code>lqdpy</code> without arguments to check the current commands and options:</p>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>Usage: lqdpy [OPTIONS] COMMAND [ARGS]...
 
 Logseq Doctor: heal your flat old Markdown files before importing them.
 

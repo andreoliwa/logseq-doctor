@@ -415,13 +415,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#python-cli-lsdpy" class="md-nav__link">
+  <a href="#python-cli-lqdpy" class="md-nav__link">
     <span class="md-ellipsis">
-      Python CLI (lsdpy)
+      Python CLI (lqdpy)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Python CLI (lsdpy)">
+    <nav class="md-nav" aria-label="Python CLI (lqdpy)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -481,13 +481,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#go-cli-lsd" class="md-nav__link">
+  <a href="#go-cli-lqd" class="md-nav__link">
     <span class="md-ellipsis">
-      Go CLI (lsd)
+      Go CLI (lqd)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Go CLI (lsd)">
+    <nav class="md-nav" aria-label="Go CLI (lqd)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1154,13 +1154,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#python-cli-lsdpy" class="md-nav__link">
+  <a href="#python-cli-lqdpy" class="md-nav__link">
     <span class="md-ellipsis">
-      Python CLI (lsdpy)
+      Python CLI (lqdpy)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Python CLI (lsdpy)">
+    <nav class="md-nav" aria-label="Python CLI (lqdpy)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1220,13 +1220,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#go-cli-lsd" class="md-nav__link">
+  <a href="#go-cli-lqd" class="md-nav__link">
     <span class="md-ellipsis">
-      Go CLI (lsd)
+      Go CLI (lqd)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Go CLI (lsd)">
+    <nav class="md-nav" aria-label="Go CLI (lqd)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1402,18 +1402,18 @@
 
 
 <h1 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">¶</a></h1>
-<p>Logseq Doctor provides two CLI tools: <code>lsdpy</code> (Python) and <code>lsd</code> (Go). This guide covers both.</p>
+<p>Logseq Doctor provides two CLI tools: <code>lqdpy</code> (Python) and <code>lqd</code> (Go). This guide covers both.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 </div>
-<p>The Go CLI (<code>lsd</code>) is the recommended version for new features. The Python CLI (<code>lsdpy</code>) is maintained for backward compatibility but new features will only be added to the Go version.</p>
-<h2 id="python-cli-lsdpy">Python CLI (<code>lsdpy</code>)<a class="headerlink" href="#python-cli-lsdpy" title="Permanent link">¶</a></h2>
+<p>The Go CLI (<code>lqd</code>) is the recommended version for new features. The Python CLI (<code>lqdpy</code>) is maintained for backward compatibility but new features will only be added to the Go version.</p>
+<h2 id="python-cli-lqdpy">Python CLI (<code>lqdpy</code>)<a class="headerlink" href="#python-cli-lqdpy" title="Permanent link">¶</a></h2>
 <h3 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">¶</a></h3>
-<p>Type <code>lsdpy</code> without arguments to check the current commands and options:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>lsdpy<span class="w"> </span>--help
+<p>Type <code>lqdpy</code> without arguments to check the current commands and options:</p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>lqdpy<span class="w"> </span>--help
 </code></pre></div>
 <p>Output:</p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Usage: lsdpy [OPTIONS] COMMAND [ARGS]...
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Usage: lqdpy [OPTIONS] COMMAND [ARGS]...
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Logseq Doctor: heal your flat old Markdown files before importing them.
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
@@ -1435,41 +1435,41 @@
 <ol>
 <li><strong>Using the <code>-g</code> flag:</strong></li>
 </ol>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/your/logseq/graph<span class="w"> </span>outline<span class="w"> </span>input.md
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/your/logseq/graph<span class="w"> </span>outline<span class="w"> </span>input.md
 </code></pre></div>
 <ol>
 <li><strong>Using the environment variable:</strong></li>
 </ol>
 <div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_GRAPH_PATH</span><span class="o">=</span>/path/to/your/logseq/graph
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>lsdpy<span class="w"> </span>outline<span class="w"> </span>input.md
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>lqdpy<span class="w"> </span>outline<span class="w"> </span>input.md
 </code></pre></div>
 <h3 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">¶</a></h3>
 <h4 id="outline-convert-flat-markdown-to-outline"><code>outline</code> - Convert Flat Markdown to Outline<a class="headerlink" href="#outline-convert-flat-markdown-to-outline" title="Permanent link">¶</a></h4>
 <p>Convert flat Markdown files to Logseq's outline format:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>outline<span class="w"> </span>input.md
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>outline<span class="w"> </span>input.md
 </code></pre></div>
 <p>This command reads a flat Markdown file and converts it to Logseq's indented outline structure.</p>
 <h4 id="tasks-list-tasks-in-logseq"><code>tasks</code> - List Tasks in Logseq<a class="headerlink" href="#tasks-list-tasks-in-logseq" title="Permanent link">¶</a></h4>
 <p>List all tasks in your Logseq graph:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>tasks
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>tasks
 </code></pre></div>
 <p>This will display all tasks found in your Logseq pages.</p>
-<h2 id="go-cli-lsd">Go CLI (<code>lsd</code>)<a class="headerlink" href="#go-cli-lsd" title="Permanent link">¶</a></h2>
+<h2 id="go-cli-lqd">Go CLI (<code>lqd</code>)<a class="headerlink" href="#go-cli-lqd" title="Permanent link">¶</a></h2>
 <h3 id="overview_1">Overview<a class="headerlink" href="#overview_1" title="Permanent link">¶</a></h3>
-<p>Type <code>lsd</code> without arguments to check the current commands and options:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>lsd<span class="w"> </span>--help
+<p>Type <code>lqd</code> without arguments to check the current commands and options:</p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>lqd<span class="w"> </span>--help
 </code></pre></div>
 <p>Output:</p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Logseq Doctor (Go) heals your Markdown files for Logseq.
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Logseq Doctor heals your Markdown files for Logseq.
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Convert flat Markdown to Logseq outline, clean up Markdown,
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>prevent invalid content, and more stuff to come.
 <a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>"lsdpy" is the CLI tool originally written in Python; "lsd" is the Go version.
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>"lqdpy" is the CLI tool originally written in Python; "lqd" is the Go version.
 <a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>The intention is to slowly convert everything to Go.
 <a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
 <a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>Usage:
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>  lsd [command]
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>  lqd [command]
 <a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
 <a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>Available Commands:
 <a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>  completion  Generate the autocompletion script for the specified shell
@@ -1478,31 +1478,31 @@
 <a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>  tidy-up     Tidy up your Markdown files.
 <a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>
 <a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>Flags:
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>  -h, --help   help for lsd
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>  -h, --help   help for lqd
 <a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>
-<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>Use "lsd [command] --help" for more information about a command.
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>Use "lqd [command] --help" for more information about a command.
 </code></pre></div>
 <h3 id="commands_1">Commands<a class="headerlink" href="#commands_1" title="Permanent link">¶</a></h3>
 <h4 id="content-append-raw-markdown-content"><code>content</code> - Append Raw Markdown Content<a class="headerlink" href="#content-append-raw-markdown-content" title="Permanent link">¶</a></h4>
 <p>Append raw Markdown content to your Logseq graph:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>lsd<span class="w"> </span>content<span class="w"> </span>--help
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>lqd<span class="w"> </span>content<span class="w"> </span>--help
 </code></pre></div>
 <p>This command allows you to add content to your Logseq pages programmatically.</p>
 <h4 id="tidy-up-tidy-up-markdown-files"><code>tidy-up</code> - Tidy Up Markdown Files<a class="headerlink" href="#tidy-up-tidy-up-markdown-files" title="Permanent link">¶</a></h4>
 <p>Clean up and standardize your Markdown files:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>lsd<span class="w"> </span>tidy-up<span class="w"> </span>--help
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>--help
 </code></pre></div>
 <p>This command helps ensure your Markdown files follow consistent formatting rules.</p>
 <h4 id="completion-shell-completion"><code>completion</code> - Shell Completion<a class="headerlink" href="#completion-shell-completion" title="Permanent link">¶</a></h4>
 <p>Generate autocompletion scripts for your shell:</p>
 <div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># For bash</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>lsd<span class="w"> </span>completion<span class="w"> </span>bash<span class="w"> </span>&gt;<span class="w"> </span>/etc/bash_completion.d/lsd
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>lqd<span class="w"> </span>completion<span class="w"> </span>bash<span class="w"> </span>&gt;<span class="w"> </span>/etc/bash_completion.d/lqd
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
 <a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># For zsh</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>lsd<span class="w"> </span>completion<span class="w"> </span>zsh<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">fpath</span><span class="p">[1]</span><span class="si">}</span><span class="s2">/_lsd"</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>lqd<span class="w"> </span>completion<span class="w"> </span>zsh<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">fpath</span><span class="p">[1]</span><span class="si">}</span><span class="s2">/_lqd"</span>
 <a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
 <a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># For fish</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>lsd<span class="w"> </span>completion<span class="w"> </span>fish<span class="w"> </span>&gt;<span class="w"> </span>~/.config/fish/completions/lsd.fish
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>lqd<span class="w"> </span>completion<span class="w"> </span>fish<span class="w"> </span>&gt;<span class="w"> </span>~/.config/fish/completions/lqd.fish
 </code></pre></div>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">¶</a></h2>
 <h3 id="converting-a-flat-markdown-file">Converting a Flat Markdown File<a class="headerlink" href="#converting-a-flat-markdown-file" title="Permanent link">¶</a></h3>
@@ -1520,11 +1520,11 @@
 <a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>Details.
 </code></pre></div>
 <p>You can convert it to Logseq's outline format:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>lsdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>outline<span class="w"> </span>my-notes.md
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>outline<span class="w"> </span>my-notes.md
 </code></pre></div>
 <h3 id="tidying-up-markdown-files">Tidying Up Markdown Files<a class="headerlink" href="#tidying-up-markdown-files" title="Permanent link">¶</a></h3>
 <p>To clean up and standardize your Markdown files:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>lsd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/your/markdown/files
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/your/markdown/files
 </code></pre></div>
 <h2 id="tips">Tips<a class="headerlink" href="#tips" title="Permanent link">¶</a></h2>
 <div class="admonition tip">
@@ -1551,7 +1551,7 @@ export LOGSEQ_GRAPH_PATH=/path/to/your/logseq/graph
 <h3 id="permission-denied">Permission Denied<a class="headerlink" href="#permission-denied" title="Permanent link">¶</a></h3>
 <p>If you get a "permission denied" error:</p>
 <ol>
-<li>Make sure the executable has execute permissions: <code>chmod +x /path/to/lsd</code></li>
+<li>Make sure the executable has execute permissions: <code>chmod +x /path/to/lqd</code></li>
 <li>Check that you have write permissions to your Logseq graph directory</li>
 </ol>
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">¶</a></h2>
