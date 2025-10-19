@@ -12,15 +12,3 @@ coverage:
       default:
         # No target for code difference on a PR https://docs.codecov.com/docs/commit-status#target
         target: 0%
-
-# Enable annotations on pull requests to show uncovered lines in the Files tab
-comment:
-  layout: "reach,diff,flags,tree,files"
-  behavior: default
-  require_changes: false
-  require_base: false
-  require_head: true
-
-# Show annotations for uncovered lines in PR diffs
-github_checks:
-  annotations: true
