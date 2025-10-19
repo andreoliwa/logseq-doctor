@@ -113,7 +113,7 @@ func AddTask(opts *AddTaskOptions) error {
 	}
 
 	if existingTask != nil {
-		updateTaskName(existingTask, opts.Name)
+		updateTaskNamePreservingChildren(existingTask, opts.Name)
 	} else {
 		newBlockTask := content.NewBlock(newParagraphTodoTask(opts.Name))
 
@@ -132,8 +132,7 @@ func AddTask(opts *AddTaskOptions) error {
 	return nil
 }
 
-// updateTaskName updates the name of an existing task while preserving children, properties, and logbook.
-func updateTaskName(task *content.Block, newName string) {
+func updateTaskNamePreservingChildren(task *content.Block, newName string) {
 	// Find the first paragraph (which contains the task marker and text)
 	var firstParagraph *content.Paragraph
 	for node := task.FirstChild(); node != nil; node = node.NextSibling() {
@@ -152,7 +151,6 @@ func updateTaskName(task *content.Block, newName string) {
 	firstParagraph.ReplaceWith(newParagraphTodoTask(newName))
 }
 
-// newParagraphTodoTask creates a new task paragraph with TO-DO marker and the given name.
 func newParagraphTodoTask(name string) *content.Paragraph {
 	return content.NewParagraph(
 		content.NewTaskMarker(content.TaskStatusTodo),
