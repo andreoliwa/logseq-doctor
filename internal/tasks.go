@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/content"
 	"github.com/andreoliwa/lsd/pkg/set"
 )
 
@@ -83,8 +84,78 @@ type AddTaskOptions struct {
 // and updates it. Otherwise, creates a new task.
 // If Page is provided, adds to that page. Otherwise, adds to journal for Date.
 // If BlockText is provided, adds as a child of the first block containing that text.
-func AddTask(_ *AddTaskOptions) error {
-	// TODO: Implement task addition logic
-	// This is a placeholder for the command structure
-	panic("AddTask not yet implemented")
+func AddTask(opts *AddTaskOptions) error {
+	transaction := opts.Graph.NewTransaction()
+
+	var targetPage logseq.Page
+
+	var err error
+
+	if opts.Page != "" {
+		targetPage, err = transaction.OpenPage(opts.Page)
+	} else {
+		targetPage, err = transaction.OpenJournal(opts.Date)
+	}
+
+	if err != nil {
+		return fmt.Errorf("error opening target page: %w", err)
+	}
+
+	var parentBlock *content.Block
+	if opts.BlockText != "" {
+		parentBlock = FindBlockContainingText(targetPage, opts.BlockText)
+		// If parent not found, parentBlock will be nil and task will be added to top level
+	}
+
+	var existingTask *content.Block
+	if opts.Key != "" {
+		existingTask = FindTaskByKey(targetPage, parentBlock, opts.Key)
+	}
+
+	if existingTask != nil {
+		updateTaskName(existingTask, opts.Name)
+	} else {
+		newBlockTask := content.NewBlock(newParagraphTodoTask(opts.Name))
+
+		if parentBlock != nil {
+			parentBlock.AddChild(newBlockTask)
+		} else {
+			targetPage.AddBlock(newBlockTask)
+		}
+	}
+
+	err = transaction.Save()
+	if err != nil {
+		return fmt.Errorf("error saving transaction: %w", err)
+	}
+
+	return nil
+}
+
+// updateTaskName updates the name of an existing task while preserving children, properties, and logbook.
+func updateTaskName(task *content.Block, newName string) {
+	// Find the first paragraph (which contains the task marker and text)
+	var firstParagraph *content.Paragraph
+	for node := task.FirstChild(); node != nil; node = node.NextSibling() {
+		if p, ok := node.(*content.Paragraph); ok {
+			firstParagraph = p
+
+			break
+		}
+	}
+
+	if firstParagraph == nil {
+		return
+	}
+
+	// Replace the old paragraph with the new one
+	firstParagraph.ReplaceWith(newParagraphTodoTask(newName))
+}
+
+// newParagraphTodoTask creates a new task paragraph with TO-DO marker and the given name.
+func newParagraphTodoTask(name string) *content.Paragraph {
+	return content.NewParagraph(
+		content.NewTaskMarker(content.TaskStatusTodo),
+		content.NewText(name),
+	)
 }

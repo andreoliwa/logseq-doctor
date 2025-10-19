@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/andreoliwa/lsd/internal"
+	"github.com/andreoliwa/lsd/internal/testutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -52,9 +53,9 @@ func TestOverdue(t *testing.T) {
 		{"no deadline or scheduled", newTask(0, 0), false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, tt.task.Overdue(time.Now), "Overdue check failed for %s", tt.name)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.expected, test.task.Overdue(time.Now), "Overdue check failed for %s", test.name)
 		})
 	}
 }
@@ -74,10 +75,86 @@ func TestDoing(t *testing.T) {
 		{"empty marker", "", false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			task := internal.TaskJSON{Marker: tt.marker} //nolint:exhaustruct
-			assert.Equal(t, tt.expected, task.Doing(), "Doing check failed for %s", tt.name)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			task := internal.TaskJSON{Marker: test.marker} //nolint:exhaustruct
+			assert.Equal(t, test.expected, task.Doing(), "Doing check failed for %s", test.name)
+		})
+	}
+}
+
+func TestAddTaskToPageOrJournal(t *testing.T) { //nolint:funlen
+	frozenTime := time.Date(2025, 1, 4, 0, 0, 0, 0, time.UTC)
+
+	tests := []struct {
+		name         string
+		taskName     string
+		page         string
+		journal      string
+		expectedFile string
+	}{
+		{
+			name:         "simple task with no flags (use frozen date of Jan 4th 2025)",
+			taskName:     "Clean the room",
+			page:         "",
+			journal:      "",
+			expectedFile: "2025_01_04",
+		},
+		{
+			name:         "provided --page exists",
+			taskName:     "Clean the room",
+			page:         "add-task",
+			journal:      "",
+			expectedFile: "add-task",
+		},
+		{
+			name:         "provided --page doesn't exist",
+			taskName:     "Clean the room",
+			page:         "non-existent-page",
+			journal:      "",
+			expectedFile: "non-existent-page",
+		},
+		{
+			name:         "valid --journal 2025-01-05 provided",
+			taskName:     "Clean the room",
+			page:         "",
+			journal:      "2025-01-05",
+			expectedFile: "2025_01_05",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			graph := testutils.StubGraph(t, "")
+
+			// Determine the target date
+			var targetDate time.Time
+			if test.journal != "" {
+				parsedDate, err := time.Parse("2006-01-02", test.journal)
+				require.NoError(t, err)
+
+				targetDate = parsedDate
+			} else {
+				targetDate = frozenTime
+			}
+
+			opts := &internal.AddTaskOptions{
+				Graph:     graph,
+				Date:      targetDate, // TODO: accept a raw date string and parse it inside the AddTask function
+				Page:      test.page,
+				BlockText: "",
+				Key:       "",
+				Name:      test.taskName,
+			}
+
+			err := internal.AddTask(opts)
+			require.NoError(t, err)
+
+			if test.page != "" {
+				testutils.AssertGoldenPages(t, graph, "", []string{test.expectedFile})
+			} else {
+				testutils.AssertGoldenJournals(t, graph, "", []string{test.expectedFile})
+			}
 		})
 	}
 }

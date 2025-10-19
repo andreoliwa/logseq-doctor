@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// addJournalFlag adds a --journal/-j flag to the command with customizable help text.
+// addJournalFlag adds a --journal/-j flag to the command.
 func addJournalFlag(cmd *cobra.Command, flagVar *string) {
 	cmd.Flags().StringVarP(flagVar, "journal", "j", "", "Journal date in YYYY-MM-DD format (default: today)")
 }
