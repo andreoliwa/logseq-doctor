@@ -3,7 +3,7 @@ coverage:
     project:
       default:
         # Target coverage for the whole project https://docs.codecov.com/docs/commit-status#target
-        target: 30% # TODO: restore to 75% or more
+        target: 65% # TODO: restore to 75% or more
 
         # Maximum decrease in coverage https://docs.codecov.com/docs/commit-status#threshold
         threshold: 5%
