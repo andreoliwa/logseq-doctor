@@ -242,7 +242,7 @@ func extractTextFromNodes(nodes content.NodeList, builder *strings.Builder) {
 
 //nolint:cyclop // This is a simple mapping function with many cases
 func taskStatusToString(status content.TaskStatus) string {
-	// TODO: move this to logseq-go, use stringer... probably when doing https://github.com/aholstenson/logseq-go/issues/1
+	// TODO: move this to logseq-go, use stringer; maybe related to https://github.com/aholstenson/logseq-go/issues/1
 	switch status {
 	case content.TaskStatusTodo:
 		return "TODO"

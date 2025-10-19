@@ -140,7 +140,7 @@ func TestAddTaskToPageOrJournal(t *testing.T) { //nolint:funlen
 
 			opts := &internal.AddTaskOptions{
 				Graph:     graph,
-				Date:      targetDate, // TODO: accept a raw date string and parse it inside the AddTask function
+				Date:      targetDate,
 				Page:      test.page,
 				BlockText: "",
 				Key:       "",
