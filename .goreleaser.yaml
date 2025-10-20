@@ -35,13 +35,13 @@ archives:
       - docs/changelog.md
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
 
 checksum:
   name_template: "checksums.txt"
 
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 
 changelog:
   sort: asc
@@ -52,22 +52,17 @@ changelog:
       - "^test:"
       - "^chore:"
 
-# https://goreleaser.com/customization/homebrew/
-brews:
+# https://goreleaser.com/customization/homebrew_casks/
+homebrew_casks:
   - name: logseq-doctor
     commit_author:
       name: andreoliwa
       email: andreoliwa@sent.com
-    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
-    directory: Formula
+    commit_msg_template: "Cask update for {{ .ProjectName }} version {{ .Tag }}"
+    directory: Casks
     homepage: "https://github.com/andreoliwa/logseq-doctor"
     description: "Heal your Logseq Markdown files"
     license: "MIT"
-    # https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md#bininstall-foo
-    install: |
-      bin.install "lqd"
-    test: |
-      assert_match "Logseq Doctor heals your Markdown files for Logseq.", shell_output("#{bin}/lqd")
     # Repository to push the generated files to.
     repository:
       pull_request:
