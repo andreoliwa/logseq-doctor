@@ -9,7 +9,7 @@ before:
     - go generate ./...
 
 builds:
-  - main: ./main.go
+  - main: ./cmd/lqd/main.go
     binary: lqd
     ldflags:
       - -s -w -X main.version={{.Version}}
