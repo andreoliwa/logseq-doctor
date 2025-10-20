@@ -3,8 +3,8 @@ package internal_test
 import (
 	"testing"
 
+	"github.com/andreoliwa/logseq-doctor/internal"
 	"github.com/andreoliwa/logseq-go/content"
-	"github.com/andreoliwa/lqd/internal"
 	"github.com/stretchr/testify/assert"
 )
 

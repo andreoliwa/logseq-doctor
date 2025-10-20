@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/andreoliwa/logseq-doctor/internal"
+	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 	"github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/lqd/internal"
-	"github.com/andreoliwa/lqd/internal/backlog"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/fs"

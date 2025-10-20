@@ -27,15 +27,20 @@ Browse the documentation for each package:
 
 ## Installation
 
+To use the library in your Go project:
+
 ```bash
 go get github.com/andreoliwa/logseq-doctor
 ```
 
-Or install the binary:
+To install the `lqd` binary:
 
 ```bash
-# Using Homebrew
+# Using Homebrew (recommended)
 brew install andreoliwa/formulae/logseq-doctor
+
+# Or using go install
+go install github.com/andreoliwa/logseq-doctor/cmd/lqd@latest
 
 # Or download from releases
 gh release download -R andreoliwa/logseq-doctor

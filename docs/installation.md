@@ -17,7 +17,7 @@ brew install andreoliwa/formulae/logseq-doctor
 You can install manually using Go:
 
 ```bash
-go install github.com/andreoliwa/logseq-doctor@latest
+go install github.com/andreoliwa/logseq-doctor/cmd/lqd@latest
 ```
 
 Confirm if it's in your path:

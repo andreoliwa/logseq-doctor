@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/andreoliwa/logseq-doctor/pkg/set"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
-	"github.com/andreoliwa/lqd/pkg/set"
 )
 
 type TaskJSON struct {

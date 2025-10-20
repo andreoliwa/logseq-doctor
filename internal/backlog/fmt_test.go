@@ -3,7 +3,7 @@ package backlog_test
 import (
 	"testing"
 
-	"github.com/andreoliwa/lqd/internal/backlog"
+	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 
 	"github.com/stretchr/testify/assert"
 )

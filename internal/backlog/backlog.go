@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/andreoliwa/logseq-doctor/internal"
+	"github.com/andreoliwa/logseq-doctor/pkg/set"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
-	"github.com/andreoliwa/lqd/internal"
-	"github.com/andreoliwa/lqd/pkg/set"
 	"github.com/fatih/color"
 )
 

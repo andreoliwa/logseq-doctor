@@ -1,7 +1,7 @@
 package set_test
 
 import (
-	"github.com/andreoliwa/lqd/pkg/set"
+	"github.com/andreoliwa/logseq-doctor/pkg/set"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

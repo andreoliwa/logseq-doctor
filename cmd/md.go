@@ -4,8 +4,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/andreoliwa/logseq-doctor/internal"
 	"github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/lqd/internal"
 	"github.com/spf13/cobra"
 )
 

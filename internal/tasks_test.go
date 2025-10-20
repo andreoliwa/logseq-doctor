@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andreoliwa/lqd/internal"
-	"github.com/andreoliwa/lqd/internal/testutils"
+	"github.com/andreoliwa/logseq-doctor/internal"
+	"github.com/andreoliwa/logseq-doctor/internal/testutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

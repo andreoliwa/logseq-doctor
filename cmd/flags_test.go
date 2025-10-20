@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andreoliwa/lqd/cmd"
+	"github.com/andreoliwa/logseq-doctor/cmd"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

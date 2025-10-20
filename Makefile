@@ -11,7 +11,7 @@ build: build-go # Build the Python package
 
 build-go: # Build the Golang executable
 	go mod tidy
-	go build
+	go build ./cmd/lqd
 	mv lqd `go env GOPATH`/bin/
 	$(MAKE) list-go
 .PHONY: build-go

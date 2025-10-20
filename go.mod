@@ -1,4 +1,4 @@
-module github.com/andreoliwa/lqd
+module github.com/andreoliwa/logseq-doctor
 
 go 1.23.0
 

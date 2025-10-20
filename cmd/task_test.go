@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/andreoliwa/logseq-doctor/cmd"
+	"github.com/andreoliwa/logseq-doctor/internal"
 	"github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/lqd/cmd"
-	"github.com/andreoliwa/lqd/internal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

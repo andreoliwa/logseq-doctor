@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/andreoliwa/lqd/internal"
+	"github.com/andreoliwa/logseq-doctor/internal"
 	"github.com/spf13/cobra"
 	"os"
 )

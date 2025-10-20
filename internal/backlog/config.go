@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/andreoliwa/logseq-doctor/internal"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
-	"github.com/andreoliwa/lqd/internal"
 )
 
 type SingleBacklogConfig struct {

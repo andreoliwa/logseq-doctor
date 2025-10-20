@@ -72,7 +72,7 @@ The recommended way for macOS and Linux is to install with Homebrew:
 
 Or you can install manually:
 
-    go install github.com/andreoliwa/logseq-doctor@latest
+    go install github.com/andreoliwa/logseq-doctor/cmd/lqd@latest
 
 Confirm if it's in your path:
 
