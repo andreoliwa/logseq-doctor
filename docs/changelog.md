@@ -1,9 +1,8 @@
 ## [0.6.1](https://github.com/andreoliwa/logseq-doctor/compare/v0.6.0...v0.6.1) (2025-10-20)
 
-
 ### Bug Fixes
 
-* installation and import paths ([ce0b743](https://github.com/andreoliwa/logseq-doctor/commit/ce0b743cf26d528a0d8c68357047c6960a4bc668))
+- installation and import paths ([ce0b743](https://github.com/andreoliwa/logseq-doctor/commit/ce0b743cf26d528a0d8c68357047c6960a4bc668))
 
 # Changelog
 

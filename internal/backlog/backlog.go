@@ -213,7 +213,7 @@ func queryTasksFromPagesConcurrent(api internal.LogseqAPI,
 		}(pageTitle)
 	}
 
-	for i := 0; i < len(pageTitles); i++ {
+	for range pageTitles {
 		result := <-resultChan
 
 		if result.err != nil {

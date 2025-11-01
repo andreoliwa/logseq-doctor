@@ -129,6 +129,7 @@ func TestAddTaskToPageOrJournal(t *testing.T) { //nolint:funlen
 
 			// Determine the target date
 			var targetDate time.Time
+
 			if test.journal != "" {
 				parsedDate, err := time.Parse("2006-01-02", test.journal)
 				require.NoError(t, err)
@@ -256,6 +257,22 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			blockText:    "Parent block",
 			key:          "groceries",
 			expectedFile: "key-deeply-nested",
+		},
+		{
+			name:         "add task to a page with filters and aliases",
+			taskName:     "My new task",
+			page:         "add-task-alias-filters",
+			blockText:    "",
+			key:          "",
+			expectedFile: "add-task-alias-filters",
+		},
+		{
+			name:         "update existing task on a page with filters and aliases",
+			taskName:     "My updated task with a key",
+			page:         "update-task-alias-filters",
+			blockText:    "",
+			key:          "key",
+			expectedFile: "update-task-alias-filters",
 		},
 	}
 

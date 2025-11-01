@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"strings"
 )
 
 // ReadFromStdin reads from stdin and returns the content as a string.
@@ -13,9 +14,12 @@ func ReadFromStdin() string {
 
 	var stdin string
 
+	var stdinSb16 strings.Builder
 	for scanner.Scan() {
-		stdin += scanner.Text() + "\n"
+		stdinSb16.WriteString(scanner.Text() + "\n")
 	}
+
+	stdin += stdinSb16.String()
 
 	err := scanner.Err()
 	if err != nil {

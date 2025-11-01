@@ -135,6 +135,7 @@ func AddTask(opts *AddTaskOptions) error {
 func updateTaskNamePreservingChildren(task *content.Block, newName string) {
 	// Find the first paragraph (which contains the task marker and text)
 	var firstParagraph *content.Paragraph
+
 	for node := task.FirstChild(); node != nil; node = node.NextSibling() {
 		if p, ok := node.(*content.Paragraph); ok {
 			firstParagraph = p
