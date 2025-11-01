@@ -13,7 +13,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.23">
     
     
       
@@ -944,9 +944,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#func-findtaskbykey" class="md-nav__link">
+  <a href="#func-findtaskmarkerbykey" class="md-nav__link">
     <span class="md-ellipsis">
-      func FindTaskByKey
+      func FindTaskMarkerByKey
     </span>
   </a>
   
@@ -1043,15 +1043,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#func-newparagraphtodotask" class="md-nav__link">
-    <span class="md-ellipsis">
-      func newParagraphTodoTask
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#func-replacecurrentpage" class="md-nav__link">
     <span class="md-ellipsis">
       func replaceCurrentPage
@@ -1061,9 +1052,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#func-updatetasknamepreservingchildren" class="md-nav__link">
+  <a href="#func-updateexistingtask" class="md-nav__link">
     <span class="md-ellipsis">
-      func updateTaskNamePreservingChildren
+      func updateExistingTask
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#func-updatetaskbacktotodo" class="md-nav__link">
+    <span class="md-ellipsis">
+      func updateTaskBackToTodo
     </span>
   </a>
   
@@ -1384,7 +1384,7 @@
 <li><a href="#AppendRawMarkdownToJournal">func AppendRawMarkdownToJournal(graph *logseq.Graph, date time.Time, rawMarkdown string) (int, error)</a></li>
 <li><a href="#DateYYYYMMDD">func DateYYYYMMDD(time time.Time) int</a></li>
 <li><a href="#FindBlockContainingText">func FindBlockContainingText(page logseq.Page, searchText string) *content.Block</a></li>
-<li><a href="#FindTaskByKey">func FindTaskByKey(page logseq.Page, parentBlock *content.Block, key string) *content.Block</a></li>
+<li><a href="#FindTaskMarkerByKey">func FindTaskMarkerByKey(page logseq.Page, parentBlock *content.Block, key string) *content.TaskMarker</a></li>
 <li><a href="#InsertMarkdownToJournal">func InsertMarkdownToJournal(opts *InsertMarkdownOptions) error</a></li>
 <li><a href="#IsAncestor">func IsAncestor(block, ancestor *content.Block) bool</a></li>
 <li><a href="#IsValidMarkdownFile">func IsValidMarkdownFile(filePath string) bool</a></li>
@@ -1395,9 +1395,9 @@
 <li><a href="#TidyUpOneFile">func TidyUpOneFile(graph *logseq.Graph, path string) int</a></li>
 <li><a href="#addContent">func addContent(page logseq.Page, parentBlock *content.Block, contentText string) error</a></li>
 <li><a href="#containsTextCaseInsensitive">func containsTextCaseInsensitive(node content.Node, searchTextLower string) bool</a></li>
-<li><a href="#newParagraphTodoTask">func newParagraphTodoTask(name string) *content.Paragraph</a></li>
 <li><a href="#replaceCurrentPage">func replaceCurrentPage(query, pageTitle string) string</a></li>
-<li><a href="#updateTaskNamePreservingChildren">func updateTaskNamePreservingChildren(task *content.Block, newName string)</a></li>
+<li><a href="#updateExistingTask">func updateExistingTask(existingTaskMarker *content.TaskMarker, opts *AddTaskOptions) error</a></li>
+<li><a href="#updateTaskBackToTodo">func updateTaskBackToTodo(taskMarker *content.TaskMarker, newName string) error</a></li>
 <li><a href="#AddTaskOptions">type AddTaskOptions</a></li>
 <li><a href="#CategorizedTasks">type CategorizedTasks</a></li>
 <li><a href="#NewCategorizedTasks">func NewCategorizedTasks() CategorizedTasks</a></li>
@@ -1441,7 +1441,7 @@
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">PageColor</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">color</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="nx">color</span><span class="p">.</span><span class="nx">FgHiWhite</span><span class="p">).</span><span class="nx">SprintfFunc</span><span class="p">()</span><span class="w"> </span><span class="c1">//nolint:gochecknoglobals</span>
 </code></pre></div>
 <p><a name="AddTask"></a></p>
-<h2 id="func-addtask">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tasks.go#L87">AddTask</a><a class="headerlink" href="#func-addtask" title="Permanent link">¶</a></h2>
+<h2 id="func-addtask">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tasks.go#L88">AddTask</a><a class="headerlink" href="#func-addtask" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">AddTask</span><span class="p">(</span><span class="nx">opts</span><span class="w"> </span><span class="o">*</span><span class="nx">AddTaskOptions</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>AddTask adds a task to Logseq. If Key is provided, it searches for an existing task containing that key (case-insensitive) and updates it. Otherwise, creates a new task. If Page is provided, adds to that page. Otherwise, adds to journal for Date. If BlockText is provided, adds as a child of the first block containing that text.</p>
@@ -1460,11 +1460,11 @@
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">FindBlockContainingText</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">searchText</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span>
 </code></pre></div>
 <p>FindBlockContainingText searches for the first block containing the specified text using FindDeep.</p>
-<p><a name="FindTaskByKey"></a></p>
-<h2 id="func-findtaskbykey">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/finder.go#L94">FindTaskByKey</a><a class="headerlink" href="#func-findtaskbykey" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">FindTaskByKey</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">parentBlock</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">key</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span>
+<p><a name="FindTaskMarkerByKey"></a></p>
+<h2 id="func-findtaskmarkerbykey">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/finder.go#L95">FindTaskMarkerByKey</a><a class="headerlink" href="#func-findtaskmarkerbykey" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">FindTaskMarkerByKey</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">parentBlock</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">key</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskMarker</span>
 </code></pre></div>
-<p>FindTaskByKey searches for a task block containing the specified key (case-insensitive). If parentBlock is provided, searches only among its children. Otherwise, searches in the entire page.</p>
+<p>FindTaskMarkerByKey searches for a task marker containing the specified key (case-insensitive). If parentBlock is provided, searches only among its children. Otherwise, searches in the entire page. Returns the TaskMarker if found, nil otherwise.</p>
 <p><a name="InsertMarkdownToJournal"></a></p>
 <h2 id="func-insertmarkdowntojournal">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/md.go#L27">InsertMarkdownToJournal</a><a class="headerlink" href="#func-insertmarkdowntojournal" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">InsertMarkdownToJournal</span><span class="p">(</span><span class="nx">opts</span><span class="w"> </span><span class="o">*</span><span class="nx">InsertMarkdownOptions</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
@@ -1513,30 +1513,31 @@
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">containsTextCaseInsensitive</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">searchTextLower</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>containsTextCaseInsensitive checks if a node contains the specified text (case-insensitive). It checks Text, PageLink, and Hashtag nodes.</p>
-<p><a name="newParagraphTodoTask"></a></p>
-<h2 id="func-newparagraphtodotask">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tasks.go#L155">newParagraphTodoTask</a><a class="headerlink" href="#func-newparagraphtodotask" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">newParagraphTodoTask</span><span class="p">(</span><span class="nx">name</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Paragraph</span>
-</code></pre></div>
 <p><a name="replaceCurrentPage"></a></p>
 <h2 id="func-replacecurrentpage">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/finder.go#L52">replaceCurrentPage</a><a class="headerlink" href="#func-replacecurrentpage" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">replaceCurrentPage</span><span class="p">(</span><span class="nx">query</span><span class="p">,</span><span class="w"> </span><span class="nx">pageTitle</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">replaceCurrentPage</span><span class="p">(</span><span class="nx">query</span><span class="p">,</span><span class="w"> </span><span class="nx">pageTitle</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
 </code></pre></div>
 <p>replaceCurrentPage replaces the current page placeholder in the query with the actual page name.</p>
-<p><a name="updateTaskNamePreservingChildren"></a></p>
-<h2 id="func-updatetasknamepreservingchildren">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tasks.go#L135">updateTaskNamePreservingChildren</a><a class="headerlink" href="#func-updatetasknamepreservingchildren" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">updateTaskNamePreservingChildren</span><span class="p">(</span><span class="nx">task</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">newName</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span>
+<p><a name="updateExistingTask"></a></p>
+<h2 id="func-updateexistingtask">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tasks.go#L142">updateExistingTask</a><a class="headerlink" href="#func-updateexistingtask" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">updateExistingTask</span><span class="p">(</span><span class="nx">existingTaskMarker</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskMarker</span><span class="p">,</span><span class="w"> </span><span class="nx">opts</span><span class="w"> </span><span class="o">*</span><span class="nx">AddTaskOptions</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+</code></pre></div>
+<p><a name="updateTaskBackToTodo"></a></p>
+<h2 id="func-updatetaskbacktotodo">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tasks.go#L151">updateTaskBackToTodo</a><a class="headerlink" href="#func-updatetaskbacktotodo" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">updateTaskBackToTodo</span><span class="p">(</span><span class="nx">taskMarker</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskMarker</span><span class="p">,</span><span class="w"> </span><span class="nx">newName</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p><a name="AddTaskOptions"></a></p>
-<h2 id="type-addtaskoptions">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tasks.go#L73-L80">AddTaskOptions</a><a class="headerlink" href="#type-addtaskoptions" title="Permanent link">¶</a></h2>
+<h2 id="type-addtaskoptions">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tasks.go#L73-L81">AddTaskOptions</a><a class="headerlink" href="#type-addtaskoptions" title="Permanent link">¶</a></h2>
 <p>AddTaskOptions contains options for adding a task to Logseq.</p>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">AddTaskOptions</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">    </span><span class="nx">Graph</span><span class="w">     </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span>
 <a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">    </span><span class="nx">Date</span><span class="w">      </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>
-<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">    </span><span class="nx">Page</span><span class="w">      </span><span class="kt">string</span><span class="w"> </span><span class="c1">// Page name to add the task to (empty = journal)</span>
-<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">    </span><span class="nx">BlockText</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="c1">// Partial text to search for in parent blocks</span>
-<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">    </span><span class="nx">Key</span><span class="w">       </span><span class="kt">string</span><span class="w"> </span><span class="c1">// Unique key to search for existing task (case-insensitive)</span>
-<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="w">    </span><span class="nx">Name</span><span class="w">      </span><span class="kt">string</span><span class="w"> </span><span class="c1">// Short name of the task</span>
-<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="p">}</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">    </span><span class="nx">Page</span><span class="w">      </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Page name to add the task to (empty = journal)</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">    </span><span class="nx">BlockText</span><span class="w"> </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Partial text to search for in parent blocks</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">    </span><span class="nx">Key</span><span class="w">       </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Unique key to search for existing task (case-insensitive)</span>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="w">    </span><span class="nx">Name</span><span class="w">      </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Short name of the task</span>
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="w">    </span><span class="nx">TimeNow</span><span class="w">   </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="w"> </span><span class="c1">// For testing</span>
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="CategorizedTasks"></a></p>
 <h2 id="type-categorizedtasks">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tasks.go#L56-L61">CategorizedTasks</a><a class="headerlink" href="#type-categorizedtasks" title="Permanent link">¶</a></h2>
