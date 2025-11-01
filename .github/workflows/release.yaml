@@ -18,6 +18,14 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version: stable
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Install prek and pre-commit hooks
+        run: |
+          pip install prek
+          prek install-hooks
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         with:

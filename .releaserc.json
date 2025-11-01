@@ -9,6 +9,12 @@
         "changelogFile": "docs/changelog.md"
       }
     ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "prek run --all-files || true"
+      }
+    ],
     "@semantic-release/github",
     [
       "@semantic-release/git",
