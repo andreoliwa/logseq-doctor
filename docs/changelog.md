@@ -1,3 +1,9 @@
+# [0.7.0](https://github.com/andreoliwa/logseq-doctor/compare/v0.6.2...v0.7.0) (2025-11-01)
+
+### Features
+
+- **task:** update existing task to TODO on "add" command ([3c89646](https://github.com/andreoliwa/logseq-doctor/commit/3c8964616f8691898abe6d358dd5c2060329b021))
+
 ## [0.6.2](https://github.com/andreoliwa/logseq-doctor/compare/v0.6.1...v0.6.2) (2025-11-01)
 
 ### Bug Fixes
