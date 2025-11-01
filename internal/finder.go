@@ -88,10 +88,11 @@ func FindBlockContainingText(page logseq.Page, searchText string) *content.Block
 	})
 }
 
-// FindTaskByKey searches for a task block containing the specified key (case-insensitive).
+// FindTaskMarkerByKey searches for a task marker containing the specified key (case-insensitive).
 // If parentBlock is provided, searches only among its children.
 // Otherwise, searches in the entire page.
-func FindTaskByKey(page logseq.Page, parentBlock *content.Block, key string) *content.Block {
+// Returns the TaskMarker if found, nil otherwise.
+func FindTaskMarkerByKey(page logseq.Page, parentBlock *content.Block, key string) *content.TaskMarker {
 	if key == "" {
 		return nil
 	}
@@ -124,9 +125,28 @@ func FindTaskByKey(page logseq.Page, parentBlock *content.Block, key string) *co
 		return textNode != nil
 	}
 
+	var block *content.Block
 	if parentBlock != nil {
-		return parentBlock.Blocks().FindDeep(predicate)
+		block = parentBlock.Blocks().FindDeep(predicate)
+	} else {
+		block = page.Blocks().FindDeep(predicate)
 	}
 
-	return page.Blocks().FindDeep(predicate)
+	if block == nil {
+		return nil
+	}
+
+	// Find the TaskMarker in the block's content
+	taskMarkerNode := block.Content().FindDeep(func(node content.Node) bool {
+		_, ok := node.(*content.TaskMarker)
+
+		return ok
+	})
+
+	if taskMarkerNode == nil {
+		return nil
+	}
+
+	//nolint:forcetypeassert // We know it's a TaskMarker from the predicate above
+	return taskMarkerNode.(*content.TaskMarker)
 }

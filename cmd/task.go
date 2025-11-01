@@ -72,6 +72,7 @@ Examples:
 				BlockText: blockFlag,
 				Key:       keyFlag,
 				Name:      args[0],
+				TimeNow:   deps.TimeNow,
 			}
 
 			return deps.AddTaskFn(opts)

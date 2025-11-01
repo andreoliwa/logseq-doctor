@@ -73,10 +73,11 @@ func NewCategorizedTasks() CategorizedTasks {
 type AddTaskOptions struct {
 	Graph     *logseq.Graph
 	Date      time.Time
-	Page      string // Page name to add the task to (empty = journal)
-	BlockText string // Partial text to search for in parent blocks
-	Key       string // Unique key to search for existing task (case-insensitive)
-	Name      string // Short name of the task
+	Page      string           // Page name to add the task to (empty = journal)
+	BlockText string           // Partial text to search for in parent blocks
+	Key       string           // Unique key to search for existing task (case-insensitive)
+	Name      string           // Short name of the task
+	TimeNow   func() time.Time // For testing
 }
 
 // AddTask adds a task to Logseq.
@@ -107,15 +108,21 @@ func AddTask(opts *AddTaskOptions) error {
 		// If parent not found, parentBlock will be nil and task will be added to top level
 	}
 
-	var existingTask *content.Block
+	var existingTaskMarker *content.TaskMarker
 	if opts.Key != "" {
-		existingTask = FindTaskByKey(targetPage, parentBlock, opts.Key)
+		existingTaskMarker = FindTaskMarkerByKey(targetPage, parentBlock, opts.Key)
 	}
 
-	if existingTask != nil {
-		updateTaskNamePreservingChildren(existingTask, opts.Name)
+	if existingTaskMarker != nil {
+		err = updateExistingTask(existingTaskMarker, opts)
+		if err != nil {
+			return fmt.Errorf("error updating task: %w", err)
+		}
 	} else {
-		newBlockTask := content.NewBlock(newParagraphTodoTask(opts.Name))
+		newBlockTask := content.NewBlock(content.NewParagraph(
+			content.NewTaskMarker(content.TaskStatusTodo),
+			content.NewText(opts.Name),
+		))
 
 		if parentBlock != nil {
 			parentBlock.AddChild(newBlockTask)
@@ -132,29 +139,51 @@ func AddTask(opts *AddTaskOptions) error {
 	return nil
 }
 
-func updateTaskNamePreservingChildren(task *content.Block, newName string) {
-	// Find the first paragraph (which contains the task marker and text)
-	var firstParagraph *content.Paragraph
+func updateExistingTask(existingTaskMarker *content.TaskMarker, opts *AddTaskOptions) error {
+	// Override time provider for testing
+	if opts.TimeNow != nil {
+		existingTaskMarker.SetTimeNow(opts.TimeNow)
+	}
 
-	for node := task.FirstChild(); node != nil; node = node.NextSibling() {
-		if p, ok := node.(*content.Paragraph); ok {
-			firstParagraph = p
+	return updateTaskBackToTodo(existingTaskMarker, opts.Name)
+}
 
-			break
+func updateTaskBackToTodo(taskMarker *content.TaskMarker, newName string) error {
+	_, err := taskMarker.WithStatus(content.TaskStatusTodo)
+	if err != nil {
+		return fmt.Errorf("failed to update task status: %w", err)
+	}
+
+	paragraph := taskMarker.ParentParagraph()
+	if paragraph == nil {
+		return nil
+	}
+
+	// Remove all children after the task marker and replace with the new name
+	// First, collect all children after the task marker to remove them
+	var nodesToRemove []content.Node
+
+	foundTaskMarker := false
+
+	for node := paragraph.FirstChild(); node != nil; node = node.NextSibling() {
+		if node == taskMarker {
+			foundTaskMarker = true
+
+			continue
+		}
+
+		if foundTaskMarker {
+			nodesToRemove = append(nodesToRemove, node)
 		}
 	}
 
-	if firstParagraph == nil {
-		return
+	// Remove the collected nodes
+	for _, node := range nodesToRemove {
+		node.RemoveSelf()
 	}
 
-	// Replace the old paragraph with the new one
-	firstParagraph.ReplaceWith(newParagraphTodoTask(newName))
-}
+	// Add the new name text after the task marker
+	paragraph.AddChild(content.NewText(newName))
 
-func newParagraphTodoTask(name string) *content.Paragraph {
-	return content.NewParagraph(
-		content.NewTaskMarker(content.TaskStatusTodo),
-		content.NewText(name),
-	)
+	return nil
 }

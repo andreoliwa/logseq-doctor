@@ -24,7 +24,7 @@ func TestNewTaskCmd(t *testing.T) {
 	assert.Contains(t, taskCmd.Long, "Manage tasks in your Logseq graph")
 }
 
-func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
+func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,maintidx
 	graphPath := "/test/graph"
 	frozenTime := time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
 
@@ -54,6 +54,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 				BlockText: "",
 				Key:       "",
 				Name:      "Review pull request",
+				TimeNow:   func() time.Time { return frozenTime },
 			},
 			addTaskError:   nil,
 			expectError:    false,
@@ -73,6 +74,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 				BlockText: "",
 				Key:       "",
 				Name:      "Call client",
+				TimeNow:   func() time.Time { return frozenTime },
 			},
 			addTaskError:   nil,
 			expectError:    false,
@@ -92,6 +94,9 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 				BlockText: "",
 				Key:       "",
 				Name:      "Buy groceries",
+				TimeNow: func() time.Time {
+					return time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC)
+				},
 			},
 			addTaskError:   nil,
 			expectError:    false,
@@ -111,6 +116,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 				BlockText: "Project A",
 				Key:       "",
 				Name:      "Meeting notes",
+				TimeNow:   func() time.Time { return frozenTime },
 			},
 			addTaskError:   nil,
 			expectError:    false,
@@ -130,6 +136,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 				BlockText: "",
 				Key:       "water plants",
 				Name:      "Water plants in living room",
+				TimeNow:   func() time.Time { return frozenTime },
 			},
 			addTaskError:   nil,
 			expectError:    false,
@@ -149,6 +156,9 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 				BlockText: "Sprint 1",
 				Key:       "task-123",
 				Name:      "Complete the feature",
+				TimeNow: func() time.Time {
+					return time.Date(2024, 3, 10, 0, 0, 0, 0, time.UTC)
+				},
 			},
 			addTaskError:   nil,
 			expectError:    false,
@@ -180,6 +190,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
 				BlockText: "",
 				Key:       "",
 				Name:      "Task with error",
+				TimeNow:   func() time.Time { return frozenTime },
 			},
 			addTaskError:   assert.AnError,
 			expectError:    true,

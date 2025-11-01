@@ -108,7 +108,7 @@ func TestFindBlockContainingText_EmptyPage(t *testing.T) {
 	assert.Nil(t, result)
 }
 
-func TestFindTaskByKey(t *testing.T) {
+func TestFindTaskMarkerByKey(t *testing.T) {
 	graph := testutils.StubGraph(t, "")
 	page, err := graph.OpenPage("finder")
 	require.NoError(t, err)
@@ -123,14 +123,14 @@ func TestFindTaskByKey(t *testing.T) {
 				require.NotNil(t, parentBlock, "parent block should be found")
 			}
 
-			result := internal.FindTaskByKey(page, parentBlock, test.key)
+			result := internal.FindTaskMarkerByKey(page, parentBlock, test.key)
 
 			if test.expectedText == "" {
 				assert.Nil(t, result)
 			} else {
 				require.NotNil(t, result)
 				// Verify the block contains the expected text
-				blockText := extractTextFromBlock(result)
+				blockText := extractTextFromBlock(result.ParentBlock())
 				assert.Contains(t, blockText, test.expectedText)
 			}
 		})
@@ -205,7 +205,7 @@ func TestFindTaskByKey_EmptyPage(t *testing.T) {
 	page, err := graph.OpenPage("empty-bullets")
 	require.NoError(t, err)
 
-	result := internal.FindTaskByKey(page, nil, "anything")
+	result := internal.FindTaskMarkerByKey(page, nil, "anything")
 	assert.Nil(t, result)
 }
 

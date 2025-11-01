@@ -146,6 +146,7 @@ func TestAddTaskToPageOrJournal(t *testing.T) { //nolint:funlen
 				BlockText: "",
 				Key:       "",
 				Name:      test.taskName,
+				TimeNow:   func() time.Time { return targetDate },
 			}
 
 			err := internal.AddTask(opts)
@@ -197,6 +198,7 @@ func TestAddTaskUnderBlock(t *testing.T) {
 				BlockText: test.blockText,
 				Key:       "",
 				Name:      test.taskName,
+				TimeNow:   func() time.Time { return frozenTime },
 			}
 
 			err := internal.AddTask(opts)
@@ -208,7 +210,7 @@ func TestAddTaskUnderBlock(t *testing.T) {
 }
 
 func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
-	frozenTime := time.Date(2025, 1, 4, 0, 0, 0, 0, time.UTC)
+	defaultFrozenTime := time.Date(2025, 1, 4, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
 		name         string
@@ -217,6 +219,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 		blockText    string
 		key          string
 		expectedFile string
+		frozenTime   *time.Time // Optional: if nil, uses defaultFrozenTime
 	}{
 		{
 			name:         "--key provided, and it doesn't exist",
@@ -225,6 +228,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			blockText:    "",
 			key:          "groceries",
 			expectedFile: "key-not-found",
+			frozenTime:   &defaultFrozenTime,
 		},
 		{
 			name:         "--key provided, and task exists with children, properties and log book",
@@ -233,6 +237,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			blockText:    "",
 			key:          "groceries",
 			expectedFile: "key-exists-with-children",
+			frozenTime:   &defaultFrozenTime,
 		},
 		{
 			name:         "--key provided but --block is not provided",
@@ -241,6 +246,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			blockText:    "",
 			key:          "groceries",
 			expectedFile: "key-search-entire-page",
+			frozenTime:   &defaultFrozenTime,
 		},
 		{
 			name:         "--key and --block provided: search for key within block and its children",
@@ -249,6 +255,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			blockText:    "Parent block",
 			key:          "groceries",
 			expectedFile: "key-search-within-block",
+			frozenTime:   &defaultFrozenTime,
 		},
 		{
 			name:         "--key and --block provided, task is deeply nested",
@@ -257,6 +264,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			blockText:    "Parent block",
 			key:          "groceries",
 			expectedFile: "key-deeply-nested",
+			frozenTime:   &defaultFrozenTime,
 		},
 		{
 			name:         "add task to a page with filters and aliases",
@@ -265,6 +273,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			blockText:    "",
 			key:          "",
 			expectedFile: "add-task-alias-filters",
+			frozenTime:   &defaultFrozenTime,
 		},
 		{
 			name:         "update existing task on a page with filters and aliases",
@@ -273,6 +282,17 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			blockText:    "",
 			key:          "key",
 			expectedFile: "update-task-alias-filters",
+			frozenTime:   &defaultFrozenTime,
+		},
+		{
+			name:         "update DOING task",
+			taskName:     "My boring chores for this week",
+			page:         "update-doing-task",
+			blockText:    "",
+			key:          "week",
+			expectedFile: "update-doing-task",
+			//nolint:gosmopolitan // Test data uses Local time
+			frozenTime: ptrTime(time.Date(2025, 11, 1, 19, 29, 57, 0, time.Local)),
 		},
 	}
 
@@ -280,13 +300,19 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 		t.Run(test.name, func(t *testing.T) {
 			graph := testutils.StubGraph(t, "")
 
+			testFrozenTime := defaultFrozenTime
+			if test.frozenTime != nil {
+				testFrozenTime = *test.frozenTime
+			}
+
 			opts := &internal.AddTaskOptions{
 				Graph:     graph,
-				Date:      frozenTime,
+				Date:      testFrozenTime,
 				Page:      test.page,
 				BlockText: test.blockText,
 				Key:       test.key,
 				Name:      test.taskName,
+				TimeNow:   func() time.Time { return testFrozenTime },
 			}
 
 			err := internal.AddTask(opts)
@@ -295,4 +321,9 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			testutils.AssertGoldenPages(t, graph, "", []string{test.expectedFile})
 		})
 	}
+}
+
+// ptrTime is a helper function to create a pointer to a time.Time value.
+func ptrTime(t time.Time) *time.Time {
+	return &t
 }
