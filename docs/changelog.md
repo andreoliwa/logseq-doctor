@@ -1,3 +1,10 @@
+## [0.6.2](https://github.com/andreoliwa/logseq-doctor/compare/v0.6.1...v0.6.2) (2025-11-01)
+
+
+### Bug Fixes
+
+* adding tasks to pages with aliases ([9b019ab](https://github.com/andreoliwa/logseq-doctor/commit/9b019abbb26c7ea38aeb067bd2a29cf90e7e3b23))
+
 ## [0.6.1](https://github.com/andreoliwa/logseq-doctor/compare/v0.6.0...v0.6.1) (2025-10-20)
 
 ### Bug Fixes
