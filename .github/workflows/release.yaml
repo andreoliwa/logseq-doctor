@@ -44,3 +44,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GH_TOKEN }}
+          # Note: Homebrew style issues will be auto-fixed by the
+          # auto-fix-style workflow in the homebrew-formulae repository
