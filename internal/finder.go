@@ -54,7 +54,7 @@ func replaceCurrentPage(query, pageTitle string) string {
 }
 
 // containsTextCaseInsensitive checks if a node contains the specified text (case-insensitive).
-// It checks Text, PageLink, and Hashtag nodes.
+// It checks Text, PageLink, Hashtag, and Link nodes (including link URLs and text content).
 func containsTextCaseInsensitive(node content.Node, searchTextLower string) bool {
 	if text, ok := node.(*content.Text); ok {
 		return strings.Contains(strings.ToLower(text.Value), searchTextLower)
@@ -66,6 +66,17 @@ func containsTextCaseInsensitive(node content.Node, searchTextLower string) bool
 
 	if hashtag, ok := node.(*content.Hashtag); ok {
 		return strings.Contains(strings.ToLower(hashtag.To), searchTextLower)
+	}
+
+	if link, ok := node.(*content.Link); ok {
+		if strings.Contains(strings.ToLower(link.URL), searchTextLower) {
+			return true
+		}
+
+		if strings.Contains(strings.ToLower(link.Title), searchTextLower) {
+			return true
+		}
+		// Check text content within the link (will be checked by FindDeep traversal)
 	}
 
 	return false

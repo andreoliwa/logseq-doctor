@@ -301,6 +301,24 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			//nolint:gosmopolitan // Test data uses Local time
 			frozenTime: ptrTime(time.Date(2025, 11, 1, 19, 29, 57, 0, time.Local)),
 		},
+		{
+			name:         "update task with key in a link",
+			taskName:     "Updated task name",
+			page:         "key-in-link",
+			blockText:    "",
+			key:          "key inside link title",
+			expectedFile: "key-in-link",
+			frozenTime:   &defaultFrozenTime,
+		},
+		{
+			name:         "update task with key in the URL of a link",
+			taskName:     "Updated task name",
+			page:         "key-in-link",
+			blockText:    "",
+			key:          "key-in-the-url-itself",
+			expectedFile: "key-in-link",
+			frozenTime:   &defaultFrozenTime,
+		},
 	}
 
 	for _, test := range tests {
