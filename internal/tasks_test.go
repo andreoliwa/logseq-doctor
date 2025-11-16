@@ -185,6 +185,13 @@ func TestAddTaskUnderBlock(t *testing.T) {
 			blockText:    "Parent block with children",
 			expectedFile: "block-with-children",
 		},
+		{
+			name:         "add task under deeply nested block",
+			taskName:     "New task",
+			page:         "add-nested-task",
+			blockText:    "Level 3",
+			expectedFile: "add-nested-task",
+		},
 	}
 
 	for _, test := range tests {

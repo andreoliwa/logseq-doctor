@@ -74,12 +74,12 @@ func TestFindBlockContainingText(t *testing.T) {
 		{
 			name:         "search for page",
 			searchText:   "page",
-			expectedText: "Parent block with nested tasks",
+			expectedText: "First block with a [[page link]]",
 		},
 		{
 			name:         "search for tag",
 			searchText:   "tag",
-			expectedText: "Parent block with tasks at first level",
+			expectedText: "First paragraph with a #tag",
 		},
 	}
 

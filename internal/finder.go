@@ -80,7 +80,7 @@ func FindBlockContainingText(page logseq.Page, searchText string) *content.Block
 	searchTextLower := strings.ToLower(searchText)
 
 	return page.Blocks().FindDeep(func(block *content.Block) bool {
-		textNode := block.Children().FindDeep(func(node content.Node) bool {
+		textNode := block.Content().FindDeep(func(node content.Node) bool {
 			return containsTextCaseInsensitive(node, searchTextLower)
 		})
 

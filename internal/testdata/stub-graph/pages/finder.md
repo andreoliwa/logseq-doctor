@@ -3,7 +3,7 @@
 - Line before 3
 - Parent block with tasks at first level
   - TODO First task
-  - Some regular paragraph with a #tag should be skipped
+  - First paragraph with a #tag
   - DOING Second task
   - DONE Third task
   - WAITING Fourth task with a #tag
@@ -13,7 +13,7 @@
       - Yet another level
         - TODO First nested task
         - DOING Second nested task
-        - A regular block with a [[page link]] should be ignored
+        - First block with a [[page link]]
         - DONE Third nested task
         - WAITING Fourth nested task with [[page link]]
 - TODO Single task at root level
