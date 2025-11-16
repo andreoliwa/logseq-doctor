@@ -32,7 +32,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 		name           string
 		args           []string
 		journalFlag    string
-		blockFlag      string
+		parentFlag     string
 		pageFlag       string
 		keyFlag        string
 		expectedOpts   *internal.AddTaskOptions
@@ -44,7 +44,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			name:        "basic command with task description only",
 			args:        []string{"Review pull request"},
 			journalFlag: "",
-			blockFlag:   "",
+			parentFlag:  "",
 			pageFlag:    "",
 			keyFlag:     "",
 			expectedOpts: &internal.AddTaskOptions{
@@ -64,7 +64,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			name:        "command with page flag",
 			args:        []string{"Call client"},
 			journalFlag: "",
-			blockFlag:   "",
+			parentFlag:  "",
 			pageFlag:    "Work",
 			keyFlag:     "",
 			expectedOpts: &internal.AddTaskOptions{
@@ -84,7 +84,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			name:        "command with journal flag",
 			args:        []string{"Buy groceries"},
 			journalFlag: "2024-12-25",
-			blockFlag:   "",
+			parentFlag:  "",
 			pageFlag:    "",
 			keyFlag:     "",
 			expectedOpts: &internal.AddTaskOptions{
@@ -103,10 +103,10 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			expectedErrMsg: "",
 		},
 		{
-			name:        "command with block flag",
+			name:        "command with parent flag",
 			args:        []string{"Meeting notes"},
 			journalFlag: "",
-			blockFlag:   "Project A",
+			parentFlag:  "Project A",
 			pageFlag:    "",
 			keyFlag:     "",
 			expectedOpts: &internal.AddTaskOptions{
@@ -126,7 +126,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			name:        "command with key flag",
 			args:        []string{"Water plants in living room"},
 			journalFlag: "",
-			blockFlag:   "",
+			parentFlag:  "",
 			pageFlag:    "",
 			keyFlag:     "water plants",
 			expectedOpts: &internal.AddTaskOptions{
@@ -146,7 +146,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			name:        "command with all flags",
 			args:        []string{"Complete the feature"},
 			journalFlag: "2024-03-10",
-			blockFlag:   "Sprint 1",
+			parentFlag:  "Sprint 1",
 			pageFlag:    "Development",
 			keyFlag:     "task-123",
 			expectedOpts: &internal.AddTaskOptions{
@@ -168,7 +168,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			name:           "invalid journal date format",
 			args:           []string{"Task description"},
 			journalFlag:    "2024/01/15",
-			blockFlag:      "",
+			parentFlag:     "",
 			pageFlag:       "",
 			keyFlag:        "",
 			expectedOpts:   nil, // Should not be called due to error
@@ -180,7 +180,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 			name:        "AddTask function returns error",
 			args:        []string{"Task with error"},
 			journalFlag: "",
-			blockFlag:   "",
+			parentFlag:  "",
 			pageFlag:    "",
 			keyFlag:     "",
 			expectedOpts: &internal.AddTaskOptions{
@@ -231,8 +231,8 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,
 				args = append(args, "--journal", test.journalFlag)
 			}
 
-			if test.blockFlag != "" {
-				args = append(args, "--block", test.blockFlag)
+			if test.parentFlag != "" {
+				args = append(args, "--parent", test.parentFlag)
 			}
 
 			if test.pageFlag != "" {

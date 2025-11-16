@@ -12,10 +12,10 @@ func addJournalFlag(cmd *cobra.Command, flagVar *string) {
 	cmd.Flags().StringVarP(flagVar, "journal", "j", "", "Journal date in YYYY-MM-DD format (default: today)")
 }
 
-// addBlockFlag adds a --block/-b flag to the command with customizable help text.
-func addBlockFlag(cmd *cobra.Command, flagVar *string, what string) {
+// addParentFlag adds a --parent flag to the command with customizable help text.
+func addParentFlag(cmd *cobra.Command, flagVar *string, what string) {
 	helpText := "Partial text of a block that will be the parent of the added " + what
-	cmd.Flags().StringVarP(flagVar, "block", "b", "", helpText)
+	cmd.Flags().StringVar(flagVar, "parent", "", helpText)
 }
 
 // addPageFlag adds a --page/-p flag to the command with customizable help text.

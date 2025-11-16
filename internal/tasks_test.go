@@ -172,14 +172,14 @@ func TestAddTaskUnderBlock(t *testing.T) {
 		expectedFile string
 	}{
 		{
-			name:         "--block provided, and it doesn't exist",
+			name:         "--parent provided, and it doesn't exist",
 			taskName:     "Clean the room",
 			page:         "block-not-found",
 			blockText:    "non-existent block",
 			expectedFile: "block-not-found",
 		},
 		{
-			name:         "--block provided, and it exists with children",
+			name:         "--parent provided, and it exists with children",
 			taskName:     "Clean the room",
 			page:         "block-with-children",
 			blockText:    "Parent block with children",
@@ -247,7 +247,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			frozenTime:   &defaultFrozenTime,
 		},
 		{
-			name:         "--key provided but --block is not provided",
+			name:         "--key provided but --parent is not provided",
 			taskName:     "Clean the room",
 			page:         "key-search-entire-page",
 			blockText:    "",
@@ -256,7 +256,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			frozenTime:   &defaultFrozenTime,
 		},
 		{
-			name:         "--key and --block provided: search for key within block and its children",
+			name:         "--key and --parent provided: search for key within block and its children",
 			taskName:     "Clean the room",
 			page:         "key-search-within-block",
 			blockText:    "Parent block",
@@ -265,7 +265,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
 			frozenTime:   &defaultFrozenTime,
 		},
 		{
-			name:         "--key and --block provided, task is deeply nested",
+			name:         "--key and --parent provided, task is deeply nested",
 			taskName:     "Clean the room",
 			page:         "key-deeply-nested",
 			blockText:    "Parent block",

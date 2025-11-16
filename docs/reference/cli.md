@@ -163,7 +163,7 @@ This command reads Markdown content from stdin and adds it to your Logseq graph 
 
 ```
 -j, --journal YYYY-MM-DD    Journal date (default: today)
--p, --parent TEXT           Partial text of a block to use as parent
+   --parent TEXT            Partial text of a block to use as parent
 ```
 
 **Examples:**
@@ -252,7 +252,7 @@ Adds a new TODO task to your Logseq graph. By default, tasks are added to today'
 ```
 -j, --journal YYYY-MM-DD    Journal date (default: today)
 -p, --page NAME             Page name to add the task to
--b, --block TEXT            Partial text of a block to use as parent
+   --parent TEXT            Partial text of a block to use as parent
 -k, --key TEXT              Unique key to search for existing task
 ```
 
@@ -272,10 +272,10 @@ lqd task add "Buy groceries" --journal 2024-12-25
 lqd task add "Water plants in living room" --key "water plants"
 
 # Add a task under a specific block
-lqd task add "Meeting notes" --block "Project A"
+lqd task add "Meeting notes" --parent "Project A"
 
 # Update a task within a specific block scope
-lqd task add "Updated task name" --block "Project A" --key "task"
+lqd task add "Updated task name" --parent "Project A" --key "task"
 ```
 
 ### `tasks`

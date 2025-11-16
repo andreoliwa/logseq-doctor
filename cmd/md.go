@@ -29,7 +29,7 @@ func NewMdCmd(deps *MdDependencies) *cobra.Command {
 		}
 	}
 
-	var journalFlag, blockFlag string
+	var journalFlag, parentFlag string
 
 	cmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "md",
@@ -37,13 +37,13 @@ func NewMdCmd(deps *MdDependencies) *cobra.Command {
 		Long: `Add Markdown content to Logseq using the DOM.
 
 Pipe your Markdown content via stdin.
-If --block is provided, the content will be added as a child block under the first block
+If --parent is provided, the content will be added as a child block under the first block
 containing the specified text. Otherwise, it will be appended at the end of the journal page.
 
 Examples:
   echo "New task" | lqd md
-  echo "Child task" | lqd md --block "Project A"
-  echo "Another task" | lqd md -b "meeting notes"`,
+  echo "Child task" | lqd md --parent "Project A"
+  echo "Another task" | lqd md --parent "meeting notes"`,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			graphPath := os.Getenv("LOGSEQ_GRAPH_PATH")
 			stdin := deps.ReadStdin()
@@ -58,7 +58,7 @@ Examples:
 				Graph:      graph,
 				Date:       targetDate,
 				Content:    stdin,
-				ParentText: blockFlag,
+				ParentText: parentFlag,
 			}
 
 			return deps.InsertFn(opts)
@@ -66,7 +66,7 @@ Examples:
 	}
 
 	addJournalFlag(cmd, &journalFlag)
-	addBlockFlag(cmd, &blockFlag, "Markdown content")
+	addParentFlag(cmd, &parentFlag, "Markdown content")
 	// TODO: addPageFlag(cmd, &pageFlag, "Markdown content")
 
 	return cmd

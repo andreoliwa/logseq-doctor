@@ -38,7 +38,7 @@ func NewTaskAddCmd(deps *TaskAddDependencies) *cobra.Command {
 		}
 	}
 
-	var journalFlag, blockFlag, pageFlag, keyFlag string
+	var journalFlag, parentFlag, pageFlag, keyFlag string
 
 	cmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "add [task description]",
@@ -54,7 +54,7 @@ Examples:
   lqd task add "Call client" --page "Work"
   lqd task add "Buy groceries" --journal "2024-12-25"
   lqd task add "Water plants in living room" --key "water plants"
-  lqd task add "Meeting notes" --block "Project A"`,
+  lqd task add "Meeting notes" --parent "Project A"`,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
 			graphPath := os.Getenv("LOGSEQ_GRAPH_PATH")
@@ -69,7 +69,7 @@ Examples:
 				Graph:     graph,
 				Date:      targetDate,
 				Page:      pageFlag,
-				BlockText: blockFlag,
+				BlockText: parentFlag,
 				Key:       keyFlag,
 				Name:      args[0],
 				TimeNow:   deps.TimeNow,
@@ -80,7 +80,7 @@ Examples:
 	}
 
 	addJournalFlag(cmd, &journalFlag)
-	addBlockFlag(cmd, &blockFlag, "task")
+	addParentFlag(cmd, &parentFlag, "task")
 	addPageFlag(cmd, &pageFlag, "task")
 
 	cmd.Flags().StringVarP(&keyFlag, "key", "k", "",
