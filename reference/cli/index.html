@@ -1646,7 +1646,7 @@
 </ul>
 <p><strong>Flags:</strong></p>
 <div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>-j, --journal YYYY-MM-DD    Journal date (default: today)
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>-p, --parent TEXT           Partial text of a block to use as parent
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>   --parent TEXT            Partial text of a block to use as parent
 </code></pre></div>
 <p><strong>Examples:</strong></p>
 <div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Add a simple note to today's journal</span>
@@ -1704,7 +1704,7 @@
 <p><strong>Flags:</strong></p>
 <div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>-j, --journal YYYY-MM-DD    Journal date (default: today)
 <a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>-p, --page NAME             Page name to add the task to
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>-b, --block TEXT            Partial text of a block to use as parent
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>   --parent TEXT            Partial text of a block to use as parent
 <a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>-k, --key TEXT              Unique key to search for existing task
 </code></pre></div>
 <p><strong>Examples:</strong></p>
@@ -1721,10 +1721,10 @@
 <a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Water plants in living room"</span><span class="w"> </span>--key<span class="w"> </span><span class="s2">"water plants"</span>
 <a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>
 <a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="c1"># Add a task under a specific block</span>
-<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Meeting notes"</span><span class="w"> </span>--block<span class="w"> </span><span class="s2">"Project A"</span>
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Meeting notes"</span><span class="w"> </span>--parent<span class="w"> </span><span class="s2">"Project A"</span>
 <a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>
 <a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="c1"># Update a task within a specific block scope</span>
-<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Updated task name"</span><span class="w"> </span>--block<span class="w"> </span><span class="s2">"Project A"</span><span class="w"> </span>--key<span class="w"> </span><span class="s2">"task"</span>
+<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Updated task name"</span><span class="w"> </span>--parent<span class="w"> </span><span class="s2">"Project A"</span><span class="w"> </span>--key<span class="w"> </span><span class="s2">"task"</span>
 </code></pre></div>
 <h3 id="tasks"><code>tasks</code><a class="headerlink" href="#tasks" title="Permanent link">¶</a></h3>
 <p>List all tasks in your Logseq graph.</p>

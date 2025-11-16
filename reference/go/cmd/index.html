@@ -1085,17 +1085,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#func-addblockflag" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        func addBlockFlag
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#func-addjournalflag" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1111,6 +1100,17 @@
     <span class="md-ellipsis">
       
         func addPageFlag
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#func-addparentflag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func addParentFlag
       
     </span>
   </a>
@@ -1202,9 +1202,9 @@
 <li><a href="#NewTaskAddCmd">func NewTaskAddCmd(deps *TaskAddDependencies) *cobra.Command</a></li>
 <li><a href="#NewTaskCmd">func NewTaskCmd() *cobra.Command</a></li>
 <li><a href="#ParseDateFromJournalFlag">func ParseDateFromJournalFlag(journalFlag string, timeNow func() time.Time) (time.Time, error)</a></li>
-<li><a href="#addBlockFlag">func addBlockFlag(cmd *cobra.Command, flagVar *string, what string)</a></li>
 <li><a href="#addJournalFlag">func addJournalFlag(cmd *cobra.Command, flagVar *string)</a></li>
 <li><a href="#addPageFlag">func addPageFlag(cmd *cobra.Command, flagVar *string, what string)</a></li>
+<li><a href="#addParentFlag">func addParentFlag(cmd *cobra.Command, flagVar *string, what string)</a></li>
 <li><a href="#init">func init()</a></li>
 <li><a href="#MdDependencies">type MdDependencies</a></li>
 <li><a href="#TaskAddDependencies">type TaskAddDependencies</a></li>
@@ -1340,23 +1340,23 @@
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">ParseDateFromJournalFlag</span><span class="p">(</span><span class="nx">journalFlag</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">timeNow</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
 <p>ParseDateFromJournalFlag parses the journal flag and returns the target date. If journalFlag is empty, it returns the current time from timeNow. If journalFlag is not empty, it parses it as YYYY-MM-DD format. Returns an error if the date format is invalid.</p>
-<p><a name="addBlockFlag"></a></p>
-<h2 id="func-addblockflag">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/flags.go#L16">addBlockFlag</a><a class="headerlink" href="#func-addblockflag" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">addBlockFlag</span><span class="p">(</span><span class="nx">cmd</span><span class="w"> </span><span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span><span class="w"> </span><span class="nx">flagVar</span><span class="w"> </span><span class="o">*</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">what</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span>
-</code></pre></div>
-<p>addBlockFlag adds a --block/-b flag to the command with customizable help text.</p>
 <p><a name="addJournalFlag"></a></p>
 <h2 id="func-addjournalflag">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/flags.go#L11">addJournalFlag</a><a class="headerlink" href="#func-addjournalflag" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">addJournalFlag</span><span class="p">(</span><span class="nx">cmd</span><span class="w"> </span><span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span><span class="w"> </span><span class="nx">flagVar</span><span class="w"> </span><span class="o">*</span><span class="kt">string</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">addJournalFlag</span><span class="p">(</span><span class="nx">cmd</span><span class="w"> </span><span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span><span class="w"> </span><span class="nx">flagVar</span><span class="w"> </span><span class="o">*</span><span class="kt">string</span><span class="p">)</span>
 </code></pre></div>
 <p>addJournalFlag adds a --journal/-j flag to the command.</p>
 <p><a name="addPageFlag"></a></p>
 <h2 id="func-addpageflag">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/flags.go#L22">addPageFlag</a><a class="headerlink" href="#func-addpageflag" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">addPageFlag</span><span class="p">(</span><span class="nx">cmd</span><span class="w"> </span><span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span><span class="w"> </span><span class="nx">flagVar</span><span class="w"> </span><span class="o">*</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">what</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">addPageFlag</span><span class="p">(</span><span class="nx">cmd</span><span class="w"> </span><span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span><span class="w"> </span><span class="nx">flagVar</span><span class="w"> </span><span class="o">*</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">what</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span>
 </code></pre></div>
 <p>addPageFlag adds a --page/-p flag to the command with customizable help text.</p>
+<p><a name="addParentFlag"></a></p>
+<h2 id="func-addparentflag">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/flags.go#L16">addParentFlag</a><a class="headerlink" href="#func-addparentflag" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">addParentFlag</span><span class="p">(</span><span class="nx">cmd</span><span class="w"> </span><span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span><span class="w"> </span><span class="nx">flagVar</span><span class="w"> </span><span class="o">*</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">what</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span>
+</code></pre></div>
+<p>addParentFlag adds a --parent flag to the command with customizable help text.</p>
 <p><a name="init"></a></p>
-<h2 id="func-init">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/backlog.go#L41">init</a><a class="headerlink" href="#func-init" title="Permanent link">¶</a></h2>
+<h2 id="func-init">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/cmd/md.go#L78">init</a><a class="headerlink" href="#func-init" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">init</span><span class="p">()</span>
 </code></pre></div>
 <p><a name="MdDependencies"></a></p>
