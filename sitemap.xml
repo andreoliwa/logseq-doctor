@@ -2,82 +2,82 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/changelog/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/contributing/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/installation/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/readme/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/usage/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/cli/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/go/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/python/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/go/cmd/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/go/internal/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/go/internal/backlog/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/go/internal/testutils/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/go/pkg/set/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/python/SUMMARY/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/python/__init__/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/python/__main__/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/python/api/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/python/cli/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/python/constants/</loc>
-         <lastmod>2025-11-16</lastmod>
+         <lastmod>2025-11-20</lastmod>
     </url>
 </urlset>
