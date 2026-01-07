@@ -22,3 +22,8 @@
   - Item with a #tag
 - Line after 2
 - Line after 3
+- Block with `inline code` text
+- TODO Task with `code key` inside
+- Parent block with inline code
+  - Nested block with code
+    - Deep nested with `deep code` text

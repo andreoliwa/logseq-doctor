@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestIsAncestor(t *testing.T) { //nolint:funlen
+func TestIsAncestor(t *testing.T) {
 	tests := []struct {
 		name     string
 		setup    func() (*content.Block, *content.Block)
