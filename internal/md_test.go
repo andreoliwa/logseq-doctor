@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestInsertMarkdownToJournal(t *testing.T) { //nolint:funlen
+func TestInsertMarkdownToJournal(t *testing.T) {
 	tests := []struct {
 		name           string
 		date           time.Time

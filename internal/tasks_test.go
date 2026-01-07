@@ -83,7 +83,7 @@ func TestDoing(t *testing.T) {
 	}
 }
 
-func TestAddTaskToPageOrJournal(t *testing.T) { //nolint:funlen
+func TestAddTaskToPageOrJournal(t *testing.T) {
 	frozenTime := time.Date(2025, 1, 4, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
@@ -216,7 +216,7 @@ func TestAddTaskUnderBlock(t *testing.T) {
 	}
 }
 
-func TestAddOrUpdateTaskByKey(t *testing.T) { //nolint:funlen
+func TestAddOrUpdateTaskByKey(t *testing.T) {
 	defaultFrozenTime := time.Date(2025, 1, 4, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {

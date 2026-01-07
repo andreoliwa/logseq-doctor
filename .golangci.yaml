@@ -31,6 +31,10 @@ linters:
       - third_party$
       - builtin$
       - examples$
+    rules:
+      - linters:
+          - funlen
+        path: _test\.go
 formatters:
   exclusions:
     generated: lax

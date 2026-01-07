@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestParseDateFromJournalFlag(t *testing.T) { //nolint:funlen
+func TestParseDateFromJournalFlag(t *testing.T) {
 	frozenTime := time.Date(2025, 4, 5, 3, 0, 0, 0, time.UTC)
 	timeNow := func() time.Time {
 		return frozenTime

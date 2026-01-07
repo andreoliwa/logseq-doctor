@@ -81,6 +81,16 @@ func TestFindBlockContainingText(t *testing.T) {
 			searchText:   "tag",
 			expectedText: "First paragraph with a #tag",
 		},
+		{
+			name:         "search for inline code",
+			searchText:   "inline code",
+			expectedText: "Block with `inline code` text",
+		},
+		{
+			name:         "search for text in deep nested inline code",
+			searchText:   "deep code",
+			expectedText: "Deep nested with `deep code` text",
+		},
 	}
 
 	for _, test := range tests {
@@ -197,6 +207,12 @@ func getFindTaskByKeyTestCases() []struct {
 			parentText:   "",
 			expectedText: "WAITING Fourth task with a #tag",
 		},
+		{
+			name:         "search for inline code in task",
+			key:          "code key",
+			parentText:   "",
+			expectedText: "TODO Task with `code key` inside",
+		},
 	}
 }
 
@@ -234,6 +250,10 @@ func extractTextFromNodes(nodes content.NodeList, builder *strings.Builder) {
 		case *content.Hashtag:
 			builder.WriteString("#")
 			builder.WriteString(nodeTyped.To)
+		case *content.CodeSpan:
+			builder.WriteString("`")
+			builder.WriteString(nodeTyped.Value)
+			builder.WriteString("`")
 		case content.HasChildren:
 			extractTextFromNodes(nodeTyped.Children(), builder)
 		}

@@ -24,7 +24,7 @@ func TestNewTaskCmd(t *testing.T) {
 	assert.Contains(t, taskCmd.Long, "Manage tasks in your Logseq graph")
 }
 
-func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen,maintidx
+func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:maintidx
 	graphPath := "/test/graph"
 	frozenTime := time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
 

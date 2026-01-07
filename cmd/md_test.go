@@ -15,7 +15,7 @@ import (
 // We use dependency injection to make the command testable without executing
 // the actual external dependencies.
 
-func TestMdCommand_WithDependencyInjection(t *testing.T) { //nolint:funlen
+func TestMdCommand_WithDependencyInjection(t *testing.T) {
 	graphPath := "/test/graph"
 	frozenTime := time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
 
