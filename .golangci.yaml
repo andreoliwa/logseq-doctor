@@ -33,6 +33,7 @@ linters:
       - examples$
     rules:
       - linters:
+          - exhaustruct
           - funlen
         path: _test\.go
 formatters:

@@ -1,0 +1,5 @@
+- Parent block
+  - Child with groceries keyword
+  - Another child
+- Other parent
+  - Should not match groceries here

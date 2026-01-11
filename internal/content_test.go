@@ -52,6 +52,7 @@ func TestIsValidMarkdownFile(t *testing.T) {
 
 func TestAppendRawMarkdownToJournal(t *testing.T) {
 	t.Run("empty content should be a no-op", func(t *testing.T) {
+		//nolint:staticcheck
 		graph := testutils.StubGraph(t, "")
 		now := time.Now()
 
@@ -87,6 +88,7 @@ func TestAppendRawMarkdownToJournal(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			//nolint:staticcheck
 			graph := testutils.StubGraph(t, "")
 			date := time.Date(2024, 12, test.day, 0, 0, 0, 0, time.UTC)
 

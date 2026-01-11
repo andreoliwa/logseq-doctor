@@ -103,6 +103,33 @@ func FindBlockContainingText(page logseq.Page, searchText string) *content.Block
 	})
 }
 
+// FindBlockByKey searches for a block containing the specified key (case-insensitive).
+// If parentBlock is provided, searches only among its children.
+// Otherwise, searches in the entire page.
+// Returns the Block if found, nil otherwise.
+func FindBlockByKey(page logseq.Page, parentBlock *content.Block, key string) *content.Block {
+	if key == "" {
+		return nil
+	}
+
+	keyLower := strings.ToLower(key)
+
+	predicate := func(block *content.Block) bool {
+		// Check if the key is in the immediate content of this block (not in nested blocks)
+		textNode := block.Content().FindDeep(func(node content.Node) bool {
+			return containsTextCaseInsensitive(node, keyLower)
+		})
+
+		return textNode != nil
+	}
+
+	if parentBlock != nil {
+		return parentBlock.Blocks().FindDeep(predicate)
+	}
+
+	return page.Blocks().FindDeep(predicate)
+}
+
 // FindTaskMarkerByKey searches for a task marker containing the specified key (case-insensitive).
 // If parentBlock is provided, searches only among its children.
 // Otherwise, searches in the entire page.
