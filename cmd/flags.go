@@ -24,6 +24,11 @@ func addPageFlag(cmd *cobra.Command, flagVar *string, what string) {
 	cmd.Flags().StringVarP(flagVar, "page", "p", "", helpText)
 }
 
+// addKeyFlag adds a --key/-k flag to the command.
+func addKeyFlag(cmd *cobra.Command, flagVar *string) {
+	cmd.Flags().StringVarP(flagVar, "key", "k", "", "Unique key, will be used to update an existing Markdown block")
+}
+
 // ParseDateFromJournalFlag parses the journal flag and returns the target date.
 // If journalFlag is empty, it returns the current time from timeNow.
 // If journalFlag is not empty, it parses it as YYYY-MM-DD format.

@@ -12,6 +12,7 @@ linters:
     # keep-sorted start
     - copyloopvar
     - depguard
+    - exhaustruct
     - forbidigo
     - gochecknoinits
     - godox

@@ -22,14 +22,14 @@ type MdDependencies struct {
 func NewMdCmd(deps *MdDependencies) *cobra.Command {
 	if deps == nil {
 		deps = &MdDependencies{
-			InsertFn:  internal.InsertMarkdownToJournal,
+			InsertFn:  internal.InsertMarkdown,
 			OpenGraph: internal.OpenGraphFromPath,
 			ReadStdin: internal.ReadFromStdin,
 			TimeNow:   time.Now,
 		}
 	}
 
-	var journalFlag, parentFlag string
+	var journalFlag, parentFlag, pageFlag, keyFlag string
 
 	cmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "md",
@@ -37,13 +37,19 @@ func NewMdCmd(deps *MdDependencies) *cobra.Command {
 		Long: `Add Markdown content to Logseq using the DOM.
 
 Pipe your Markdown content via stdin.
+The content will be added to the specified page or to today's journal by default.
+If --key is provided, searches for an existing block containing that key (case-insensitive)
+and updates it. Otherwise, creates a new block.
 If --parent is provided, the content will be added as a child block under the first block
-containing the specified text. Otherwise, it will be appended at the end of the journal page.
+containing the specified text. Otherwise, it will be appended at the end of the page.
 
 Examples:
   echo "New task" | lqd md
+  echo "Meeting notes" | lqd md --page "Work"
   echo "Child task" | lqd md --parent "Project A"
-  echo "Another task" | lqd md --parent "meeting notes"`,
+  echo "Another task" | lqd md --parent "meeting notes"
+  echo "Updated content" | lqd md --key "unique identifier"
+  echo "Update work item" | lqd md --page "Projects" --key "feature-123"`,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			graphPath := os.Getenv("LOGSEQ_GRAPH_PATH")
 			stdin := deps.ReadStdin()
@@ -57,8 +63,10 @@ Examples:
 			opts := &internal.InsertMarkdownOptions{
 				Graph:      graph,
 				Date:       targetDate,
+				Page:       pageFlag,
 				Content:    stdin,
 				ParentText: parentFlag,
+				Key:        keyFlag,
 			}
 
 			return deps.InsertFn(opts)
@@ -67,7 +75,8 @@ Examples:
 
 	addJournalFlag(cmd, &journalFlag)
 	addParentFlag(cmd, &parentFlag, "Markdown content")
-	// TODO: addPageFlag(cmd, &pageFlag, "Markdown content")
+	addPageFlag(cmd, &pageFlag, "Markdown content")
+	addKeyFlag(cmd, &keyFlag)
 
 	return cmd
 }
