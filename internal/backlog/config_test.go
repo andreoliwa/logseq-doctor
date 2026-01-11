@@ -10,6 +10,7 @@ import (
 )
 
 func TestPageConfigReader_emptyBacklog(t *testing.T) {
+	//nolint:staticcheck
 	graph := testutils.StubGraph(t, "")
 	reader := backlog.NewPageConfigReader(graph, "non-existing")
 
@@ -24,6 +25,7 @@ func TestPageConfigReader_emptyBacklog(t *testing.T) {
 }
 
 func TestPageConfigReader_ReadConfig(t *testing.T) {
+	//nolint:staticcheck
 	graph := testutils.StubGraph(t, "")
 	prefix := "config"
 	reader := backlog.NewPageConfigReader(graph, prefix)

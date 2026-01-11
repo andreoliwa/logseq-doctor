@@ -45,6 +45,7 @@ func TestSortAndRemoveDuplicates(t *testing.T) {
 func setupPage(t *testing.T, name string) logseq.Page {
 	t.Helper()
 
+	//nolint:staticcheck
 	graph := testutils.StubGraph(t, "")
 	page := internal.OpenPage(graph, name)
 

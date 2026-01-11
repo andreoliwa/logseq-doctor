@@ -63,7 +63,7 @@ func TestInsertMarkdownToJournal(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			graph := testutils.StubGraph(t, "")
+			graph := testutils.NewStubGraph(t, "md")
 
 			opts := &internal.InsertMarkdownOptions{
 				Graph:      graph,
@@ -75,7 +75,7 @@ func TestInsertMarkdownToJournal(t *testing.T) {
 			require.NoError(t, err)
 
 			if test.expectedGolden != "" {
-				testutils.AssertGoldenJournals(t, graph, "", []string{test.expectedGolden})
+				testutils.AssertGoldenJournals(t, graph, "md", []string{test.expectedGolden})
 			}
 		})
 	}
@@ -92,54 +92,49 @@ func TestInsertMarkdownToPage(t *testing.T) {
 	}{
 		{
 			name:           "key provided, and it doesn't exist",
-			page:           "md-key-not-found",
+			page:           "key-not-found",
 			content:        "New markdown content",
 			parentText:     "",
 			key:            "unique-key",
-			expectedGolden: "md-key-not-found",
+			expectedGolden: "key-not-found",
 		},
 		{
 			name:           "key provided, and block exists with children, properties and logbook",
-			page:           "md-key-with-children",
+			page:           "key-with-children",
 			content:        "Updated content",
 			parentText:     "",
 			key:            "groceries",
-			expectedGolden: "md-key-with-children",
+			expectedGolden: "key-with-children",
 		},
 		{
 			name:           "key provided but parent is not provided",
-			page:           "md-key-entire-page",
+			page:           "key-entire-page",
 			content:        "Updated content from anywhere",
 			parentText:     "",
 			key:            "groceries",
-			expectedGolden: "md-key-entire-page",
+			expectedGolden: "key-entire-page",
 		},
 		{
 			name:           "key and parent provided: search for key within block and its children",
-			page:           "md-key-within-parent",
+			page:           "key-within-parent",
 			content:        "Updated nested content",
 			parentText:     "Parent block",
 			key:            "groceries",
-			expectedGolden: "md-key-within-parent",
+			expectedGolden: "key-within-parent",
 		},
 		{
 			name:           "key and parent provided, block is deeply nested",
-			page:           "md-key-deeply-nested",
+			page:           "key-deeply-nested",
 			content:        "Updated deeply nested content",
 			parentText:     "Parent block",
 			key:            "groceries",
-			expectedGolden: "md-key-deeply-nested",
+			expectedGolden: "key-deeply-nested",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			// TODO: test: move all Markdown test files to separate subdirs
-			//   - rename "stub-graph" to "graph-template", keep only "logseq" dir
-			//   - create an "testdata/md" dir with "journals" and "pages" dirs
-			//   - move all .md files to these dirs
-			//   graph := testutils.StubGraph(t, "md")
-			graph := testutils.StubGraph(t, "")
+			graph := testutils.NewStubGraph(t, "md")
 
 			opts := &internal.InsertMarkdownOptions{
 				Graph:      graph,
@@ -152,7 +147,7 @@ func TestInsertMarkdownToPage(t *testing.T) {
 			err := internal.InsertMarkdown(opts)
 			require.NoError(t, err)
 
-			testutils.AssertGoldenPages(t, graph, "", []string{test.expectedGolden})
+			testutils.AssertGoldenPages(t, graph, "md", []string{test.expectedGolden})
 		})
 	}
 }

@@ -125,6 +125,7 @@ func TestAddTaskToPageOrJournal(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			//nolint:staticcheck
 			graph := testutils.StubGraph(t, "")
 
 			// Determine the target date
@@ -196,6 +197,7 @@ func TestAddTaskUnderBlock(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			//nolint:staticcheck
 			graph := testutils.StubGraph(t, "")
 
 			opts := &internal.AddTaskOptions{
@@ -323,6 +325,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			//nolint:staticcheck
 			graph := testutils.StubGraph(t, "")
 
 			testFrozenTime := defaultFrozenTime

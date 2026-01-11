@@ -16,6 +16,8 @@ import (
 )
 
 // StubGraph opens the example graph under "testdata" for testing.
+//
+// Deprecated: Use NewStubGraph instead. This function will be removed in a future PR.
 func StubGraph(t *testing.T, caseDirName string) *logseq.Graph {
 	t.Helper()
 
@@ -35,6 +37,27 @@ func StubGraph(t *testing.T, caseDirName string) *logseq.Graph {
 		fs.WithDir("logseq", fs.FromDir(filepath.Join(stubGraphDir, "logseq"))),
 		fs.WithDir("journals", fs.FromDir(filepath.Join(stubGraphDir, "journals"))),
 		fs.WithDir("pages", pagesOps...),
+	)
+
+	return internal.OpenGraphFromPath(tempDir.Path())
+}
+
+// NewStubGraph creates a test graph using the new directory structure.
+// It uses graph-template as the base and loads test data
+// from testdata/{subDir}/journals and testdata/{subDir}/pages.
+func NewStubGraph(t *testing.T, subDir string) *logseq.Graph {
+	t.Helper()
+
+	graphTemplateDir, err := filepath.Abs(filepath.Join("testdata", "graph-template"))
+	require.NoError(t, err)
+
+	path, err := filepath.Abs(filepath.Join("testdata", subDir))
+	require.NoError(t, err)
+
+	tempDir := fs.NewDir(t, "test-graph",
+		fs.WithDir("logseq", fs.FromDir(filepath.Join(graphTemplateDir, "logseq"))),
+		fs.WithDir("journals", fs.FromDir(filepath.Join(path, "journals"))),
+		fs.WithDir("pages", fs.FromDir(filepath.Join(path, "pages"))),
 	)
 
 	return internal.OpenGraphFromPath(tempDir.Path())
