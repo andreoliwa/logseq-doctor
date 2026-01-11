@@ -151,19 +151,26 @@ lqd md [OPTIONS]
 
 This command reads Markdown content from stdin and adds it to your Logseq graph by parsing and manipulating the document object model (DOM). Unlike the `content` command which appends raw text, `md` parses the Markdown structure and properly integrates it into Logseq's outline format.
 
+If `--key` is provided, the command searches for an existing block containing that key (case-insensitive) and updates it while preserving children, properties, and logbook entries. Otherwise, it creates a new block.
+
 **Features:**
 
 - **Markdown parsing**: Parses input as Markdown and converts it to Logseq's block structure
+- **Key-based updates**: Use `--key` to search for and update existing blocks (case-insensitive)
 - **Parent block support**: Can add content as a child of a specific block using `--parent`
+- **Page targeting**: Supports adding to specific pages with `--page`
 - **Journal targeting**: Supports adding to specific journal dates with `--journal`
 - **Multi-line content**: Handles complex Markdown including tasks with properties and logbooks
 - **Smart placement**: Adds to journal page by default, or under a parent block if specified
+- **Preserve structure**: When updating blocks, preserves children, properties, and logbook entries
 
 **Flags:**
 
 ```
 -j, --journal YYYY-MM-DD    Journal date (default: today)
+-p, --page NAME             Page name to add the content to
    --parent TEXT            Partial text of a block to use as parent
+-k, --key TEXT              Unique key to search for existing block
 ```
 
 **Examples:**
@@ -172,11 +179,20 @@ This command reads Markdown content from stdin and adds it to your Logseq graph 
 # Add a simple note to today's journal
 echo "New task" | lqd md
 
+# Add content to a specific page
+echo "Meeting notes" | lqd md --page "Work"
+
 # Add content under a specific parent block
 echo "Child task" | lqd md --parent "Project A"
 
 # Add to a specific journal date
 echo "Meeting notes" | lqd md --journal 2024-12-25
+
+# Update an existing block by key (preserves children and properties)
+echo "Updated content" | lqd md --key "unique identifier"
+
+# Update a block on a specific page
+echo "Update work item" | lqd md --page "Projects" --key "feature-123"
 
 # Add a task with properties and logbook
 echo "DOING Some task
