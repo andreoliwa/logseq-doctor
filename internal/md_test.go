@@ -130,6 +130,14 @@ func TestInsertMarkdownToPage(t *testing.T) {
 			key:            "groceries",
 			expectedGolden: "key-deeply-nested",
 		},
+		{
+			name:           "update block with multi-paragraph content preserves order",
+			page:           "multi-paragraph-update",
+			content:        "First paragraph\n\nSecond paragraph\n\nThird paragraph",
+			parentText:     "",
+			key:            "test-key",
+			expectedGolden: "multi-paragraph-update",
+		},
 	}
 
 	for _, test := range tests {

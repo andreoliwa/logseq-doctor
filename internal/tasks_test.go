@@ -31,7 +31,7 @@ func TestExtractTasksFromJSON(t *testing.T) {
 }
 
 func newTask(deadline, scheduled int) internal.TaskJSON {
-	return internal.TaskJSON{ //nolint:exhaustruct
+	return internal.TaskJSON{
 		Deadline:  deadline,
 		Scheduled: scheduled,
 	}
@@ -77,7 +77,7 @@ func TestDoing(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			task := internal.TaskJSON{Marker: test.marker} //nolint:exhaustruct
+			task := internal.TaskJSON{Marker: test.marker}
 			assert.Equal(t, test.expected, task.Doing(), "Doing check failed for %s", test.name)
 		})
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 func TestEmpty(t *testing.T) {
-	back := testutils.StubBacklog(t, "non-existent", "", &testutils.StubAPIResponses{}) //nolint: exhaustruct
+	back := testutils.StubBacklog(t, "non-existent", "", &testutils.StubAPIResponses{})
 
 	tests := []struct {
 		name     string

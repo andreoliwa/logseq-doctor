@@ -157,19 +157,33 @@ func insertNewContentNodes(block *content.Block, parsedBlock *content.Block, fir
 		return
 	}
 
+	// Find the insertion point: before the first child block, or before the first preserved node (Properties/Logbook)
+	var insertBefore content.Node
+	if firstChildBlock != nil {
+		insertBefore = firstChildBlock
+	} else {
+		// No child blocks, find the first Properties or Logbook node to insert before
+		for node := block.FirstChild(); node != nil; node = node.NextSibling() {
+			if shouldPreserveNode(node) {
+				insertBefore = node
+
+				break
+			}
+		}
+	}
+
 	children := parsedBlock.Children()
-	for i := len(children) - 1; i >= 0; i-- {
+	// Always iterate forward to maintain order, whether inserting before a node or appending
+	for i := range len(children) {
 		child := children[i]
 		// Skip child blocks from the parsed content, only add content nodes
 		if _, ok := child.(*content.Block); ok {
 			continue
 		}
 
-		if firstChildBlock != nil {
-			// Insert before the first child block
-			block.InsertChildBefore(child, firstChildBlock)
+		if insertBefore != nil {
+			block.InsertChildBefore(child, insertBefore)
 		} else {
-			// No child blocks, append to the end
 			block.AddChild(child)
 		}
 	}
