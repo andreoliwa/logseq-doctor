@@ -22,11 +22,13 @@ For now, it will be appended at the end of the current journal page.`,
 		stdin := internal.ReadFromStdin()
 
 		var targetDate time.Time
+
 		if journalFlag != "" {
 			parsedDate, err := time.Parse("2006-01-02", journalFlag)
 			if err != nil {
 				log.Fatalln("Invalid journal date format. Use YYYY-MM-DD:", err)
 			}
+
 			targetDate = parsedDate
 		} else {
 			targetDate = time.Now()

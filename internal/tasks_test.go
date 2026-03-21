@@ -55,7 +55,7 @@ func TestOverdue(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.expected, test.task.Overdue(time.Now), "Overdue check failed for %s", test.name)
+			assert.Equal(t, test.expected, internal.TaskOverdue(test.task, time.Now), "Overdue check failed for %s", test.name)
 		})
 	}
 }
@@ -78,7 +78,7 @@ func TestDoing(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			task := internal.TaskJSON{Marker: test.marker}
-			assert.Equal(t, test.expected, task.Doing(), "Doing check failed for %s", test.name)
+			assert.Equal(t, test.expected, internal.TaskDoing(task), "Doing check failed for %s", test.name)
 		})
 	}
 }

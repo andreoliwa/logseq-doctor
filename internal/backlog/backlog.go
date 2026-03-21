@@ -255,15 +255,15 @@ func queryTasksFromSinglePage(api internal.LogseqAPI, pageTitle string,
 func addTasksToCategories(jsonTasks []internal.TaskJSON, tasks *internal.CategorizedTasks,
 	currentTime func() time.Time) {
 	for _, task := range jsonTasks {
-		if task.Overdue(currentTime) {
+		if internal.TaskOverdue(task, currentTime) {
 			tasks.Overdue.Add(task.UUID)
 		}
 
-		if task.FutureScheduled(currentTime) {
+		if internal.TaskFutureScheduled(task, currentTime) {
 			tasks.FutureScheduled.Add(task.UUID)
 		}
 
-		if task.Doing() {
+		if internal.TaskDoing(task) {
 			tasks.Doing.Add(task.UUID)
 		} else {
 			// Only add non-DOING tasks to All set
@@ -310,13 +310,13 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit,gocyclo,maintidx
 		block.Children().FindDeep(func(node content.Node) bool {
 			if text, ok := node.(*content.Text); ok {
 				switch {
-				case strings.Contains(text.Value, "New tasks"):
+				case strings.Contains(text.Value, sectionNewTasksText):
 					dividerNewTasks = block
-				case strings.Contains(text.Value, "Overdue tasks"):
+				case strings.Contains(text.Value, SectionOverdue):
 					dividerOverdue = block
-				case text.Value == "Focus":
+				case text.Value == SectionFocus:
 					dividerFocus = block
-				case strings.Contains(text.Value, "Scheduled tasks"):
+				case strings.Contains(text.Value, SectionScheduled):
 					dividerScheduled = block
 				}
 			}
@@ -386,8 +386,8 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit,gocyclo,maintidx
 
 		if dividerOverdue == nil {
 			dividerOverdue = content.NewBlock(content.NewParagraph(
-				content.NewText("📅 Overdue tasks "),
-				content.NewPageLink("quick capture"),
+				content.NewText(SectionOverdue+" "),
+				content.NewPageLink(PageQuickCapture),
 			))
 			AddSibling(page, dividerOverdue, firstBlock, dividerFocus)
 		}
@@ -418,8 +418,8 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit,gocyclo,maintidx
 
 			if dividerNewTasks == nil {
 				dividerNewTasks = content.NewBlock(content.NewParagraph(
-					content.NewText("New tasks "),
-					content.NewPageLink("quick capture"),
+					content.NewText(SectionNewTasks+" "),
+					content.NewPageLink(PageQuickCapture),
 				))
 				AddSibling(page, dividerNewTasks, firstBlock, dividerOverdue, dividerFocus)
 			}
@@ -438,8 +438,8 @@ func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit,gocyclo,maintidx
 		for _, blockRef := range futureScheduledBlockRefs.ValuesSorted() {
 			if dividerScheduled == nil {
 				dividerScheduled = content.NewBlock(content.NewParagraph(
-					content.NewText("⏰ Scheduled tasks "),
-					content.NewPageLink("quick capture"),
+					content.NewText(SectionScheduled+" "),
+					content.NewPageLink(PageQuickCapture),
 				))
 				page.AddBlock(dividerScheduled)
 			}

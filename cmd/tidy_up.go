@@ -21,11 +21,13 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 		graph := internal.OpenGraphFromPath(os.Getenv("LOGSEQ_GRAPH_PATH"))
 
 		exitCode := 0
+
 		for _, path := range args {
 			if internal.TidyUpOneFile(graph, path) != 0 {
 				exitCode = 1
 			}
 		}
+
 		os.Exit(exitCode)
 	},
 }
