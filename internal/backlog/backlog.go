@@ -28,14 +28,14 @@ type Backlog interface {
 
 type backlogImpl struct {
 	graph        *logseq.Graph
-	api          logseqapi.LogseqAPI
+	logseqAPI    logseqapi.LogseqAPI
 	configReader ConfigReader
 	currentTime  func() time.Time
 }
 
-func NewBacklog(graph *logseq.Graph, api logseqapi.LogseqAPI, reader ConfigReader,
+func NewBacklog(graph *logseq.Graph, logseqAPI logseqapi.LogseqAPI, reader ConfigReader,
 	currentTime func() time.Time) Backlog {
-	return &backlogImpl{graph: graph, api: api, configReader: reader, currentTime: currentTime}
+	return &backlogImpl{graph: graph, logseqAPI: logseqAPI, configReader: reader, currentTime: currentTime}
 }
 
 func (b *backlogImpl) Graph() *logseq.Graph {
@@ -75,7 +75,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 
 		result, err := b.ProcessOne(backlogConfig.BacklogPage,
 			func() (*logseqapi.CategorizedTasks, error) {
-				return queryTasksFromPages(b.graph, b.api, backlogConfig.InputPages, b.currentTime)
+				return queryTasksFromPages(b.graph, b.logseqAPI, backlogConfig.InputPages, b.currentTime)
 			})
 		if err != nil {
 			return err
@@ -165,24 +165,24 @@ func blockRefsFromPages(page logseq.Page) *set.Set[string] {
 
 // queryTasksFromPages queries Logseq API for tasks from specified pages.
 // It uses concurrent processing for multiple pages and sequential processing for a single page.
-func queryTasksFromPages(graph *logseq.Graph, api logseqapi.LogseqAPI,
+func queryTasksFromPages(graph *logseq.Graph, logseqAPI logseqapi.LogseqAPI,
 	pageTitles []string, currentTime func() time.Time) (*logseqapi.CategorizedTasks, error) {
 	tasks := logseqapi.NewCategorizedTasks()
 	finder := logseqext.NewLogseqFinder(graph)
 
 	if len(pageTitles) <= 1 {
-		return queryTasksFromPagesSequential(api, pageTitles, &tasks, finder, currentTime)
+		return queryTasksFromPagesSequential(logseqAPI, pageTitles, &tasks, finder, currentTime)
 	}
 
-	return queryTasksFromPagesConcurrent(api, pageTitles, &tasks, finder, currentTime)
+	return queryTasksFromPagesConcurrent(logseqAPI, pageTitles, &tasks, finder, currentTime)
 }
 
 // queryTasksFromPagesSequential processes pages sequentially (original implementation).
-func queryTasksFromPagesSequential(api logseqapi.LogseqAPI,
+func queryTasksFromPagesSequential(logseqAPI logseqapi.LogseqAPI,
 	pageTitles []string, tasks *logseqapi.CategorizedTasks,
 	finder logseqext.LogseqFinder, currentTime func() time.Time) (*logseqapi.CategorizedTasks, error) {
 	for _, pageTitle := range pageTitles {
-		jsonTasks, err := queryTasksFromSinglePage(api, pageTitle, finder)
+		jsonTasks, err := queryTasksFromSinglePage(logseqAPI, pageTitle, finder)
 		if err != nil {
 			return nil, err
 		}
@@ -197,7 +197,7 @@ func queryTasksFromPagesSequential(api logseqapi.LogseqAPI,
 }
 
 // queryTasksFromPagesConcurrent processes pages concurrently using goroutines.
-func queryTasksFromPagesConcurrent(api logseqapi.LogseqAPI,
+func queryTasksFromPagesConcurrent(logseqAPI logseqapi.LogseqAPI,
 	pageTitles []string, tasks *logseqapi.CategorizedTasks,
 	finder logseqext.LogseqFinder, currentTime func() time.Time) (*logseqapi.CategorizedTasks, error) {
 	type pageResult struct {
@@ -210,7 +210,7 @@ func queryTasksFromPagesConcurrent(api logseqapi.LogseqAPI,
 
 	for _, pageTitle := range pageTitles {
 		go func(title string) {
-			jsonTasks, err := queryTasksFromSinglePage(api, title, finder)
+			jsonTasks, err := queryTasksFromSinglePage(logseqAPI, title, finder)
 			resultChan <- pageResult{pageTitle: title, jsonTasks: jsonTasks, err: err}
 		}(pageTitle)
 	}
@@ -233,14 +233,14 @@ func queryTasksFromPagesConcurrent(api logseqapi.LogseqAPI,
 }
 
 // queryTasksFromSinglePage queries tasks from a single page and returns the JSON tasks.
-func queryTasksFromSinglePage(api logseqapi.LogseqAPI, pageTitle string,
+func queryTasksFromSinglePage(logseqAPI logseqapi.LogseqAPI, pageTitle string,
 	finder logseqext.LogseqFinder) ([]logseqapi.TaskJSON, error) {
 	query := finder.FindFirstQuery(pageTitle)
 	if query == "" {
 		query = defaultQuery(pageTitle)
 	}
 
-	jsonStr, err := api.PostQuery(query)
+	jsonStr, err := logseqAPI.PostQuery(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query Logseq API: %w", err)
 	}
@@ -277,262 +277,4 @@ func addTasksToCategories(jsonTasks []logseqapi.TaskJSON, tasks *logseqapi.Categ
 
 func defaultQuery(pageTitle string) string {
 	return fmt.Sprintf("(and [[%s]] (task TODO LATER DOING NOW WAITING))", pageTitle)
-}
-
-func insertAndRemoveRefs( //nolint:cyclop,funlen,gocognit,gocyclo,maintidx
-	graph *logseq.Graph, pageTitle string, newBlockRefs, obsoleteBlockRefs,
-	overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
-) (*Result, error) {
-	// TODO: refactor: break this big function in smaller functions
-	transaction := graph.NewTransaction()
-
-	page, err := transaction.OpenPage(pageTitle)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open page for transaction: %w", err)
-	}
-
-	var firstBlock, dividerNewTasks, dividerOverdue, dividerFocus, dividerScheduled *content.Block
-
-	deletedCount := 0
-	movedCount := 0
-	movedScheduledCount := 0
-	unpinnedCount := 0
-	result := &Result{
-		FocusRefsFromPage: set.NewSet[string](),
-		ShowQuickCapture:  false,
-	}
-	pinnedBlockRefs := set.NewSet[string]()
-
-	for i, block := range page.Blocks() {
-		if i == 0 {
-			firstBlock = block
-		}
-
-		// Remove refs marked for deletion or overdue tasks
-		block.Children().FindDeep(func(node content.Node) bool {
-			if text, ok := node.(*content.Text); ok {
-				switch {
-				case strings.Contains(text.Value, sectionNewTasksText):
-					dividerNewTasks = block
-				case strings.Contains(text.Value, SectionOverdue):
-					dividerOverdue = block
-				case text.Value == SectionFocus:
-					dividerFocus = block
-				case strings.Contains(text.Value, SectionScheduled):
-					dividerScheduled = block
-				}
-			}
-
-			if blockRef, ok := node.(*content.BlockRef); ok { //nolint:nestif
-				shouldDelete := false
-
-				switch {
-				case obsoleteBlockRefs.Contains(blockRef.ID):
-					shouldDelete = true
-
-					deletedCount++
-				case overdueBlockRefs.Contains(blockRef.ID):
-					if nextChildHasPin(node) {
-						pinnedBlockRefs.Add(blockRef.ID)
-					} else {
-						shouldDelete = true
-
-						movedCount++
-					}
-				case futureScheduledBlockRefs.Contains(blockRef.ID):
-					shouldDelete = true
-
-					if dividerScheduled == nil || !internal.IsAncestor(block, dividerScheduled) {
-						movedScheduledCount++
-					}
-				default:
-					// Here we have an existing task that's not overdue.
-					// Find the pin text node and remove it.
-					if nextChildHasPin(node) {
-						nextChild := node.NextSibling()
-						if nextChild != nil {
-							nextChild.RemoveSelf()
-
-							unpinnedCount++
-						}
-					}
-				}
-
-				if shouldDelete {
-					// Block ref's parents are: paragraph and block
-					// TODO: handle cases when the block ref is nested under another block ref.
-					//  This will remove the obsolete block and its children.
-					//  Should I show a warning message to the user and prevent the block from being deleted?
-					blockRef.Parent().Parent().RemoveSelf()
-				} else if dividerFocus == nil {
-					// Keep adding tasks to the focus section until the divider is found
-					result.FocusRefsFromPage.Add(blockRef.ID)
-				}
-
-				return false
-			}
-
-			return false
-		})
-	}
-
-	//  Sections: Focus / Overdue / New tasks / all other tasks / Scheduled tasks
-
-	// Insert (new and moved) overdue tasks after the focus section and before the new ones
-	//  If they are moved to the top, all overdue tasks will go to the focus page, and this misses the point.
-	//  The user should decide manually which tasks should have focus.
-	for _, blockRef := range overdueBlockRefs.ValuesSorted() {
-		if pinnedBlockRefs.Contains(blockRef) {
-			continue
-		}
-
-		if dividerOverdue == nil {
-			dividerOverdue = content.NewBlock(content.NewParagraph(
-				content.NewText(SectionOverdue+" "),
-				content.NewPageLink(PageQuickCapture),
-			))
-			AddSibling(page, dividerOverdue, firstBlock, dividerFocus)
-		}
-
-		overdueTask := content.NewBlock(content.NewParagraph(
-			content.NewBlockRef(blockRef),
-			content.NewText("📅📌"),
-		))
-		dividerOverdue.AddChild(overdueTask)
-	}
-
-	save := false
-
-	// Insert new tasks
-	if newBlockRefs.Size() > 0 {
-		for _, blockRef := range newBlockRefs.ValuesSorted() {
-			if overdueBlockRefs.Contains(blockRef) {
-				// Don't add overdue tasks again as new tasks
-				continue
-			}
-
-			if futureScheduledBlockRefs.Contains(blockRef) {
-				// Don't add future scheduled tasks as new tasks but count them as moved
-				movedScheduledCount++
-
-				continue
-			}
-
-			if dividerNewTasks == nil {
-				dividerNewTasks = content.NewBlock(content.NewParagraph(
-					content.NewText(SectionNewTasks+" "),
-					content.NewPageLink(PageQuickCapture),
-				))
-				AddSibling(page, dividerNewTasks, firstBlock, dividerOverdue, dividerFocus)
-			}
-
-			dividerNewTasks.AddChild(content.NewBlock(content.NewBlockRef(blockRef)))
-		}
-
-		color.Green(" %s", FormatCount(newBlockRefs.Size(), "new task", "new tasks"))
-
-		save = true
-		result.ShowQuickCapture = true
-	}
-
-	// Move future scheduled tasks to the bottom of the backlog page
-	if futureScheduledBlockRefs.Size() > 0 {
-		for _, blockRef := range futureScheduledBlockRefs.ValuesSorted() {
-			if dividerScheduled == nil {
-				dividerScheduled = content.NewBlock(content.NewParagraph(
-					content.NewText(SectionScheduled+" "),
-					content.NewPageLink(PageQuickCapture),
-				))
-				page.AddBlock(dividerScheduled)
-			}
-
-			scheduledTask := content.NewBlock(content.NewBlockRef(blockRef))
-			dividerScheduled.AddChild(scheduledTask)
-		}
-	}
-
-	save = removeEmptyDividers(save, dividerNewTasks, dividerOverdue, dividerScheduled)
-
-	if deletedCount > 0 {
-		// Remove completed or unreferenced tasks
-		color.Red(" %s removed", FormatCount(deletedCount, "task was", "tasks were"))
-
-		save = true
-	}
-
-	if movedCount > 0 {
-		color.Magenta(" %s moved around", FormatCount(movedCount, "task was", "tasks were"))
-
-		save = true
-		result.ShowQuickCapture = true
-	}
-
-	if movedScheduledCount > 0 {
-		color.Blue(" %s moved to scheduled tasks", FormatCount(movedScheduledCount, "task was", "tasks were"))
-
-		save = true
-	}
-
-	if unpinnedCount > 0 {
-		color.Cyan(" %s unpinned", FormatCount(unpinnedCount, "task was", "tasks were"))
-
-		save = true
-	}
-
-	if save {
-		err = transaction.Save()
-		if err != nil {
-			return nil, fmt.Errorf("failed to save transaction: %w", err)
-		}
-	} else {
-		color.Yellow(" no changes")
-	}
-
-	if dividerFocus == nil {
-		result.FocusRefsFromPage.Clear()
-	}
-
-	return result, nil
-}
-
-func nextChildHasPin(node content.Node) bool {
-	nextChild := node.NextSibling()
-	if nextChild != nil {
-		if text, ok := nextChild.(*content.Text); ok {
-			return strings.Contains(text.Value, "📌")
-		}
-	}
-
-	return false
-}
-
-func AddSibling(page logseq.Page, newBlock, before *content.Block, after ...*content.Block) {
-	for _, a := range after {
-		if a != nil {
-			page.InsertBlockAfter(newBlock, a)
-
-			return
-		}
-	}
-
-	if before != nil {
-		page.InsertBlockBefore(newBlock, before)
-
-		return
-	}
-
-	page.AddBlock(newBlock)
-}
-
-// removeEmptyDividers removes empty dividers (no blocks under it) and returns true if any were removed.
-func removeEmptyDividers(save bool, dividers ...*content.Block) bool {
-	for _, divider := range dividers {
-		if divider != nil && len(divider.Blocks()) == 0 {
-			divider.RemoveSelf()
-
-			save = true
-		}
-	}
-
-	return save
 }

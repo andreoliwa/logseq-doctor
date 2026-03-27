@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
+	"github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 )
@@ -39,7 +39,7 @@ func NewPageConfigReader(graph *logseq.Graph, configPage string) ConfigReader {
 
 // ReadConfig reads the backlog configuration from a Logseq page.
 func (p *pageConfigReader) ReadConfig() (*Config, error) { //nolint:cyclop,funlen
-	configPage := logseqapi.OpenPage(p.graph, p.configPage)
+	configPage := api.OpenPage(p.graph, p.configPage)
 
 	var backlogs []SingleBacklogConfig
 
