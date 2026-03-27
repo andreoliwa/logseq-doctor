@@ -4,14 +4,15 @@ import (
 	"os"
 	"time"
 
-	"github.com/andreoliwa/logseq-doctor/internal"
+	"github.com/andreoliwa/logseq-doctor/internal/api"
+	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/spf13/cobra"
 )
 
 // TaskAddDependencies holds all the dependencies for the task add command.
 type TaskAddDependencies struct {
-	AddTaskFn func(*internal.AddTaskOptions) error
+	AddTaskFn func(*logseqext.AddTaskOptions) error
 	OpenGraph func(string) *logseq.Graph
 	TimeNow   func() time.Time
 }
@@ -32,8 +33,8 @@ func NewTaskCmd() *cobra.Command {
 func NewTaskAddCmd(deps *TaskAddDependencies) *cobra.Command {
 	if deps == nil {
 		deps = &TaskAddDependencies{
-			AddTaskFn: internal.AddTask,
-			OpenGraph: internal.OpenGraphFromPath,
+			AddTaskFn: logseqext.AddTask,
+			OpenGraph: api.OpenGraphFromPath,
 			TimeNow:   time.Now,
 		}
 	}
@@ -65,7 +66,7 @@ Examples:
 				return err
 			}
 
-			opts := &internal.AddTaskOptions{
+			opts := &logseqext.AddTaskOptions{
 				Graph:     graph,
 				Date:      targetDate,
 				Page:      pageFlag,

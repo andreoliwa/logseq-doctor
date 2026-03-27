@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/andreoliwa/logseq-doctor/internal"
+	"github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -18,7 +19,7 @@ var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 - Check for double spaces`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
-		graph := internal.OpenGraphFromPath(os.Getenv("LOGSEQ_GRAPH_PATH"))
+		graph := api.OpenGraphFromPath(os.Getenv("LOGSEQ_GRAPH_PATH"))
 
 		exitCode := 0
 

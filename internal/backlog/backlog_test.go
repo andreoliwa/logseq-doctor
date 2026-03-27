@@ -262,6 +262,21 @@ func TestFutureScheduledTasks(t *testing.T) {
 	}
 }
 
+func TestSomedayPreservation(t *testing.T) {
+	back := testutils.StubBacklog(t, "dt", "someday-preserved", &testutils.StubAPIResponses{
+		Queries: []testutils.QueryArg{
+			{Contains: "health"},
+		},
+	})
+
+	pages := []string{"dt___health"}
+
+	err := back.ProcessAll([]string{})
+	require.NoError(t, err)
+
+	testutils.AssertGoldenPages(t, back.Graph(), "someday-preserved", pages)
+}
+
 func TestDoingTasks(t *testing.T) {
 	tests := []struct {
 		name        string

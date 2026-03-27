@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andreoliwa/logseq-doctor/internal"
+	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/stretchr/testify/mock"
@@ -39,7 +39,7 @@ func StubGraph(t *testing.T, caseDirName string) *logseq.Graph {
 		fs.WithDir("pages", pagesOps...),
 	)
 
-	return internal.OpenGraphFromPath(tempDir.Path())
+	return logseqapi.OpenGraphFromPath(tempDir.Path())
 }
 
 // NewStubGraph creates a test graph using the new directory structure.
@@ -60,7 +60,7 @@ func NewStubGraph(t *testing.T, subDir string) *logseq.Graph {
 		fs.WithDir("pages", fs.FromDir(filepath.Join(path, "pages"))),
 	)
 
-	return internal.OpenGraphFromPath(tempDir.Path())
+	return logseqapi.OpenGraphFromPath(tempDir.Path())
 }
 
 type mockLogseqAPI struct {
@@ -75,6 +75,7 @@ func newMockLogseqAPI(t *testing.T, responses StubAPIResponses) *mockLogseqAPI {
 
 	api := mockLogseqAPI{t: t, responses: &responses} //nolint:exhaustruct
 	api.On("PostQuery", mock.Anything).Return("{}", nil)
+	api.On("PostDatascriptQuery", mock.Anything).Return("[]", nil)
 
 	return &api
 }
@@ -97,6 +98,16 @@ func (m *mockLogseqAPI) PostQuery(query string) (string, error) {
 	}
 
 	return args.String(0), args.Error(1)
+}
+
+func (m *mockLogseqAPI) PostDatascriptQuery(query string) (string, error) {
+	args := m.Called(query)
+
+	return args.String(0), args.Error(1)
+}
+
+func (m *mockLogseqAPI) UpsertBlockProperty(_ string, _ string, _ string) error {
+	return nil
 }
 
 func stubJSONResponse(t *testing.T, basename string) (string, error) {

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/andreoliwa/logseq-doctor/cmd"
-	"github.com/andreoliwa/logseq-doctor/internal"
+	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -35,7 +35,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:maintid
 		parentFlag     string
 		pageFlag       string
 		keyFlag        string
-		expectedOpts   *internal.AddTaskOptions
+		expectedOpts   *logseqext.AddTaskOptions
 		addTaskError   error
 		expectError    bool
 		expectedErrMsg string
@@ -47,7 +47,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:maintid
 			parentFlag:  "",
 			pageFlag:    "",
 			keyFlag:     "",
-			expectedOpts: &internal.AddTaskOptions{
+			expectedOpts: &logseqext.AddTaskOptions{
 				Graph:     nil, // Will be set to mockGraph in test
 				Date:      frozenTime,
 				Page:      "",
@@ -67,7 +67,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:maintid
 			parentFlag:  "",
 			pageFlag:    "Work",
 			keyFlag:     "",
-			expectedOpts: &internal.AddTaskOptions{
+			expectedOpts: &logseqext.AddTaskOptions{
 				Graph:     nil, // Will be set to mockGraph in test
 				Date:      frozenTime,
 				Page:      "Work",
@@ -87,7 +87,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:maintid
 			parentFlag:  "",
 			pageFlag:    "",
 			keyFlag:     "",
-			expectedOpts: &internal.AddTaskOptions{
+			expectedOpts: &logseqext.AddTaskOptions{
 				Graph:     nil, // Will be set to mockGraph in test
 				Date:      time.Date(2024, 12, 25, 0, 0, 0, 0, time.UTC),
 				Page:      "",
@@ -109,7 +109,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:maintid
 			parentFlag:  "Project A",
 			pageFlag:    "",
 			keyFlag:     "",
-			expectedOpts: &internal.AddTaskOptions{
+			expectedOpts: &logseqext.AddTaskOptions{
 				Graph:     nil, // Will be set to mockGraph in test
 				Date:      frozenTime,
 				Page:      "",
@@ -129,7 +129,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:maintid
 			parentFlag:  "",
 			pageFlag:    "",
 			keyFlag:     "water plants",
-			expectedOpts: &internal.AddTaskOptions{
+			expectedOpts: &logseqext.AddTaskOptions{
 				Graph:     nil, // Will be set to mockGraph in test
 				Date:      frozenTime,
 				Page:      "",
@@ -149,7 +149,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:maintid
 			parentFlag:  "Sprint 1",
 			pageFlag:    "Development",
 			keyFlag:     "task-123",
-			expectedOpts: &internal.AddTaskOptions{
+			expectedOpts: &logseqext.AddTaskOptions{
 				Graph:     nil, // Will be set to mockGraph in test
 				Date:      time.Date(2024, 3, 10, 0, 0, 0, 0, time.UTC),
 				Page:      "Development",
@@ -183,7 +183,7 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:maintid
 			parentFlag:  "",
 			pageFlag:    "",
 			keyFlag:     "",
-			expectedOpts: &internal.AddTaskOptions{
+			expectedOpts: &logseqext.AddTaskOptions{
 				Graph:     nil, // Will be set to mockGraph in test
 				Date:      frozenTime,
 				Page:      "",
@@ -202,12 +202,12 @@ func TestTaskAddCommand_WithDependencyInjection(t *testing.T) { //nolint:maintid
 		t.Run(test.name, func(t *testing.T) {
 			mockGraph := &logseq.Graph{} // Empty graph for testing
 
-			var capturedOpts *internal.AddTaskOptions
+			var capturedOpts *logseqext.AddTaskOptions
 
 			var capturedGraphPath string
 
 			mockDeps := &cmd.TaskAddDependencies{
-				AddTaskFn: func(opts *internal.AddTaskOptions) error {
+				AddTaskFn: func(opts *logseqext.AddTaskOptions) error {
 					capturedOpts = opts
 
 					return test.addTaskError
@@ -290,7 +290,7 @@ func TestTaskAddCommand_WithNilDependencies(t *testing.T) {
 
 func TestTaskAddCommand_RequiresArgument(t *testing.T) {
 	mockDeps := &cmd.TaskAddDependencies{
-		AddTaskFn: func(_ *internal.AddTaskOptions) error {
+		AddTaskFn: func(_ *logseqext.AddTaskOptions) error {
 			t.Fatal("AddTaskFn should not be called when args validation fails")
 
 			return nil

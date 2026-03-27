@@ -24,6 +24,20 @@ func TestPageConfigReader_emptyBacklog(t *testing.T) {
 	assert.Equal(t, &expected, result)
 }
 
+func TestFindBacklogPageTitle(t *testing.T) {
+	cfg := &backlog.Config{
+		FocusPage: "config/Focus",
+		Backlogs: []backlog.SingleBacklogConfig{
+			{BacklogPage: "config/computer", InputPages: []string{"computer"}},
+			{BacklogPage: "config/house", InputPages: []string{"house"}},
+		},
+	}
+
+	assert.Equal(t, "config/computer", cfg.FindBacklogPageTitle("computer"))
+	assert.Equal(t, "config/house", cfg.FindBacklogPageTitle("house"))
+	assert.Empty(t, cfg.FindBacklogPageTitle("unknown"))
+}
+
 func TestPageConfigReader_ReadConfig(t *testing.T) {
 	//nolint:staticcheck
 	graph := testutils.StubGraph(t, "")

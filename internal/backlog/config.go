@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/andreoliwa/logseq-doctor/internal"
+	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 )
@@ -39,7 +39,7 @@ func NewPageConfigReader(graph *logseq.Graph, configPage string) ConfigReader {
 
 // ReadConfig reads the backlog configuration from a Logseq page.
 func (p *pageConfigReader) ReadConfig() (*Config, error) { //nolint:cyclop,funlen
-	configPage := internal.OpenPage(p.graph, p.configPage)
+	configPage := logseqapi.OpenPage(p.graph, p.configPage)
 
 	var backlogs []SingleBacklogConfig
 
@@ -108,4 +108,16 @@ func (p *pageConfigReader) ReadConfig() (*Config, error) { //nolint:cyclop,funle
 	}
 
 	return &Config{FocusPage: p.configPage + "/Focus", Backlogs: backlogs}, nil
+}
+
+// FindBacklogPageTitle looks up the full backlog page path from config by backlog name.
+// Returns empty string if no matching backlog is found.
+func (c *Config) FindBacklogPageTitle(backlogName string) string {
+	for _, bc := range c.Backlogs {
+		if strings.HasSuffix(bc.BacklogPage, "/"+backlogName) || strings.HasSuffix(bc.BacklogPage, backlogName) {
+			return bc.BacklogPage
+		}
+	}
+
+	return ""
 }

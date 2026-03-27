@@ -1,12 +1,13 @@
-package internal
+package logseqext
 
 import (
 	"strings"
 
-	"github.com/andreoliwa/logseq-go"
+	logseq "github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 )
 
+// LogseqFinder provides methods for searching within a Logseq graph.
 type LogseqFinder interface {
 	FindFirstQuery(pageTitle string) string
 }
@@ -15,14 +16,21 @@ type logseqFinderImpl struct {
 	graph *logseq.Graph
 }
 
+// NewLogseqFinder creates a new LogseqFinder backed by the given graph.
 func NewLogseqFinder(graph *logseq.Graph) LogseqFinder {
 	return &logseqFinderImpl{graph: graph}
 }
 
+// FindFirstQuery returns the first query found on the given page,
+// with the current page placeholder replaced by the actual page name.
+// Returns empty string if no query is found or the page cannot be opened.
 func (f logseqFinderImpl) FindFirstQuery(pageTitle string) string {
 	var query string
 
-	page := OpenPage(f.graph, pageTitle)
+	page, err := f.graph.OpenPage(pageTitle)
+	if err != nil {
+		return ""
+	}
 
 	for _, block := range page.Blocks() {
 		block.Children().FindDeep(func(n content.Node) bool {

@@ -1,10 +1,10 @@
-package internal_test
+package logseqext_test
 
 import (
 	"strings"
 	"testing"
 
-	"github.com/andreoliwa/logseq-doctor/internal"
+	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
 	"github.com/andreoliwa/logseq-go/content"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +14,7 @@ import (
 func TestFindFirstQuery(t *testing.T) {
 	//nolint:staticcheck
 	graph := testutils.StubGraph(t, "")
-	finder := internal.NewLogseqFinder(graph)
+	finder := logseqext.NewLogseqFinder(graph)
 
 	tests := []struct {
 		name      string
@@ -97,7 +97,7 @@ func TestFindBlockContainingText(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result := internal.FindBlockContainingText(page, test.searchText)
+			result := logseqext.FindBlockContainingText(page, test.searchText)
 
 			if test.expectedText == "" {
 				assert.Nil(t, result)
@@ -117,7 +117,7 @@ func TestFindBlockContainingText_EmptyPage(t *testing.T) {
 	page, err := graph.OpenPage("empty-bullets")
 	require.NoError(t, err)
 
-	result := internal.FindBlockContainingText(page, "anything")
+	result := logseqext.FindBlockContainingText(page, "anything")
 	assert.Nil(t, result)
 }
 
@@ -133,11 +133,11 @@ func TestFindTaskMarkerByKey(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			var parentBlock *content.Block
 			if test.parentText != "" {
-				parentBlock = internal.FindBlockContainingText(page, test.parentText)
+				parentBlock = logseqext.FindBlockContainingText(page, test.parentText)
 				require.NotNil(t, parentBlock, "parent block should be found")
 			}
 
-			result := internal.FindTaskMarkerByKey(page, parentBlock, test.key)
+			result := logseqext.FindTaskMarkerByKey(page, parentBlock, test.key)
 
 			if test.expectedText == "" {
 				assert.Nil(t, result)
@@ -226,7 +226,7 @@ func TestFindTaskByKey_EmptyPage(t *testing.T) {
 	page, err := graph.OpenPage("empty-bullets")
 	require.NoError(t, err)
 
-	result := internal.FindTaskMarkerByKey(page, nil, "anything")
+	result := logseqext.FindTaskMarkerByKey(page, nil, "anything")
 	assert.Nil(t, result)
 }
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/andreoliwa/logseq-doctor/internal"
+	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 	"github.com/spf13/cobra"
 )
@@ -24,11 +24,11 @@ This setup enables users to rearrange tasks using the arrow keys and manage task
 directly within the interface.`,
 	Run: func(_ *cobra.Command, args []string) {
 		path := os.Getenv("LOGSEQ_GRAPH_PATH")
-		api := internal.NewLogseqAPI(path,
+		logseqAPI := logseqapi.NewLogseqAPI(path,
 			os.Getenv("LOGSEQ_HOST_URL"), os.Getenv("LOGSEQ_API_TOKEN"))
-		graph := internal.OpenGraphFromPath(path)
+		graph := logseqapi.OpenGraphFromPath(path)
 		reader := backlog.NewPageConfigReader(graph, "backlog")
-		proc := backlog.NewBacklog(graph, api, reader, time.Now)
+		proc := backlog.NewBacklog(graph, logseqAPI, reader, time.Now)
 
 		err := proc.ProcessAll(args)
 		if err != nil {

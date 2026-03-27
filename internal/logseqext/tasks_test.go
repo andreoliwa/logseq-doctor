@@ -1,4 +1,4 @@
-package internal_test
+package logseqext_test
 
 import (
 	"os"
@@ -6,7 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andreoliwa/logseq-doctor/internal"
+	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
+	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,7 +18,7 @@ func TestExtractTasksFromJSON(t *testing.T) {
 	data, err := os.ReadFile(filePath)
 	require.NoError(t, err, "Failed to read test JSON file")
 
-	tasks, err := internal.ExtractTasksFromJSON(string(data))
+	tasks, err := logseqapi.ExtractTasksFromJSON(string(data))
 	require.NoError(t, err, "Failed to unmarshal JSON")
 	assert.NotEmpty(t, tasks, "Expected tasks to be non-empty")
 
@@ -30,19 +31,19 @@ func TestExtractTasksFromJSON(t *testing.T) {
 	assert.Positive(t, task.Scheduled)
 }
 
-func newTask(deadline, scheduled int) internal.TaskJSON {
-	return internal.TaskJSON{
+func newTask(deadline, scheduled int) logseqapi.TaskJSON {
+	return logseqapi.TaskJSON{
 		Deadline:  deadline,
 		Scheduled: scheduled,
 	}
 }
 
 func TestOverdue(t *testing.T) {
-	currentDate := internal.DateYYYYMMDD(time.Now())
+	currentDate := logseqext.DateYYYYMMDD(time.Now())
 
 	tests := []struct {
 		name     string
-		task     internal.TaskJSON
+		task     logseqapi.TaskJSON
 		expected bool
 	}{
 		{"future task", newTask(currentDate+1, currentDate+2), false},
@@ -55,7 +56,7 @@ func TestOverdue(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.expected, internal.TaskOverdue(test.task, time.Now), "Overdue check failed for %s", test.name)
+			assert.Equal(t, test.expected, logseqapi.TaskOverdue(test.task, time.Now), "Overdue check failed for %s", test.name)
 		})
 	}
 }
@@ -77,8 +78,8 @@ func TestDoing(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			task := internal.TaskJSON{Marker: test.marker}
-			assert.Equal(t, test.expected, internal.TaskDoing(task), "Doing check failed for %s", test.name)
+			task := logseqapi.TaskJSON{Marker: test.marker}
+			assert.Equal(t, test.expected, logseqapi.TaskDoing(task), "Doing check failed for %s", test.name)
 		})
 	}
 }
@@ -140,7 +141,7 @@ func TestAddTaskToPageOrJournal(t *testing.T) {
 				targetDate = frozenTime
 			}
 
-			opts := &internal.AddTaskOptions{
+			opts := &logseqext.AddTaskOptions{
 				Graph:     graph,
 				Date:      targetDate,
 				Page:      test.page,
@@ -150,7 +151,7 @@ func TestAddTaskToPageOrJournal(t *testing.T) {
 				TimeNow:   func() time.Time { return targetDate },
 			}
 
-			err := internal.AddTask(opts)
+			err := logseqext.AddTask(opts)
 			require.NoError(t, err)
 
 			if test.page != "" {
@@ -200,7 +201,7 @@ func TestAddTaskUnderBlock(t *testing.T) {
 			//nolint:staticcheck
 			graph := testutils.StubGraph(t, "")
 
-			opts := &internal.AddTaskOptions{
+			opts := &logseqext.AddTaskOptions{
 				Graph:     graph,
 				Date:      frozenTime,
 				Page:      test.page,
@@ -210,7 +211,7 @@ func TestAddTaskUnderBlock(t *testing.T) {
 				TimeNow:   func() time.Time { return frozenTime },
 			}
 
-			err := internal.AddTask(opts)
+			err := logseqext.AddTask(opts)
 			require.NoError(t, err)
 
 			testutils.AssertGoldenPages(t, graph, "", []string{test.expectedFile})
@@ -333,7 +334,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) {
 				testFrozenTime = *test.frozenTime
 			}
 
-			opts := &internal.AddTaskOptions{
+			opts := &logseqext.AddTaskOptions{
 				Graph:     graph,
 				Date:      testFrozenTime,
 				Page:      test.page,
@@ -343,7 +344,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) {
 				TimeNow:   func() time.Time { return testFrozenTime },
 			}
 
-			err := internal.AddTask(opts)
+			err := logseqext.AddTask(opts)
 			require.NoError(t, err)
 
 			testutils.AssertGoldenPages(t, graph, "", []string{test.expectedFile})

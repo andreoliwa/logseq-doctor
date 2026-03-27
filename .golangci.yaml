@@ -36,6 +36,10 @@ linters:
           - exhaustruct
           - funlen
         path: _test\.go
+      - linters:
+          - revive
+        text: "avoid meaningless package names"
+        path: internal/api/
 formatters:
   exclusions:
     generated: lax

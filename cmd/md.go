@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/andreoliwa/logseq-doctor/internal"
+	api "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/spf13/cobra"
 )
@@ -23,7 +24,7 @@ func NewMdCmd(deps *MdDependencies) *cobra.Command {
 	if deps == nil {
 		deps = &MdDependencies{
 			InsertFn:  internal.InsertMarkdown,
-			OpenGraph: internal.OpenGraphFromPath,
+			OpenGraph: api.OpenGraphFromPath,
 			ReadStdin: internal.ReadFromStdin,
 			TimeNow:   time.Now,
 		}

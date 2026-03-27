@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/andreoliwa/logseq-doctor/internal"
+	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
 	"github.com/stretchr/testify/require"
 
@@ -47,7 +48,7 @@ func setupPage(t *testing.T, name string) logseq.Page {
 
 	//nolint:staticcheck
 	graph := testutils.StubGraph(t, "")
-	page := internal.OpenPage(graph, name)
+	page := logseqapi.OpenPage(graph, name)
 
 	return page
 }

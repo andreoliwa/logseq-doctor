@@ -8,6 +8,8 @@ import (
 
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
+
+	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 )
 
 // ErrPageIsNil is returned when a page is nil.
@@ -52,13 +54,13 @@ func InsertMarkdown(opts *InsertMarkdownOptions) error {
 
 	var parentBlock *content.Block
 	if opts.ParentText != "" {
-		parentBlock = FindBlockContainingText(targetPage, opts.ParentText)
+		parentBlock = logseqext.FindBlockContainingText(targetPage, opts.ParentText)
 		// If parent not found, parentBlock will be nil and content will be added to top level
 	}
 
 	var existingBlock *content.Block
 	if opts.Key != "" {
-		existingBlock = FindBlockByKey(targetPage, parentBlock, opts.Key)
+		existingBlock = logseqext.FindBlockByKey(targetPage, parentBlock, opts.Key)
 	}
 
 	if existingBlock != nil {

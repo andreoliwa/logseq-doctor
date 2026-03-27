@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/andreoliwa/logseq-doctor/internal"
+	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
+	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/pkg/set"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
@@ -21,17 +23,17 @@ type Result struct {
 type Backlog interface {
 	Graph() *logseq.Graph
 	ProcessAll(partialNames []string) error
-	ProcessOne(pageTitle string, funcQueryRefs func() (*internal.CategorizedTasks, error)) (*Result, error)
+	ProcessOne(pageTitle string, funcQueryRefs func() (*logseqapi.CategorizedTasks, error)) (*Result, error)
 }
 
 type backlogImpl struct {
 	graph        *logseq.Graph
-	api          internal.LogseqAPI
+	api          logseqapi.LogseqAPI
 	configReader ConfigReader
 	currentTime  func() time.Time
 }
 
-func NewBacklog(graph *logseq.Graph, api internal.LogseqAPI, reader ConfigReader,
+func NewBacklog(graph *logseq.Graph, api logseqapi.LogseqAPI, reader ConfigReader,
 	currentTime func() time.Time) Backlog {
 	return &backlogImpl{graph: graph, api: api, configReader: reader, currentTime: currentTime}
 }
@@ -46,7 +48,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 		return fmt.Errorf("failed to read config: %w", err)
 	}
 
-	allFocusTasks := internal.NewCategorizedTasks()
+	allFocusTasks := logseqapi.NewCategorizedTasks()
 	processAllPages := len(partialNames) == 0
 	showQuickCapture := false
 
@@ -72,7 +74,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 		}
 
 		result, err := b.ProcessOne(backlogConfig.BacklogPage,
-			func() (*internal.CategorizedTasks, error) {
+			func() (*logseqapi.CategorizedTasks, error) {
 				return queryTasksFromPages(b.graph, b.api, backlogConfig.InputPages, b.currentTime)
 			})
 		if err != nil {
@@ -99,7 +101,7 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 		return nil
 	}
 
-	_, err = b.ProcessOne(config.FocusPage, func() (*internal.CategorizedTasks, error) {
+	_, err = b.ProcessOne(config.FocusPage, func() (*logseqapi.CategorizedTasks, error) {
 		return &allFocusTasks, nil
 	})
 
@@ -114,8 +116,8 @@ func printQuickCaptureURL(graph *logseq.Graph) {
 }
 
 func (b *backlogImpl) ProcessOne(pageTitle string,
-	funcQueryRefs func() (*internal.CategorizedTasks, error)) (*Result, error) {
-	page := internal.OpenPage(b.graph, pageTitle)
+	funcQueryRefs func() (*logseqapi.CategorizedTasks, error)) (*Result, error) {
+	page := logseqapi.OpenPage(b.graph, pageTitle)
 
 	existingBlockRefs := blockRefsFromPages(page)
 
@@ -163,10 +165,10 @@ func blockRefsFromPages(page logseq.Page) *set.Set[string] {
 
 // queryTasksFromPages queries Logseq API for tasks from specified pages.
 // It uses concurrent processing for multiple pages and sequential processing for a single page.
-func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
-	pageTitles []string, currentTime func() time.Time) (*internal.CategorizedTasks, error) {
-	tasks := internal.NewCategorizedTasks()
-	finder := internal.NewLogseqFinder(graph)
+func queryTasksFromPages(graph *logseq.Graph, api logseqapi.LogseqAPI,
+	pageTitles []string, currentTime func() time.Time) (*logseqapi.CategorizedTasks, error) {
+	tasks := logseqapi.NewCategorizedTasks()
+	finder := logseqext.NewLogseqFinder(graph)
 
 	if len(pageTitles) <= 1 {
 		return queryTasksFromPagesSequential(api, pageTitles, &tasks, finder, currentTime)
@@ -176,9 +178,9 @@ func queryTasksFromPages(graph *logseq.Graph, api internal.LogseqAPI,
 }
 
 // queryTasksFromPagesSequential processes pages sequentially (original implementation).
-func queryTasksFromPagesSequential(api internal.LogseqAPI,
-	pageTitles []string, tasks *internal.CategorizedTasks,
-	finder internal.LogseqFinder, currentTime func() time.Time) (*internal.CategorizedTasks, error) {
+func queryTasksFromPagesSequential(api logseqapi.LogseqAPI,
+	pageTitles []string, tasks *logseqapi.CategorizedTasks,
+	finder logseqext.LogseqFinder, currentTime func() time.Time) (*logseqapi.CategorizedTasks, error) {
 	for _, pageTitle := range pageTitles {
 		jsonTasks, err := queryTasksFromSinglePage(api, pageTitle, finder)
 		if err != nil {
@@ -195,12 +197,12 @@ func queryTasksFromPagesSequential(api internal.LogseqAPI,
 }
 
 // queryTasksFromPagesConcurrent processes pages concurrently using goroutines.
-func queryTasksFromPagesConcurrent(api internal.LogseqAPI,
-	pageTitles []string, tasks *internal.CategorizedTasks,
-	finder internal.LogseqFinder, currentTime func() time.Time) (*internal.CategorizedTasks, error) {
+func queryTasksFromPagesConcurrent(api logseqapi.LogseqAPI,
+	pageTitles []string, tasks *logseqapi.CategorizedTasks,
+	finder logseqext.LogseqFinder, currentTime func() time.Time) (*logseqapi.CategorizedTasks, error) {
 	type pageResult struct {
 		pageTitle string
-		jsonTasks []internal.TaskJSON
+		jsonTasks []logseqapi.TaskJSON
 		err       error
 	}
 
@@ -231,8 +233,8 @@ func queryTasksFromPagesConcurrent(api internal.LogseqAPI,
 }
 
 // queryTasksFromSinglePage queries tasks from a single page and returns the JSON tasks.
-func queryTasksFromSinglePage(api internal.LogseqAPI, pageTitle string,
-	finder internal.LogseqFinder) ([]internal.TaskJSON, error) {
+func queryTasksFromSinglePage(api logseqapi.LogseqAPI, pageTitle string,
+	finder logseqext.LogseqFinder) ([]logseqapi.TaskJSON, error) {
 	query := finder.FindFirstQuery(pageTitle)
 	if query == "" {
 		query = defaultQuery(pageTitle)
@@ -243,7 +245,7 @@ func queryTasksFromSinglePage(api internal.LogseqAPI, pageTitle string,
 		return nil, fmt.Errorf("failed to query Logseq API: %w", err)
 	}
 
-	jsonTasks, err := internal.ExtractTasksFromJSON(jsonStr)
+	jsonTasks, err := logseqapi.ExtractTasksFromJSON(jsonStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to extract tasks: %w", err)
 	}
@@ -252,18 +254,18 @@ func queryTasksFromSinglePage(api internal.LogseqAPI, pageTitle string,
 }
 
 // addTasksToCategories adds tasks to the appropriate categories in CategorizedTasks.
-func addTasksToCategories(jsonTasks []internal.TaskJSON, tasks *internal.CategorizedTasks,
+func addTasksToCategories(jsonTasks []logseqapi.TaskJSON, tasks *logseqapi.CategorizedTasks,
 	currentTime func() time.Time) {
 	for _, task := range jsonTasks {
-		if internal.TaskOverdue(task, currentTime) {
+		if logseqapi.TaskOverdue(task, currentTime) {
 			tasks.Overdue.Add(task.UUID)
 		}
 
-		if internal.TaskFutureScheduled(task, currentTime) {
+		if logseqapi.TaskFutureScheduled(task, currentTime) {
 			tasks.FutureScheduled.Add(task.UUID)
 		}
 
-		if internal.TaskDoing(task) {
+		if logseqapi.TaskDoing(task) {
 			tasks.Doing.Add(task.UUID)
 		} else {
 			// Only add non-DOING tasks to All set

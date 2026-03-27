@@ -1,57 +1,12 @@
-package internal
+package logseqext
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
-	"github.com/andreoliwa/logseq-doctor/internal/model"
-	"github.com/andreoliwa/logseq-go"
+	logseq "github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 )
-
-// TaskJSON represents a task block from the Logseq HTTP API.
-// It is a type alias for model.TaskJSON for backward compatibility.
-type TaskJSON = model.TaskJSON
-
-// CategorizedTasks holds sets of task UUIDs grouped by category.
-// It is a type alias for model.CategorizedTasks for backward compatibility.
-type CategorizedTasks = model.CategorizedTasks
-
-// NewCategorizedTasks creates a new CategorizedTasks with initialized sets.
-func NewCategorizedTasks() CategorizedTasks {
-	return model.NewCategorizedTasks()
-}
-
-func ExtractTasksFromJSON(jsonStr string) ([]TaskJSON, error) {
-	var tasks []TaskJSON
-
-	err := json.Unmarshal([]byte(jsonStr), &tasks)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal JSON: %w", err)
-	}
-
-	return tasks, nil
-}
-
-// TaskOverdue checks if the task is overdue based on deadline or scheduled date.
-func TaskOverdue(t TaskJSON, currentTime func() time.Time) bool {
-	currentDate := DateYYYYMMDD(currentTime())
-
-	return (t.Deadline > 0 && t.Deadline <= currentDate) || (t.Scheduled > 0 && t.Scheduled <= currentDate)
-}
-
-// TaskDoing checks if the task has the DOING marker.
-func TaskDoing(t TaskJSON) bool {
-	return t.Marker == "DOING"
-}
-
-// TaskFutureScheduled checks if the task is scheduled for the future (tomorrow onwards) and it's not overdue.
-func TaskFutureScheduled(t TaskJSON, currentTime func() time.Time) bool {
-	currentDate := DateYYYYMMDD(currentTime())
-
-	return t.Scheduled > currentDate && !TaskOverdue(t, currentTime)
-}
 
 // AddTaskOptions contains options for adding a task to Logseq.
 type AddTaskOptions struct {
