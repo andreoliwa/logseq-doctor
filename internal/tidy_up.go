@@ -51,7 +51,7 @@ func TidyUpOneFile(graph *logseq.Graph, path string) int { //nolint:cyclop,funle
 	}
 
 	if write {
-		err := os.WriteFile(path, []byte(currentFileContents), fileInfo.Mode())
+		err := os.WriteFile(path, []byte(currentFileContents), fileInfo.Mode()) //nolint:gosec,lll // path is intentionally user-supplied (CLI argument)
 		if err != nil {
 			log.Fatalf("%s: error writing file contents: %s\n", path, err)
 		}
