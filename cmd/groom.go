@@ -125,7 +125,7 @@ func fetchGroomTasks(now, thresholdDate time.Time, limit int) (*pocketbase.Clien
 
 	filter := groom.BuildGroomFilter(now, thresholdDate)
 
-	// Fetch more than the limit to account for tasks filtered out by HasFutureDate.
+	// Fetch more than the limit to account for tasks filtered out by HasRecentDate.
 	// PocketBase date fields store null (not empty string) when unset, so scheduled/deadline
 	// comparisons in the query string are unreliable — we filter in Go instead. See CLAUDE.md.
 	fetchLimit := limit * groomFetchMultiplier
@@ -138,7 +138,7 @@ func fetchGroomTasks(now, thresholdDate time.Time, limit int) (*pocketbase.Clien
 	tasks := make([]map[string]any, 0, len(rawTasks))
 
 	for _, t := range rawTasks {
-		if !groom.HasFutureDate(t, now) {
+		if !groom.HasRecentDate(t, thresholdDate) {
 			tasks = append(tasks, t)
 		}
 	}
@@ -387,12 +387,12 @@ func printTaskCard(task map[string]any, index, total int, now time.Time, termWid
 
 	if scheduledStr != "" {
 		fmt.Println(" " + groomStyles.label.Render("Scheduled: ") +
-			groomStyles.warning.Render(strings.Split(scheduledStr, "T")[0]))
+			groomStyles.warning.Render(pocketbase.FormatDateLocal(scheduledStr)))
 	}
 
 	if deadlineStr != "" {
 		fmt.Println(" " + groomStyles.label.Render("Deadline:  ") +
-			groomStyles.warning.Render(strings.Split(deadlineStr, "T")[0]))
+			groomStyles.warning.Render(pocketbase.FormatDateLocal(deadlineStr)))
 	}
 
 	if hasBacklog {

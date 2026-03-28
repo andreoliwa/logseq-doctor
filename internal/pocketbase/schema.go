@@ -1,7 +1,20 @@
 package pocketbase
 
+import "time"
+
 // DateFormat is the ISO date format used for PocketBase date/datetime record fields.
 const DateFormat = "2006-01-02 15:04:05.000Z"
+
+// FormatDateLocal parses a PocketBase UTC datetime string and returns it in local time
+// as "YYYY-MM-DD HH:MM". Returns the raw string if parsing fails.
+func FormatDateLocal(utcStr string) string {
+	t, err := time.Parse(DateFormat, utcStr)
+	if err != nil {
+		return utcStr
+	}
+
+	return t.Local().Format("2006-01-02 15:04") //nolint:gosmopolitan
+}
 
 const idMaxLength = float64(36)
 

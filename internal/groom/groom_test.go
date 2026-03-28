@@ -58,8 +58,9 @@ func TestBuildGroomFilter(t *testing.T) {
 	assert.NotContains(t, filter, "deadline")
 }
 
-func TestHasFutureDate(t *testing.T) {
-	now := time.Date(2026, 3, 21, 0, 0, 0, 0, time.UTC)
+func TestHasRecentDate(t *testing.T) {
+	// threshold = 1 year ago from "now" 2026-03-28 → 2025-03-28
+	threshold := time.Date(2025, 3, 28, 0, 0, 0, 0, time.UTC)
 
 	tests := []struct {
 		name     string
@@ -68,21 +69,24 @@ func TestHasFutureDate(t *testing.T) {
 	}{
 		{"no dates", map[string]any{}, false},
 		{"empty scheduled", map[string]any{"scheduled": ""}, false},
-		// past dates → include in groom (overdue/forgotten)
-		{"past scheduled (PB format)", map[string]any{"scheduled": "2023-07-27 00:00:00.000Z"}, false},
-		{"today scheduled", map[string]any{"scheduled": "2026-03-21 00:00:00.000Z"}, false},
-		// future dates → exclude (still actively planned)
-		{"future scheduled (PB format)", map[string]any{"scheduled": "2026-04-01 00:00:00.000Z"}, true},
-		{"future scheduled (RFC3339)", map[string]any{"scheduled": "2026-04-01T00:00:00+02:00"}, true},
 		{"empty deadline", map[string]any{"deadline": ""}, false},
-		{"past deadline", map[string]any{"deadline": "2025-01-01"}, false},
-		{"future deadline", map[string]any{"deadline": "2026-12-31"}, true},
-		{"past scheduled future deadline", map[string]any{"scheduled": "2025-01-01", "deadline": "2026-12-31"}, true},
+		// older than threshold → include in groom
+		{"scheduled older than threshold", map[string]any{"scheduled": "2020-01-01 00:00:00.000Z"}, false},
+		{"scheduled just before threshold", map[string]any{"scheduled": "2025-03-27 00:00:00.000Z"}, false},
+		// at or newer than threshold → exclude from groom
+		{"scheduled on threshold day", map[string]any{"scheduled": "2025-03-28 00:00:00.000Z"}, true},
+		{"scheduled newer than threshold", map[string]any{"scheduled": "2025-12-01 00:00:00.000Z"}, true},
+		{"deadline newer than threshold", map[string]any{"deadline": "2026-06-01 00:00:00.000Z"}, true},
+		// any field newer → exclude
+		{"old scheduled new deadline", map[string]any{
+			"scheduled": "2020-01-01 00:00:00.000Z",
+			"deadline":  "2026-06-01 00:00:00.000Z",
+		}, true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, groom.HasFutureDate(tt.task, now))
+			assert.Equal(t, tt.expected, groom.HasRecentDate(tt.task, threshold))
 		})
 	}
 }

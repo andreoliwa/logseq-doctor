@@ -67,22 +67,22 @@ func BuildGroomFilter(now time.Time, thresholdDate time.Time) string {
 	)
 }
 
-// HasFutureDate reports whether a task record should be excluded from the groom queue
-// because it has a future scheduled or deadline date and is therefore still active.
+// HasRecentDate reports whether a task should be excluded from the groom queue because
+// its scheduled or deadline date is newer than thresholdDate (i.e. not yet stale).
 //
-// Tasks with past scheduled/deadline dates are included — they are overdue or forgotten
-// and should be reviewed. Only future dates mean the task is intentionally planned ahead.
+// A task with scheduled/deadline older than the threshold is stale enough to review.
+// A task with a date newer than the threshold is still active and should be skipped.
+// A task with no date is unaffected by this check.
 //
 // PocketBase date fields store null (not empty string) when unset, so these comparisons
 // cannot be done reliably in PocketBase query strings. Filter in Go instead. See CLAUDE.md.
-func HasFutureDate(task map[string]any, now time.Time) bool {
-	today := now.Format("2006-01-02")
+func HasRecentDate(task map[string]any, thresholdDate time.Time) bool {
+	threshold := thresholdDate.Format("2006-01-02")
 
 	for _, field := range []string{"scheduled", "deadline"} {
 		val, _ := task[field].(string)
-		// PocketBase returns datetime strings like "2026-04-01 00:00:00.000Z" or RFC3339.
-		// Comparing the first 10 chars (YYYY-MM-DD) against today's date is sufficient.
-		if len(val) >= len(today) && val[:len(today)] > today {
+		// Compare first 10 chars (YYYY-MM-DD). If the date is >= threshold, the task is recent.
+		if len(val) >= len(threshold) && val[:len(threshold)] >= threshold {
 			return true
 		}
 	}

@@ -2,6 +2,7 @@ package pocketbase_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/andreoliwa/logseq-doctor/internal/pocketbase"
 	"github.com/stretchr/testify/assert"
@@ -71,4 +72,40 @@ func TestLqdTasksSchema_StatusValues(t *testing.T) {
 	}
 
 	t.Fatal("status field not found")
+}
+
+func TestFormatDateLocal(t *testing.T) {
+	berlin, err := time.LoadLocation("Europe/Berlin")
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "UTC midnight stored as previous day 23:00 UTC, displays correctly in Berlin",
+			input:    "2026-03-27 23:00:00.000Z",
+			expected: "2026-03-28 00:00",
+		},
+		{
+			name:     "UTC noon stays same date in Berlin",
+			input:    "2026-03-28 12:00:00.000Z",
+			expected: "2026-03-28 13:00",
+		},
+		{
+			name:     "invalid string returned as-is",
+			input:    "not-a-date",
+			expected: "not-a-date",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Setenv("TZ", berlin.String())
+
+			result := pocketbase.FormatDateLocal(tt.input)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
 }
