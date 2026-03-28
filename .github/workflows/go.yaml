@@ -73,6 +73,6 @@ jobs:
           GOTESTTOOLS_GOLDEN_NormalizeCRLFToLF: "${{ matrix.normalize_crlf_to_lf }}"
       - name: Upload coverage to CodeCov
         if: ${{ matrix.codecov }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
