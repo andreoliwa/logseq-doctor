@@ -7,7 +7,7 @@
       
       
       
-        <link rel="canonical" href="https://andreoliwa.github.io/logseq-doctor/reference/go/pkg/set/">
+        <link rel="canonical" href="https://andreoliwa.github.io/logseq-doctor/reference/go/internal/pocketbase/">
       
       
       
@@ -85,7 +85,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#set" class="md-skip">
+        <a href="#pocketbase" class="md-skip">
           Skip to content
         </a>
       
@@ -1019,22 +1019,77 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-set" class="md-nav__link">
+  <a href="#constants" class="md-nav__link">
     <span class="md-ellipsis">
       
-        type Set
+        Constants
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="type Set">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#func-formatdatelocal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func FormatDateLocal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#func-lqdtasksschema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func LqdTasksSchema
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#func-lqdtasksfields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func lqdTasksFields
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#type-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        type Client
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="type Client">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#func-newset" class="md-nav__link">
+  <a href="#func-newclient" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func NewSet
+        func NewClient
       
     </span>
   </a>
@@ -1042,10 +1097,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#func-sett-add" class="md-nav__link">
+  <a href="#func-client-collectionexists" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func (*Set[T]) Add
+        func (*Client) CollectionExists
       
     </span>
   </a>
@@ -1053,10 +1108,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#func-sett-clear" class="md-nav__link">
+  <a href="#func-client-createcollection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func (*Set[T]) Clear
+        func (*Client) CreateCollection
       
     </span>
   </a>
@@ -1064,10 +1119,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#func-sett-contains" class="md-nav__link">
+  <a href="#func-client-createrecord" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func (*Set[T]) Contains
+        func (*Client) CreateRecord
       
     </span>
   </a>
@@ -1075,10 +1130,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#func-sett-diff" class="md-nav__link">
+  <a href="#func-client-deletecollection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func (*Set[T]) Diff
+        func (*Client) DeleteCollection
       
     </span>
   </a>
@@ -1086,10 +1141,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#func-sett-remove" class="md-nav__link">
+  <a href="#func-client-deleterecord" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func (*Set[T]) Remove
+        func (*Client) DeleteRecord
       
     </span>
   </a>
@@ -1097,10 +1152,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#func-sett-size" class="md-nav__link">
+  <a href="#func-client-fetchrecords" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func (*Set[T]) Size
+        func (*Client) FetchRecords
       
     </span>
   </a>
@@ -1108,10 +1163,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#func-sett-update" class="md-nav__link">
+  <a href="#func-client-updaterecord" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func (*Set[T]) Update
+        func (*Client) UpdateRecord
       
     </span>
   </a>
@@ -1119,10 +1174,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#func-sett-values" class="md-nav__link">
+  <a href="#func-client-authenticate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func (*Set[T]) Values
+        func (*Client) authenticate
       
     </span>
   </a>
@@ -1130,10 +1185,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#func-sett-valuessorted" class="md-nav__link">
+  <a href="#func-client-dorequest" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func (*Set[T]) ValuesSorted
+        func (*Client) doRequest
       
     </span>
   </a>
@@ -1170,7 +1225,7 @@
 
 
   
-    <a href="https://github.com/andreoliwa/logseq-doctor/edit/master/docs/reference/go/pkg/set/README.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/andreoliwa/logseq-doctor/edit/master/docs/reference/go/internal/pocketbase/README.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
     </a>
@@ -1179,87 +1234,125 @@
     
       
     
-    <a href="https://github.com/andreoliwa/logseq-doctor/raw/master/docs/reference/go/pkg/set/README.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/andreoliwa/logseq-doctor/raw/master/docs/reference/go/internal/pocketbase/README.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
     </a>
   
 
 
-<!-- Code generated by gomarkdoc. DO NOT EDIT --><h1 id="set">set<a class="headerlink" href="#set" title="Permanent link">¶</a></h1>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="s">"github.com/andreoliwa/logseq-doctor/pkg/set"</span>
+<!-- Code generated by gomarkdoc. DO NOT EDIT --><h1 id="pocketbase">pocketbase<a class="headerlink" href="#pocketbase" title="Permanent link">¶</a></h1>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="s">"github.com/andreoliwa/logseq-doctor/internal/pocketbase"</span>
 </code></pre></div>
 <h2 id="index">Index<a class="headerlink" href="#index" title="Permanent link">¶</a></h2>
 <ul>
-<li><a href="#Set">type Set</a></li>
-<li><a href="#NewSet">func NewSet[T cmp.Ordered]() *Set[T]</a></li>
-<li><a href="#Set[T].Add">func (s *Set[T]) Add(value T)</a></li>
-<li><a href="#Set[T].Clear">func (s *Set[T]) Clear()</a></li>
-<li><a href="#Set[T].Contains">func (s *Set[T]) Contains(value T) bool</a></li>
-<li><a href="#Set[T].Diff">func (s *Set[T]) Diff(sets ...*Set[T]) *Set[T]</a></li>
-<li><a href="#Set[T].Remove">func (s *Set[T]) Remove(value T)</a></li>
-<li><a href="#Set[T].Size">func (s *Set[T]) Size() int</a></li>
-<li><a href="#Set[T].Update">func (s *Set[T]) Update(sets ...*Set[T])</a></li>
-<li><a href="#Set[T].Values">func (s *Set[T]) Values() []T</a></li>
-<li><a href="#Set[T].ValuesSorted">func (s *Set[T]) ValuesSorted() []T</a></li>
+<li><a href="#constants">Constants</a></li>
+<li><a href="#variables">Variables</a></li>
+<li><a href="#FormatDateLocal">func FormatDateLocal(utcStr string) string</a></li>
+<li><a href="#LqdTasksSchema">func LqdTasksSchema() map[string]any</a></li>
+<li><a href="#lqdTasksFields">func lqdTasksFields() []map[string]any</a></li>
+<li><a href="#Client">type Client</a></li>
+<li><a href="#NewClient">func NewClient(baseURL, username, password string) (*Client, error)</a></li>
+<li><a href="#Client.CollectionExists">func (c *Client) CollectionExists(name string) (bool, error)</a></li>
+<li><a href="#Client.CreateCollection">func (c *Client) CreateCollection(schema map[string]any) error</a></li>
+<li><a href="#Client.CreateRecord">func (c *Client) CreateRecord(collection string, data map[string]any) error</a></li>
+<li><a href="#Client.DeleteCollection">func (c *Client) DeleteCollection(name string) error</a></li>
+<li><a href="#Client.DeleteRecord">func (c *Client) DeleteRecord(collection, recordID string) error</a></li>
+<li><a href="#Client.FetchRecords">func (c *Client) FetchRecords(collection, filter, sort string, limit ...int) ([]map[string]any, error)</a></li>
+<li><a href="#Client.UpdateRecord">func (c *Client) UpdateRecord(collection, recordID string, data map[string]any) error</a></li>
+<li><a href="#Client.authenticate">func (c *Client) authenticate(username, password string) error</a></li>
+<li><a href="#Client.doRequest">func (c *Client) doRequest(method, path string, body io.Reader) (*http.Response, error)</a></li>
 </ul>
-<p><a name="Set"></a></p>
-<h2 id="type-set">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/pkg/set/set.go#L9-L11">Set</a><a class="headerlink" href="#type-set" title="Permanent link">¶</a></h2>
-<p>Set is a simple implementation of a set using a map.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="w"> </span><span class="nx">cmp</span><span class="p">.</span><span class="nx">Ordered</span><span class="p">]</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nx">data</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="nx">T</span><span class="p">]</span><span class="kd">struct</span><span class="p">{}</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">}</span>
+<h2 id="constants">Constants<a class="headerlink" href="#constants" title="Permanent link">¶</a></h2>
+<p><a name="DateFormat"></a>DateFormat is the ISO date format used for PocketBase date/datetime record fields.</p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">DateFormat</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"2006-01-02 15:04:05.000Z"</span>
 </code></pre></div>
-<p><a name="NewSet"></a></p>
-<h3 id="func-newset">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/pkg/set/set.go#L14">NewSet</a><a class="headerlink" href="#func-newset" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NewSet</span><span class="p">[</span><span class="nx">T</span><span class="w"> </span><span class="nx">cmp</span><span class="p">.</span><span class="nx">Ordered</span><span class="p">]()</span><span class="w"> </span><span class="o">*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">]</span>
+<p><a name="httpClientTimeout"></a></p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">httpClientTimeout</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span>
 </code></pre></div>
-<p>NewSet creates and returns a new set.</p>
-<p><a name="Set[T].Add"></a></p>
-<h3 id="func-sett-add">func (*Set[T]) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/pkg/set/set.go#L19">Add</a><a class="headerlink" href="#func-sett-add" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="nx">Add</span><span class="p">(</span><span class="nx">value</span><span class="w"> </span><span class="nx">T</span><span class="p">)</span>
+<p><a name="idMaxLength"></a></p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">idMaxLength</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">float64</span><span class="p">(</span><span class="mi">36</span><span class="p">)</span>
 </code></pre></div>
-<p>Add inserts an element into the set.</p>
-<p><a name="Set[T].Clear"></a></p>
-<h3 id="func-sett-clear">func (*Set[T]) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/pkg/set/set.go#L89">Clear</a><a class="headerlink" href="#func-sett-clear" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="nx">Clear</span><span class="p">()</span>
+<h2 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">¶</a></h2>
+<p><a name="ErrCannotConnect"></a>Sentinel errors for PocketBase client operations.</p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">var</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="nx">ErrCannotConnect</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"cannot connect to PocketBase"</span><span class="p">)</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nx">ErrAuthFailed</span><span class="w">       </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"PocketBase authentication failed"</span><span class="p">)</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nx">ErrUnexpectedStatus</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"unexpected status from PocketBase"</span><span class="p">)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">)</span>
 </code></pre></div>
-<p>Clear removes all elements from the set.</p>
-<p><a name="Set[T].Contains"></a></p>
-<h3 id="func-sett-contains">func (*Set[T]) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/pkg/set/set.go#L29">Contains</a><a class="headerlink" href="#func-sett-contains" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="nx">Contains</span><span class="p">(</span><span class="nx">value</span><span class="w"> </span><span class="nx">T</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
+<p><a name="FormatDateLocal"></a></p>
+<h2 id="func-formatdatelocal">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/schema.go#L10">FormatDateLocal</a><a class="headerlink" href="#func-formatdatelocal" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">FormatDateLocal</span><span class="p">(</span><span class="nx">utcStr</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
 </code></pre></div>
-<p>Contains checks if an element exists in the set.</p>
-<p><a name="Set[T].Diff"></a></p>
-<h3 id="func-sett-diff">func (*Set[T]) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/pkg/set/set.go#L61">Diff</a><a class="headerlink" href="#func-sett-diff" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="nx">Diff</span><span class="p">(</span><span class="nx">sets</span><span class="w"> </span><span class="o">...*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">]</span>
+<p>FormatDateLocal parses a PocketBase UTC datetime string and returns it in local time as "YYYY-MM-DD HH:MM". Returns the raw string if parsing fails.</p>
+<p><a name="LqdTasksSchema"></a></p>
+<h2 id="func-lqdtasksschema">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/schema.go#L23">LqdTasksSchema</a><a class="headerlink" href="#func-lqdtasksschema" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">LqdTasksSchema</span><span class="p">()</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span>
 </code></pre></div>
-<p>Diff returns a new set containing elements that are in the current set but not in the provided sets.</p>
-<p><a name="Set[T].Remove"></a></p>
-<h3 id="func-sett-remove">func (*Set[T]) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/pkg/set/set.go#L24">Remove</a><a class="headerlink" href="#func-sett-remove" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="nx">Remove</span><span class="p">(</span><span class="nx">value</span><span class="w"> </span><span class="nx">T</span><span class="p">)</span>
+<p>LqdTasksSchema returns the PocketBase collection schema for lqd_tasks. Go code is the source of truth — not PB migrations.</p>
+<p><a name="lqdTasksFields"></a></p>
+<h2 id="func-lqdtasksfields">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/schema.go#L31">lqdTasksFields</a><a class="headerlink" href="#func-lqdtasksfields" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">lqdTasksFields</span><span class="p">()</span><span class="w"> </span><span class="p">[]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span>
 </code></pre></div>
-<p>Remove deletes an element from the set.</p>
-<p><a name="Set[T].Size"></a></p>
-<h3 id="func-sett-size">func (*Set[T]) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/pkg/set/set.go#L36">Size</a><a class="headerlink" href="#func-sett-size" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="nx">Size</span><span class="p">()</span><span class="w"> </span><span class="kt">int</span>
+<p><a name="Client"></a></p>
+<h2 id="type-client">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L25-L29">Client</a><a class="headerlink" href="#type-client" title="Permanent link">¶</a></h2>
+<p>Client is a minimal PocketBase HTTP client.</p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Client</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="nx">baseURL</span><span class="w">    </span><span class="kt">string</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nx">token</span><span class="w">      </span><span class="kt">string</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="nx">httpClient</span><span class="w"> </span><span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Client</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">}</span>
 </code></pre></div>
-<p>Size returns the number of elements in the set.</p>
-<p><a name="Set[T].Update"></a></p>
-<h3 id="func-sett-update">func (*Set[T]) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/pkg/set/set.go#L80">Update</a><a class="headerlink" href="#func-sett-update" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="nx">Update</span><span class="p">(</span><span class="nx">sets</span><span class="w"> </span><span class="o">...*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span>
+<p><a name="NewClient"></a></p>
+<h3 id="func-newclient">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L32">NewClient</a><a class="headerlink" href="#func-newclient" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NewClient</span><span class="p">(</span><span class="nx">baseURL</span><span class="p">,</span><span class="w"> </span><span class="nx">username</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">Client</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
-<p>Update adds all elements from the given sets into the current set.</p>
-<p><a name="Set[T].Values"></a></p>
-<h3 id="func-sett-values">func (*Set[T]) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/pkg/set/set.go#L41">Values</a><a class="headerlink" href="#func-sett-values" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="nx">Values</span><span class="p">()</span><span class="w"> </span><span class="p">[]</span><span class="nx">T</span>
+<p>NewClient authenticates with PocketBase and returns a ready-to-use client.</p>
+<p><a name="Client.CollectionExists"></a></p>
+<h3 id="func-client-collectionexists">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L48">CollectionExists</a><a class="headerlink" href="#func-client-collectionexists" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">CollectionExists</span><span class="p">(</span><span class="nx">name</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
-<p>Values returns all elements in the set as a slice.</p>
-<p><a name="Set[T].ValuesSorted"></a></p>
-<h3 id="func-sett-valuessorted">func (*Set[T]) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/pkg/set/set.go#L51">ValuesSorted</a><a class="headerlink" href="#func-sett-valuessorted" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="o">*</span><span class="nx">Set</span><span class="p">[</span><span class="nx">T</span><span class="p">])</span><span class="w"> </span><span class="nx">ValuesSorted</span><span class="p">()</span><span class="w"> </span><span class="p">[]</span><span class="nx">T</span>
+<p>CollectionExists checks if a collection exists in PocketBase.</p>
+<p><a name="Client.CreateCollection"></a></p>
+<h3 id="func-client-createcollection">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L67">CreateCollection</a><a class="headerlink" href="#func-client-createcollection" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">CreateCollection</span><span class="p">(</span><span class="nx">schema</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
-<p>ValuesSorted returns all elements in the set as a sorted slice.</p>
+<p>CreateCollection creates a new collection with the given schema.</p>
+<p><a name="Client.CreateRecord"></a></p>
+<h3 id="func-client-createrecord">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L175">CreateRecord</a><a class="headerlink" href="#func-client-createrecord" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">CreateRecord</span><span class="p">(</span><span class="nx">collection</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+</code></pre></div>
+<p>CreateRecord creates a record in the given collection.</p>
+<p><a name="Client.DeleteCollection"></a></p>
+<h3 id="func-client-deletecollection">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L89">DeleteCollection</a><a class="headerlink" href="#func-client-deletecollection" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">DeleteCollection</span><span class="p">(</span><span class="nx">name</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+</code></pre></div>
+<p>DeleteCollection deletes a collection by name. It first fetches the collection to get its ID.</p>
+<p><a name="Client.DeleteRecord"></a></p>
+<h3 id="func-client-deleterecord">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L223">DeleteRecord</a><a class="headerlink" href="#func-client-deleterecord" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">DeleteRecord</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span><span class="w"> </span><span class="nx">recordID</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+</code></pre></div>
+<p>DeleteRecord deletes a record by ID from the given collection.</p>
+<p><a name="Client.FetchRecords"></a></p>
+<h3 id="func-client-fetchrecords">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L123">FetchRecords</a><a class="headerlink" href="#func-client-fetchrecords" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">FetchRecords</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span><span class="w"> </span><span class="nx">filter</span><span class="p">,</span><span class="w"> </span><span class="nx">sort</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">limit</span><span class="w"> </span><span class="o">...</span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+</code></pre></div>
+<p>FetchRecords fetches all records from a collection, handling pagination. Optional filter and sort parameters are passed as PB query params. If limit &gt; 0, fetches at most that many records (single page).</p>
+<p><a name="Client.UpdateRecord"></a></p>
+<h3 id="func-client-updaterecord">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L197">UpdateRecord</a><a class="headerlink" href="#func-client-updaterecord" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">UpdateRecord</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span><span class="w"> </span><span class="nx">recordID</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+</code></pre></div>
+<p>UpdateRecord updates a record by ID in the given collection.</p>
+<p><a name="Client.authenticate"></a></p>
+<h3 id="func-client-authenticate">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L239">authenticate</a><a class="headerlink" href="#func-client-authenticate" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">authenticate</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+</code></pre></div>
+<p><a name="Client.doRequest"></a></p>
+<h3 id="func-client-dorequest">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L287">doRequest</a><a class="headerlink" href="#func-client-dorequest" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">doRequest</span><span class="p">(</span><span class="nx">method</span><span class="p">,</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Reader</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Response</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+</code></pre></div>
+<p>doRequest sends an authenticated HTTP request to PocketBase.</p>
 <p>Generated by <a href="https://github.com/princjef/gomarkdoc">gomarkdoc</a></p>
 
 
