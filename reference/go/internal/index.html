@@ -1420,7 +1420,7 @@
 <a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="RemoveUnnecessaryBracketsFromTags"></a></p>
-<h3 id="func-removeunnecessarybracketsfromtags">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L264">RemoveUnnecessaryBracketsFromTags</a><a class="headerlink" href="#func-removeunnecessarybracketsfromtags" title="Permanent link">¶</a></h3>
+<h3 id="func-removeunnecessarybracketsfromtags">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L258">RemoveUnnecessaryBracketsFromTags</a><a class="headerlink" href="#func-removeunnecessarybracketsfromtags" title="Permanent link">¶</a></h3>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">RemoveUnnecessaryBracketsFromTags</span><span class="p">(</span><span class="nx">oldContents</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedContents</span>
 </code></pre></div>
 <p>RemoveUnnecessaryBracketsFromTags removes unnecessary brackets from hashtags. logseq-go rewrites tags correctly when saving the transaction, removing unnecessary brackets. But, when reading the file, the AST doesn't provide the information if a tag has brackets or not. So I would have to rewrite the file to fix them, and I don't want to do it every time there is a tag without spaces. Also, as of 2024-12-30, logseq-go has a bug when reading properties with spaces in values, which causes them to be partially removed from the file, destroying data. I will report it soon.</p>
@@ -1443,12 +1443,12 @@
 </code></pre></div>
 <p>CheckRunningTasks checks if a page has running tasks (DOING, etc.).</p>
 <p><a name="RemoveDoubleSpaces"></a></p>
-<h3 id="func-removedoublespaces">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L209">RemoveDoubleSpaces</a><a class="headerlink" href="#func-removedoublespaces" title="Permanent link">¶</a></h3>
+<h3 id="func-removedoublespaces">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L203">RemoveDoubleSpaces</a><a class="headerlink" href="#func-removedoublespaces" title="Permanent link">¶</a></h3>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">RemoveDoubleSpaces</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedPage</span>
 </code></pre></div>
 <p>RemoveDoubleSpaces removes double spaces from text, page links, and tags, except for tables.</p>
 <p><a name="RemoveEmptyBullets"></a></p>
-<h3 id="func-removeemptybullets">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L275">RemoveEmptyBullets</a><a class="headerlink" href="#func-removeemptybullets" title="Permanent link">¶</a></h3>
+<h3 id="func-removeemptybullets">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L269">RemoveEmptyBullets</a><a class="headerlink" href="#func-removeemptybullets" title="Permanent link">¶</a></h3>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">RemoveEmptyBullets</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedPage</span>
 </code></pre></div>
 <p><a name="InsertMarkdownOptions"></a></p>

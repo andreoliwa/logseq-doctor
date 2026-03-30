@@ -1318,6 +1318,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#type-taskuuid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        type TaskUUID
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#type-logseqapiimpl" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1450,6 +1461,7 @@
 <li><a href="#RefJSON">type RefJSON</a></li>
 <li><a href="#TaskJSON">type TaskJSON</a></li>
 <li><a href="#ExtractTasksFromJSON">func ExtractTasksFromJSON(jsonStr string) ([]TaskJSON, error)</a></li>
+<li><a href="#TaskUUID">type TaskUUID</a></li>
 <li><a href="#logseqAPIImpl">type logseqAPIImpl</a></li>
 <li><a href="#logseqAPIImpl.PostDatascriptQuery">func (l *logseqAPIImpl) PostDatascriptQuery(query string) (string, error)</a></li>
 <li><a href="#logseqAPIImpl.PostQuery">func (l *logseqAPIImpl) PostQuery(query string) (string, error)</a></li>
@@ -1490,17 +1502,17 @@
 </code></pre></div>
 <p>OpenPage opens a page in the Logseq graph. Delegates to logseqext.OpenPage.</p>
 <p><a name="TaskDoing"></a></p>
-<h2 id="func-taskdoing">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L77">TaskDoing</a><a class="headerlink" href="#func-taskdoing" title="Permanent link">¶</a></h2>
+<h2 id="func-taskdoing">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L84">TaskDoing</a><a class="headerlink" href="#func-taskdoing" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">TaskDoing</span><span class="p">(</span><span class="nx">t</span><span class="w"> </span><span class="nx">TaskJSON</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>TaskDoing checks if the task has the DOING marker.</p>
 <p><a name="TaskFutureScheduled"></a></p>
-<h2 id="func-taskfuturescheduled">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L82">TaskFutureScheduled</a><a class="headerlink" href="#func-taskfuturescheduled" title="Permanent link">¶</a></h2>
+<h2 id="func-taskfuturescheduled">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L89">TaskFutureScheduled</a><a class="headerlink" href="#func-taskfuturescheduled" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">TaskFutureScheduled</span><span class="p">(</span><span class="nx">t</span><span class="w"> </span><span class="nx">TaskJSON</span><span class="p">,</span><span class="w"> </span><span class="nx">currentTime</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>TaskFutureScheduled checks if the task is scheduled for the future (tomorrow onwards) and it's not overdue.</p>
 <p><a name="TaskOverdue"></a></p>
-<h2 id="func-taskoverdue">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L70">TaskOverdue</a><a class="headerlink" href="#func-taskoverdue" title="Permanent link">¶</a></h2>
+<h2 id="func-taskoverdue">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L77">TaskOverdue</a><a class="headerlink" href="#func-taskoverdue" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">TaskOverdue</span><span class="p">(</span><span class="nx">t</span><span class="w"> </span><span class="nx">TaskJSON</span><span class="p">,</span><span class="w"> </span><span class="nx">currentTime</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>TaskOverdue checks if the task is overdue based on deadline or scheduled date.</p>
@@ -1554,17 +1566,18 @@
 </code></pre></div>
 <p>parseBlockQueryResponse parses the JSON response from a block UUID query.</p>
 <p><a name="CategorizedTasks"></a></p>
-<h2 id="type-categorizedtasks">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L40-L45">CategorizedTasks</a><a class="headerlink" href="#type-categorizedtasks" title="Permanent link">¶</a></h2>
+<h2 id="type-categorizedtasks">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L45-L51">CategorizedTasks</a><a class="headerlink" href="#type-categorizedtasks" title="Permanent link">¶</a></h2>
 <p>CategorizedTasks holds sets of task UUIDs grouped by category.</p>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">CategorizedTasks</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="nx">All</span><span class="w">             </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span>
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">    </span><span class="nx">Overdue</span><span class="w">         </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span>
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">    </span><span class="nx">Doing</span><span class="w">           </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">    </span><span class="nx">FutureScheduled</span><span class="w"> </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span>
-<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="p">}</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="nx">All</span><span class="w">             </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="nx">TaskUUID</span><span class="p">]</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">    </span><span class="nx">Overdue</span><span class="w">         </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="nx">TaskUUID</span><span class="p">]</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">    </span><span class="nx">Doing</span><span class="w">           </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="nx">TaskUUID</span><span class="p">]</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">    </span><span class="nx">FutureScheduled</span><span class="w"> </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="nx">TaskUUID</span><span class="p">]</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">    </span><span class="nx">TaskLookup</span><span class="w">      </span><span class="kd">map</span><span class="p">[</span><span class="nx">TaskUUID</span><span class="p">]</span><span class="nx">TaskJSON</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="NewCategorizedTasks"></a></p>
-<h3 id="func-newcategorizedtasks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L48">NewCategorizedTasks</a><a class="headerlink" href="#func-newcategorizedtasks" title="Permanent link">¶</a></h3>
+<h3 id="func-newcategorizedtasks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L54">NewCategorizedTasks</a><a class="headerlink" href="#func-newcategorizedtasks" title="Permanent link">¶</a></h3>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NewCategorizedTasks</span><span class="p">()</span><span class="w"> </span><span class="nx">CategorizedTasks</span>
 </code></pre></div>
 <p>NewCategorizedTasks creates a new CategorizedTasks with initialized sets.</p>
@@ -1587,7 +1600,7 @@
 </code></pre></div>
 <p>NewLogseqAPI creates a new LogseqAPI instance.</p>
 <p><a name="PageJSON"></a></p>
-<h2 id="type-pagejson">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L19-L24">PageJSON</a><a class="headerlink" href="#type-pagejson" title="Permanent link">¶</a></h2>
+<h2 id="type-pagejson">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L24-L29">PageJSON</a><a class="headerlink" href="#type-pagejson" title="Permanent link">¶</a></h2>
 <p>PageJSON holds page-level metadata from the Logseq API.</p>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">PageJSON</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">    </span><span class="nx">ID</span><span class="w">           </span><span class="kt">int</span><span class="w">    </span><span class="s">`json:"id"`</span>
@@ -1597,7 +1610,7 @@
 <a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="RefJSON"></a></p>
-<h2 id="type-refjson">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L13-L16">RefJSON</a><a class="headerlink" href="#type-refjson" title="Permanent link">¶</a></h2>
+<h2 id="type-refjson">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L18-L21">RefJSON</a><a class="headerlink" href="#type-refjson" title="Permanent link">¶</a></h2>
 <p>RefJSON represents a reference entry from the Logseq API response.</p>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">RefJSON</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">    </span><span class="nx">ID</span><span class="w">   </span><span class="kt">int</span><span class="w">    </span><span class="s">`json:"id"`</span>
@@ -1605,10 +1618,10 @@
 <a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="TaskJSON"></a></p>
-<h2 id="type-taskjson">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L27-L37">TaskJSON</a><a class="headerlink" href="#type-taskjson" title="Permanent link">¶</a></h2>
+<h2 id="type-taskjson">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L32-L42">TaskJSON</a><a class="headerlink" href="#type-taskjson" title="Permanent link">¶</a></h2>
 <p>TaskJSON represents a task block from the Logseq HTTP API.</p>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">TaskJSON</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">    </span><span class="nx">UUID</span><span class="w">                 </span><span class="kt">string</span><span class="w">            </span><span class="s">`json:"uuid"`</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">    </span><span class="nx">UUID</span><span class="w">                 </span><span class="nx">TaskUUID</span><span class="w">          </span><span class="s">`json:"uuid"`</span>
 <a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">    </span><span class="nx">Marker</span><span class="w">               </span><span class="kt">string</span><span class="w">            </span><span class="s">`json:"marker"`</span>
 <a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">    </span><span class="nx">Content</span><span class="w">              </span><span class="kt">string</span><span class="w">            </span><span class="s">`json:"content"`</span>
 <a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">    </span><span class="nx">Page</span><span class="w">                 </span><span class="nx">PageJSON</span><span class="w">          </span><span class="s">`json:"page"`</span>
@@ -1620,36 +1633,41 @@
 <a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="ExtractTasksFromJSON"></a></p>
-<h3 id="func-extracttasksfromjson">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L58">ExtractTasksFromJSON</a><a class="headerlink" href="#func-extracttasksfromjson" title="Permanent link">¶</a></h3>
+<h3 id="func-extracttasksfromjson">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L65">ExtractTasksFromJSON</a><a class="headerlink" href="#func-extracttasksfromjson" title="Permanent link">¶</a></h3>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">ExtractTasksFromJSON</span><span class="p">(</span><span class="nx">jsonStr</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="nx">TaskJSON</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
 <p>ExtractTasksFromJSON parses a JSON string into a slice of TaskJSON.</p>
+<p><a name="TaskUUID"></a></p>
+<h2 id="type-taskuuid">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/tasks.go#L15">TaskUUID</a><a class="headerlink" href="#type-taskuuid" title="Permanent link">¶</a></h2>
+<p>TaskUUID is a type alias for task block UUIDs, making it clear when a string represents a Logseq block UUID.</p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">TaskUUID</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kt">string</span>
+</code></pre></div>
 <p><a name="logseqAPIImpl"></a></p>
 <h2 id="type-logseqapiimpl">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/api.go#L38-L42">logseqAPIImpl</a><a class="headerlink" href="#type-logseqapiimpl" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">logseqAPIImpl</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">    </span><span class="nx">path</span><span class="w">     </span><span class="kt">string</span>
-<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">    </span><span class="nx">hostURL</span><span class="w">  </span><span class="kt">string</span>
-<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="w">    </span><span class="nx">apiToken</span><span class="w"> </span><span class="kt">string</span>
-<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">logseqAPIImpl</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">    </span><span class="nx">path</span><span class="w">     </span><span class="kt">string</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="nx">hostURL</span><span class="w">  </span><span class="kt">string</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">    </span><span class="nx">apiToken</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="logseqAPIImpl.PostDatascriptQuery"></a></p>
 <h3 id="func-logseqapiimpl-postdatascriptquery">func (*logseqAPIImpl) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/api.go#L66">PostDatascriptQuery</a><a class="headerlink" href="#func-logseqapiimpl-postdatascriptquery" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">l</span><span class="w"> </span><span class="o">*</span><span class="nx">logseqAPIImpl</span><span class="p">)</span><span class="w"> </span><span class="nx">PostDatascriptQuery</span><span class="p">(</span><span class="nx">query</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">l</span><span class="w"> </span><span class="o">*</span><span class="nx">logseqAPIImpl</span><span class="p">)</span><span class="w"> </span><span class="nx">PostDatascriptQuery</span><span class="p">(</span><span class="nx">query</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
 <p>PostDatascriptQuery sends a Datascript query ([:find ...]) to the Logseq API. Use this instead of PostQuery for queries that require pull syntax or complex patterns.</p>
 <p><a name="logseqAPIImpl.PostQuery"></a></p>
 <h3 id="func-logseqapiimpl-postquery">func (*logseqAPIImpl) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/api.go#L60">PostQuery</a><a class="headerlink" href="#func-logseqapiimpl-postquery" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">l</span><span class="w"> </span><span class="o">*</span><span class="nx">logseqAPIImpl</span><span class="p">)</span><span class="w"> </span><span class="nx">PostQuery</span><span class="p">(</span><span class="nx">query</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">l</span><span class="w"> </span><span class="o">*</span><span class="nx">logseqAPIImpl</span><span class="p">)</span><span class="w"> </span><span class="nx">PostQuery</span><span class="p">(</span><span class="nx">query</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
 <p>PostQuery sends a query to the Logseq API and returns the result as JSON.</p>
 <p><a name="logseqAPIImpl.UpsertBlockProperty"></a></p>
 <h3 id="func-logseqapiimpl-upsertblockproperty">func (*logseqAPIImpl) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/api.go#L76">UpsertBlockProperty</a><a class="headerlink" href="#func-logseqapiimpl-upsertblockproperty" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">l</span><span class="w"> </span><span class="o">*</span><span class="nx">logseqAPIImpl</span><span class="p">)</span><span class="w"> </span><span class="nx">UpsertBlockProperty</span><span class="p">(</span><span class="nx">uuid</span><span class="p">,</span><span class="w"> </span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">l</span><span class="w"> </span><span class="o">*</span><span class="nx">logseqAPIImpl</span><span class="p">)</span><span class="w"> </span><span class="nx">UpsertBlockProperty</span><span class="p">(</span><span class="nx">uuid</span><span class="p">,</span><span class="w"> </span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>UpsertBlockProperty calls logseq.Editor.upsertBlockProperty to set a property on a block. Unlike PostQuery/PostDatascriptQuery which take a single query string, this method passes three separate args: uuid, key, value. Logseq then writes the property to the .md file, which forces the id:: property onto disk for blocks that haven't been persisted yet. Logseq lazy-writes block UUIDs: they exist in its DB but only hit .md files when something triggers a write (a backlink, an edit, or this Editor API call).</p>
 <p><a name="logseqAPIImpl.postAPI"></a></p>
 <h3 id="func-logseqapiimpl-postapi">func (*logseqAPIImpl) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/api/api.go#L125">postAPI</a><a class="headerlink" href="#func-logseqapiimpl-postapi" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">l</span><span class="w"> </span><span class="o">*</span><span class="nx">logseqAPIImpl</span><span class="p">)</span><span class="w"> </span><span class="nx">postAPI</span><span class="p">(</span><span class="nx">method</span><span class="p">,</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">l</span><span class="w"> </span><span class="o">*</span><span class="nx">logseqAPIImpl</span><span class="p">)</span><span class="w"> </span><span class="nx">postAPI</span><span class="p">(</span><span class="nx">method</span><span class="p">,</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
 <p>postAPI is the shared HTTP implementation for PostQuery and PostDatascriptQuery.</p>
 <p>Generated by <a href="https://github.com/princjef/gomarkdoc">gomarkdoc</a></p>
