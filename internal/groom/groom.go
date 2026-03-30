@@ -178,12 +178,13 @@ func FormatTaskAge(isoDate string, now time.Time) string {
 // Groom action name constants. Use these instead of string literals whenever
 // comparing or switching on GroomAction.Name to avoid typos and enable refactoring.
 const (
-	GroomActionKeep   = "keep"
-	GroomActionCancel = "cancel"
-	GroomActionFocus  = "focus"
-	GroomActionDefer  = "defer"
-	GroomActionSkip   = "skip"
-	GroomActionQuit   = "quit"
+	GroomActionCancel         = "cancel"
+	GroomActionFocus          = "focus"
+	GroomActionPriorityHigh   = "priority-high"
+	GroomActionPriorityMedium = "priority-medium"
+	GroomActionPriorityLow    = "priority-low"
+	GroomActionSkip           = "skip"
+	GroomActionQuit           = "quit"
 )
 
 // Logseq block property key constants written by groom actions.
@@ -197,16 +198,18 @@ type Action struct {
 	Name         string
 	SetsGroomed  bool
 	RequiresFile bool
+	Priority     content.PriorityValue
 }
 
 // groomActions maps single-letter inputs to their corresponding actions.
 //
 //nolint:gochecknoglobals // lookup table used by ParseAction
 var groomActions = map[string]*Action{
-	"k": {Name: GroomActionKeep, SetsGroomed: true, RequiresFile: true},
-	"c": {Name: GroomActionCancel, SetsGroomed: true, RequiresFile: true},
+	"x": {Name: GroomActionCancel, SetsGroomed: true, RequiresFile: true},
 	"f": {Name: GroomActionFocus, SetsGroomed: true, RequiresFile: true},
-	"d": {Name: GroomActionDefer, SetsGroomed: true, RequiresFile: true},
+	"a": {Name: GroomActionPriorityHigh, SetsGroomed: true, RequiresFile: true, Priority: content.PriorityHigh},
+	"b": {Name: GroomActionPriorityMedium, SetsGroomed: true, RequiresFile: true, Priority: content.PriorityMedium},
+	"c": {Name: GroomActionPriorityLow, SetsGroomed: true, RequiresFile: true, Priority: content.PriorityLow},
 	"s": {Name: GroomActionSkip, SetsGroomed: false, RequiresFile: false},
 	"q": {Name: GroomActionQuit, SetsGroomed: false, RequiresFile: false},
 }
@@ -214,12 +217,12 @@ var groomActions = map[string]*Action{
 // ParseAction converts a single-letter input to an Action.
 // Returns nil if the input is invalid or requires backlog when none exists.
 func ParseAction(input string, hasBacklog bool) *Action {
-	action, ok := groomActions[input]
+	action, ok := groomActions[strings.ToLower(input)]
 	if !ok {
 		return nil
 	}
 
-	if !hasBacklog && (input == "f" || input == "d") {
+	if !hasBacklog && input == "f" {
 		return nil
 	}
 
@@ -228,11 +231,12 @@ func ParseAction(input string, hasBacklog bool) *Action {
 
 // Counts tracks how many tasks received each action.
 type Counts struct {
-	Kept      int
-	Cancelled int
-	Focused   int
-	Deferred  int
-	Skipped   int
+	Cancelled      int
+	Focused        int
+	PriorityHigh   int
+	PriorityMedium int
+	PriorityLow    int
+	Skipped        int
 }
 
 // FormatGroomSummary formats the end-of-session summary.
@@ -242,11 +246,12 @@ func FormatGroomSummary(counts Counts, remaining int, olderThan string) string {
 	fmt.Fprintf(&buf, "\n%s\n", groomSeparator)
 	fmt.Fprintf(&buf, " Grooming complete!\n")
 	fmt.Fprintf(&buf, "%s\n", groomSeparator)
-	fmt.Fprintf(&buf, " Kept:      %d\n", counts.Kept)
-	fmt.Fprintf(&buf, " Cancelled: %d\n", counts.Cancelled)
-	fmt.Fprintf(&buf, " Focus:     %d\n", counts.Focused)
-	fmt.Fprintf(&buf, " Deferred:  %d\n", counts.Deferred)
-	fmt.Fprintf(&buf, " Skipped:   %d\n", counts.Skipped)
+	fmt.Fprintf(&buf, " Cancelled:  %d\n", counts.Cancelled)
+	fmt.Fprintf(&buf, " Focus:      %d\n", counts.Focused)
+	fmt.Fprintf(&buf, " High (A):   %d\n", counts.PriorityHigh)
+	fmt.Fprintf(&buf, " Medium (B): %d\n", counts.PriorityMedium)
+	fmt.Fprintf(&buf, " Low (C):    %d\n", counts.PriorityLow)
+	fmt.Fprintf(&buf, " Skipped:    %d\n", counts.Skipped)
 	fmt.Fprintf(&buf, "%s\n", groomSeparator)
 	fmt.Fprintf(&buf, " Remaining ungroomed tasks older than %s: %d\n", olderThan, remaining)
 	fmt.Fprintf(&buf, "%s\n", groomSeparator)
@@ -259,7 +264,7 @@ func FormatGroomSummary(counts Counts, remaining int, olderThan string) string {
 type WriteOpts struct {
 	FocusPageTitle       string
 	BacklogPageTitle     string
-	SomedaySectionText   string
+	TriagedSectionText   string
 	ScheduledSectionText string
 	CurrentTime          func() time.Time
 }
@@ -388,14 +393,12 @@ func applyActionToBlock(
 	block *content.Block, groomedDate, uuid string, opts *WriteOpts,
 ) error {
 	switch action.Name {
-	case GroomActionKeep:
-		logseqext.BlockProperties(block).Set(GroomPropertyGroomed, content.NewText(groomedDate))
 	case GroomActionCancel:
 		return applyCancelAction(block, groomedDate)
 	case GroomActionFocus:
 		return applyFocusAction(transaction, block, groomedDate, uuid, opts.FocusPageTitle)
-	case GroomActionDefer:
-		return applyDeferAction(transaction, block, groomedDate, uuid, opts)
+	case GroomActionPriorityHigh, GroomActionPriorityMedium, GroomActionPriorityLow:
+		return applyPriorityAction(transaction, block, groomedDate, uuid, action.Priority, opts)
 	}
 
 	return nil
@@ -429,18 +432,26 @@ func applyFocusAction(
 	return nil
 }
 
-// applyDeferAction marks the block groomed and adds a reference to the Someday section.
-func applyDeferAction(
+// applyPriorityAction sets priority on the block, marks it groomed,
+// and adds a reference to the Triaged section of the backlog page (if the task has a backlog).
+func applyPriorityAction(
 	transaction *logseq.Transaction, block *content.Block,
-	groomedDate, uuid string, opts *WriteOpts,
+	groomedDate, uuid string, priority content.PriorityValue, opts *WriteOpts,
 ) error {
+	priorityErr := logseqext.SetPriority(block, priority)
+	if priorityErr != nil {
+		return fmt.Errorf("failed to set priority: %w", priorityErr)
+	}
+
 	logseqext.BlockProperties(block).Set(GroomPropertyGroomed, content.NewText(groomedDate))
 
-	deferErr := backlog.AddBlockRefToSomedaySection(
-		transaction, opts.BacklogPageTitle, uuid, opts.SomedaySectionText, opts.ScheduledSectionText,
-	)
-	if deferErr != nil {
-		return fmt.Errorf("failed to add block ref to someday section: %w", deferErr)
+	if opts.BacklogPageTitle != "" {
+		triagedErr := backlog.MoveBlockRefToTriagedSection(
+			transaction, opts.BacklogPageTitle, uuid, opts.TriagedSectionText, opts.ScheduledSectionText,
+		)
+		if triagedErr != nil {
+			return fmt.Errorf("failed to add block ref to triaged section: %w", triagedErr)
+		}
 	}
 
 	return nil

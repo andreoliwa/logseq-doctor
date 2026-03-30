@@ -307,7 +307,7 @@ func groomHandleTask(
 		opts := &groom.WriteOpts{
 			FocusPageTitle:       backlogConfig.FocusPage,
 			BacklogPageTitle:     backlogConfig.FindBacklogPageTitle(backlogName),
-			SomedaySectionText:   backlog.SectionSomeday,
+			TriagedSectionText:   backlog.SectionTriaged,
 			ScheduledSectionText: backlog.SectionScheduled,
 			CurrentTime:          time.Now,
 		}
@@ -414,10 +414,10 @@ func printTaskCard(task map[string]any, index, total int, now time.Time, termWid
 	fmt.Println(sep)
 
 	if hasBacklog {
-		fmt.Println(" " + groomStyles.actions.Render("[k]eep  [c]ancel  [f]ocus  [d]efer  [s]kip  [q]uit"))
+		fmt.Println(" " + groomStyles.actions.Render("X Cancel  F Focus  A High  B Medium  C Low  S Skip  Q Quit"))
 	} else {
-		fmt.Println(" " + groomStyles.actions.Render("[k]eep  [c]ancel  [s]kip  [q]uit"))
-		fmt.Println(" " + groomStyles.warning.Render("(no backlog — focus/defer unavailable)"))
+		fmt.Println(" " + groomStyles.actions.Render("X Cancel  A High  B Medium  C Low  S Skip  Q Quit"))
+		fmt.Println(" " + groomStyles.warning.Render("(no backlog — Focus unavailable)"))
 	}
 }
 
@@ -486,14 +486,16 @@ func terminalWidth() int {
 // updateGroomCounts increments the appropriate counter for the given action name.
 func updateGroomCounts(counts *groom.Counts, actionName string) {
 	switch actionName {
-	case groom.GroomActionKeep:
-		counts.Kept++
 	case groom.GroomActionCancel:
 		counts.Cancelled++
 	case groom.GroomActionFocus:
 		counts.Focused++
-	case groom.GroomActionDefer:
-		counts.Deferred++
+	case groom.GroomActionPriorityHigh:
+		counts.PriorityHigh++
+	case groom.GroomActionPriorityMedium:
+		counts.PriorityMedium++
+	case groom.GroomActionPriorityLow:
+		counts.PriorityLow++
 	case groom.GroomActionSkip:
 		counts.Skipped++
 	}

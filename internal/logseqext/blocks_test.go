@@ -168,3 +168,105 @@ func TestRemoveEmptyBlocks_PropagatesSaveTrue(t *testing.T) {
 	save := logseqext.RemoveEmptyBlocks(true, nil)
 	assert.True(t, save)
 }
+
+func TestSetPriority_InsertAfterTaskMarker(t *testing.T) {
+	//nolint:staticcheck
+	graph := testutils.StubGraph(t, "")
+	page, err := graph.OpenPage("finder")
+	require.NoError(t, err)
+
+	// Find a TODO task block without priority
+	block := logseqext.FindBlockContainingText(page, "Single task at root level")
+	require.NotNil(t, block)
+
+	err = logseqext.SetPriority(block, content.PriorityHigh)
+	require.NoError(t, err)
+
+	// Verify priority was inserted
+	var priority *content.Priority
+
+	block.Content().FindDeep(func(node content.Node) bool {
+		if p, ok := node.(*content.Priority); ok {
+			priority = p
+
+			return true
+		}
+
+		return false
+	})
+	require.NotNil(t, priority)
+	assert.Equal(t, content.PriorityHigh, priority.Priority)
+}
+
+func TestSetPriority_ReplaceExisting(t *testing.T) {
+	// Build a block with an existing priority in-memory
+	block := content.NewBlock(content.NewParagraph(
+		content.NewTaskMarkerFromString("TODO"),
+		content.NewPriority(content.PriorityHigh),
+		content.NewText("Task with priority"),
+	))
+
+	err := logseqext.SetPriority(block, content.PriorityLow)
+	require.NoError(t, err)
+
+	var priority *content.Priority
+
+	block.Content().FindDeep(func(node content.Node) bool {
+		if p, ok := node.(*content.Priority); ok {
+			priority = p
+
+			return true
+		}
+
+		return false
+	})
+	require.NotNil(t, priority)
+	assert.Equal(t, content.PriorityLow, priority.Priority)
+}
+
+func TestSetPriority_PlainBlock(t *testing.T) {
+	// A block with no task marker — priority should be prepended
+	block := content.NewBlock(content.NewParagraph(
+		content.NewText("Plain text block"),
+	))
+
+	err := logseqext.SetPriority(block, content.PriorityMedium)
+	require.NoError(t, err)
+
+	var priority *content.Priority
+
+	block.Content().FindDeep(func(node content.Node) bool {
+		if p, ok := node.(*content.Priority); ok {
+			priority = p
+
+			return true
+		}
+
+		return false
+	})
+	require.NotNil(t, priority)
+	assert.Equal(t, content.PriorityMedium, priority.Priority)
+}
+
+func TestParsePriorityFromContent(t *testing.T) {
+	tests := []struct {
+		name     string
+		content  string
+		expected content.PriorityValue
+	}{
+		{"high", "TODO [#A] High priority task", content.PriorityHigh},
+		{"medium", "TODO [#B] Medium priority task", content.PriorityMedium},
+		{"low", "TODO [#C] Low priority task", content.PriorityLow},
+		{"none", "TODO Regular task without priority", content.PriorityNone},
+		{"with time", "TODO [#A] 17:51 Task with time", content.PriorityHigh},
+		{"with properties", "TODO [#B] Task\nid:: abc-123\ngroomed:: [[Monday]]", content.PriorityMedium},
+		{"empty", "", content.PriorityNone},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := logseqext.ParsePriorityFromContent(tt.content)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}

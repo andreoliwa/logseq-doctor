@@ -8,14 +8,7 @@ help: # Display this help
 upgrade: # Upgrade all dependencies
 	uv lock
 	uv sync
-
 	go get -u -t ./...
-
-	@echo "Fetching latest release from andreoliwa/logseq-go..."
-	@LATEST=$$(gh release view --repo andreoliwa/logseq-go --json tagName --jq '.tagName'); \
-	echo "Latest release: $$LATEST"; \
-	sed -i '' "s|github.com/andreoliwa/logseq-go v.*|github.com/andreoliwa/logseq-go $$LATEST|" go.mod; \
-	echo "Updated go.mod to $$LATEST"
 	go mod tidy
 .PHONY: upgrade
 
@@ -49,16 +42,8 @@ setup: # Set up the local development environment
 	uv sync
 # TODO: keep the list of dev packages in a single place; this was copied from tox.ini
 	uv add --dev pytest pytest-cov pytest-datadir responses pytest-env pytest-watch pytest-testmon
-	$(MAKE) setup-go
 	@echo "Run 'make smoke' to check if the development environment is working"
 .PHONY: setup
-
-setup-go: # Set up Go dependencies (logseq-go from the last commit of the local repo)
-	LAST_COMMIT=$$(cd ../logseq-go; git log -1 --format=%h); \
-		echo "LAST_COMMIT: $$LAST_COMMIT"; \
-		go get -u github.com/andreoliwa/logseq-go@$$LAST_COMMIT
-	go mod tidy
-.PHONY: setup-go
 
 install: build-go # Install the package with pipx in editable mode. Do this when you want to use "lqdpy" outside of the development environment
 	-pipx install -e --force .

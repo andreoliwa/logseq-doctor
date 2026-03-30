@@ -1,11 +1,14 @@
 package backlog_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
+	logseq "github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/content"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -92,36 +95,37 @@ func TestAddBlockRefToFocusPage_InsertsBeforeSectionDivider(t *testing.T) {
 	assert.Positive(t, dividerIdx, "divider should not be the first block")
 }
 
-func TestAddBlockRefToSomedaySection_ExistingSection(t *testing.T) {
+func TestMoveBlockRefToTriagedSection_ExistingSection(t *testing.T) {
 	//nolint:staticcheck
 	graph := testutils.StubGraph(t, "")
 	transaction := graph.NewTransaction()
 
-	err := backlog.AddBlockRefToSomedaySection(
-		transaction, "backlog-someday-test", "new-someday-uuid",
-		backlog.SectionSomeday, backlog.SectionScheduled,
+	// backlog-with-triaged-child.md has a Triaged section divider with one child
+	err := backlog.MoveBlockRefToTriagedSection(
+		transaction, "backlog-with-triaged-child", "new-triaged-uuid",
+		backlog.SectionTriaged, backlog.SectionScheduled,
 	)
 	require.NoError(t, err)
 
 	err = transaction.Save()
 	require.NoError(t, err)
 
-	page, err := graph.OpenPage("backlog-someday-test")
+	page, err := graph.OpenPage("backlog-with-triaged-child")
 	require.NoError(t, err)
 
-	somedayBlock := logseqext.FindBlockContainingText(page, backlog.SectionSomeday)
-	require.NotNil(t, somedayBlock)
-	assert.Len(t, somedayBlock.Blocks(), 2, "should have original + new child")
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.SectionTriaged)
+	require.NotNil(t, triagedBlock, "Triaged section should exist")
+	assert.Len(t, triagedBlock.Blocks(), 2) // existing child + newly added
 }
 
-func TestAddBlockRefToSomedaySection_CreatesSectionBeforeScheduled(t *testing.T) {
+func TestMoveBlockRefToTriagedSection_CreatesSectionBeforeScheduled(t *testing.T) {
 	//nolint:staticcheck
 	graph := testutils.StubGraph(t, "")
 	transaction := graph.NewTransaction()
 
-	err := backlog.AddBlockRefToSomedaySection(
-		transaction, "backlog-no-someday", "new-someday-uuid",
-		backlog.SectionSomeday, backlog.SectionScheduled,
+	err := backlog.MoveBlockRefToTriagedSection(
+		transaction, "backlog-no-someday", "new-triaged-uuid",
+		backlog.SectionTriaged, backlog.SectionScheduled,
 	)
 	require.NoError(t, err)
 
@@ -131,21 +135,19 @@ func TestAddBlockRefToSomedaySection_CreatesSectionBeforeScheduled(t *testing.T)
 	page, err := graph.OpenPage("backlog-no-someday")
 	require.NoError(t, err)
 
-	somedayBlock := logseqext.FindBlockContainingText(page, backlog.SectionSomeday)
-	require.NotNil(t, somedayBlock, "Someday section should be created")
-	assert.Len(t, somedayBlock.Blocks(), 1)
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.SectionTriaged)
+	require.NotNil(t, triagedBlock, "Triaged section should be created")
+	assert.Len(t, triagedBlock.Blocks(), 1)
 
-	// Verify Someday appears before Scheduled in the page
-	somedayDivider := logseqext.FindBlockContainingText(page, backlog.SectionSomeday)
 	scheduledDivider := logseqext.FindBlockContainingText(page, backlog.SectionScheduled)
 
-	if somedayDivider != nil && scheduledDivider != nil {
+	if triagedBlock != nil && scheduledDivider != nil {
 		blocks := page.Blocks()
-		somedayIdx, scheduledIdx := -1, -1
+		triagedIdx, scheduledIdx := -1, -1
 
 		for idx, block := range blocks {
-			if block == somedayDivider {
-				somedayIdx = idx
+			if block == triagedBlock {
+				triagedIdx = idx
 			}
 
 			if block == scheduledDivider {
@@ -153,6 +155,311 @@ func TestAddBlockRefToSomedaySection_CreatesSectionBeforeScheduled(t *testing.T)
 			}
 		}
 
-		assert.Less(t, somedayIdx, scheduledIdx, "Someday should appear before Scheduled")
+		assert.Less(t, triagedIdx, scheduledIdx, "Triaged should appear before Scheduled")
 	}
+}
+
+// uuidRegularTask is the UUID of the block ref in the regular area of backlog-with-regular-task.md.
+const uuidRegularTask = "a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1"
+
+// uuidAlreadyTriaged is the UUID already under Triaged in backlog-triaged-only.md.
+const uuidAlreadyTriaged = "a5a5a5a5-a5a5-a5a5-a5a5-a5a5a5a5a5a5"
+
+// uuidDupTask is the UUID that appears in both regular area and Triaged in backlog-duplicate-task.md.
+const uuidDupTask = "a6a6a6a6-a6a6-a6a6-a6a6-a6a6a6a6a6a6"
+
+// uuidTriagedNested is a block ref nested 2 levels under Triaged in backlog-triaged-nested.md.
+// It is not a direct child of Triaged, so naive direct-children logic would miss it.
+const uuidTriagedNested = "c2c2c2c2-c2c2-c2c2-c2c2-c2c2c2c2c2c2"
+
+// uuidRegularAfterNewTasks is the UUID of the top-level block ref that appears after the New tasks
+// divider in backlog-regular-after-newtasks.md. It should still be considered part of the regular area.
+const uuidRegularAfterNewTasks = "b3b3b3b3-b3b3-b3b3-b3b3-b3b3b3b3b3b3"
+
+// uuidUnderNewTasks is the UUID of the block ref that is a child of the New tasks divider.
+// It should NOT be removed from the regular area.
+const uuidUnderNewTasks = "b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2"
+
+// uuidNestedInSection is a block ref nested 2 levels under a non-divider named section
+// ("Features > Outline") in backlog-nested-in-section.md.
+// It should be removed from that nested position when moved to Triaged.
+const uuidNestedInSection = "e1e1e1e1-e1e1-e1e1-e1e1-e1e1e1e1e1e1"
+
+func TestMoveBlockRefToTriagedSection_MovesFromRegularArea(t *testing.T) {
+	//nolint:staticcheck
+	graph := testutils.StubGraph(t, "")
+	transaction := graph.NewTransaction()
+
+	// uuidRegularTask exists in regular area of backlog-with-regular-task
+	err := backlog.MoveBlockRefToTriagedSection(
+		transaction, "backlog-with-regular-task", uuidRegularTask,
+		backlog.SectionTriaged, backlog.SectionScheduled,
+	)
+	require.NoError(t, err)
+
+	err = transaction.Save()
+	require.NoError(t, err)
+
+	page, err := graph.OpenPage("backlog-with-regular-task")
+	require.NoError(t, err)
+
+	// Should be in Triaged
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.SectionTriaged)
+	require.NotNil(t, triagedBlock)
+	uuidsInTriaged := collectBlockRefUUIDs(triagedBlock)
+	assert.Contains(t, uuidsInTriaged, uuidRegularTask, "task should be moved to Triaged")
+
+	// Should NOT be in regular area anymore
+	uuidsInRegular := collectRegularAreaBlockRefUUIDs(t, page)
+	assert.NotContains(t, uuidsInRegular, uuidRegularTask, "task should be removed from regular area")
+}
+
+func TestMoveBlockRefToTriagedSection_AlreadyInTriaged_Idempotent(t *testing.T) {
+	//nolint:staticcheck
+	graph := testutils.StubGraph(t, "")
+	transaction := graph.NewTransaction()
+
+	err := backlog.MoveBlockRefToTriagedSection(
+		transaction, "backlog-triaged-only", uuidAlreadyTriaged,
+		backlog.SectionTriaged, backlog.SectionScheduled,
+	)
+	require.NoError(t, err)
+
+	err = transaction.Save()
+	require.NoError(t, err)
+
+	page, err := graph.OpenPage("backlog-triaged-only")
+	require.NoError(t, err)
+
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.SectionTriaged)
+	require.NotNil(t, triagedBlock)
+
+	// Should appear exactly once
+	uuidsInTriaged := collectBlockRefUUIDs(triagedBlock)
+	count := 0
+
+	for _, u := range uuidsInTriaged {
+		if u == uuidAlreadyTriaged {
+			count++
+		}
+	}
+
+	assert.Equal(t, 1, count, "task should appear exactly once in Triaged")
+}
+
+func TestMoveBlockRefToTriagedSection_InBothAreas_RemovesFromRegular(t *testing.T) {
+	//nolint:staticcheck
+	graph := testutils.StubGraph(t, "")
+	transaction := graph.NewTransaction()
+
+	err := backlog.MoveBlockRefToTriagedSection(
+		transaction, "backlog-duplicate-task", uuidDupTask,
+		backlog.SectionTriaged, backlog.SectionScheduled,
+	)
+	require.NoError(t, err)
+
+	err = transaction.Save()
+	require.NoError(t, err)
+
+	page, err := graph.OpenPage("backlog-duplicate-task")
+	require.NoError(t, err)
+
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.SectionTriaged)
+	require.NotNil(t, triagedBlock)
+
+	uuidsInTriaged := collectBlockRefUUIDs(triagedBlock)
+	count := 0
+
+	for _, u := range uuidsInTriaged {
+		if u == uuidDupTask {
+			count++
+		}
+	}
+
+	assert.Equal(t, 1, count, "should appear exactly once in Triaged")
+
+	uuidsInRegular := collectRegularAreaBlockRefUUIDs(t, page)
+	assert.NotContains(t, uuidsInRegular, uuidDupTask, "should be removed from regular area")
+}
+
+// collectBlockRefUUIDs returns all block-ref UUIDs that are direct children of block.
+func collectBlockRefUUIDs(block *content.Block) []string {
+	var uuids []string
+
+	for _, child := range block.Blocks() {
+		uuid := logseqext.ExtractBlockRefUUID(child)
+		if uuid != "" {
+			uuids = append(uuids, uuid)
+		}
+	}
+
+	return uuids
+}
+
+func TestMoveBlockRefToTriagedSection_NestedInTriaged_Idempotent(t *testing.T) {
+	//nolint:staticcheck
+	graph := testutils.StubGraph(t, "")
+	transaction := graph.NewTransaction()
+
+	// uuidTriagedNested is nested 2 levels under Triaged (not a direct child).
+	// It should be recognized as already in Triaged and not added again.
+	err := backlog.MoveBlockRefToTriagedSection(
+		transaction, "backlog-triaged-nested", uuidTriagedNested,
+		backlog.SectionTriaged, backlog.SectionScheduled,
+	)
+	require.NoError(t, err)
+
+	err = transaction.Save()
+	require.NoError(t, err)
+
+	page, err := graph.OpenPage("backlog-triaged-nested")
+	require.NoError(t, err)
+
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.SectionTriaged)
+	require.NotNil(t, triagedBlock)
+
+	// Count occurrences of the nested UUID across all descendants of Triaged.
+	count := 0
+
+	triagedBlock.Children().FindDeep(func(node content.Node) bool {
+		if blockRef, ok := node.(*content.BlockRef); ok {
+			if blockRef.ID == uuidTriagedNested {
+				count++
+			}
+		}
+
+		return false
+	})
+
+	assert.Equal(t, 1, count, "nested UUID should appear exactly once in Triaged (not duplicated)")
+}
+
+func TestMoveBlockRefToTriagedSection_RegularAreaAfterNewTasks(t *testing.T) {
+	//nolint:staticcheck
+	graph := testutils.StubGraph(t, "")
+	transaction := graph.NewTransaction()
+
+	// uuidRegularAfterNewTasks is a top-level block ref that appears AFTER the New tasks divider.
+	// It should still be considered part of the regular area and be moved to Triaged.
+	err := backlog.MoveBlockRefToTriagedSection(
+		transaction, "backlog-regular-after-newtasks", uuidRegularAfterNewTasks,
+		backlog.SectionTriaged, backlog.SectionScheduled,
+	)
+	require.NoError(t, err)
+
+	err = transaction.Save()
+	require.NoError(t, err)
+
+	page, err := graph.OpenPage("backlog-regular-after-newtasks")
+	require.NoError(t, err)
+
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.SectionTriaged)
+	require.NotNil(t, triagedBlock)
+
+	uuidsInTriaged := collectBlockRefUUIDs(triagedBlock)
+	assert.Contains(t, uuidsInTriaged, uuidRegularAfterNewTasks, "task after New tasks divider should be moved to Triaged")
+
+	// The block should no longer exist in the regular area
+	uuidsInRegular := collectRegularAreaBlockRefUUIDs(t, page)
+	assert.NotContains(t, uuidsInRegular, uuidRegularAfterNewTasks, "task should be removed from regular area")
+}
+
+func TestMoveBlockRefToTriagedSection_DoesNotRemoveFromNewTasksChildren(t *testing.T) {
+	//nolint:staticcheck
+	graph := testutils.StubGraph(t, "")
+	transaction := graph.NewTransaction()
+
+	// uuidUnderNewTasks is a child of the New tasks divider, not in the regular area.
+	// MoveBlockRefToTriagedSection should not remove it from there.
+	err := backlog.MoveBlockRefToTriagedSection(
+		transaction, "backlog-regular-after-newtasks", uuidUnderNewTasks,
+		backlog.SectionTriaged, backlog.SectionScheduled,
+	)
+	require.NoError(t, err)
+
+	err = transaction.Save()
+	require.NoError(t, err)
+
+	page, err := graph.OpenPage("backlog-regular-after-newtasks")
+	require.NoError(t, err)
+
+	newTasksBlock := logseqext.FindBlockContainingText(page, backlog.SectionNewTasks)
+	require.NotNil(t, newTasksBlock, "New tasks section should still exist")
+
+	uuidsInNewTasks := collectBlockRefUUIDs(newTasksBlock)
+	assert.Contains(t, uuidsInNewTasks, uuidUnderNewTasks, "task under New tasks should NOT be removed")
+}
+
+func TestMoveBlockRefToTriagedSection_MovesFromNestedNamedSection(t *testing.T) {
+	//nolint:staticcheck
+	graph := testutils.StubGraph(t, "")
+	transaction := graph.NewTransaction()
+
+	// uuidNestedInSection is nested 2 levels under a non-divider section ("Features > Outline").
+	// It should be removed from that nested position and added to Triaged.
+	err := backlog.MoveBlockRefToTriagedSection(
+		transaction, "backlog-nested-in-section", uuidNestedInSection,
+		backlog.SectionTriaged, backlog.SectionScheduled,
+	)
+	require.NoError(t, err)
+
+	err = transaction.Save()
+	require.NoError(t, err)
+
+	page, err := graph.OpenPage("backlog-nested-in-section")
+	require.NoError(t, err)
+
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.SectionTriaged)
+	require.NotNil(t, triagedBlock, "Triaged section should be created")
+
+	uuidsInTriaged := collectBlockRefUUIDs(triagedBlock)
+	assert.Contains(t, uuidsInTriaged, uuidNestedInSection, "task should be moved to Triaged")
+
+	// The block ref should no longer exist under the nested named section
+	page.Blocks()[0].Children().FindDeep(func(node content.Node) bool {
+		if blockRef, ok := node.(*content.BlockRef); ok {
+			assert.NotEqual(t, uuidNestedInSection, blockRef.ID, "task should be removed from nested section")
+		}
+
+		return false
+	})
+}
+
+// collectRegularAreaBlockRefUUIDs returns all block-ref UUIDs in the regular area.
+// The regular area is any top-level block ref that is NOT a section divider itself.
+// (Section dividers are top-level blocks whose text contains a known section header.)
+func collectRegularAreaBlockRefUUIDs(t *testing.T, page logseq.Page) []string {
+	t.Helper()
+
+	sectionHeaders := []string{
+		backlog.SectionFocus, backlog.SectionOverdue, backlog.SectionNewTasks,
+		backlog.SectionTriaged, backlog.SectionScheduled,
+	}
+
+	var uuids []string
+
+	for _, block := range page.Blocks() {
+		text := logseqext.BlockContentText(block)
+
+		isDivider := false
+
+		for _, h := range sectionHeaders {
+			if strings.Contains(text, h) {
+				isDivider = true
+
+				break
+			}
+		}
+
+		if isDivider {
+			continue
+		}
+
+		uuid := logseqext.ExtractBlockRefUUID(block)
+		if uuid != "" {
+			uuids = append(uuids, uuid)
+		}
+	}
+
+	return uuids
 }

@@ -139,7 +139,7 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 	obsoleteBlockRefs := existingBlockRefs.Diff(allValidRefs)
 
 	result, err := insertAndRemoveRefs(b.graph, pageTitle, newBlockRefs, obsoleteBlockRefs,
-		blockRefsFromQuery.Overdue, blockRefsFromQuery.FutureScheduled)
+		blockRefsFromQuery.Overdue, blockRefsFromQuery.FutureScheduled, blockRefsFromQuery.TaskLookup)
 	if err != nil {
 		return nil, err
 	}
@@ -257,6 +257,8 @@ func queryTasksFromSinglePage(logseqAPI logseqapi.LogseqAPI, pageTitle string,
 func addTasksToCategories(jsonTasks []logseqapi.TaskJSON, tasks *logseqapi.CategorizedTasks,
 	currentTime func() time.Time) {
 	for _, task := range jsonTasks {
+		tasks.TaskLookup[task.UUID] = task
+
 		if logseqapi.TaskOverdue(task, currentTime) {
 			tasks.Overdue.Add(task.UUID)
 		}

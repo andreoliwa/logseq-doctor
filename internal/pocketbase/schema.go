@@ -1,6 +1,18 @@
 package pocketbase
 
-import "time"
+import (
+	"time"
+
+	"github.com/andreoliwa/logseq-go/content"
+)
+
+// taskStatusValues are the task status values stored in the PocketBase select field.
+//
+//nolint:gochecknoglobals // constant derived from logseq-go
+var taskStatusValues = []string{
+	content.TaskStringTodo, content.TaskStringDoing, content.TaskStringDone,
+	content.TaskStringWaiting, content.TaskStringCanceled,
+}
 
 // DateFormat is the ISO date format used for PocketBase date/datetime record fields.
 const DateFormat = "2006-01-02 15:04:05.000Z"
@@ -45,7 +57,7 @@ func lqdTasksFields() []map[string]any {
 			"name":     "status",
 			"type":     "select",
 			"required": true,
-			"values":   []string{"TODO", "DOING", "DONE", "WAITING", "CANCELED"},
+			"values":   taskStatusValues,
 		},
 		{
 			"name": "tags",

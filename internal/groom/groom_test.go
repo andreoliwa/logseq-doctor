@@ -97,19 +97,29 @@ func TestGroomAction_IsValid(t *testing.T) {
 		hasBacklog bool
 		valid      bool
 	}{
-		{"k", true, true},
-		{"c", true, true},
+		{"x", true, true},
 		{"f", true, true},
-		{"d", true, true},
+		{"a", true, true},
+		{"b", true, true},
+		{"c", true, true},
 		{"s", true, true},
-		{"k", false, true},
-		{"c", false, true},
+		{"q", true, true},
+		// Case-insensitive
+		{"X", true, true},
+		{"A", false, true},
+		{"B", false, true},
+		{"C", false, true},
+		// Without backlog: priorities and cancel still available
+		{"x", false, true},
+		{"a", false, true},
 		{"s", false, true},
 		{"q", false, true},
-		{"q", true, true},
+		// Focus requires backlog
 		{"f", false, false},
-		{"d", false, false},
-		{"x", true, false},
+		// Invalid keys
+		{"k", true, false},
+		{"d", true, false},
+		{"z", true, false},
 	}
 
 	for _, tt := range tests {
@@ -125,10 +135,11 @@ func TestGroomAction_IsValid(t *testing.T) {
 }
 
 func TestGroomAction_Names(t *testing.T) {
-	assert.Equal(t, "keep", groom.ParseAction("k", true).Name)
-	assert.Equal(t, "cancel", groom.ParseAction("c", true).Name)
+	assert.Equal(t, "cancel", groom.ParseAction("x", true).Name)
 	assert.Equal(t, "focus", groom.ParseAction("f", true).Name)
-	assert.Equal(t, "defer", groom.ParseAction("d", true).Name)
+	assert.Equal(t, "priority-high", groom.ParseAction("a", true).Name)
+	assert.Equal(t, "priority-medium", groom.ParseAction("b", true).Name)
+	assert.Equal(t, "priority-low", groom.ParseAction("c", true).Name)
 	assert.Equal(t, "skip", groom.ParseAction("s", true).Name)
 	assert.Equal(t, "quit", groom.ParseAction("q", true).Name)
 	assert.Equal(t, "quit", groom.ParseAction("q", false).Name)
@@ -136,19 +147,21 @@ func TestGroomAction_Names(t *testing.T) {
 
 func TestGroomSummary(t *testing.T) {
 	counts := groom.Counts{
-		Kept:      3,
-		Cancelled: 5,
-		Focused:   1,
-		Deferred:  1,
-		Skipped:   0,
+		Cancelled:      5,
+		Focused:        1,
+		PriorityHigh:   2,
+		PriorityMedium: 1,
+		PriorityLow:    1,
+		Skipped:        0,
 	}
 
 	output := groom.FormatGroomSummary(counts, 266, "5 years")
-	assert.Contains(t, output, "Kept:      3")
-	assert.Contains(t, output, "Cancelled: 5")
-	assert.Contains(t, output, "Focus:     1")
-	assert.Contains(t, output, "Deferred:  1")
-	assert.Contains(t, output, "Skipped:   0")
+	assert.Contains(t, output, "Cancelled:  5")
+	assert.Contains(t, output, "Focus:      1")
+	assert.Contains(t, output, "High (A):   2")
+	assert.Contains(t, output, "Medium (B): 1")
+	assert.Contains(t, output, "Low (C):    1")
+	assert.Contains(t, output, "Skipped:    0")
 	assert.Contains(t, output, "older than 5 years: 266")
 }
 
@@ -164,10 +177,8 @@ func (s *stubGroomAPI) PostDatascriptQuery(_ string) (string, error) {
 	return `[[{"uuid":"test-block-uuid-0001","page":` + page + `}]]`, nil
 }
 
-func TestApplyGroomAction_Keep_GroomedPropertyAfterTODO(t *testing.T) {
-	// Reproduces: groomed:: appearing before the TODO line instead of after it.
-	// Root cause: block.Properties().Set() prepends a new Properties node when the
-	// first child is a Paragraph (task blocks always have paragraph first).
+func TestApplyGroomAction_PriorityHigh_SetsPriorityAndGroomed(t *testing.T) {
+	// Verifies that priority action sets [#A] on the block and groomed:: after TODO.
 	graph := testutils.NewStubGraph(t, "groom-keep")
 
 	task := map[string]any{"id": "test-block-uuid-0001"}
@@ -176,7 +187,7 @@ func TestApplyGroomAction_Keep_GroomedPropertyAfterTODO(t *testing.T) {
 
 	opts := &groom.WriteOpts{CurrentTime: now}
 
-	action := groom.ParseAction("k", false)
+	action := groom.ParseAction("a", false)
 	err := groom.ApplyGroomAction(graph, &stubGroomAPI{}, action, task, opts)
 	require.NoError(t, err)
 
@@ -186,6 +197,9 @@ func TestApplyGroomAction_Keep_GroomedPropertyAfterTODO(t *testing.T) {
 	require.NoError(t, readErr)
 
 	fileText := string(fileBytes)
+
+	// Verify priority marker was inserted
+	assert.Contains(t, fileText, "[#A]")
 
 	// groomed:: must appear AFTER the TODO line, not before it.
 	todoIdx := indexOf(fileText, "TODO")

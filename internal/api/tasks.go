@@ -5,9 +5,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/andreoliwa/logseq-go/content"
+
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/pkg/set"
 )
+
+// TaskUUID is a type alias for task block UUIDs, making it clear when a string represents a Logseq block UUID.
+type TaskUUID = string
 
 // RefJSON represents a reference entry from the Logseq API response.
 type RefJSON struct {
@@ -25,7 +30,7 @@ type PageJSON struct {
 
 // TaskJSON represents a task block from the Logseq HTTP API.
 type TaskJSON struct {
-	UUID                 string            `json:"uuid"`
+	UUID                 TaskUUID          `json:"uuid"`
 	Marker               string            `json:"marker"`
 	Content              string            `json:"content"`
 	Page                 PageJSON          `json:"page"`
@@ -38,19 +43,21 @@ type TaskJSON struct {
 
 // CategorizedTasks holds sets of task UUIDs grouped by category.
 type CategorizedTasks struct {
-	All             *set.Set[string]
-	Overdue         *set.Set[string]
-	Doing           *set.Set[string]
-	FutureScheduled *set.Set[string]
+	All             *set.Set[TaskUUID]
+	Overdue         *set.Set[TaskUUID]
+	Doing           *set.Set[TaskUUID]
+	FutureScheduled *set.Set[TaskUUID]
+	TaskLookup      map[TaskUUID]TaskJSON
 }
 
 // NewCategorizedTasks creates a new CategorizedTasks with initialized sets.
 func NewCategorizedTasks() CategorizedTasks {
 	return CategorizedTasks{
-		All:             set.NewSet[string](),
-		Overdue:         set.NewSet[string](),
-		Doing:           set.NewSet[string](),
-		FutureScheduled: set.NewSet[string](),
+		All:             set.NewSet[TaskUUID](),
+		Overdue:         set.NewSet[TaskUUID](),
+		Doing:           set.NewSet[TaskUUID](),
+		FutureScheduled: set.NewSet[TaskUUID](),
+		TaskLookup:      make(map[TaskUUID]TaskJSON),
 	}
 }
 
@@ -75,7 +82,7 @@ func TaskOverdue(t TaskJSON, currentTime func() time.Time) bool {
 
 // TaskDoing checks if the task has the DOING marker.
 func TaskDoing(t TaskJSON) bool {
-	return t.Marker == "DOING"
+	return t.Marker == content.TaskStringDoing
 }
 
 // TaskFutureScheduled checks if the task is scheduled for the future (tomorrow onwards) and it's not overdue.

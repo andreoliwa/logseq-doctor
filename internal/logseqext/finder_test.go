@@ -244,7 +244,7 @@ func extractTextFromNodes(nodes content.NodeList, builder *strings.Builder) {
 	for _, node := range nodes {
 		switch nodeTyped := node.(type) {
 		case *content.TaskMarker:
-			builder.WriteString(taskStatusToString(nodeTyped.Status))
+			builder.WriteString(nodeTyped.Status.String())
 			builder.WriteString(" ")
 		case *content.Text:
 			builder.WriteString(nodeTyped.Value)
@@ -262,36 +262,5 @@ func extractTextFromNodes(nodes content.NodeList, builder *strings.Builder) {
 		case content.HasChildren:
 			extractTextFromNodes(nodeTyped.Children(), builder)
 		}
-	}
-}
-
-//nolint:cyclop // This is a simple mapping function with many cases
-func taskStatusToString(status content.TaskStatus) string {
-	// TODO: move this to logseq-go, use stringer; maybe related to https://github.com/aholstenson/logseq-go/issues/1
-	switch status {
-	case content.TaskStatusTodo:
-		return "TODO"
-	case content.TaskStatusDoing:
-		return "DOING"
-	case content.TaskStatusDone:
-		return "DONE"
-	case content.TaskStatusLater:
-		return "LATER"
-	case content.TaskStatusNow:
-		return "NOW"
-	case content.TaskStatusCancelled:
-		return "CANCELLED"
-	case content.TaskStatusCanceled:
-		return "CANCELED"
-	case content.TaskStatusInProgress:
-		return "IN-PROGRESS"
-	case content.TaskStatusWait:
-		return "WAIT"
-	case content.TaskStatusWaiting:
-		return "WAITING"
-	case content.TaskStatusNone:
-		return ""
-	default:
-		return ""
 	}
 }

@@ -19,6 +19,8 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
+        # TODO: #logseq-go is adding trailing whitespace somewhere, investigate and fix
+        exclude: '\.golden$'
       - id: end-of-file-fixer
         exclude: '\.golden$'
       - id: debug-statements

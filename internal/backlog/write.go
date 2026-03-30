@@ -2,13 +2,16 @@ package backlog
 
 import (
 	"fmt"
+	"sort"
 	"strings"
+	"time"
 
 	logseq "github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 	"github.com/fatih/color"
 
 	"github.com/andreoliwa/logseq-doctor/internal"
+	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/pkg/set"
 )
@@ -20,27 +23,30 @@ type pageState struct {
 	dividerOverdue   *content.Block
 	dividerFocus     *content.Block
 	dividerScheduled *content.Block
-	dividerSomeday   *content.Block
+	dividerTriaged   *content.Block
 
 	deletedCount        int
 	movedCount          int
 	movedScheduledCount int
 	unpinnedCount       int
 
-	result          *Result
-	pinnedBlockRefs *set.Set[string]
+	result           *Result
+	pinnedBlockRefs  *set.Set[string]
+	triagedBlockRefs *set.Set[string] // UUIDs already in the Triaged section
 }
 
 func newPageState() *pageState {
 	return &pageState{ //nolint:exhaustruct // zero values for all pointer/int fields are correct defaults
-		result:          &Result{FocusRefsFromPage: set.NewSet[string](), ShowQuickCapture: false},
-		pinnedBlockRefs: set.NewSet[string](),
+		result:           &Result{FocusRefsFromPage: set.NewSet[string](), ShowQuickCapture: false},
+		pinnedBlockRefs:  set.NewSet[string](),
+		triagedBlockRefs: set.NewSet[string](),
 	}
 }
 
 func insertAndRemoveRefs(
 	graph *logseq.Graph, pageTitle string, newBlockRefs, obsoleteBlockRefs,
 	overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
+	taskLookup map[logseqapi.TaskUUID]logseqapi.TaskJSON,
 ) (*Result, error) {
 	transaction := graph.NewTransaction()
 
@@ -57,7 +63,10 @@ func insertAndRemoveRefs(
 	save := insertNewTasks(page, state, newBlockRefs, overdueBlockRefs, futureScheduledBlockRefs)
 	insertScheduledTasks(page, state, futureScheduledBlockRefs)
 
-	save = logseqext.RemoveEmptyBlocks(save, state.dividerNewTasks, state.dividerOverdue, state.dividerScheduled)
+	sortTriagedSection(state, taskLookup)
+	save = logseqext.RemoveEmptyBlocks(save,
+		state.dividerNewTasks, state.dividerOverdue, state.dividerScheduled,
+		state.dividerTriaged)
 	save = reportCounts(state, save)
 
 	if save {
@@ -76,9 +85,52 @@ func insertAndRemoveRefs(
 	return state.result, nil
 }
 
-// scanPageBlocks iterates all blocks on the page, records section dividers,
-// and removes or unpins block refs that are obsolete, overdue, or scheduled.
+// scanPageBlocks is a two-pass coordinator: first it collects UUIDs already in
+// the Triaged section, then it processes all blocks (which uses those UUIDs for
+// deduplication in the regular area).
 func scanPageBlocks(
+	page logseq.Page, state *pageState,
+	obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
+) {
+	collectTriagedRefs(page, state)
+	processAllBlocks(page, state, obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs)
+}
+
+// collectTriagedRefs performs a first pass over the page to find the Triaged
+// section divider and record all block-ref UUIDs that are descendants of it.
+func collectTriagedRefs(page logseq.Page, state *pageState) {
+	for _, block := range page.Blocks() {
+		block.Children().FindDeep(func(node content.Node) bool {
+			if text, ok := node.(*content.Text); ok {
+				if strings.Contains(text.Value, SectionTriaged) {
+					state.dividerTriaged = block
+				}
+			}
+
+			return false
+		})
+
+		if state.dividerTriaged != nil {
+			break
+		}
+	}
+
+	if state.dividerTriaged == nil {
+		return
+	}
+
+	state.dividerTriaged.Children().FindDeep(func(node content.Node) bool {
+		if blockRef, ok := node.(*content.BlockRef); ok {
+			state.triagedBlockRefs.Add(blockRef.ID)
+		}
+
+		return false
+	})
+}
+
+// processAllBlocks iterates all blocks on the page, records section dividers,
+// and removes or unpins block refs that are obsolete, overdue, or scheduled.
+func processAllBlocks(
 	page logseq.Page, state *pageState,
 	obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
 ) {
@@ -112,8 +164,8 @@ func recordSectionDivider(block *content.Block, textValue string, state *pageSta
 		state.dividerFocus = block
 	case strings.Contains(textValue, SectionScheduled):
 		state.dividerScheduled = block
-	case strings.Contains(textValue, SectionSomeday):
-		state.dividerSomeday = block
+	case strings.Contains(textValue, SectionTriaged):
+		state.dividerTriaged = block
 	}
 }
 
@@ -126,10 +178,19 @@ func processBlockRef(
 	obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
 ) {
 	shouldDelete := false
-	underSomeday := state.dividerSomeday != nil && internal.IsAncestor(block, state.dividerSomeday)
+	underTriaged := state.dividerTriaged != nil && internal.IsAncestor(block, state.dividerTriaged)
+
+	// If already in Triaged and this ref is in the regular area, remove it (deduplication).
+	if state.triagedBlockRefs.Contains(blockRef.ID) && !underTriaged {
+		blockRef.Parent().Parent().RemoveSelf()
+
+		state.deletedCount++
+
+		return
+	}
 
 	switch {
-	case obsoleteBlockRefs.Contains(blockRef.ID) && !underSomeday:
+	case obsoleteBlockRefs.Contains(blockRef.ID) && !underTriaged:
 		shouldDelete = true
 		state.deletedCount++
 
@@ -302,10 +363,102 @@ func nextChildHasPin(node content.Node) bool {
 	return false
 }
 
+// taskSortKey holds the fields used to sort tasks in the Triaged section.
+type taskSortKey struct {
+	priority    content.PriorityValue // PriorityNone=0 sorts FIRST (unprioritized at top)
+	createdDate time.Time             // oldest first
+	firstLine   string                // alphabetical tiebreaker
+	id          logseqapi.TaskUUID    // UUID, guaranteed unique final tiebreaker
+	block       *content.Block        // reference to the block for reordering
+}
+
+// sortTriagedSection sorts children of the Triaged divider by priority, date, name, and ID.
+func sortTriagedSection(state *pageState, taskLookup map[logseqapi.TaskUUID]logseqapi.TaskJSON) {
+	// TODO: the same triaged task can belong to multiple backlogs...
+	//  It will be moved in one backlog but not in the others. How to solve this?
+	if state.dividerTriaged == nil {
+		return
+	}
+
+	children := state.dividerTriaged.Blocks()
+	if len(children) == 0 {
+		return
+	}
+
+	keys, unprioritizedCount := newSortKeys(children, taskLookup)
+
+	// Sort: priority asc (none=0 first), date asc, name asc, id asc
+	sort.SliceStable(keys, func(left, right int) bool {
+		return taskSortKeyLess(keys[left], keys[right])
+	})
+
+	// Reorder child blocks without touching the paragraph (block text).
+	// SetChildren would strip the paragraph, so we remove child blocks and re-add in order.
+	childNodes := make([]content.Node, len(children))
+	for i, c := range children {
+		childNodes[i] = c
+	}
+
+	state.dividerTriaged.RemoveChildren(childNodes...)
+
+	for _, k := range keys {
+		state.dividerTriaged.AddChild(k.block)
+	}
+
+	if unprioritizedCount > 0 {
+		color.Yellow(" %s in Triaged without priority",
+			FormatCount(unprioritizedCount, "task", "tasks"))
+	}
+}
+
+// newSortKeys creates sort keys for all children of the Triaged section.
+func newSortKeys(
+	children content.BlockList, taskLookup map[logseqapi.TaskUUID]logseqapi.TaskJSON,
+) ([]taskSortKey, int) {
+	keys := make([]taskSortKey, 0, len(children))
+	unprioritizedCount := 0
+
+	for _, child := range children {
+		uuid := logseqext.ExtractBlockRefUUID(child)
+		key := taskSortKey{block: child, id: uuid} //nolint:exhaustruct // zero values are correct defaults
+
+		if task, ok := taskLookup[uuid]; ok {
+			key.priority = logseqext.ParsePriorityFromContent(task.Content)
+			key.createdDate = logseqext.JournalDayToTime(task.Page.JournalDay)
+			key.firstLine = logseqext.ExtractFirstLine(task.Content)
+		}
+
+		if key.priority == content.PriorityNone {
+			unprioritizedCount++
+		}
+
+		keys = append(keys, key)
+	}
+
+	return keys, unprioritizedCount
+}
+
+// taskSortKeyLess compares two sort keys for ordering in the Triaged section.
+func taskSortKeyLess(left, right taskSortKey) bool {
+	if left.priority != right.priority {
+		return left.priority < right.priority
+	}
+
+	if !left.createdDate.Equal(right.createdDate) {
+		return left.createdDate.Before(right.createdDate)
+	}
+
+	if left.firstLine != right.firstLine {
+		return left.firstLine < right.firstLine
+	}
+
+	return left.id < right.id
+}
+
 // focusSectionTexts are text substrings that identify section dividers on the Focus page.
 //
 //nolint:gochecknoglobals // constant lookup table for section detection
-var focusSectionTexts = []string{SectionOverdue, SectionNewTasks, SectionSomeday, SectionScheduled}
+var focusSectionTexts = []string{SectionOverdue, SectionNewTasks, SectionTriaged, SectionScheduled}
 
 // AddBlockRefToFocusPage adds a block ref ((uuid)) to the Focus page.
 func AddBlockRefToFocusPage(transaction *logseq.Transaction, focusPageTitle, uuid string) error {
@@ -341,43 +494,132 @@ func FindFirstSectionDivider(page logseq.Page) *content.Block {
 	return nil
 }
 
-// AddBlockRefToSomedaySection adds a block ref to the Someday section of a backlog page.
-// Creates the section if it doesn't exist.
-func AddBlockRefToSomedaySection(
-	transaction *logseq.Transaction, backlogPage, uuid, somedayText, scheduledText string,
+// regularAreaSectionHeaders are section texts that mark the boundary of the regular area.
+// A top-level block containing any of these texts is a section divider, not part of the regular area.
+//
+//nolint:gochecknoglobals // constant lookup table for regular area detection
+var regularAreaSectionHeaders = []string{
+	SectionFocus, SectionOverdue, sectionNewTasksText, SectionTriaged, SectionScheduled,
+}
+
+// blockRefExistsUnder returns true if a block ref with the given UUID exists
+// anywhere in the descendant tree of parent.
+func blockRefExistsUnder(parent *content.Block, uuid logseqapi.TaskUUID) bool {
+	found := false
+
+	parent.Children().FindDeep(func(node content.Node) bool {
+		if blockRef, ok := node.(*content.BlockRef); ok && blockRef.ID == uuid {
+			found = true
+
+			return true
+		}
+
+		return false
+	})
+
+	return found
+}
+
+// removeBlockRefFromRegularArea removes the block ref with the given UUID from the regular area
+// of the page. The regular area is any top-level block ref that is not itself a section divider.
+// Section dividers (Focus, Overdue, New tasks, Triaged, Someday, Scheduled) and their children
+// are not part of the regular area. Since we walk only top-level blocks, child refs are never seen.
+func removeBlockRefFromRegularArea(page logseq.Page, uuid logseqapi.TaskUUID) {
+	for _, block := range page.Blocks() {
+		blockText := logseqext.BlockContentText(block)
+
+		isDivider := false
+
+		for _, header := range regularAreaSectionHeaders {
+			if strings.Contains(blockText, header) {
+				isDivider = true
+
+				break
+			}
+		}
+
+		if isDivider {
+			continue
+		}
+
+		if logseqext.ExtractBlockRefUUID(block) == uuid {
+			block.RemoveSelf()
+
+			return
+		}
+
+		// Also search descendants of non-divider blocks (e.g. block refs nested under
+		// named sub-sections like "Features", "Bugs", "Convert from Python > Outline").
+		var found *content.Block
+
+		block.Children().FindDeep(func(node content.Node) bool {
+			if b, ok := node.(*content.Block); ok {
+				if logseqext.ExtractBlockRefUUID(b) == uuid {
+					found = b
+
+					return true
+				}
+			}
+
+			return false
+		})
+
+		if found != nil {
+			found.RemoveSelf()
+
+			return
+		}
+	}
+}
+
+// MoveBlockRefToTriagedSection moves a block ref to the Triaged section of a backlog page.
+// If the ref exists in the regular area (not under Focus, New tasks, Overdue, or Scheduled),
+// it is removed from there. If it's already in Triaged, no duplicate is added.
+// Creates the Triaged section if it doesn't exist.
+func MoveBlockRefToTriagedSection(
+	transaction *logseq.Transaction, backlogPage string, uuid logseqapi.TaskUUID, triagedText, scheduledText string,
 ) error {
 	page, err := transaction.OpenPage(backlogPage)
 	if err != nil {
 		return fmt.Errorf("failed to open backlog page %s: %w", backlogPage, err)
 	}
 
-	somedayBlock := logseqext.FindBlockContainingText(page, somedayText)
+	triagedBlock := logseqext.FindBlockContainingText(page, triagedText)
+	alreadyInTriaged := triagedBlock != nil && blockRefExistsUnder(triagedBlock, uuid)
 
-	if somedayBlock == nil {
-		return createSomedaySectionWithRef(page, uuid, somedayText, scheduledText)
+	// Remove from regular area if present (regardless of whether it's in Triaged).
+	removeBlockRefFromRegularArea(page, uuid)
+
+	if alreadyInTriaged {
+		// Already in Triaged; removal from regular area is sufficient.
+		return nil
+	}
+
+	if triagedBlock == nil {
+		return createTriagedSectionWithRef(page, uuid, triagedText, scheduledText)
 	}
 
 	ref := content.NewBlock(content.NewParagraph(content.NewBlockRef(uuid)))
-	somedayBlock.AddChild(ref)
+	triagedBlock.AddChild(ref)
 
 	return nil
 }
 
-// createSomedaySectionWithRef creates a new Someday section with a block reference.
+// createTriagedSectionWithRef creates a new Triaged section with a block reference.
 // It inserts the section before the Scheduled section if found, or appends to the end.
-func createSomedaySectionWithRef(
-	page logseq.Page, uuid, somedayText, scheduledText string,
+func createTriagedSectionWithRef(
+	page logseq.Page, uuid logseqapi.TaskUUID, triagedText, scheduledText string,
 ) error {
 	scheduledBlock := logseqext.FindBlockContainingText(page, scheduledText)
 
-	somedayDivider := content.NewBlock(content.NewParagraph(content.NewText(somedayText)))
+	triagedDivider := content.NewBlock(content.NewParagraph(content.NewText(triagedText)))
 	ref := content.NewBlock(content.NewParagraph(content.NewBlockRef(uuid)))
-	somedayDivider.AddChild(ref)
+	triagedDivider.AddChild(ref)
 
 	if scheduledBlock != nil {
-		page.InsertBlockBefore(somedayDivider, scheduledBlock)
+		page.InsertBlockBefore(triagedDivider, scheduledBlock)
 	} else {
-		page.AddBlock(somedayDivider)
+		page.AddBlock(triagedDivider)
 	}
 
 	return nil

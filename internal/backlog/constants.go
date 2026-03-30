@@ -14,6 +14,6 @@ const (
 	SectionFocus     = "Focus"
 	SectionOverdue   = "📅 Overdue tasks"
 	SectionNewTasks  = "🆕 " + sectionNewTasksText
-	SectionSomeday   = "📦 Someday"
+	SectionTriaged   = "🏷️ Triaged"
 	SectionScheduled = "⏰ Scheduled tasks"
 )

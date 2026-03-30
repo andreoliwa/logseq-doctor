@@ -181,14 +181,8 @@ func CheckRunningTasks(page logseq.Page) ChangedPage {
 	for _, block := range page.Blocks() {
 		block.Children().FindDeep(func(n content.Node) bool {
 			if task, ok := n.(*content.TaskMarker); ok {
-				status := task.Status
-				// TODO: convert to strings "DOING"/"IN-PROGRESS" in logseq-go
-				if status == content.TaskStatusDoing {
-					all = append(all, "DOING")
-				}
-
-				if status == content.TaskStatusInProgress {
-					all = append(all, "IN-PROGRESS")
+				if task.Status == content.TaskStatusDoing || task.Status == content.TaskStatusInProgress {
+					all = append(all, task.Status.String())
 				}
 			}
 

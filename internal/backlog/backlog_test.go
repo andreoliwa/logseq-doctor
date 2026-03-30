@@ -262,19 +262,20 @@ func TestFutureScheduledTasks(t *testing.T) {
 	}
 }
 
-func TestSomedayPreservation(t *testing.T) {
-	back := testutils.StubBacklog(t, "dt", "someday-preserved", &testutils.StubAPIResponses{
+func TestTriagedDedup(t *testing.T) {
+	back := testutils.StubBacklog(t, "bk", "triaged-dedup", &testutils.StubAPIResponses{
 		Queries: []testutils.QueryArg{
-			{Contains: "health"},
+			{Contains: "home"},
+			{Contains: "phone"},
 		},
 	})
 
-	pages := []string{"dt___health"}
+	pages := []string{"bk___home", "bk___phone"}
 
 	err := back.ProcessAll([]string{})
 	require.NoError(t, err)
 
-	testutils.AssertGoldenPages(t, back.Graph(), "someday-preserved", pages)
+	testutils.AssertGoldenPages(t, back.Graph(), "triaged-dedup", pages)
 }
 
 func TestDoingTasks(t *testing.T) {

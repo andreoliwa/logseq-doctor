@@ -2,13 +2,18 @@ package logseqext
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 
 	logseq "github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 )
+
+// ErrNoParagraph is returned when SetPriority is called on a block with no paragraph.
+var ErrNoParagraph = errors.New("block has no paragraph to insert priority into")
 
 // JournalDayDivisorYear is used to extract the year from a journalDay integer (YYYYMMDD).
 const JournalDayDivisorYear = 10000
@@ -119,6 +124,73 @@ func SetTaskCanceled(block *content.Block) error {
 	return nil
 }
 
+// SetPriority sets or replaces the priority marker ([#A]/[#B]/[#C]) on a block.
+// If a Priority node exists, it is updated in place. Otherwise, a new Priority node
+// is inserted after the TaskMarker (or at the start of the first paragraph for plain blocks).
+func SetPriority(block *content.Block, priority content.PriorityValue) error {
+	var existingPriority *content.Priority
+
+	var taskMarker *content.TaskMarker
+
+	var firstParagraph *content.Paragraph
+
+	block.Content().FindDeep(func(node content.Node) bool {
+		switch typedNode := node.(type) {
+		case *content.Paragraph:
+			if firstParagraph == nil {
+				firstParagraph = typedNode
+			}
+		case *content.Priority:
+			existingPriority = typedNode
+		case *content.TaskMarker:
+			taskMarker = typedNode
+		}
+
+		return false
+	})
+
+	if existingPriority != nil {
+		existingPriority.WithPriority(priority)
+
+		return nil
+	}
+
+	if firstParagraph == nil {
+		return ErrNoParagraph
+	}
+
+	newPriority := content.NewPriority(priority)
+
+	if taskMarker != nil {
+		// Use the TaskMarker's parent paragraph, not firstParagraph,
+		// because a block can have multiple paragraphs (e.g. SCHEDULED line).
+		if parent, ok := taskMarker.Parent().(*content.Paragraph); ok {
+			parent.InsertChildAfter(newPriority, taskMarker)
+		} else {
+			firstParagraph.InsertChildAfter(newPriority, taskMarker)
+		}
+	} else {
+		firstParagraph.PrependChild(newPriority)
+	}
+
+	return nil
+}
+
+// priorityRegex matches Logseq priority markers like [#A], [#B], [#C] in content strings.
+var priorityRegex = regexp.MustCompile(`\[#([ABC])\]`)
+
+// ParsePriorityFromContent extracts a priority value from a Logseq API content string.
+// It looks for [#A], [#B], or [#C] patterns and returns the corresponding PriorityValue.
+// Returns PriorityNone if no priority marker is found.
+func ParsePriorityFromContent(contentStr string) content.PriorityValue {
+	match := priorityRegex.FindStringSubmatch(contentStr)
+	if len(match) < 2 { //nolint:mnd
+		return content.PriorityNone
+	}
+
+	return content.ParsePriorityFromLetter(match[1])
+}
+
 // AddSibling inserts newBlock into page relative to the given anchor blocks.
 // It inserts after the last non-nil block in after, or before the before block,
 // or appends to the page if neither is provided.
@@ -180,4 +252,38 @@ func OpenPage(graph *logseq.Graph, pageTitle string) logseq.Page {
 	}
 
 	return page
+}
+
+// priorityPrefixRegex matches a priority marker at the start of a line for stripping.
+var priorityPrefixRegex = regexp.MustCompile(`^\[#[ABC]\]\s*`)
+
+// ExtractBlockRefUUID extracts the UUID from a block ref inside a child block.
+func ExtractBlockRefUUID(block *content.Block) string {
+	var uuid string
+
+	block.Content().FindDeep(func(node content.Node) bool {
+		if ref, ok := node.(*content.BlockRef); ok {
+			uuid = ref.ID
+
+			return true
+		}
+
+		return false
+	})
+
+	return uuid
+}
+
+// ExtractFirstLine extracts the first line of task content, stripping the marker and priority.
+func ExtractFirstLine(taskContent string) string {
+	line, _, _ := strings.Cut(taskContent, "\n")
+
+	for _, status := range content.TaskStatusStrings() {
+		line = strings.TrimPrefix(line, status+" ")
+	}
+
+	// Strip priority marker
+	line = priorityPrefixRegex.ReplaceAllString(line, "")
+
+	return strings.TrimSpace(line)
 }
