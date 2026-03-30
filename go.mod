@@ -3,7 +3,7 @@ module github.com/andreoliwa/logseq-doctor
 go 1.25.0
 
 require (
-	github.com/andreoliwa/logseq-go v0.4.1
+	github.com/andreoliwa/logseq-go v1.2.0
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/fatih/color v1.19.0
 	github.com/karrick/tparse/v2 v2.8.2
