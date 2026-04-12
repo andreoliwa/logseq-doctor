@@ -24,6 +24,7 @@ type pageState struct {
 	dividerFocus     *content.Block
 	dividerScheduled *content.Block
 	dividerTriaged   *content.Block
+	dividerUnranked  *content.Block
 
 	deletedCount        int
 	movedCount          int
@@ -66,7 +67,7 @@ func insertAndRemoveRefs(
 	sortTriagedSection(state, taskLookup)
 	save = logseqext.RemoveEmptyBlocks(save,
 		state.dividerNewTasks, state.dividerOverdue, state.dividerScheduled,
-		state.dividerTriaged)
+		state.dividerTriaged, state.dividerUnranked)
 	save = reportCounts(state, save)
 
 	if save {
@@ -166,6 +167,8 @@ func recordSectionDivider(block *content.Block, textValue string, state *pageSta
 		state.dividerScheduled = block
 	case strings.Contains(textValue, SectionTriaged):
 		state.dividerTriaged = block
+	case strings.Contains(textValue, SectionUnranked):
+		state.dividerUnranked = block
 	}
 }
 
@@ -179,6 +182,12 @@ func processBlockRef(
 ) {
 	shouldDelete := false
 	underTriaged := state.dividerTriaged != nil && internal.IsAncestor(block, state.dividerTriaged)
+	underUnranked := state.dividerUnranked != nil && internal.IsAncestor(block, state.dividerUnranked)
+
+	// Preserve tasks under the Unranked divider — they are intentionally unranked.
+	if underUnranked {
+		return
+	}
 
 	// If already in Triaged and this ref is in the regular area, remove it (deduplication).
 	if state.triagedBlockRefs.Contains(blockRef.ID) && !underTriaged {
@@ -499,12 +508,12 @@ func FindFirstSectionDivider(page logseq.Page) *content.Block {
 //
 //nolint:gochecknoglobals // constant lookup table for regular area detection
 var regularAreaSectionHeaders = []string{
-	SectionFocus, SectionOverdue, sectionNewTasksText, SectionTriaged, SectionScheduled,
+	SectionFocus, SectionOverdue, sectionNewTasksText, SectionTriaged, SectionScheduled, SectionUnranked,
 }
 
-// blockRefExistsUnder returns true if a block ref with the given UUID exists
+// BlockRefExistsUnder returns true if a block ref with the given UUID exists
 // anywhere in the descendant tree of parent.
-func blockRefExistsUnder(parent *content.Block, uuid logseqapi.TaskUUID) bool {
+func BlockRefExistsUnder(parent *content.Block, uuid logseqapi.TaskUUID) bool {
 	found := false
 
 	parent.Children().FindDeep(func(node content.Node) bool {
@@ -520,11 +529,11 @@ func blockRefExistsUnder(parent *content.Block, uuid logseqapi.TaskUUID) bool {
 	return found
 }
 
-// removeBlockRefFromRegularArea removes the block ref with the given UUID from the regular area
+// RemoveBlockRefFromRegularArea removes the block ref with the given UUID from the regular area
 // of the page. The regular area is any top-level block ref that is not itself a section divider.
-// Section dividers (Focus, Overdue, New tasks, Triaged, Someday, Scheduled) and their children
+// Section dividers (Focus, Overdue, New tasks, Triaged, Scheduled, Unranked) and their children
 // are not part of the regular area. Since we walk only top-level blocks, child refs are never seen.
-func removeBlockRefFromRegularArea(page logseq.Page, uuid logseqapi.TaskUUID) {
+func RemoveBlockRefFromRegularArea(page logseq.Page, uuid logseqapi.TaskUUID) {
 	for _, block := range page.Blocks() {
 		blockText := logseqext.BlockContentText(block)
 
@@ -585,10 +594,10 @@ func MoveBlockRefToTriagedSection(
 	}
 
 	triagedBlock := logseqext.FindBlockContainingText(page, triagedText)
-	alreadyInTriaged := triagedBlock != nil && blockRefExistsUnder(triagedBlock, uuid)
+	alreadyInTriaged := triagedBlock != nil && BlockRefExistsUnder(triagedBlock, uuid)
 
 	// Remove from regular area if present (regardless of whether it's in Triaged).
-	removeBlockRefFromRegularArea(page, uuid)
+	RemoveBlockRefFromRegularArea(page, uuid)
 
 	if alreadyInTriaged {
 		// Already in Triaged; removal from regular area is sufficient.

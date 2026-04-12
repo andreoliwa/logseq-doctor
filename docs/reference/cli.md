@@ -314,6 +314,58 @@ This command scans your Logseq graph and lists all tasks found in your pages. It
 lqdpy -g ~/logseq/my-graph tasks
 ```
 
+### `dashboard`
+
+Start PocketBase and the backlog web UI.
+
+**Usage:**
+
+```bash
+lqd dashboard [OPTIONS]
+lqd dash [OPTIONS]        # short alias
+```
+
+**Description:**
+
+Starts PocketBase as a managed subprocess, waits for it to be ready, then serves
+the backlog dashboard at `http://localhost:8091`. On macOS the browser opens automatically.
+
+The dashboard lets you browse, filter, sort, and reorder tasks across all your backlogs
+in a visual web UI. Rank changes are written directly to PocketBase; use `lqd backlog`
+to propagate them back to Logseq `.md` files.
+
+**Options:**
+
+| Flag         | Env var          | Default | Description      |
+| ------------ | ---------------- | ------- | ---------------- |
+| `-p, --port` | `LQD_SERVE_PORT` | `8091`  | HTTP server port |
+
+**Required environment variables:**
+
+| Variable              | Description                                                    |
+| --------------------- | -------------------------------------------------------------- |
+| `POCKETBASE_URL`      | PocketBase base URL (default `http://127.0.0.1:8090`)          |
+| `POCKETBASE_USERNAME` | PocketBase admin email                                         |
+| `POCKETBASE_PASSWORD` | PocketBase admin password                                      |
+| `LOGSEQ_GRAPH_PATH`   | Path to Logseq graph root (required for write-back operations) |
+
+**Example:**
+
+```bash
+# Start with defaults (port 8091)
+lqd dashboard
+
+# Start on a custom port
+lqd dash --port 9000
+
+# Start with explicit credentials
+POCKETBASE_USERNAME=admin@example.com POCKETBASE_PASSWORD=secret lqd dashboard
+```
+
+See [Dashboard Guide](../dashboard.md) for a full walkthrough of the web UI.
+
+---
+
 ### `tidy-up`
 
 Clean up and standardize your Markdown files.

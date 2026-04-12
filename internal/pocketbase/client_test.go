@@ -47,6 +47,19 @@ func TestAuthenticate_Failure(t *testing.T) {
 	assert.Contains(t, err.Error(), "authentication failed")
 }
 
+func TestClientTokenAfterAuth(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		writer.Header().Set("Content-Type", "application/json")
+		err := json.NewEncoder(writer).Encode(map[string]string{"token": "returned-token-xyz"})
+		assert.NoError(t, err)
+	}))
+	defer server.Close()
+
+	client, err := pocketbase.NewClient(server.URL, "user@test.com", "pass")
+	require.NoError(t, err)
+	assert.Equal(t, "returned-token-xyz", client.Token())
+}
+
 func TestAuthenticate_Unreachable(t *testing.T) {
 	client, err := pocketbase.NewClient("http://127.0.0.1:19999", "a@b.com", "x")
 	require.Error(t, err)

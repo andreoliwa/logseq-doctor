@@ -1,0 +1,1504 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Backlog</title>
+
+        <!--
+    Tom Select: a lightweight, accessible multi-select / tag-picker widget.
+    We load its default CSS here, then override the colours in backlog.css to
+    match our palette (see the "Tom Select overrides" section there).
+    The JS bundle is loaded at the bottom of <body>, just before our script.
+  -->
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/tom-select@2/dist/css/tom-select.css"
+        />
+
+        <!--
+    Our own stylesheet, served by the Go server from the embedded backlog.css
+    file (cmd/web/backlog.css, embedded via go:embed in cmd/web.go).
+    It handles theming, layout, and all component styles. See that file for
+    detailed comments on every section.
+  -->
+        <link rel="stylesheet" href="/backlog.css" />
+    </head>
+    <body>
+        <!--
+  Filter bar — two rows, sticky at the top of the viewport.
+  Row 1: search, tags, AND/OR toggle, backlog dropdown.
+  Row 2: date-type checkboxes, status checkboxes, clear button.
+  All controls only affect the in-memory `allTasks` array; no network requests on filter change.
+-->
+        <div id="filter-bar">
+            <!--
+              Row 1: backlog selector | search box | tags picker (expands to fill remaining width)
+              The tags wrapper uses flex-grow:1 so it takes all leftover space.
+            -->
+            <div class="filter-row">
+                <!--
+      Quick filter: preset combinations that override the individual checkboxes.
+      Selecting a quick filter resets all filters first, then applies the preset.
+    -->
+                <select id="quick-select">
+                    <option value="">(no quick filter)</option>
+                    <option value="overdue">Overdue</option>
+                    <option value="waiting">Waiting</option>
+                    <option value="waiting-no-due-date">
+                        Waiting without due date
+                    </option>
+                </select>
+
+                <!-- Backlog dropdown; options are populated dynamically from loaded tasks. -->
+                <select id="backlog-select">
+                    <option value="">All backlogs</option>
+                </select>
+
+                <!-- Free-text search. Supports multi-word AND (space-separated) and OR (literal " or "). -->
+                <input
+                    type="text"
+                    id="text-filter"
+                    placeholder="Search tasks…"
+                    autocomplete="off"
+                />
+
+                <!--
+      Tom Select replaces this <select multiple> with a rich tag-picker widget.
+      Options are populated dynamically from the loaded tasks.
+      flex-grow:1 via #tags-wrap makes it fill the remaining row width (~70%).
+    -->
+                <div id="tags-wrap">
+                    <select
+                        id="tags-select"
+                        multiple
+                        placeholder="Filter by tags…"
+                    ></select>
+                </div>
+
+                <!-- AND/OR toggle controls whether all selected tags must match or any one. -->
+                <div class="tag-and-or">
+                    <label
+                        ><input
+                            type="radio"
+                            name="tag-mode"
+                            value="AND"
+                            checked
+                        />
+                        AND</label
+                    >
+                    <label
+                        ><input type="radio" name="tag-mode" value="OR" />
+                        OR</label
+                    >
+                </div>
+            </div>
+
+            <!--
+              Row 2: status checkboxes on the left | date checkboxes + clear button on the right.
+              `justify-content: space-between` pushes the two groups to opposite ends.
+              Each group is its own flex container so its items stay together when the row wraps.
+            -->
+            <div class="filter-row filter-row-split">
+                <!-- Status checkboxes — left side. -->
+                <div class="filter-group">
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="status-cb"
+                            value="TODO"
+                            checked
+                        />
+                        TODO</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="status-cb"
+                            value="DOING"
+                            checked
+                        />
+                        DOING</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="status-cb"
+                            value="WAITING"
+                            checked
+                        />
+                        WAITING</label
+                    >
+                </div>
+
+                <!-- Date-type filters + clear button — right side.
+                     Each checkbox independently controls visibility based on whether
+                     the task has that field set. All checked by default. -->
+                <div class="filter-group">
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="date-type-cb"
+                            value="overdue"
+                            checked
+                        />
+                        Overdue</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="date-type-cb"
+                            value="scheduled"
+                            checked
+                        />
+                        Scheduled</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="date-type-cb"
+                            value="deadline"
+                            checked
+                        />
+                        Deadline</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="date-type-cb"
+                            value="no-due-date"
+                            checked
+                        />
+                        No due date</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="date-type-cb"
+                            value="journal"
+                            checked
+                        />
+                        Journal</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="date-type-cb"
+                            value="page"
+                            checked
+                        />
+                        Page</label
+                    >
+                    <button class="clear-btn" id="clear-btn">
+                        Clear filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!--
+  Main content area. Both sections start hidden (display:none); JS shows them
+  once data is loaded and there is something to display.
+-->
+        <div id="main">
+            <!-- Shown while the initial fetch is in progress; hidden once done. -->
+            <div id="loading">Loading tasks…</div>
+            <!-- Shown (and populated) only when loading fails. -->
+            <div id="error-msg" style="display: none"></div>
+
+            <!--
+    Ranked tasks: tasks with rank > 0, grouped by backlog.
+    Each group has a header row (.backlog-group-header) followed by data rows.
+    Rows within a group are drag-sortable via SortableJS; dragging updates the
+    rank field in PocketBase via a PATCH request.
+  -->
+            <div id="ranked-section" style="display: none">
+                <h2>Ranked tasks</h2>
+                <table id="ranked-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <!-- drag handle column, no label -->
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Backlog</th>
+                            <th>Tags</th>
+                            <th>Status</th>
+                            <th>Overdue</th>
+                            <th>Scheduled</th>
+                            <th>Deadline</th>
+                            <th>Journal</th>
+                            <th>Sort date</th>
+                            <th>Groomed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ranked-body"></tbody>
+                </table>
+            </div>
+
+            <!--
+    Unranked tasks: tasks with rank = 0 (or null).
+    Sorted client-side by the user-configurable sort bar above the table.
+    No drag-to-rank here; use the ranked section for that.
+  -->
+            <div id="unranked-section" style="display: none">
+                <h2>Unranked tasks</h2>
+                <!--
+      Sort bar: a row of draggable criterion chips rendered by renderSortBar().
+      Each chip has a field selector, a direction selector (ASC/DESC), and a
+      remove button. Chips themselves are drag-sortable (priority order).
+    -->
+                <div class="sort-bar" id="sort-bar"></div>
+                <table id="unranked-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Backlog</th>
+                            <th>Tags</th>
+                            <th>Status</th>
+                            <th>Overdue</th>
+                            <th>Scheduled</th>
+                            <th>Deadline</th>
+                            <th>Journal</th>
+                            <th>Sort date</th>
+                            <th>Groomed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="unranked-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!--
+  Context menu — appears on right-click of a ranked task row.
+  Positioned by JS (style.left / style.top = cursor coordinates).
+  Hidden by default; shown/hidden entirely through JS.
+-->
+        <!--
+  SortableJS: drag-and-drop library used for two things:
+    1. Reordering ranked task rows within a backlog group.
+    2. Reordering sort-criterion chips in the sort bar.
+  Loaded before our script so `Sortable` is available when we call it.
+-->
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1/Sortable.min.js"></script>
+        <!--
+  Tom Select JS: replaces the #tags-select <select multiple> with a rich
+  tag-picker. Loaded after SortableJS to avoid any load-order issues.
+-->
+        <script src="https://cdn.jsdelivr.net/npm/tom-select@2/dist/js/tom-select.complete.min.js"></script>
+        <script>
+            "use strict";
+
+            // ── DOM helpers ──────────────────────────────────────────────────────────────
+            // These three utilities reduce boilerplate when building DOM nodes in JS.
+
+            // el(tag, props, ...children) — creates an element, assigns properties, appends children.
+            // String children become text nodes; null/undefined children are skipped.
+            function el(tag, props, ...children) {
+                const node = document.createElement(tag);
+                if (props) Object.assign(node, props);
+                for (const ch of children) {
+                    if (ch == null) continue;
+                    node.appendChild(
+                        typeof ch === "string"
+                            ? document.createTextNode(ch)
+                            : ch,
+                    );
+                }
+                return node;
+            }
+
+            // td(cls, ...children) — shorthand for creating a <td> with an optional class.
+            function td(cls, ...children) {
+                const cell = el("td", null, ...children);
+                if (cls) cell.className = cls;
+                return cell;
+            }
+
+            // fmtDate(iso) — trims an ISO-8601 datetime to just the date part (YYYY-MM-DD).
+            // Guards against non-string values (null, false, 0) that PocketBase may return
+            // for unset date fields — avoids "iso.slice is not a function" at runtime.
+            function fmtDate(iso) {
+                if (!iso || typeof iso !== "string") return "";
+                return iso.slice(0, 10);
+            }
+
+            // formatJournalTitle(isoDate) — formats an ISO date string (e.g. "2025-04-12")
+            // as a Logseq journal page title using the format string from the graph config
+            // (e.g. "EEEE, dd.MM.yyyy" → "Saturday, 12.04.2025").
+            //
+            // Logseq uses Unicode CLDR tokens: EEEE=full weekday, EEE=short weekday,
+            // do=ordinal day (1st/2nd/...), dd=zero-padded day, d=day, MM=zero-padded month,
+            // MMM=short month, MMMM=full month, yyyy=4-digit year.
+            // We resolve each token using Intl.DateTimeFormat to stay locale-correct.
+            function formatJournalTitle(isoDate) {
+                if (!isoDate || !journalTitleFormat) return "";
+                // Parse as UTC noon to avoid timezone edge cases shifting the date.
+                const d = new Date(isoDate.slice(0, 10) + "T12:00:00Z");
+                if (isNaN(d)) return "";
+
+                // Precompute the parts we might need.
+                const locale = "en-US"; // Logseq journal titles use English regardless of system locale
+                const parts = {
+                    EEEE: d.toLocaleDateString(locale, {
+                        weekday: "long",
+                        timeZone: "UTC",
+                    }),
+                    EEE: d.toLocaleDateString(locale, {
+                        weekday: "short",
+                        timeZone: "UTC",
+                    }),
+                    MMMM: d.toLocaleDateString(locale, {
+                        month: "long",
+                        timeZone: "UTC",
+                    }),
+                    MMM: d.toLocaleDateString(locale, {
+                        month: "short",
+                        timeZone: "UTC",
+                    }),
+                    MM: String(d.getUTCMonth() + 1).padStart(2, "0"),
+                    M: String(d.getUTCMonth() + 1),
+                    dd: String(d.getUTCDate()).padStart(2, "0"),
+                    d: String(d.getUTCDate()),
+                    yyyy: String(d.getUTCFullYear()),
+                    yy: String(d.getUTCFullYear()).slice(-2),
+                };
+                // Ordinal: 1st, 2nd, 3rd, 4th…
+                const day = d.getUTCDate();
+                const suffix =
+                    day === 1 || day === 21 || day === 31
+                        ? "st"
+                        : day === 2 || day === 22
+                          ? "nd"
+                          : day === 3 || day === 23
+                            ? "rd"
+                            : "th";
+                parts["do"] = day + suffix;
+
+                // Replace tokens longest-first to avoid partial matches (e.g. EEEE before EEE).
+                return journalTitleFormat
+                    .replace(/EEEE/g, parts.EEEE)
+                    .replace(/EEE/g, parts.EEE)
+                    .replace(/MMMM/g, parts.MMMM)
+                    .replace(/MMM/g, parts.MMM)
+                    .replace(/MM/g, parts.MM)
+                    .replace(/\bM\b/g, parts.M)
+                    .replace(/do/g, parts["do"])
+                    .replace(/dd/g, parts.dd)
+                    .replace(/\bd\b/g, parts.d)
+                    .replace(/yyyy/g, parts.yyyy)
+                    .replace(/yy/g, parts.yy);
+            }
+
+            // clearChildren(node) — removes all child nodes (faster than innerHTML = '').
+            function clearChildren(node) {
+                while (node.firstChild) node.removeChild(node.firstChild);
+            }
+
+            // backlogCell(task, showAction) — creates a <td> with:
+            //   • a Logseq deep-link to the backlog page (if the graph name is known)
+            //   • optionally, a ⤵️ action link (visible only on row hover) that marks
+            //     this task and all ranked tasks below it in the same backlog as unranked.
+            //   showAction should be true only for ranked rows.
+            function backlogCell(task, showAction) {
+                const name = task.backlog_name || "";
+                const cell = el("td", { className: "backlog-name" });
+                const url = logseqPageURL(name);
+                cell.appendChild(
+                    url
+                        ? el("a", { href: url }, name)
+                        : document.createTextNode(name),
+                );
+                if (showAction) {
+                    // ⤵️ action — placed after the backlog name; hidden via CSS until hovered.
+                    const action = el("a", {
+                        href: "#",
+                        className: "unrank-action",
+                        title: "Mark this and below as unranked",
+                    });
+                    action.textContent = "⤵️";
+                    action.addEventListener("click", async (evt) => {
+                        evt.preventDefault();
+                        await doMoveToUnranked(task);
+                    });
+                    cell.appendChild(action);
+                }
+                return cell;
+            }
+
+            // taskNameCell(task) — creates a .task-name <td> with an optional 🔗 link that
+            // opens the block directly in Logseq, followed by the task description.
+            // The link uses the block-id URL scheme: logseq://graph/<name>?block-id=<uuid>.
+            // The UUID comes from the task's `id` field in PocketBase.
+            function taskNameCell(task) {
+                const cell = el("td", { className: "task-name" });
+                if (graphName && task.id) {
+                    const url =
+                        "logseq://graph/" +
+                        encodeURIComponent(graphName) +
+                        "?block-id=" +
+                        encodeURIComponent(task.id);
+                    cell.appendChild(
+                        el(
+                            "a",
+                            {
+                                href: url,
+                                className: "task-link",
+                                title: "Open in Logseq",
+                            },
+                            "🔗",
+                        ),
+                    );
+                    cell.appendChild(document.createTextNode(" "));
+                }
+                cell.appendChild(document.createTextNode(task.name || ""));
+                return cell;
+            }
+
+            // overdueBadgeCell(task) — creates a .date-cell <td> for the Overdue column.
+            // `overdue` is a boolean in PocketBase. When true, the cell shows "overdue" and
+            // links to the task's scheduled date journal page (the date that has passed).
+            function overdueBadgeCell(task) {
+                const cell = el("td", { className: "date-cell" });
+                if (!task.overdue) return cell;
+                // Link to the scheduled date's journal page, since that's the date that lapsed.
+                const dateForLink = task.scheduled || task.deadline;
+                if (graphName && journalTitleFormat && dateForLink) {
+                    const pageTitle = formatJournalTitle(dateForLink);
+                    const url =
+                        "logseq://graph/" +
+                        encodeURIComponent(graphName) +
+                        "?page=" +
+                        encodeURIComponent(pageTitle);
+                    cell.appendChild(
+                        el(
+                            "a",
+                            { href: url, className: "overdue-badge" },
+                            "overdue",
+                        ),
+                    );
+                } else {
+                    cell.appendChild(
+                        el("span", { className: "overdue-badge" }, "overdue"),
+                    );
+                }
+                return cell;
+            }
+
+            // journalDateCell(iso) — creates a .date-cell <td> whose text is the plain date
+            // (YYYY-MM-DD) and, if graphName is known, links to the Logseq journal page.
+            // The link uses the journal page title format from the graph config so Logseq
+            // can open the exact journal entry.
+            function journalDateCell(iso) {
+                const cell = el("td", { className: "date-cell" });
+                const text = fmtDate(iso);
+                if (!text) return cell;
+                if (graphName && journalTitleFormat) {
+                    const pageTitle = formatJournalTitle(iso);
+                    const url =
+                        "logseq://graph/" +
+                        encodeURIComponent(graphName) +
+                        "?page=" +
+                        encodeURIComponent(pageTitle);
+                    cell.appendChild(el("a", { href: url }, text));
+                } else {
+                    cell.appendChild(document.createTextNode(text));
+                }
+                return cell;
+            }
+
+            // ── State ────────────────────────────────────────────────────────────────────
+            let allTasks = []; // flat array of all task records from PocketBase
+            let tagSelect; // Tom Select instance for the tag picker
+            let sortCriteria = [{ field: "journal", dir: "ASC" }]; // default sort for unranked
+            let graphName = ""; // basename of LOGSEQ_GRAPH_PATH, used in deep links
+            let backlogPages = {}; // short name → full page title, e.g. "Focus" → "backlog/Focus"
+            // populated from /internal/config, which reads the backlog config page
+            let journalTitleFormat = ""; // Logseq JS date format for journal page titles, e.g. "EEEE, dd.MM.yyyy"
+            // used by formatJournalTitle() to build deep links to journal pages
+
+            // Fields available for sorting unranked tasks.
+            const SORT_FIELDS = [
+                { value: "journal", label: "Created date" },
+                { value: "name", label: "Name" },
+                { value: "tags", label: "Tags" },
+                { value: "status", label: "Status" },
+                { value: "sort_date", label: "Sort date" },
+                { value: "groomed", label: "Groomed" },
+                { value: "backlog_name", label: "Backlog" },
+            ];
+
+            // ── Logseq deep links ────────────────────────────────────────────────────────
+            // Logseq supports a custom URL scheme: logseq://graph/<name>?page=<title>
+            // Opening such a URL focuses the matching page inside the Logseq desktop app.
+            //
+            // `shortName` is the backlog_name stored in PocketBase (e.g. "Focus", "self").
+            // We look it up in `backlogPages` to get the full Logseq page title
+            // (e.g. "backlog/Focus") before encoding it into the URL, because PocketBase
+            // stores only the last path component as the backlog name.
+            function logseqPageURL(shortName) {
+                if (!graphName || !shortName) return null;
+                const fullPage = backlogPages[shortName] || shortName;
+                return (
+                    "logseq://graph/" +
+                    encodeURIComponent(graphName) +
+                    "?page=" +
+                    encodeURIComponent(fullPage)
+                );
+            }
+
+            // ── Filter helpers ───────────────────────────────────────────────────────────
+            function getTextFilter() {
+                return document.getElementById("text-filter").value.trim();
+            }
+            function getTagMode() {
+                return document.querySelector('input[name="tag-mode"]:checked')
+                    .value;
+            }
+            function getSelectedTags() {
+                return tagSelect ? tagSelect.getValue() : [];
+            }
+            function getStatusFilter() {
+                return [...document.querySelectorAll(".status-cb:checked")].map(
+                    (c) => c.value,
+                );
+            }
+            function getBacklogFilter() {
+                return document.getElementById("backlog-select").value;
+            }
+            // getDateTypeFilter() — returns a Set of the *unchecked* date-type values.
+            // We store unchecked (not checked) because the filter logic needs to know
+            // which categories are hidden; an empty set means "show everything".
+            function getDateTypeFilter() {
+                return new Set(
+                    [
+                        ...document.querySelectorAll(
+                            ".date-type-cb:not(:checked)",
+                        ),
+                    ].map((c) => c.value),
+                );
+            }
+
+            // matchesFilters(task) — returns true if the task passes all active filters.
+            // All filtering is done in-memory; no network requests are involved.
+            function matchesFilters(task) {
+                const text = getTextFilter().toLowerCase();
+                if (text) {
+                    const name = (task.name || "").toLowerCase();
+                    // Support "foo or bar" syntax: any word match is sufficient.
+                    if (text.includes(" or ")) {
+                        const parts = text
+                            .split(" or ")
+                            .map((p) => p.trim())
+                            .filter(Boolean);
+                        if (!parts.some((p) => name.includes(p))) return false;
+                    } else {
+                        // Default: all space-separated terms must appear in the name (AND).
+                        const terms = text.split(/\s+/).filter(Boolean);
+                        if (!terms.every((t) => name.includes(t))) return false;
+                    }
+                }
+                const selectedTags = getSelectedTags();
+                if (selectedTags.length > 0) {
+                    const taskTags = (task.tags || "")
+                        .split(/\s+/)
+                        .filter(Boolean);
+                    if (getTagMode() === "AND") {
+                        if (!selectedTags.every((t) => taskTags.includes(t)))
+                            return false;
+                    } else {
+                        if (!selectedTags.some((t) => taskTags.includes(t)))
+                            return false;
+                    }
+                }
+                if (!getStatusFilter().includes(task.status)) return false;
+                const backlog = getBacklogFilter();
+                if (backlog && task.backlog_name !== backlog) return false;
+
+                // Date-type filter — each checkbox controls visibility for tasks that
+                // have that field set. Overdue acts as a "rescue" flag: when Overdue is
+                // checked, an overdue task is always shown even if its other date fields
+                // (scheduled, deadline, journal) are unchecked. This means unchecking
+                // Scheduled hides "has scheduled, not overdue" rows only — overdue tasks
+                // slip through regardless. Unchecking Overdue itself always hides overdue
+                // tasks, even if they also have scheduled/deadline dates.
+                //
+                // Summary of hide conditions (overdue = task.overdue):
+                //   overdue  unchecked → hide if overdue
+                //   scheduled unchecked → hide if scheduled AND NOT overdue
+                //   deadline  unchecked → hide if deadline  AND NOT overdue
+                //   no-due-date unchecked → hide if no scheduled AND no deadline
+                //   journal  unchecked → hide if journal   AND NOT overdue
+                const hidden = getDateTypeFilter(); // Set of unchecked values
+                if (hidden.size > 0) {
+                    const isOverdue = !!task.overdue;
+                    if (hidden.has("overdue") && isOverdue) return false;
+                    if (hidden.has("scheduled") && task.scheduled && !isOverdue)
+                        return false;
+                    if (hidden.has("deadline") && task.deadline && !isOverdue)
+                        return false;
+                    if (
+                        hidden.has("no-due-date") &&
+                        !task.scheduled &&
+                        !task.deadline
+                    )
+                        return false;
+                    if (hidden.has("journal") && task.journal && !isOverdue)
+                        return false;
+                    if (hidden.has("page") && !task.journal && !isOverdue)
+                        return false;
+                }
+
+                return true;
+            }
+
+            // ── Render ranked table ──────────────────────────────────────────────────────
+            function renderRanked() {
+                const ranked = allTasks.filter((t) => t.rank > 0);
+
+                // Build posMap: task id → 1-based position within its backlog group.
+                // Position is computed from the full ranked set (not just visible tasks),
+                // so position numbers remain stable when filters hide some rows.
+                const posMap = {};
+                const byBacklog = {};
+                for (const t of ranked) {
+                    const bl = t.backlog_name || "";
+                    (byBacklog[bl] = byBacklog[bl] || []).push(t);
+                }
+                for (const bl of Object.keys(byBacklog)) {
+                    byBacklog[bl].sort(
+                        (a, b) =>
+                            a.rank - b.rank ||
+                            a.backlog_index - b.backlog_index,
+                    );
+                    byBacklog[bl].forEach((t, i) => {
+                        posMap[t.id] = i + 1;
+                    });
+                }
+
+                // Apply filters, then group visible tasks by backlog.
+                const visible = ranked.filter(matchesFilters);
+                const visibleByBacklog = {};
+                for (const t of visible) {
+                    const bl = t.backlog_name || "";
+                    (visibleByBacklog[bl] = visibleByBacklog[bl] || []).push(t);
+                }
+                // Sort groups by backlog_index so they appear in the same order as in Logseq.
+                const bls = Object.keys(visibleByBacklog).sort((a, b) => {
+                    return (
+                        ((visibleByBacklog[a][0] || {}).backlog_index || 0) -
+                        ((visibleByBacklog[b][0] || {}).backlog_index || 0)
+                    );
+                });
+
+                const tbody = document.getElementById("ranked-body");
+                clearChildren(tbody);
+
+                for (const bl of bls) {
+                    // Group header row — spans all columns, links to the Logseq backlog page.
+                    const headerRow = document.createElement("tr");
+                    headerRow.className = "backlog-group-header";
+                    const headerCell = document.createElement("td");
+                    headerCell.setAttribute("colspan", "12");
+                    const blURL = logseqPageURL(bl);
+                    if (blURL) {
+                        const link = el("a", { href: blURL }, bl);
+                        headerCell.appendChild(link);
+                    } else {
+                        headerCell.textContent = bl;
+                    }
+                    headerRow.appendChild(headerCell);
+                    tbody.appendChild(headerRow);
+
+                    for (const t of visibleByBacklog[bl]) {
+                        const handle = el(
+                            "span",
+                            { className: "drag-handle" },
+                            "⠿",
+                        );
+                        const badge = el(
+                            "span",
+                            { className: "status-badge status-" + t.status },
+                            t.status,
+                        );
+
+                        const blCell = backlogCell(t, true);
+                        const row = el(
+                            "tr",
+                            null,
+                            td("", handle),
+                            td("pos", String(posMap[t.id] ?? "")),
+                            taskNameCell(t),
+                            blCell,
+                            td("tags", t.tags || ""),
+                            td("", badge),
+                            overdueBadgeCell(t),
+                            journalDateCell(t.scheduled),
+                            journalDateCell(t.deadline),
+                            journalDateCell(t.journal),
+                            td("date-cell", fmtDate(t.sort_date)),
+                            journalDateCell(t.groomed),
+                        );
+                        // Store task metadata on the row element so drag handlers can read it
+                        // without looking up the task in allTasks.
+                        row.dataset.id = t.id;
+                        row.dataset.backlog = t.backlog_name || "";
+                        row.dataset.rank = String(t.rank);
+                        tbody.appendChild(row);
+                    }
+                }
+
+                document.getElementById("ranked-section").style.display =
+                    visible.length ? "" : "none";
+                // SortableJS must be rebound after the DOM is rebuilt, because the old
+                // Sortable instance holds references to nodes that no longer exist.
+                rebindRankedSortable();
+            }
+
+            // ── Ranked drag-drop ─────────────────────────────────────────────────────────
+            let rankedSortable = null;
+
+            function rebindRankedSortable() {
+                if (rankedSortable) {
+                    rankedSortable.destroy();
+                    rankedSortable = null;
+                }
+                const tbody = document.getElementById("ranked-body");
+                rankedSortable = Sortable.create(tbody, {
+                    handle: ".drag-handle",
+                    animation: 150,
+                    ghostClass: "sortable-ghost",
+                    filter: ".backlog-group-header", // prevent dragging the header rows
+                    onEnd: onRankedDragEnd,
+                });
+            }
+
+            async function onRankedDragEnd(evt) {
+                const row = evt.item;
+                const id = row.dataset.id;
+                const backlog = row.dataset.backlog;
+
+                // Find the rows belonging to the same backlog to compute neighbours.
+                const tbody = document.getElementById("ranked-body");
+                const rowsInBacklog = [
+                    ...tbody.querySelectorAll("tr[data-backlog]"),
+                ].filter((r) => r.dataset.backlog === backlog);
+                const idx = rowsInBacklog.indexOf(row);
+                const prev = rowsInBacklog[idx - 1];
+                const next = rowsInBacklog[idx + 1];
+                const prevRank = prev ? parseInt(prev.dataset.rank) : 0;
+                const nextRank = next ? parseInt(next.dataset.rank) : 0;
+
+                // Rank assignment uses midpoint insertion:
+                //   - No neighbours → 1000 (plenty of space for future insertions)
+                //   - Only prev     → prev + 1000 (append after)
+                //   - Only next     → next / 2 (prepend before)
+                //   - Both          → midpoint between prev and next
+                // If midpoint collapses (no integer between the two), renumber the whole backlog.
+                let newRank;
+                if (!prevRank && !nextRank) {
+                    newRank = 1000;
+                } else if (!nextRank) {
+                    newRank = prevRank + 1000;
+                } else if (!prevRank) {
+                    newRank = Math.max(1, Math.floor(nextRank / 2));
+                } else {
+                    newRank = Math.floor((prevRank + nextRank) / 2);
+                }
+
+                if (newRank === prevRank || newRank === nextRank) {
+                    // Ranks are too dense to insert between; renumber the whole backlog evenly.
+                    await renumberBacklog(backlog, id);
+                    return;
+                }
+
+                row.dataset.rank = String(newRank);
+                const task = allTasks.find((t) => t.id === id);
+                if (task) task.rank = newRank;
+                await patchRank(id, newRank);
+            }
+
+            // patchRank — sends a PATCH to PocketBase to update a single task's rank.
+            // The request goes through the Go proxy at /api/, which forwards it to PocketBase
+            // with the auth token added in the Authorization header.
+            async function patchRank(id, rank) {
+                try {
+                    await fetch(
+                        "/api/collections/lqd_tasks/records/" +
+                            encodeURIComponent(id),
+                        {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ rank }),
+                        },
+                    );
+                } catch (e) {
+                    console.error("Failed to patch rank:", e);
+                }
+            }
+
+            // renumberBacklog — reassigns ranks as multiples of 1000 (1000, 2000, 3000…)
+            // to restore space between entries after midpoint insertion collapses.
+            async function renumberBacklog(backlogName, _movedId) {
+                const tbody = document.getElementById("ranked-body");
+                const rows = [
+                    ...tbody.querySelectorAll("tr[data-backlog]"),
+                ].filter((r) => r.dataset.backlog === backlogName);
+                for (let i = 0; i < rows.length; i++) {
+                    const r = rows[i];
+                    const newRank = (i + 1) * 1000;
+                    r.dataset.rank = String(newRank);
+                    const task = allTasks.find((t) => t.id === r.dataset.id);
+                    if (task) task.rank = newRank;
+                    await patchRank(r.dataset.id, newRank);
+                }
+                renderRanked();
+            }
+
+            // ── Render unranked table ────────────────────────────────────────────────────
+            function renderUnranked() {
+                const unranked = allTasks
+                    .filter((t) => !t.rank || t.rank === 0)
+                    .filter(matchesFilters);
+                // Client-side multi-key sort driven by sortCriteria[].
+                // localeCompare handles string comparison correctly for names and dates alike.
+                unranked.sort((a, b) => {
+                    for (const { field, dir } of sortCriteria) {
+                        const cmp = String(a[field] ?? "").localeCompare(
+                            String(b[field] ?? ""),
+                        );
+                        if (cmp !== 0) return dir === "ASC" ? cmp : -cmp;
+                    }
+                    return 0;
+                });
+
+                const tbody = document.getElementById("unranked-body");
+                clearChildren(tbody);
+
+                for (const t of unranked) {
+                    const badge = el(
+                        "span",
+                        { className: "status-badge status-" + t.status },
+                        t.status,
+                    );
+                    const row = el(
+                        "tr",
+                        null,
+                        taskNameCell(t),
+                        backlogCell(t, false),
+                        td("tags", t.tags || ""),
+                        td("", badge),
+                        overdueBadgeCell(t),
+                        journalDateCell(t.scheduled),
+                        journalDateCell(t.deadline),
+                        journalDateCell(t.journal),
+                        td("date-cell", fmtDate(t.sort_date)),
+                        journalDateCell(t.groomed),
+                    );
+                    row.dataset.id = t.id;
+                    tbody.appendChild(row);
+                }
+
+                document.getElementById("unranked-section").style.display =
+                    unranked.length ? "" : "none";
+            }
+
+            // ── Sort bar ─────────────────────────────────────────────────────────────────
+            // The sort bar is rebuilt from scratch on every change to sortCriteria, because
+            // it's simpler than trying to patch individual chips in place.
+            let sortBarSortable = null;
+
+            function renderSortBar() {
+                const bar = document.getElementById("sort-bar");
+                if (sortBarSortable) {
+                    sortBarSortable.destroy();
+                    sortBarSortable = null;
+                }
+                clearChildren(bar);
+
+                sortCriteria.forEach((c, i) => {
+                    const fieldSel = el("select", { className: "sc-field" });
+                    for (const f of SORT_FIELDS) {
+                        const opt = el("option", { value: f.value }, f.label);
+                        if (f.value === c.field) opt.selected = true;
+                        fieldSel.appendChild(opt);
+                    }
+                    fieldSel.addEventListener("change", (e) => {
+                        sortCriteria[i].field = e.target.value;
+                        renderUnranked();
+                        syncURL();
+                    });
+
+                    const dirSel = el("select", { className: "sc-dir" });
+                    [
+                        ["ASC", "↑ ASC"],
+                        ["DESC", "↓ DESC"],
+                    ].forEach(([v, label]) => {
+                        const opt = el("option", { value: v }, label);
+                        if (v === c.dir) opt.selected = true;
+                        dirSel.appendChild(opt);
+                    });
+                    dirSel.addEventListener("change", (e) => {
+                        sortCriteria[i].dir = e.target.value;
+                        renderUnranked();
+                        syncURL();
+                    });
+
+                    const rmBtn = el(
+                        "span",
+                        { className: "rm", title: "Remove" },
+                        "✕",
+                    );
+                    rmBtn.addEventListener("click", () => {
+                        sortCriteria.splice(i, 1);
+                        // Always keep at least one criterion so the table has a stable sort order.
+                        if (sortCriteria.length === 0)
+                            sortCriteria.push({ field: "journal", dir: "ASC" });
+                        renderSortBar();
+                        renderUnranked();
+                        syncURL();
+                    });
+
+                    const criterion = el(
+                        "div",
+                        { className: "sort-criterion" },
+                        el("span", { className: "drag-handle" }, "⠿"),
+                        fieldSel,
+                        dirSel,
+                        rmBtn,
+                    );
+                    bar.appendChild(criterion);
+                });
+
+                const addBtn = el(
+                    "button",
+                    {
+                        className: "add-criterion",
+                        disabled: sortCriteria.length >= 4,
+                    },
+                    "+ Add sort",
+                );
+                addBtn.addEventListener("click", () => {
+                    if (sortCriteria.length < 4) {
+                        sortCriteria.push({ field: "name", dir: "ASC" });
+                        renderSortBar();
+                        renderUnranked();
+                        syncURL();
+                    }
+                });
+                bar.appendChild(addBtn);
+
+                // Make the criterion chips themselves draggable to change priority order.
+                // The "+ Add sort" button is excluded from dragging via `filter`.
+                sortBarSortable = Sortable.create(bar, {
+                    handle: ".drag-handle",
+                    animation: 150,
+                    filter: ".add-criterion",
+                    onEnd: (evt) => {
+                        if (evt.oldIndex === evt.newIndex) return;
+                        const moved = sortCriteria.splice(evt.oldIndex, 1)[0];
+                        sortCriteria.splice(evt.newIndex, 0, moved);
+                        renderSortBar();
+                        renderUnranked();
+                        syncURL();
+                    },
+                });
+            }
+
+            // ── Mark as unranked ─────────────────────────────────────────────────────────
+            // doMoveToUnranked(task) — collects `task` and all ranked tasks below it in the
+            // same backlog (by their current DOM order), POSTs their UUIDs to the Go server,
+            // and re-renders both tables.
+            async function doMoveToUnranked(task) {
+                const backlog = task.backlog_name || "";
+                const tbody = document.getElementById("ranked-body");
+                const rows = [
+                    ...tbody.querySelectorAll("tr[data-backlog]"),
+                ].filter((r) => r.dataset.backlog === backlog);
+                const clickedIdx = rows.findIndex(
+                    (r) => r.dataset.id === task.id,
+                );
+                const toMove = rows.slice(clickedIdx).map((r) => r.dataset.id);
+
+                const n = toMove.length;
+                const noun = n === 1 ? "task" : "tasks";
+                if (
+                    !window.confirm(
+                        n +
+                            " " +
+                            noun +
+                            " will be marked as unranked. Are you sure?",
+                    )
+                )
+                    return;
+
+                try {
+                    // POST to the Go server, which writes the unranked divider into the
+                    // Logseq markdown file and sets rank=0 on these records in PocketBase.
+                    const resp = await fetch("/internal/move-to-unranked", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            backlogPage: backlog,
+                            uuids: toMove,
+                        }),
+                    });
+                    if (!resp.ok) throw new Error(await resp.text());
+
+                    // Update local state so the UI reflects the change without a full reload.
+                    for (const id of toMove) {
+                        const t = allTasks.find((x) => x.id === id);
+                        if (t) t.rank = 0;
+                    }
+                    renderRanked();
+                    renderUnranked();
+                } catch (e) {
+                    window.alert("Failed to move tasks: " + e.message);
+                }
+            }
+
+            // ── Data loading ─────────────────────────────────────────────────────────────
+            // fetchAllTasks — paginates through PocketBase until all records are retrieved.
+            // PocketBase's default page size is 30; we request 500 per page to minimise
+            // round trips, but loop until totalPages is exhausted so nothing is missed.
+            async function fetchAllTasks() {
+                const perPage = 500;
+                let page = 1;
+                let items = [];
+                while (true) {
+                    const resp = await fetch(
+                        `/api/collections/lqd_tasks/records?perPage=${perPage}&page=${page}&sort=backlog_index,rank`,
+                    );
+                    if (!resp.ok) throw new Error("HTTP " + resp.status);
+                    const data = await resp.json();
+                    items = items.concat(data.items || []);
+                    if (page >= (data.totalPages || 1)) break;
+                    page++;
+                }
+                return items;
+            }
+
+            // loadTasks — entry point called on page load.
+            // Sequence: fetch config → fetch tasks → build filter controls → render tables.
+            async function loadTasks() {
+                try {
+                    // /internal/config is served by the Go server (not proxied to PocketBase).
+                    // It returns the graph name (for deep links) and the backlogPages map
+                    // (short name → full Logseq page title, e.g. "Focus" → "backlog/Focus").
+                    const cfgResp = await fetch("/internal/config");
+                    if (cfgResp.ok) {
+                        const cfg = await cfgResp.json();
+                        graphName = cfg.graphName || "";
+                        backlogPages = cfg.backlogPages || {};
+                        journalTitleFormat = cfg.journalTitleFormat || "";
+                    }
+
+                    allTasks = await fetchAllTasks();
+
+                    // Populate the backlog dropdown ordered by backlog_index (config page order),
+                    // not alphabetically. We find the minimum backlog_index for each backlog name
+                    // (all tasks in the same backlog share the same index) and sort by that.
+                    const backlogIndexMap = {};
+                    for (const t of allTasks) {
+                        if (!t.backlog_name) continue;
+                        if (
+                            !(t.backlog_name in backlogIndexMap) ||
+                            t.backlog_index < backlogIndexMap[t.backlog_name]
+                        ) {
+                            backlogIndexMap[t.backlog_name] =
+                                t.backlog_index || 0;
+                        }
+                    }
+                    const backlogs = Object.keys(backlogIndexMap).sort(
+                        (a, b) => backlogIndexMap[a] - backlogIndexMap[b],
+                    );
+                    const bSel = document.getElementById("backlog-select");
+                    for (const bl of backlogs) {
+                        const opt = el("option", { value: bl }, bl);
+                        bSel.appendChild(opt);
+                    }
+
+                    // Collect all unique tags across all tasks for the Tom Select picker.
+                    const allTagsSet = new Set();
+                    for (const t of allTasks) {
+                        for (const tag of (t.tags || "")
+                            .split(/\s+/)
+                            .filter(Boolean)) {
+                            allTagsSet.add(tag);
+                        }
+                    }
+                    const allTagsSorted = [...allTagsSet].sort();
+
+                    // Initialise Tom Select on the <select multiple> element.
+                    // `remove_button` plugin adds an × on each selected tag chip.
+                    // `onDelete: () => true` allows backspace to remove the last chip.
+                    tagSelect = new TomSelect("#tags-select", {
+                        plugins: ["remove_button"],
+                        options: allTagsSorted.map((t) => ({
+                            value: t,
+                            text: t,
+                        })),
+                        placeholder: "Filter by tags…",
+                        onDelete: () => true,
+                    });
+                    // Restore tags from URL now that Tom Select is initialised and
+                    // options are populated. Silently set the value without triggering
+                    // the change event (we'll rerender after all state is restored).
+                    if (window._pendingTags && window._pendingTags.length > 0) {
+                        tagSelect.setValue(
+                            window._pendingTags,
+                            true /* silent */,
+                        );
+                        window._pendingTags = null;
+                    }
+                    tagSelect.on("change", () => {
+                        renderRanked();
+                        renderUnranked();
+                        syncURL();
+                    });
+
+                    document.getElementById("loading").style.display = "none";
+                    renderSortBar();
+                    renderRanked();
+                    renderUnranked();
+                } catch (e) {
+                    document.getElementById("loading").style.display = "none";
+                    const errEl = document.getElementById("error-msg");
+                    errEl.style.display = "";
+                    errEl.textContent = "Failed to load tasks: " + e.message;
+                }
+            }
+
+            // ── Filter event wiring ──────────────────────────────────────────────────────
+            // All filter controls call rerender(), which re-evaluates matchesFilters() for
+            // every task in allTasks and rebuilds both tables. No network requests are made.
+            function rerender() {
+                renderRanked();
+                renderUnranked();
+            }
+            document
+                .getElementById("text-filter")
+                .addEventListener("input", () => {
+                    rerender();
+                    syncURL();
+                });
+            document.querySelectorAll('input[name="tag-mode"]').forEach((el) =>
+                el.addEventListener("change", () => {
+                    rerender();
+                    syncURL();
+                }),
+            );
+            document.querySelectorAll(".status-cb").forEach((cb) =>
+                cb.addEventListener("change", () => {
+                    rerender();
+                    syncURL();
+                }),
+            );
+            document.querySelectorAll(".date-type-cb").forEach((cb) =>
+                cb.addEventListener("change", () => {
+                    rerender();
+                    syncURL();
+                }),
+            );
+            document
+                .getElementById("backlog-select")
+                .addEventListener("change", () => {
+                    rerender();
+                    syncURL();
+                });
+
+            document
+                .getElementById("clear-btn")
+                .addEventListener("click", () => {
+                    document.getElementById("text-filter").value = "";
+                    document.getElementById("quick-select").value = "";
+                    if (tagSelect) tagSelect.clear();
+                    // Reset status checkboxes to the default: active statuses checked, terminal ones unchecked.
+                    document.querySelectorAll(".status-cb").forEach((cb) => {
+                        cb.checked = ["TODO", "DOING", "WAITING"].includes(
+                            cb.value,
+                        );
+                    });
+                    document.querySelectorAll(".date-type-cb").forEach((cb) => {
+                        cb.checked = true;
+                    });
+                    document.getElementById("backlog-select").value = "";
+                    rerender();
+                    serializeState();
+                });
+
+            // ── Quick filters ────────────────────────────────────────────────────────────
+            // applyQuickFilter(value) — applies a preset filter combination by directly
+            // manipulating the individual checkboxes, then rerenders and syncs the URL.
+            // Selecting "" (no quick filter) is a no-op on the checkboxes; the user's
+            // current individual checkbox state is left intact.
+            function applyQuickFilter(value) {
+                if (
+                    value === "overdue" ||
+                    value === "waiting" ||
+                    value === "waiting-no-due-date"
+                ) {
+                    // Reset all filters to defaults first.
+                    document.getElementById("text-filter").value = "";
+                    if (tagSelect) tagSelect.clear();
+                    document.querySelector(
+                        'input[name="tag-mode"][value="AND"]',
+                    ).checked = true;
+                    document.getElementById("backlog-select").value = "";
+                    document.querySelectorAll(".status-cb").forEach((cb) => {
+                        cb.checked = DEFAULT_STATUS.includes(cb.value);
+                    });
+                    document.querySelectorAll(".date-type-cb").forEach((cb) => {
+                        cb.checked = true;
+                    });
+                }
+                if (value === "overdue") {
+                    // Uncheck all date-type checkboxes except "overdue".
+                    document.querySelectorAll(".date-type-cb").forEach((cb) => {
+                        cb.checked = cb.value === "overdue";
+                    });
+                } else if (value === "waiting") {
+                    // Uncheck all status checkboxes except "WAITING".
+                    document.querySelectorAll(".status-cb").forEach((cb) => {
+                        cb.checked = cb.value === "WAITING";
+                    });
+                } else if (value === "waiting-no-due-date") {
+                    // Status: only WAITING.
+                    document.querySelectorAll(".status-cb").forEach((cb) => {
+                        cb.checked = cb.value === "WAITING";
+                    });
+                    // Date: only "No due date", Journal, Page (i.e. hide Overdue, Scheduled, Deadline).
+                    const showOnly = new Set([
+                        "no-due-date",
+                        "journal",
+                        "page",
+                    ]);
+                    document.querySelectorAll(".date-type-cb").forEach((cb) => {
+                        cb.checked = showOnly.has(cb.value);
+                    });
+                }
+                rerender();
+                serializeState();
+            }
+
+            document
+                .getElementById("quick-select")
+                .addEventListener("change", (e) => {
+                    applyQuickFilter(e.target.value);
+                });
+
+            // ── URL persistence ──────────────────────────────────────────────────────────
+            // State is serialized to query params and restored on load so filter/sort
+            // views can be bookmarked and shared. Only non-default values are written
+            // to keep URLs short.
+            //
+            // Schema:
+            //   q          free-text search string
+            //   backlog    selected backlog name
+            //   tags       comma-separated selected tag values
+            //   tagMode    AND (default, omitted) or OR
+            //   status     comma-separated checked status values (omitted = all three defaults)
+            //   dateHidden comma-separated unchecked date-type values
+            //   sort       comma-separated field:DIR pairs (omitted = journal:ASC default)
+
+            const DEFAULT_STATUS = ["TODO", "DOING", "WAITING"];
+            const DEFAULT_SORT = "journal:ASC";
+
+            // serializeState() — writes current filter+sort state to the URL (replaceState,
+            // no history entry) and updates the page title. Called debounced after any change.
+            function serializeState() {
+                const params = new URLSearchParams();
+
+                const q = document.getElementById("text-filter").value.trim();
+                if (q) params.set("q", q);
+
+                const backlog = document.getElementById("backlog-select").value;
+                if (backlog) params.set("backlog", backlog);
+
+                const quick = document.getElementById("quick-select").value;
+                if (quick) params.set("quick", quick);
+
+                const tags = tagSelect ? tagSelect.getValue() : [];
+                if (tags.length > 0) {
+                    params.set("tags", tags.join(","));
+                    const mode = document.querySelector(
+                        'input[name="tag-mode"]:checked',
+                    ).value;
+                    if (mode !== "AND") params.set("tagMode", mode);
+                }
+
+                const status = [
+                    ...document.querySelectorAll(".status-cb:checked"),
+                ].map((c) => c.value);
+                const statusChanged =
+                    status.length !== DEFAULT_STATUS.length ||
+                    !DEFAULT_STATUS.every((s) => status.includes(s));
+                if (statusChanged) params.set("status", status.join(","));
+
+                const dateHidden = [
+                    ...document.querySelectorAll(".date-type-cb:not(:checked)"),
+                ].map((c) => c.value);
+                if (dateHidden.length > 0)
+                    params.set("dateHidden", dateHidden.join(","));
+
+                const sortStr = sortCriteria
+                    .map((c) => c.field + ":" + c.dir)
+                    .join(",");
+                if (sortStr !== DEFAULT_SORT) params.set("sort", sortStr);
+
+                const qs = params.toString();
+                history.replaceState(
+                    null,
+                    "",
+                    qs ? "?" + qs : location.pathname,
+                );
+                updateTitle(q, backlog, quick, tags, status, dateHidden);
+            }
+
+            // updateTitle() — sets document.title to a human-readable summary of
+            // non-default filter state: "{parts} — Logseq Doctor Dashboard".
+            function updateTitle(q, backlog, quick, tags, status, dateHidden) {
+                const parts = [];
+                if (backlog) parts.push(backlog);
+                if (quick)
+                    parts.push(
+                        {
+                            overdue: "Overdue",
+                            waiting: "Waiting",
+                            "waiting-no-due-date": "Waiting without due date",
+                        }[quick] || quick,
+                    );
+                if (q) parts.push("\u201C" + q + "\u201D"); // "quoted"
+                if (tags.length > 0) parts.push(tags.join(", "));
+                // Status: mention only if not all three defaults are selected
+                if (
+                    status.length !== DEFAULT_STATUS.length ||
+                    !DEFAULT_STATUS.every((s) => status.includes(s))
+                ) {
+                    parts.push(status.length ? status.join("/") : "no status");
+                }
+                // Date: mention each hidden filter as −Name
+                dateHidden.forEach((v) => {
+                    const label = {
+                        overdue: "Overdue",
+                        scheduled: "Scheduled",
+                        deadline: "Deadline",
+                        "no-due-date": "No due date",
+                        journal: "Journal",
+                        page: "Page",
+                    }[v];
+                    if (label) parts.push("\u2212" + label); // −Label
+                });
+                document.title =
+                    (parts.length ? parts.join(", ") + " \u2014 " : "") +
+                    "Logseq Doctor Dashboard";
+            }
+
+            // restoreState() — reads URL params and applies them to all filter controls
+            // and sortCriteria before the first render.
+            function restoreState() {
+                const params = new URLSearchParams(location.search);
+
+                if (params.has("q"))
+                    document.getElementById("text-filter").value =
+                        params.get("q");
+
+                if (params.has("backlog"))
+                    document.getElementById("backlog-select").value =
+                        params.get("backlog");
+
+                if (params.has("tagMode")) {
+                    const mode = params.get("tagMode");
+                    const radio = document.querySelector(
+                        'input[name="tag-mode"][value="' + mode + '"]',
+                    );
+                    if (radio) radio.checked = true;
+                }
+                // Tags are restored after Tom Select is initialised — see loadTasks().
+                // The raw value is stashed here for that deferred restore.
+                window._pendingTags = params.has("tags")
+                    ? params.get("tags").split(",").filter(Boolean)
+                    : null;
+
+                // Quick filter takes precedence: if set, it owns the status/date checkboxes,
+                // so we skip the individual status/dateHidden restore and let applyQuickFilter
+                // set them instead (called after restoreState, in loadTasks boot sequence).
+                const quick = params.get("quick") || "";
+                if (quick) {
+                    document.getElementById("quick-select").value = quick;
+                    applyQuickFilter(quick);
+                } else {
+                    if (params.has("status")) {
+                        const active = new Set(
+                            params.get("status").split(",").filter(Boolean),
+                        );
+                        document
+                            .querySelectorAll(".status-cb")
+                            .forEach((cb) => {
+                                cb.checked = active.has(cb.value);
+                            });
+                    }
+
+                    if (params.has("dateHidden")) {
+                        const hidden = new Set(
+                            params.get("dateHidden").split(",").filter(Boolean),
+                        );
+                        document
+                            .querySelectorAll(".date-type-cb")
+                            .forEach((cb) => {
+                                cb.checked = !hidden.has(cb.value);
+                            });
+                    }
+                }
+
+                if (params.has("sort")) {
+                    const parsed = params
+                        .get("sort")
+                        .split(",")
+                        .map((s) => {
+                            const [field, dir] = s.split(":");
+                            return {
+                                field,
+                                dir: dir === "DESC" ? "DESC" : "ASC",
+                            };
+                        })
+                        .filter((c) => c.field);
+                    if (parsed.length > 0) sortCriteria = parsed;
+                }
+
+                // Set initial title from restored state.
+                updateTitle(
+                    document.getElementById("text-filter").value.trim(),
+                    document.getElementById("backlog-select").value,
+                    quick,
+                    window._pendingTags || [],
+                    [...document.querySelectorAll(".status-cb:checked")].map(
+                        (c) => c.value,
+                    ),
+                    [
+                        ...document.querySelectorAll(
+                            ".date-type-cb:not(:checked)",
+                        ),
+                    ].map((c) => c.value),
+                );
+            }
+
+            // debounce(fn, ms) — returns a function that delays invoking fn until ms
+            // milliseconds have passed since the last call. Used so the URL is updated
+            // only after the user stops interacting, not on every keystroke.
+            function debounce(fn, ms) {
+                let timer;
+                return (...args) => {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => fn(...args), ms);
+                };
+            }
+
+            const syncURL = debounce(serializeState, 400);
+
+            // ── Boot ─────────────────────────────────────────────────────────────────────
+            restoreState();
+            loadTasks();
+        </script>
+    </body>
+</html>

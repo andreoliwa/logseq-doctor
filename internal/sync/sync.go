@@ -85,15 +85,19 @@ func yyyymmddToLocalISO(dateInt int) string {
 	return localTime.Format(time.RFC3339)
 }
 
-// syncCompareFields returns the fields checked by recordChanged to detect updates.
-func syncCompareFields() []string {
+// syncUpdateFields returns the fields checked by recordChanged to detect updates.
+// rank is intentionally excluded — the UI owns rank after record creation.
+func syncUpdateFields() []string {
 	return []string{
 		"name", "status", "tags", "journal", "scheduled", "deadline",
-		"overdue", "backlog_name", "backlog_index", "rank", "sort_date", "groomed",
+		"overdue", "backlog_name", "backlog_index", "sort_date", "groomed",
 	}
 }
 
-const hoursPerDay = 24
+const (
+	hoursPerDay    = 24
+	rankSeedFactor = 1000 // rank is seeded as position × rankSeedFactor on first sync
+)
 
 // isOverdue checks if a task is past its scheduled or deadline date.
 // Parses RFC3339 date strings (produced by yyyymmddLocalISO) and compares as dates.
@@ -183,7 +187,7 @@ func TaskToRecord(
 		"overdue":       overdue,
 		"backlog_name":  backlogName,
 		"backlog_index": backlogIndex,
-		"rank":          rankValue,
+		"rank":          rankValue * rankSeedFactor,
 		"sort_date":     sortDate,
 		"groomed":       groomedISO,
 	}
@@ -234,7 +238,7 @@ func indexRecordsByID(records []map[string]any) map[string]map[string]any {
 
 // recordChanged checks if any sync-relevant fields differ between two records.
 func recordChanged(existing, desired map[string]any) bool {
-	for _, field := range syncCompareFields() {
+	for _, field := range syncUpdateFields() {
 		if fmt.Sprint(existing[field]) != fmt.Sprint(desired[field]) {
 			return true
 		}

@@ -1,6 +1,7 @@
 package logseqext_test
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -84,6 +85,49 @@ func TestJournalDayToTime(t *testing.T) {
 			assert.Equal(t, tt.expected, result)
 		})
 	}
+}
+
+func TestReadJournalTitleFormat(t *testing.T) {
+	const defaultFormat = "EEE do, MMM yyyy"
+
+	t.Run("empty graph path returns default", func(t *testing.T) {
+		result := logseqext.ReadJournalTitleFormat("")
+		assert.Equal(t, defaultFormat, result)
+	})
+
+	t.Run("missing config file returns default", func(t *testing.T) {
+		dir := t.TempDir() // no logseq/config.edn inside
+		result := logseqext.ReadJournalTitleFormat(dir)
+		assert.Equal(t, defaultFormat, result)
+	})
+
+	t.Run("config without the key returns default", func(t *testing.T) {
+		dir := t.TempDir()
+		require.NoError(t, os.MkdirAll(dir+"/logseq", 0o755))
+		require.NoError(t, os.WriteFile(dir+"/logseq/config.edn", []byte(`{:other/key "value"}`), 0o600))
+		result := logseqext.ReadJournalTitleFormat(dir)
+		assert.Equal(t, defaultFormat, result)
+	})
+
+	t.Run("config with key returns extracted format", func(t *testing.T) {
+		dir := t.TempDir()
+		require.NoError(t, os.MkdirAll(dir+"/logseq", 0o755))
+
+		edn := `{:journal/page-title-format "EEEE, dd.MM.yyyy"}`
+		require.NoError(t, os.WriteFile(dir+"/logseq/config.edn", []byte(edn), 0o600))
+		result := logseqext.ReadJournalTitleFormat(dir)
+		assert.Equal(t, "EEEE, dd.MM.yyyy", result)
+	})
+
+	t.Run("format with surrounding whitespace is parsed correctly", func(t *testing.T) {
+		dir := t.TempDir()
+		require.NoError(t, os.MkdirAll(dir+"/logseq", 0o755))
+
+		edn := "{\n  :journal/page-title-format  \"MMM do, yyyy\"\n}"
+		require.NoError(t, os.WriteFile(dir+"/logseq/config.edn", []byte(edn), 0o600))
+		result := logseqext.ReadJournalTitleFormat(dir)
+		assert.Equal(t, "MMM do, yyyy", result)
+	})
 }
 
 func TestJournalDayToTime_RoundTrip(t *testing.T) {

@@ -1,14 +1,43 @@
 package logseqext
 
 import (
+	"os"
+	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
 
 // logseqDateFormat is the Go format string for the current graph's journal title format.
-// Derived from config.edn `:journal/page-title-format` = "%A, %d.%m.%Y" → "Monday, 02.01.2006".
-// TODO: Read this from the graph config via logseq-go's ConvertDateFormat() instead of hardcoding.
+// Derived from config.edn `:journal/page-title-format` = "EEEE, dd.MM.yyyy" → "Monday, 02.01.2006".
 const logseqDateFormat = "Monday, 02.01.2006"
+
+// journalTitleFormatRe matches the :journal/page-title-format line in config.edn.
+var journalTitleFormatRe = regexp.MustCompile(`(?m):journal/page-title-format\s+"([^"]+)"`)
+
+// ReadJournalTitleFormat reads the JS-style date format string used for journal
+// page titles from logseq/config.edn (e.g. "EEEE, dd.MM.yyyy").
+// Returns the Logseq default "EEE do, MMM yyyy" if the file cannot be read or
+// the key is absent. This is a candidate for upstreaming to logseq-go.
+func ReadJournalTitleFormat(graphPath string) string {
+	const defaultFormat = "EEE do, MMM yyyy"
+
+	if graphPath == "" {
+		return defaultFormat
+	}
+
+	data, err := os.ReadFile(filepath.Join(graphPath, "logseq", "config.edn"))
+	if err != nil {
+		return defaultFormat
+	}
+
+	matches := journalTitleFormatRe.FindSubmatch(data)
+	if len(matches) < 2 { //nolint:mnd
+		return defaultFormat
+	}
+
+	return string(matches[1])
+}
 
 // DateYYYYMMDD returns the current date in YYYYMMDD format.
 func DateYYYYMMDD(time time.Time) int {

@@ -44,6 +44,11 @@ func NewClient(baseURL, username, password string) (*Client, error) {
 	return client, nil
 }
 
+// Token returns the current authentication token.
+func (c *Client) Token() string {
+	return c.token
+}
+
 // CollectionExists checks if a collection exists in PocketBase.
 func (c *Client) CollectionExists(name string) (bool, error) {
 	resp, err := c.doRequest(http.MethodGet, "/api/collections/"+name, nil)

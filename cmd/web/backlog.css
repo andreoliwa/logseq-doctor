@@ -1,0 +1,480 @@
+/*
+ * backlog.css — styles for the backlog web UI served by `lqd dashboard`.
+ *
+ * Theme strategy: CSS custom properties (variables) are declared once in :root
+ * for the light theme, then overridden inside a `@media (prefers-color-scheme: dark)`
+ * block for the dark theme. All rules below reference only the variables, never
+ * raw colours, so a single media query flips the entire palette automatically.
+ * macOS applies the OS dark/light schedule (System Settings → Appearance) to the
+ * browser, so the page switches at the same time as the rest of the desktop.
+ */
+
+/* ── Palette: light (default) ───────────────────────────────────────────────
+   --bg   page background
+   --bg2  raised surfaces (filter bar, table rows, context menu)
+   --bg3  slightly elevated surfaces (table header, sort chips)
+   --text primary text
+   --text2 secondary / muted text (labels, dates, placeholders)
+   --border subtle divider colour
+   --link  hyperlink / accent colour
+   --hover row hover tint
+   --sel   selected / active tint
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+    --bg: #f8f8f8;
+    --bg2: #ffffff;
+    --bg3: rgba(0, 0, 0, 0.04);
+    --text: rgba(0, 0, 0, 0.87);
+    --text2: rgba(0, 0, 0, 0.55);
+    --border: rgba(0, 0, 0, 0.12);
+    --link: #2563eb;
+    --hover: rgba(0, 0, 0, 0.04);
+    --sel: rgba(0, 0, 0, 0.08);
+}
+
+/* ── Palette: dark ──────────────────────────────────────────────────────────
+   Activated automatically when macOS (or the OS) switches to dark mode.
+   Colours are drawn from the Harmony Logseq theme (~/.logseq/plugins/harmony-theme).
+   ───────────────────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #21232b;
+        --bg2: #282a33;
+        --bg3: rgba(40, 42, 51, 0.95);
+        --text: rgba(255, 255, 255, 0.87);
+        --text2: rgba(255, 255, 255, 0.6);
+        --border: rgba(255, 255, 255, 0.15);
+        --link: #b2ccdf;
+        --hover: rgba(255, 255, 255, 0.07);
+        --sel: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* ── Reset ──────────────────────────────────────────────────────────────────
+   box-sizing: border-box makes padding and border included in element width,
+   which is almost always what you want. The universal selector applies it to
+   every element and its ::before / ::after pseudo-elements.
+   ───────────────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+}
+h2 {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 12px 0 4px;
+    color: var(--text2);
+}
+
+/* ── Filter bar ─────────────────────────────────────────────────────────────
+   `position: sticky; top: 0` keeps the bar visible while scrolling the task
+   list. `z-index: 100` ensures it renders above table content and dropdowns.
+   The bar itself is a column flex container; each .filter-row is a flex row.
+
+   Row 1: backlog | search | tags (grows to fill remaining width) | AND/OR
+   Row 2: status group (left) ←→ date group + clear button (right)
+     `.filter-row-split` uses `justify-content: space-between` to push the two
+     `.filter-group` children apart. Each group is its own flex line so its
+     items stay together when the viewport is narrow and the row wraps.
+   ───────────────────────────────────────────────────────────────────────── */
+#filter-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+/* Base row: horizontal, wrapping flex line */
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+/* Split row: status on the left, dates + clear on the right */
+.filter-row-split {
+    justify-content: space-between;
+}
+/* Each side of the split row is a self-contained flex group */
+.filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+#filter-bar input[type="text"] {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 13px;
+    width: 180px;
+    color: var(--text);
+}
+#filter-bar input[type="text"]::placeholder {
+    color: var(--text2);
+}
+#filter-bar label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: var(--text2);
+}
+#filter-bar select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 13px;
+    color: var(--text);
+}
+/* Tags wrapper grows to fill all remaining width in row 1 (~70% at typical viewport widths) */
+#tags-wrap {
+    flex: 1 1 0;
+    min-width: 120px;
+}
+.tag-and-or {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+.tag-and-or label {
+    font-size: 12px;
+}
+button.clear-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text2);
+}
+button.clear-btn:hover {
+    background: var(--sel);
+}
+/* Visual separator between filter groups in the filter bar */
+.filter-sep {
+    color: var(--border);
+    font-size: 16px;
+    padding: 0 2px;
+}
+
+/* ── Main content ───────────────────────────────────────────────────────────
+   Bottom padding is large so the last table row isn't hidden behind the
+   context menu when it appears near the bottom of the viewport.
+   ───────────────────────────────────────────────────────────────────────── */
+#main {
+    padding: 8px 12px 60px;
+}
+
+/* ── Tables ─────────────────────────────────────────────────────────────────
+   `border-collapse: collapse` removes the double-border between cells.
+   `overflow: hidden` combined with `border-radius` clips the corners of the
+   table so the rounded corners are actually visible (without it, the table
+   background would bleed past the radius).
+   ───────────────────────────────────────────────────────────────────────── */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg2);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 16px;
+}
+th {
+    background: var(--bg3);
+    text-align: left;
+    padding: 6px 8px;
+    font-size: 12px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    font-weight: 500;
+}
+td {
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+tr:last-child td {
+    border-bottom: none;
+} /* avoids a double border at the table's bottom edge */
+tr:hover td {
+    background: var(--hover);
+}
+
+/* ── Table cells ────────────────────────────────────────────────────────────
+   .drag-handle: the ⠿ braille character is a common drag indicator. Its
+     colour matches --border by default so it's barely visible; :hover makes
+     it more prominent to signal interactivity.
+   .backlog-group-header: a full-width row used as a section separator between
+     backlogs in the ranked table. It's styled like a sub-heading, not a data row.
+   ───────────────────────────────────────────────────────────────────────── */
+.drag-handle {
+    cursor: grab;
+    color: var(--border);
+    user-select: none;
+    font-size: 16px;
+}
+.drag-handle:hover {
+    color: var(--text2);
+}
+.pos {
+    color: var(--text2);
+    font-size: 11px;
+    min-width: 24px;
+    text-align: right;
+}
+.task-name {
+    max-width: 360px;
+}
+/* 🔗 link icon prepended to each task name — subtle, no underline */
+.task-link {
+    text-decoration: none;
+    opacity: 0.5;
+    font-size: 11px;
+}
+.task-link:hover {
+    opacity: 1;
+}
+.backlog-name {
+    color: var(--text2);
+    white-space: nowrap;
+}
+.backlog-name a,
+.backlog-group-header a {
+    color: var(--link);
+    text-decoration: none;
+}
+.backlog-name a:hover,
+.backlog-group-header a:hover {
+    text-decoration: underline;
+}
+/* ⤵️ action link — hidden until the row is hovered; no underline, subtle left margin */
+.unrank-action {
+    visibility: hidden;
+    margin-left: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    cursor: pointer;
+}
+tr:hover .unrank-action {
+    visibility: visible;
+}
+.tags {
+    color: var(--text2);
+    font-size: 11px;
+}
+.date-cell {
+    white-space: nowrap;
+    color: var(--text2);
+    font-size: 11px;
+}
+.backlog-group-header td {
+    font-weight: 600;
+    color: var(--link);
+    font-size: 12px;
+    padding: 4px 8px;
+    background: var(--bg3);
+}
+
+/* ── Status badges ──────────────────────────────────────────────────────────
+   Each status gets a tinted background + matching foreground colour.
+   Light-mode colours use saturated hues (readable on white).
+   Dark-mode overrides (below) use lighter, more muted tones for readability
+   on dark backgrounds — the same hue family, but higher lightness.
+   ───────────────────────────────────────────────────────────────────────── */
+.status-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.status-TODO {
+    background: rgba(46, 125, 50, 0.15);
+    color: #2e7d32;
+}
+.status-DOING {
+    background: rgba(230, 81, 0, 0.15);
+    color: #e65100;
+}
+.status-WAITING {
+    background: rgba(21, 101, 192, 0.15);
+    color: #1565c0;
+}
+.status-DONE {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text2);
+}
+.status-CANCELED {
+    background: rgba(198, 40, 40, 0.1);
+    color: #c62828;
+}
+
+@media (prefers-color-scheme: dark) {
+    .status-TODO {
+        background: rgba(46, 125, 50, 0.25);
+        color: #81c784;
+    }
+    .status-DOING {
+        background: rgba(230, 81, 0, 0.25);
+        color: #ffb74d;
+    }
+    .status-WAITING {
+        background: rgba(21, 101, 192, 0.25);
+        color: #90caf9;
+    }
+    .status-DONE {
+        background: rgba(255, 255, 255, 0.07);
+        color: var(--text2);
+    }
+    .status-CANCELED {
+        background: rgba(198, 40, 40, 0.2);
+        color: #ef9a9a;
+    }
+}
+
+/* Overdue badge — shown in the Overdue column when a task's scheduled date has passed */
+.overdue-badge {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(198, 40, 40, 0.15);
+    color: #c62828;
+    text-decoration: none;
+}
+@media (prefers-color-scheme: dark) {
+    .overdue-badge {
+        background: rgba(198, 40, 40, 0.25);
+        color: #ef9a9a;
+    }
+}
+
+/* ── Drag ghost ─────────────────────────────────────────────────────────────
+   SortableJS adds .sortable-ghost to the element being dragged. We fade it
+   and tint it so the user can see where the row will land.
+   `!important` is needed because SortableJS may set inline styles on the ghost.
+   ───────────────────────────────────────────────────────────────────────── */
+.sortable-ghost {
+    opacity: 0.4;
+    background: var(--sel) !important;
+}
+
+/* ── Sort bar (unranked section) ────────────────────────────────────────────
+   The sort bar is a row of draggable "criterion chips" (field + direction),
+   plus an "+ Add sort" button. Each chip uses `cursor: grab` to signal that
+   it can be reordered via SortableJS.
+   ───────────────────────────────────────────────────────────────────────── */
+.sort-bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+    align-items: center;
+}
+.sort-criterion {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    cursor: grab;
+    font-size: 12px;
+    color: var(--text);
+}
+.sort-criterion select {
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text);
+}
+.sort-criterion .rm {
+    cursor: pointer;
+    color: var(--text2);
+    margin-left: 2px;
+}
+.sort-criterion .rm:hover {
+    color: #c62828;
+}
+.add-criterion {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--link);
+}
+.add-criterion:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+/* ── Misc ───────────────────────────────────────────────────────────────────
+   #loading and #error-msg are shown/hidden by JS during data fetching.
+   ───────────────────────────────────────────────────────────────────────── */
+#loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text2);
+}
+#error-msg {
+    color: #c62828;
+    padding: 12px;
+    background: rgba(198, 40, 40, 0.1);
+    border-radius: 4px;
+    margin: 12px;
+}
+
+/* ── Tom Select overrides ───────────────────────────────────────────────────
+   Tom Select is the multi-select tag picker. Its default stylesheet uses hard-
+   coded light colours, so we override the key surfaces to match our palette.
+   .ts-control  = the visible input box
+   .ts-dropdown = the dropdown list that appears when you type
+   .item        = a selected tag chip inside the control
+   ───────────────────────────────────────────────────────────────────────── */
+.ts-wrapper .ts-control {
+    background: var(--bg);
+    border-color: var(--border);
+    color: var(--text);
+}
+.ts-wrapper .ts-dropdown {
+    background: var(--bg2);
+    border-color: var(--border);
+    color: var(--text);
+}
+.ts-wrapper .ts-dropdown .option {
+    color: var(--text);
+}
+.ts-wrapper .ts-dropdown .option:hover,
+.ts-wrapper .ts-dropdown .option.active {
+    background: var(--sel);
+}
+.ts-wrapper .ts-control .item {
+    background: var(--bg3);
+    color: var(--link);
+    border: 1px solid var(--border);
+}
