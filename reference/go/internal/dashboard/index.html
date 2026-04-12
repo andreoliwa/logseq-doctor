@@ -7,7 +7,7 @@
       
       
       
-        <link rel="canonical" href="https://andreoliwa.github.io/logseq-doctor/reference/go/internal/sync/">
+        <link rel="canonical" href="https://andreoliwa.github.io/logseq-doctor/reference/go/internal/dashboard/">
       
       
       
@@ -85,7 +85,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#lqdsync" class="md-skip">
+        <a href="#dashboard" class="md-skip">
           Skip to content
         </a>
       
@@ -1019,10 +1019,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#constants" class="md-nav__link">
+  <a href="#func-movetounranked" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Constants
+        func MoveToUnranked
       
     </span>
   </a>
@@ -1030,10 +1030,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#func-calculateranks" class="md-nav__link">
+  <a href="#func-allsectionheaders" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func CalculateRanks
+        func allSectionHeaders
       
     </span>
   </a>
@@ -1041,10 +1041,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#func-diffrecords" class="md-nav__link">
+  <a href="#func-collectblockstomove" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func DiffRecords
+        func collectBlocksToMove
       
     </span>
   </a>
@@ -1052,10 +1052,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#func-tasktorecord" class="md-nav__link">
+  <a href="#func-ensureunrankeddivider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func TaskToRecord
+        func ensureUnrankedDivider
       
     </span>
   </a>
@@ -1063,120 +1063,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#func-determinesortdate" class="md-nav__link">
+  <a href="#func-issectionheaderblock" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func determineSortDate
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#func-extractrankfields" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        func extractRankFields
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#func-indexrecordsbyid" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        func indexRecordsByID
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#func-isdatebeforetoday" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        func isDateBeforeToday
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#func-isoverdue" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        func isOverdue
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#func-parsegroomeddate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        func parseGroomedDate
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#func-recordchanged" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        func recordChanged
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#func-syncupdatefields" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        func syncUpdateFields
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#func-yyyymmddtodateonly" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        func yyyymmddToDateOnly
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#func-yyyymmddtolocaliso" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        func yyyymmddToLocalISO
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#type-rankinfo" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        type RankInfo
+        func isSectionHeaderBlock
       
     </span>
   </a>
@@ -1208,7 +1098,7 @@
 
 
   
-    <a href="https://github.com/andreoliwa/logseq-doctor/edit/master/docs/reference/go/internal/sync/README.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/andreoliwa/logseq-doctor/edit/master/docs/reference/go/internal/dashboard/README.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
     </a>
@@ -1217,115 +1107,49 @@
     
       
     
-    <a href="https://github.com/andreoliwa/logseq-doctor/raw/master/docs/reference/go/internal/sync/README.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/andreoliwa/logseq-doctor/raw/master/docs/reference/go/internal/dashboard/README.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
     </a>
   
 
 
-<!-- Code generated by gomarkdoc. DO NOT EDIT --><h1 id="lqdsync">lqdsync<a class="headerlink" href="#lqdsync" title="Permanent link">¶</a></h1>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="s">"github.com/andreoliwa/logseq-doctor/internal/sync"</span>
+<!-- Code generated by gomarkdoc. DO NOT EDIT --><h1 id="dashboard">dashboard<a class="headerlink" href="#dashboard" title="Permanent link">¶</a></h1>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="s">"github.com/andreoliwa/logseq-doctor/internal/dashboard"</span>
 </code></pre></div>
 <h2 id="index">Index<a class="headerlink" href="#index" title="Permanent link">¶</a></h2>
 <ul>
-<li><a href="#constants">Constants</a></li>
-<li><a href="#CalculateRanks">func CalculateRanks(backlogs map[string][]string, backlogOrder []string) map[string]RankInfo</a></li>
-<li><a href="#DiffRecords">func DiffRecords(existing, desired []map[string]any) ([]map[string]any, []map[string]any, []string)</a></li>
-<li><a href="#TaskToRecord">func TaskToRecord(task logseqapi.TaskJSON, rank *RankInfo, enrichedTags string, currentTime func() time.Time) map[string]any</a></li>
-<li><a href="#determineSortDate">func determineSortDate(scheduledISO, deadlineISO, today string) string</a></li>
-<li><a href="#extractRankFields">func extractRankFields(rank *RankInfo) (string, int, int)</a></li>
-<li><a href="#indexRecordsByID">func indexRecordsByID(records []map[string]any) map[string]map[string]any</a></li>
-<li><a href="#isDateBeforeToday">func isDateBeforeToday(dateISO string, today time.Time) bool</a></li>
-<li><a href="#isOverdue">func isOverdue(scheduledISO, deadlineISO string, currentTime func() time.Time) bool</a></li>
-<li><a href="#parseGroomedDate">func parseGroomedDate(task logseqapi.TaskJSON) string</a></li>
-<li><a href="#recordChanged">func recordChanged(existing, desired map[string]any) bool</a></li>
-<li><a href="#syncUpdateFields">func syncUpdateFields() []string</a></li>
-<li><a href="#yyyymmddToDateOnly">func yyyymmddToDateOnly(dateInt int) string</a></li>
-<li><a href="#yyyymmddToLocalISO">func yyyymmddToLocalISO(dateInt int) string</a></li>
-<li><a href="#RankInfo">type RankInfo</a></li>
+<li><a href="#MoveToUnranked">func MoveToUnranked(graphPath, backlogPageName string, uuids []string) error</a></li>
+<li><a href="#allSectionHeaders">func allSectionHeaders() []string</a></li>
+<li><a href="#collectBlocksToMove">func collectBlocksToMove(page logseq.Page, uuidSet map[string]bool) []*content.Block</a></li>
+<li><a href="#ensureUnrankedDivider">func ensureUnrankedDivider(page logseq.Page, existing *content.Block) *content.Block</a></li>
+<li><a href="#isSectionHeaderBlock">func isSectionHeaderBlock(block *content.Block) bool</a></li>
 </ul>
-<h2 id="constants">Constants<a class="headerlink" href="#constants" title="Permanent link">¶</a></h2>
-<p><a name="hoursPerDay"></a></p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nx">hoursPerDay</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="mi">24</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nx">rankSeedFactor</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="c1">// rank is seeded as position × rankSeedFactor on first sync</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span>
+<p><a name="MoveToUnranked"></a></p>
+<h2 id="func-movetounranked">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L28">MoveToUnranked</a><a class="headerlink" href="#func-movetounranked" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">MoveToUnranked</span><span class="p">(</span><span class="nx">graphPath</span><span class="p">,</span><span class="w"> </span><span class="nx">backlogPageName</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">uuids</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
-<p><a name="CalculateRanks"></a></p>
-<h2 id="func-calculateranks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L21">CalculateRanks</a><a class="headerlink" href="#func-calculateranks" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">CalculateRanks</span><span class="p">(</span><span class="nx">backlogs</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][]</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">backlogOrder</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">RankInfo</span>
+<p>MoveToUnranked moves the given task UUIDs from the regular area of backlogPage to under the "🔢 Unranked tasks" section divider, creating the divider if absent.</p>
+<p>graphPath is the path to the Logseq graph root directory. backlogPageName is the page name (e.g. "my-backlog", without .md extension). uuids is the list of task UUIDs to move.</p>
+<p><a name="allSectionHeaders"></a></p>
+<h2 id="func-allsectionheaders">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L15">allSectionHeaders</a><a class="headerlink" href="#func-allsectionheaders" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">allSectionHeaders</span><span class="p">()</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span>
 </code></pre></div>
-<p>CalculateRanks processes backlogs in reverse order and assigns ranks. Tasks in earlier backlogs override later backlogs.</p>
-<p><a name="DiffRecords"></a></p>
-<h2 id="func-diffrecords">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L198-L200">DiffRecords</a><a class="headerlink" href="#func-diffrecords" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">DiffRecords</span><span class="p">(</span><span class="nx">existing</span><span class="p">,</span><span class="w"> </span><span class="nx">desired</span><span class="w"> </span><span class="p">[]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">,</span><span class="w"> </span><span class="p">[]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">,</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">)</span>
+<p><a name="collectBlocksToMove"></a></p>
+<h2 id="func-collectblockstomove">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L70">collectBlocksToMove</a><a class="headerlink" href="#func-collectblockstomove" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">collectBlocksToMove</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">uuidSet</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="p">[]</span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span>
 </code></pre></div>
-<p>DiffRecords compares existing PB records with desired records. Returns slices of records to create, update, and IDs to delete.</p>
-<p><a name="TaskToRecord"></a></p>
-<h2 id="func-tasktorecord">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L166-L168">TaskToRecord</a><a class="headerlink" href="#func-tasktorecord" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">TaskToRecord</span><span class="p">(</span><span class="nx">task</span><span class="w"> </span><span class="nx">logseqapi</span><span class="p">.</span><span class="nx">TaskJSON</span><span class="p">,</span><span class="w"> </span><span class="nx">rank</span><span class="w"> </span><span class="o">*</span><span class="nx">RankInfo</span><span class="p">,</span><span class="w"> </span><span class="nx">enrichedTags</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">currentTime</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span>
+<p>collectBlocksToMove returns all top-level page blocks (excluding section headers) whose block-ref UUID is in uuidSet.</p>
+<p><a name="ensureUnrankedDivider"></a></p>
+<h2 id="func-ensureunrankeddivider">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L101">ensureUnrankedDivider</a><a class="headerlink" href="#func-ensureunrankeddivider" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">ensureUnrankedDivider</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">existing</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span>
 </code></pre></div>
-<p>TaskToRecord converts a TaskJSON + optional RankInfo to a PocketBase record map.</p>
-<p><a name="determineSortDate"></a></p>
-<h2 id="func-determinesortdate">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L125">determineSortDate</a><a class="headerlink" href="#func-determinesortdate" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">determineSortDate</span><span class="p">(</span><span class="nx">scheduledISO</span><span class="p">,</span><span class="w"> </span><span class="nx">deadlineISO</span><span class="p">,</span><span class="w"> </span><span class="nx">today</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+<p>ensureUnrankedDivider returns the existing divider block, or creates and inserts one.</p>
+<p><a name="isSectionHeaderBlock"></a></p>
+<h2 id="func-issectionheaderblock">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L88">isSectionHeaderBlock</a><a class="headerlink" href="#func-issectionheaderblock" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">isSectionHeaderBlock</span><span class="p">(</span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
-<p>determineSortDate picks the best sort date: scheduled &gt; deadline &gt; today (fallback).</p>
-<p><a name="extractRankFields"></a></p>
-<h2 id="func-extractrankfields">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L157">extractRankFields</a><a class="headerlink" href="#func-extractrankfields" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">extractRankFields</span><span class="p">(</span><span class="nx">rank</span><span class="w"> </span><span class="o">*</span><span class="nx">RankInfo</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span>
-</code></pre></div>
-<p>extractRankFields returns backlog name, index, and rank from a RankInfo pointer.</p>
-<p><a name="indexRecordsByID"></a></p>
-<h2 id="func-indexrecordsbyid">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L228">indexRecordsByID</a><a class="headerlink" href="#func-indexrecordsbyid" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">indexRecordsByID</span><span class="p">(</span><span class="nx">records</span><span class="w"> </span><span class="p">[]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span>
-</code></pre></div>
-<p>indexRecordsByID builds a map from record "id" field to the full record.</p>
-<p><a name="isDateBeforeToday"></a></p>
-<h2 id="func-isdatebeforetoday">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L111">isDateBeforeToday</a><a class="headerlink" href="#func-isdatebeforetoday" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">isDateBeforeToday</span><span class="p">(</span><span class="nx">dateISO</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">today</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
-</code></pre></div>
-<p>isDateBeforeToday returns true if the RFC3339 date string is non-empty and before today.</p>
-<p><a name="isOverdue"></a></p>
-<h2 id="func-isoverdue">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L104">isOverdue</a><a class="headerlink" href="#func-isoverdue" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">isOverdue</span><span class="p">(</span><span class="nx">scheduledISO</span><span class="p">,</span><span class="w"> </span><span class="nx">deadlineISO</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">currentTime</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
-</code></pre></div>
-<p>isOverdue checks if a task is past its scheduled or deadline date. Parses RFC3339 date strings (produced by yyyymmddLocalISO) and compares as dates.</p>
-<p><a name="parseGroomedDate"></a></p>
-<h2 id="func-parsegroomeddate">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L138">parseGroomedDate</a><a class="headerlink" href="#func-parsegroomeddate" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">parseGroomedDate</span><span class="p">(</span><span class="nx">task</span><span class="w"> </span><span class="nx">logseqapi</span><span class="p">.</span><span class="nx">TaskJSON</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
-</code></pre></div>
-<p>parseGroomedDate extracts the groomed date from task properties.</p>
-<p><a name="recordChanged"></a></p>
-<h2 id="func-recordchanged">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L240">recordChanged</a><a class="headerlink" href="#func-recordchanged" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">recordChanged</span><span class="p">(</span><span class="nx">existing</span><span class="p">,</span><span class="w"> </span><span class="nx">desired</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
-</code></pre></div>
-<p>recordChanged checks if any sync-relevant fields differ between two records.</p>
-<p><a name="syncUpdateFields"></a></p>
-<h2 id="func-syncupdatefields">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L90">syncUpdateFields</a><a class="headerlink" href="#func-syncupdatefields" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">syncUpdateFields</span><span class="p">()</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span>
-</code></pre></div>
-<p>syncUpdateFields returns the fields checked by recordChanged to detect updates. rank is intentionally excluded — the UI owns rank after record creation.</p>
-<p><a name="yyyymmddToDateOnly"></a></p>
-<h2 id="func-yyyymmddtodateonly">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L47">yyyymmddToDateOnly</a><a class="headerlink" href="#func-yyyymmddtodateonly" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">yyyymmddToDateOnly</span><span class="p">(</span><span class="nx">dateInt</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
-</code></pre></div>
-<p>yyyymmddToDateOnly converts a YYYYMMDD integer to a plain date string (YYYY-MM-DD). Returns empty string for zero values. Used for journal dates where Python sends date.isoformat() without timezone.</p>
-<p><a name="yyyymmddToLocalISO"></a></p>
-<h2 id="func-yyyymmddtolocaliso">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L68">yyyymmddToLocalISO</a><a class="headerlink" href="#func-yyyymmddtolocaliso" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">yyyymmddToLocalISO</span><span class="p">(</span><span class="nx">dateInt</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
-</code></pre></div>
-<p>yyyymmddToLocalISO converts a YYYYMMDD integer to an RFC3339 datetime string with local timezone offset. Returns empty string for zero values. Used for scheduled/deadline dates where Python uses datetime.strptime().astimezone().isoformat() which includes the local timezone offset, causing PocketBase to shift to UTC on storage.</p>
-<p><a name="RankInfo"></a></p>
-<h2 id="type-rankinfo">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/sync/sync.go#L13-L17">RankInfo</a><a class="headerlink" href="#type-rankinfo" title="Permanent link">¶</a></h2>
-<p>RankInfo holds backlog rank data for a task.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">RankInfo</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="nx">BacklogName</span><span class="w">  </span><span class="kt">string</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="nx">BacklogIndex</span><span class="w"> </span><span class="kt">int</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="nx">Rank</span><span class="w">         </span><span class="kt">int</span>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">}</span>
-</code></pre></div>
+<p>isSectionHeaderBlock reports whether block's text matches any known section header.</p>
 <p>Generated by <a href="https://github.com/princjef/gomarkdoc">gomarkdoc</a></p>
 
 

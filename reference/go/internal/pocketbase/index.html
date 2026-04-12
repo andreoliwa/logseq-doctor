@@ -1063,6 +1063,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#func-startpocketbase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func StartPocketBase
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#func-waitforready" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func WaitForReady
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#func-findpocketbase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func findPocketBase
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#func-lqdtasksfields" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1163,6 +1196,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#func-client-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func (*Client) Token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#func-client-updaterecord" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1250,6 +1294,9 @@
 <li><a href="#variables">Variables</a></li>
 <li><a href="#FormatDateLocal">func FormatDateLocal(utcStr string) string</a></li>
 <li><a href="#LqdTasksSchema">func LqdTasksSchema() map[string]any</a></li>
+<li><a href="#StartPocketBase">func StartPocketBase(workDir string) (*exec.Cmd, error)</a></li>
+<li><a href="#WaitForReady">func WaitForReady(healthURL string, timeout time.Duration) error</a></li>
+<li><a href="#findPocketBase">func findPocketBase() (string, error)</a></li>
 <li><a href="#lqdTasksFields">func lqdTasksFields() []map[string]any</a></li>
 <li><a href="#Client">type Client</a></li>
 <li><a href="#NewClient">func NewClient(baseURL, username, password string) (*Client, error)</a></li>
@@ -1259,104 +1306,137 @@
 <li><a href="#Client.DeleteCollection">func (c *Client) DeleteCollection(name string) error</a></li>
 <li><a href="#Client.DeleteRecord">func (c *Client) DeleteRecord(collection, recordID string) error</a></li>
 <li><a href="#Client.FetchRecords">func (c *Client) FetchRecords(collection, filter, sort string, limit ...int) ([]map[string]any, error)</a></li>
+<li><a href="#Client.Token">func (c *Client) Token() string</a></li>
 <li><a href="#Client.UpdateRecord">func (c *Client) UpdateRecord(collection, recordID string, data map[string]any) error</a></li>
 <li><a href="#Client.authenticate">func (c *Client) authenticate(username, password string) error</a></li>
 <li><a href="#Client.doRequest">func (c *Client) doRequest(method, path string, body io.Reader) (*http.Response, error)</a></li>
 </ul>
 <h2 id="constants">Constants<a class="headerlink" href="#constants" title="Permanent link">¶</a></h2>
+<p><a name="pbPollInterval"></a></p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nx">pbPollInterval</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nx">pbPollTimeout</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="mi">500</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Millisecond</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span>
+</code></pre></div>
 <p><a name="DateFormat"></a>DateFormat is the ISO date format used for PocketBase date/datetime record fields.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">DateFormat</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"2006-01-02 15:04:05.000Z"</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">DateFormat</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"2006-01-02 15:04:05.000Z"</span>
 </code></pre></div>
 <p><a name="httpClientTimeout"></a></p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">httpClientTimeout</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">httpClientTimeout</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span>
 </code></pre></div>
 <p><a name="idMaxLength"></a></p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">idMaxLength</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">float64</span><span class="p">(</span><span class="mi">36</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">idMaxLength</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">float64</span><span class="p">(</span><span class="mi">36</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">¶</a></h2>
 <p><a name="ErrCannotConnect"></a>Sentinel errors for PocketBase client operations.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">var</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="nx">ErrCannotConnect</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"cannot connect to PocketBase"</span><span class="p">)</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nx">ErrAuthFailed</span><span class="w">       </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"PocketBase authentication failed"</span><span class="p">)</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nx">ErrUnexpectedStatus</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"unexpected status from PocketBase"</span><span class="p">)</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">var</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nx">ErrCannotConnect</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"cannot connect to PocketBase"</span><span class="p">)</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nx">ErrAuthFailed</span><span class="w">       </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"PocketBase authentication failed"</span><span class="p">)</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nx">ErrUnexpectedStatus</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"unexpected status from PocketBase"</span><span class="p">)</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">)</span>
+</code></pre></div>
+<p><a name="ErrPocketBaseNotFound"></a>ErrPocketBaseNotFound is returned when the pocketbase binary cannot be located.</p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">ErrPocketBaseNotFound</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"pocketbase executable not found in $PATH or ~/.local/bin"</span><span class="p">)</span>
+</code></pre></div>
+<p><a name="ErrWaitTimeout"></a>ErrWaitTimeout is returned when WaitForReady times out.</p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">ErrWaitTimeout</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"timed out waiting for service to be ready"</span><span class="p">)</span>
 </code></pre></div>
 <p><a name="taskStatusValues"></a>taskStatusValues are the task status values stored in the PocketBase select field.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">taskStatusValues</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">{</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskStringTodo</span><span class="p">,</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskStringDoing</span><span class="p">,</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskStringDone</span><span class="p">,</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskStringWaiting</span><span class="p">,</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskStringCanceled</span><span class="p">,</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">taskStatusValues</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskStringTodo</span><span class="p">,</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskStringDoing</span><span class="p">,</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskStringDone</span><span class="p">,</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskStringWaiting</span><span class="p">,</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskStringCanceled</span><span class="p">,</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="FormatDateLocal"></a></p>
 <h2 id="func-formatdatelocal">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/schema.go#L22">FormatDateLocal</a><a class="headerlink" href="#func-formatdatelocal" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">FormatDateLocal</span><span class="p">(</span><span class="nx">utcStr</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">FormatDateLocal</span><span class="p">(</span><span class="nx">utcStr</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
 </code></pre></div>
 <p>FormatDateLocal parses a PocketBase UTC datetime string and returns it in local time as "YYYY-MM-DD HH:MM". Returns the raw string if parsing fails.</p>
 <p><a name="LqdTasksSchema"></a></p>
 <h2 id="func-lqdtasksschema">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/schema.go#L35">LqdTasksSchema</a><a class="headerlink" href="#func-lqdtasksschema" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">LqdTasksSchema</span><span class="p">()</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">LqdTasksSchema</span><span class="p">()</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span>
 </code></pre></div>
 <p>LqdTasksSchema returns the PocketBase collection schema for lqd_tasks. Go code is the source of truth — not PB migrations.</p>
+<p><a name="StartPocketBase"></a></p>
+<h2 id="func-startpocketbase">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/subprocess.go#L27">StartPocketBase</a><a class="headerlink" href="#func-startpocketbase" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">StartPocketBase</span><span class="p">(</span><span class="nx">workDir</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">exec</span><span class="p">.</span><span class="nx">Cmd</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+</code></pre></div>
+<p>StartPocketBase starts pocketbase serve as a managed subprocess from workDir. Stdout and stderr are inherited so PocketBase logs appear in the same terminal. The caller is responsible for calling cmd.Process.Kill() on shutdown.</p>
+<p><a name="WaitForReady"></a></p>
+<h2 id="func-waitforready">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/subprocess.go#L71">WaitForReady</a><a class="headerlink" href="#func-waitforready" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">WaitForReady</span><span class="p">(</span><span class="nx">healthURL</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">timeout</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+</code></pre></div>
+<p>WaitForReady polls healthURL until it returns 200 OK or timeout elapses.</p>
+<p><a name="findPocketBase"></a></p>
+<h2 id="func-findpocketbase">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/subprocess.go#L49">findPocketBase</a><a class="headerlink" href="#func-findpocketbase" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">findPocketBase</span><span class="p">()</span><span class="w"> </span><span class="p">(</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+</code></pre></div>
+<p>findPocketBase resolves the pocketbase executable path. It checks $PATH first, then falls back to \~/.local/bin/pocketbase.</p>
 <p><a name="lqdTasksFields"></a></p>
 <h2 id="func-lqdtasksfields">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/schema.go#L43">lqdTasksFields</a><a class="headerlink" href="#func-lqdtasksfields" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">lqdTasksFields</span><span class="p">()</span><span class="w"> </span><span class="p">[]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">lqdTasksFields</span><span class="p">()</span><span class="w"> </span><span class="p">[]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span>
 </code></pre></div>
 <p><a name="Client"></a></p>
 <h2 id="type-client">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L25-L29">Client</a><a class="headerlink" href="#type-client" title="Permanent link">¶</a></h2>
 <p>Client is a minimal PocketBase HTTP client.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Client</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="nx">baseURL</span><span class="w">    </span><span class="kt">string</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="nx">token</span><span class="w">      </span><span class="kt">string</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="nx">httpClient</span><span class="w"> </span><span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Client</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Client</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="nx">baseURL</span><span class="w">    </span><span class="kt">string</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="nx">token</span><span class="w">      </span><span class="kt">string</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="nx">httpClient</span><span class="w"> </span><span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Client</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="NewClient"></a></p>
 <h3 id="func-newclient">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L32">NewClient</a><a class="headerlink" href="#func-newclient" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NewClient</span><span class="p">(</span><span class="nx">baseURL</span><span class="p">,</span><span class="w"> </span><span class="nx">username</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">Client</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NewClient</span><span class="p">(</span><span class="nx">baseURL</span><span class="p">,</span><span class="w"> </span><span class="nx">username</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">Client</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
 <p>NewClient authenticates with PocketBase and returns a ready-to-use client.</p>
 <p><a name="Client.CollectionExists"></a></p>
-<h3 id="func-client-collectionexists">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L48">CollectionExists</a><a class="headerlink" href="#func-client-collectionexists" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">CollectionExists</span><span class="p">(</span><span class="nx">name</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<h3 id="func-client-collectionexists">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L53">CollectionExists</a><a class="headerlink" href="#func-client-collectionexists" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">CollectionExists</span><span class="p">(</span><span class="nx">name</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
 <p>CollectionExists checks if a collection exists in PocketBase.</p>
 <p><a name="Client.CreateCollection"></a></p>
-<h3 id="func-client-createcollection">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L67">CreateCollection</a><a class="headerlink" href="#func-client-createcollection" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">CreateCollection</span><span class="p">(</span><span class="nx">schema</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<h3 id="func-client-createcollection">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L72">CreateCollection</a><a class="headerlink" href="#func-client-createcollection" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">CreateCollection</span><span class="p">(</span><span class="nx">schema</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>CreateCollection creates a new collection with the given schema.</p>
 <p><a name="Client.CreateRecord"></a></p>
-<h3 id="func-client-createrecord">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L175">CreateRecord</a><a class="headerlink" href="#func-client-createrecord" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">CreateRecord</span><span class="p">(</span><span class="nx">collection</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<h3 id="func-client-createrecord">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L180">CreateRecord</a><a class="headerlink" href="#func-client-createrecord" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">CreateRecord</span><span class="p">(</span><span class="nx">collection</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>CreateRecord creates a record in the given collection.</p>
 <p><a name="Client.DeleteCollection"></a></p>
-<h3 id="func-client-deletecollection">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L89">DeleteCollection</a><a class="headerlink" href="#func-client-deletecollection" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">DeleteCollection</span><span class="p">(</span><span class="nx">name</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<h3 id="func-client-deletecollection">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L94">DeleteCollection</a><a class="headerlink" href="#func-client-deletecollection" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">DeleteCollection</span><span class="p">(</span><span class="nx">name</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>DeleteCollection deletes a collection by name. It first fetches the collection to get its ID.</p>
 <p><a name="Client.DeleteRecord"></a></p>
-<h3 id="func-client-deleterecord">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L223">DeleteRecord</a><a class="headerlink" href="#func-client-deleterecord" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">DeleteRecord</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span><span class="w"> </span><span class="nx">recordID</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<h3 id="func-client-deleterecord">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L228">DeleteRecord</a><a class="headerlink" href="#func-client-deleterecord" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">DeleteRecord</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span><span class="w"> </span><span class="nx">recordID</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>DeleteRecord deletes a record by ID from the given collection.</p>
 <p><a name="Client.FetchRecords"></a></p>
-<h3 id="func-client-fetchrecords">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L123">FetchRecords</a><a class="headerlink" href="#func-client-fetchrecords" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">FetchRecords</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span><span class="w"> </span><span class="nx">filter</span><span class="p">,</span><span class="w"> </span><span class="nx">sort</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">limit</span><span class="w"> </span><span class="o">...</span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<h3 id="func-client-fetchrecords">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L128">FetchRecords</a><a class="headerlink" href="#func-client-fetchrecords" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">FetchRecords</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span><span class="w"> </span><span class="nx">filter</span><span class="p">,</span><span class="w"> </span><span class="nx">sort</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">limit</span><span class="w"> </span><span class="o">...</span><span class="kt">int</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
 <p>FetchRecords fetches all records from a collection, handling pagination. Optional filter and sort parameters are passed as PB query params. If limit &gt; 0, fetches at most that many records (single page).</p>
+<p><a name="Client.Token"></a></p>
+<h3 id="func-client-token">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L48">Token</a><a class="headerlink" href="#func-client-token" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">Token</span><span class="p">()</span><span class="w"> </span><span class="kt">string</span>
+</code></pre></div>
+<p>Token returns the current authentication token.</p>
 <p><a name="Client.UpdateRecord"></a></p>
-<h3 id="func-client-updaterecord">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L197">UpdateRecord</a><a class="headerlink" href="#func-client-updaterecord" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">UpdateRecord</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span><span class="w"> </span><span class="nx">recordID</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<h3 id="func-client-updaterecord">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L202">UpdateRecord</a><a class="headerlink" href="#func-client-updaterecord" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">UpdateRecord</span><span class="p">(</span><span class="nx">collection</span><span class="p">,</span><span class="w"> </span><span class="nx">recordID</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">any</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>UpdateRecord updates a record by ID in the given collection.</p>
 <p><a name="Client.authenticate"></a></p>
-<h3 id="func-client-authenticate">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L239">authenticate</a><a class="headerlink" href="#func-client-authenticate" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">authenticate</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<h3 id="func-client-authenticate">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L244">authenticate</a><a class="headerlink" href="#func-client-authenticate" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">authenticate</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p><a name="Client.doRequest"></a></p>
-<h3 id="func-client-dorequest">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L287">doRequest</a><a class="headerlink" href="#func-client-dorequest" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">doRequest</span><span class="p">(</span><span class="nx">method</span><span class="p">,</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Reader</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Response</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<h3 id="func-client-dorequest">func (*Client) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/pocketbase/client.go#L292">doRequest</a><a class="headerlink" href="#func-client-dorequest" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">Client</span><span class="p">)</span><span class="w"> </span><span class="nx">doRequest</span><span class="p">(</span><span class="nx">method</span><span class="p">,</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">body</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Reader</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Response</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
 <p>doRequest sends an authenticated HTTP request to PocketBase.</p>
 <p>Generated by <a href="https://github.com/princjef/gomarkdoc">gomarkdoc</a></p>

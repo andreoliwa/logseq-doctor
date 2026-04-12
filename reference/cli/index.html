@@ -659,6 +659,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dashboard
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tidy-up" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1372,6 +1383,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dashboard
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tidy-up" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1751,10 +1773,80 @@
 <p><strong>Example:</strong></p>
 <div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>~/logseq/my-graph<span class="w"> </span>tasks
 </code></pre></div>
+<h3 id="dashboard"><code>dashboard</code><a class="headerlink" href="#dashboard" title="Permanent link">¶</a></h3>
+<p>Start PocketBase and the backlog web UI.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>lqd<span class="w"> </span>dashboard<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>lqd<span class="w"> </span>dash<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w">        </span><span class="c1"># short alias</span>
+</code></pre></div>
+<p><strong>Description:</strong></p>
+<p>Starts PocketBase as a managed subprocess, waits for it to be ready, then serves
+the backlog dashboard at <code>http://localhost:8091</code>. On macOS the browser opens automatically.</p>
+<p>The dashboard lets you browse, filter, sort, and reorder tasks across all your backlogs
+in a visual web UI. Rank changes are written directly to PocketBase; use <code>lqd backlog</code>
+to propagate them back to Logseq <code>.md</code> files.</p>
+<p><strong>Options:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Env var</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-p, --port</code></td>
+<td><code>LQD_SERVE_PORT</code></td>
+<td><code>8091</code></td>
+<td>HTTP server port</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Required environment variables:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POCKETBASE_URL</code></td>
+<td>PocketBase base URL (default <code>http://127.0.0.1:8090</code>)</td>
+</tr>
+<tr>
+<td><code>POCKETBASE_USERNAME</code></td>
+<td>PocketBase admin email</td>
+</tr>
+<tr>
+<td><code>POCKETBASE_PASSWORD</code></td>
+<td>PocketBase admin password</td>
+</tr>
+<tr>
+<td><code>LOGSEQ_GRAPH_PATH</code></td>
+<td>Path to Logseq graph root (required for write-back operations)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Start with defaults (port 8091)</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>lqd<span class="w"> </span>dashboard
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Start on a custom port</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>lqd<span class="w"> </span>dash<span class="w"> </span>--port<span class="w"> </span><span class="m">9000</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="c1"># Start with explicit credentials</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="nv">POCKETBASE_USERNAME</span><span class="o">=</span>admin@example.com<span class="w"> </span><span class="nv">POCKETBASE_PASSWORD</span><span class="o">=</span>secret<span class="w"> </span>lqd<span class="w"> </span>dashboard
+</code></pre></div>
+<p>See <a href="../../dashboard/">Dashboard Guide</a> for a full walkthrough of the web UI.</p>
+<hr>
 <h3 id="tidy-up"><code>tidy-up</code><a class="headerlink" href="#tidy-up" title="Permanent link">¶</a></h3>
 <p>Clean up and standardize your Markdown files.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[</span>FILES...<span class="o">]</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[</span>FILES...<span class="o">]</span>
 </code></pre></div>
 <p><strong>Description:</strong></p>
 <p>This command helps ensure your Markdown files follow consistent formatting rules. It performs various cleanup operations:</p>
@@ -1765,15 +1857,15 @@
 <li>Standardizes formatting</li>
 </ul>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/markdown/files/*.md
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/markdown/files/*.md
 </code></pre></div>
 <h2 id="global-flags">Global Flags<a class="headerlink" href="#global-flags" title="Permanent link">¶</a></h2>
 <p><strong>Go CLI (<code>lqd</code>):</strong></p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>-h, --help
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>-h, --help
 </code></pre></div>
 <p>Show help information for any command.</p>
 <p><strong>Python CLI (<code>lqdpy</code>):</strong></p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>-g, --graph DIRECTORY
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>-g, --graph DIRECTORY
 </code></pre></div>
 <p>Path to your Logseq graph directory. Can also be set via the <code>LOGSEQ_GRAPH_PATH</code> environment variable.</p>
 <p><strong>Required:</strong> Yes (for most commands)</p>
@@ -1781,21 +1873,21 @@
 <h3 id="logseq_graph_path"><code>LOGSEQ_GRAPH_PATH</code><a class="headerlink" href="#logseq_graph_path" title="Permanent link">¶</a></h3>
 <p>Path to your Logseq graph directory. Used by the Python CLI (<code>lqdpy</code>) as the default value for the <code>-g</code> flag, and by the <code>backlog</code> command to locate your graph.</p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_GRAPH_PATH</span><span class="o">=</span>~/logseq/my-graph
-<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>lqdpy<span class="w"> </span>tasks<span class="w">  </span><span class="c1"># No need to specify -g flag</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_GRAPH_PATH</span><span class="o">=</span>~/logseq/my-graph
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>lqdpy<span class="w"> </span>tasks<span class="w">  </span><span class="c1"># No need to specify -g flag</span>
 </code></pre></div>
 <h3 id="logseq_host_url"><code>LOGSEQ_HOST_URL</code><a class="headerlink" href="#logseq_host_url" title="Permanent link">¶</a></h3>
 <p>Logseq API host URL. Used by the <code>backlog</code> command to connect to the Logseq API.</p>
 <p><strong>Default:</strong> <code>http://localhost:12315</code></p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_HOST_URL</span><span class="o">=</span>http://localhost:12315
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>lqd<span class="w"> </span>backlog
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_HOST_URL</span><span class="o">=</span>http://localhost:12315
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>lqd<span class="w"> </span>backlog
 </code></pre></div>
 <h3 id="logseq_api_token"><code>LOGSEQ_API_TOKEN</code><a class="headerlink" href="#logseq_api_token" title="Permanent link">¶</a></h3>
 <p>Logseq API authentication token. Required by the <code>backlog</code> command to authenticate with the Logseq API.</p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_API_TOKEN</span><span class="o">=</span>your-api-token-here
-<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>lqd<span class="w"> </span>backlog
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_API_TOKEN</span><span class="o">=</span>your-api-token-here
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>lqd<span class="w"> </span>backlog
 </code></pre></div>
 <h2 id="exit-code">Exit Code<a class="headerlink" href="#exit-code" title="Permanent link">¶</a></h2>
 <p>Both CLIs use standard exit codes:</p>
