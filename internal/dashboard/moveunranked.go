@@ -2,7 +2,6 @@ package dashboard
 
 import (
 	"fmt"
-	"strings"
 
 	logseq "github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
@@ -12,10 +11,10 @@ import (
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 )
 
-func allSectionHeaders() []string {
-	return []string{
-		backlog.SectionFocus, backlog.SectionOverdue, backlog.SectionNewTasks,
-		backlog.SectionTriaged, backlog.SectionScheduled, backlog.SectionUnranked,
+func allSectionHeaders() []backlog.Header {
+	return []backlog.Header{
+		backlog.HeaderFocus, backlog.HeaderOverdue, backlog.HeaderNewTasks,
+		backlog.HeaderTriaged, backlog.HeaderScheduled, backlog.HeaderUnranked,
 	}
 }
 
@@ -43,7 +42,7 @@ func MoveToUnranked(graphPath, backlogPageName string, uuids []string) error {
 		uuidSet[u] = true
 	}
 
-	unrankedDivider := logseqext.FindBlockContainingText(page, backlog.SectionUnranked)
+	unrankedDivider := logseqext.FindBlockContainingText(page, backlog.HeaderUnranked.Text)
 	toMove := collectBlocksToMove(page, uuidSet)
 
 	if len(toMove) == 0 {
@@ -65,13 +64,28 @@ func MoveToUnranked(graphPath, backlogPageName string, uuids []string) error {
 	return nil
 }
 
-// collectBlocksToMove returns all top-level page blocks (excluding section headers)
-// whose block-ref UUID is in uuidSet.
+// collectBlocksToMove returns all blocks (top-level or children of section headers)
+// whose block-ref UUID is in uuidSet. Section header blocks themselves are skipped.
 func collectBlocksToMove(page logseq.Page, uuidSet map[string]bool) []*content.Block {
 	var toMove []*content.Block
 
 	for _, block := range page.Blocks() {
 		if isSectionHeaderBlock(block) {
+			// Tasks under a section header (e.g. 🆕 New tasks) are descendant blocks.
+			block.Children().FindDeep(func(n content.Node) bool {
+				childBlock, ok := n.(*content.Block)
+				if !ok {
+					return false
+				}
+
+				uuid := logseqext.ExtractBlockRefUUID(childBlock)
+				if uuidSet[uuid] {
+					toMove = append(toMove, childBlock)
+				}
+
+				return false
+			})
+
 			continue
 		}
 
@@ -89,7 +103,7 @@ func isSectionHeaderBlock(block *content.Block) bool {
 	blockText := logseqext.BlockContentText(block)
 
 	for _, header := range allSectionHeaders() {
-		if strings.Contains(blockText, header) {
+		if header.Matches(blockText) {
 			return true
 		}
 	}
@@ -103,8 +117,8 @@ func ensureUnrankedDivider(page logseq.Page, existing *content.Block) *content.B
 		return existing
 	}
 
-	dividerBlock := content.NewBlock(content.NewParagraph(content.NewText(backlog.SectionUnranked)))
-	scheduledDivider := logseqext.FindBlockContainingText(page, backlog.SectionScheduled)
+	dividerBlock := content.NewBlock(content.NewParagraph(content.NewText(backlog.HeaderUnranked.String())))
+	scheduledDivider := logseqext.FindBlockContainingText(page, backlog.HeaderScheduled.Text)
 
 	if scheduledDivider != nil {
 		page.InsertBlockBefore(dividerBlock, scheduledDivider)

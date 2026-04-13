@@ -9,11 +9,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path/filepath"
-	"runtime"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -101,7 +100,6 @@ func runDashboard(cmd *cobra.Command, _ []string) error {
 	uiURL := fmt.Sprintf("http://localhost:%d", port)
 
 	fmt.Fprintf(os.Stderr, "Backlog UI ready at %s\n", uiURL)
-	openBrowser(cmd.Context(), uiURL)
 
 	return startHTTPServer(cmd.Context(), port, mux)
 }
@@ -167,7 +165,8 @@ func BuildHTTPMux(pbURL, token, graphPath string) *http.ServeMux {
 	})
 
 	mux.HandleFunc("POST /internal/move-to-unranked", func(writer http.ResponseWriter, req *http.Request) {
-		handleMoveToUnranked(writer, req, graphPath) //nolint:contextcheck // logseq-go graph API has no context support
+		//nolint:contextcheck // logseq-go graph API has no context support
+		handleMoveToUnranked(writer, req, graphPath, pbURL, token)
 	})
 
 	return mux
@@ -250,13 +249,6 @@ func resolveBacklogPage(graphPath, shortName string) string {
 	return shortName
 }
 
-// openBrowser opens the UI URL in the default browser on macOS.
-func openBrowser(ctx context.Context, uiURL string) {
-	if runtime.GOOS == "darwin" {
-		_ = exec.CommandContext(ctx, "open", uiURL).Start()
-	}
-}
-
 // startHTTPServer runs the server until a signal arrives or a listen error occurs.
 func startHTTPServer(ctx context.Context, port int, mux http.Handler) error {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
@@ -302,7 +294,7 @@ func gracefulShutdown(srv *http.Server) error {
 }
 
 // handleMoveToUnranked handles POST /internal/move-to-unranked.
-func handleMoveToUnranked(writer http.ResponseWriter, req *http.Request, graphPath string) {
+func handleMoveToUnranked(writer http.ResponseWriter, req *http.Request, graphPath, pbURL, token string) {
 	var body struct {
 		BacklogPage string   `json:"backlogPage"`
 		UUIDs       []string `json:"uuids"`
@@ -330,11 +322,29 @@ func handleMoveToUnranked(writer http.ResponseWriter, req *http.Request, graphPa
 
 	pageTitle := resolveBacklogPage(graphPath, body.BacklogPage)
 
-	err = dashboard.MoveToUnranked(graphPath, pageTitle, body.UUIDs)
+	// body.UUIDs contains composite PocketBase record IDs (uuid_backlogname).
+	// MoveToUnranked needs bare block UUIDs to match ((uuid)) refs in the .md file.
+	suffix := "_" + strings.ToLower(body.BacklogPage)
+	bareUUIDs := make([]string, 0, len(body.UUIDs))
+
+	for _, id := range body.UUIDs {
+		bareUUIDs = append(bareUUIDs, strings.TrimSuffix(id, suffix))
+	}
+
+	err = dashboard.MoveToUnranked(graphPath, pageTitle, bareUUIDs)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
 
 		return
+	}
+
+	// Update section in PocketBase so these tasks immediately appear as unranked
+	// in the dashboard without requiring a full lqd sync.
+	// body.UUIDs are already composite record IDs (uuid_backlogname).
+	pb := pocketbase.NewClientWithToken(pbURL, token)
+
+	for _, recordID := range body.UUIDs {
+		_ = pb.UpdateRecord("lqd_tasks", recordID, map[string]any{"section": backlog.SectionUnranked})
 	}
 
 	writer.WriteHeader(http.StatusNoContent)

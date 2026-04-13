@@ -284,7 +284,7 @@ type WriteOpts struct {
 //   - upserted=true means the API call was made (Logseq may need a moment to flush; a second
 //     groom run will reliably find it even if the file hasn't been updated within this process).
 func EnsureBlockOnDisk(graph *logseq.Graph, groomAPI logseqapi.LogseqAPI, task map[string]any) (bool, bool) {
-	uuid, _ := task["id"].(string)
+	uuid, _ := task["task_uuid"].(string)
 	if uuid == "" {
 		return false, false
 	}
@@ -335,7 +335,7 @@ func ApplyGroomAction(
 		return nil
 	}
 
-	uuid, _ := task["id"].(string)
+	uuid, _ := task["task_uuid"].(string)
 	groomedDate := logseqext.FormatLogseqDate(opts.CurrentTime())
 
 	blockInfo, err := logseqapi.FindBlockByUUID(groomAPI, uuid)

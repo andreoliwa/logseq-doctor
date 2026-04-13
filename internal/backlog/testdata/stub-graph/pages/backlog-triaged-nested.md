@@ -1,4 +1,4 @@
-- 🏷️ Triaged
+- 🏷️ Triaged tasks
   - ((c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c1c1c1))
     - ((c2c2c2c2-c2c2-c2c2-c2c2-c2c2c2c2c2c2))
 - ⏰ Scheduled tasks

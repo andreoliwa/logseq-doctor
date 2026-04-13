@@ -73,6 +73,38 @@ h2 {
     font-weight: 500;
     margin: 12px 0 4px;
     color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Collapse toggle arrow button inside h2 */
+button.collapse-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1;
+    flex-shrink: 0;
+}
+button.collapse-toggle:hover {
+    color: var(--text);
+}
+
+/* Jump link to the other section (↓ Unranked / ↑ Ranked) */
+a.section-jump {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text2);
+    text-decoration: none;
+    white-space: nowrap;
+}
+a.section-jump:hover {
+    color: var(--link);
+    text-decoration: underline;
 }
 
 /* ── Filter bar ─────────────────────────────────────────────────────────────
@@ -167,6 +199,13 @@ button.clear-btn {
 button.clear-btn:hover {
     background: var(--sel);
 }
+/* Total record count — sits next to the clear button, muted style */
+#total-count {
+    font-size: 12px;
+    color: var(--text2);
+    white-space: nowrap;
+}
+
 /* Visual separator between filter groups in the filter bar */
 .filter-sep {
     color: var(--border);

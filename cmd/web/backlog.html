@@ -189,6 +189,10 @@
                         />
                         Page</label
                     >
+                    <span
+                        id="total-count"
+                        title="Total records in PocketBase"
+                    ></span>
                     <button class="clear-btn" id="clear-btn">
                         Clear filters
                     </button>
@@ -207,65 +211,99 @@
             <div id="error-msg" style="display: none"></div>
 
             <!--
-    Ranked tasks: tasks with rank > 0, grouped by backlog.
+    Ranked tasks: tasks with section === 1, grouped by backlog.
     Each group has a header row (.backlog-group-header) followed by data rows.
     Rows within a group are drag-sortable via SortableJS; dragging updates the
     rank field in PocketBase via a PATCH request.
   -->
             <div id="ranked-section" style="display: none">
-                <h2>Ranked tasks</h2>
-                <table id="ranked-table">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <!-- drag handle column, no label -->
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Backlog</th>
-                            <th>Tags</th>
-                            <th>Status</th>
-                            <th>Overdue</th>
-                            <th>Scheduled</th>
-                            <th>Deadline</th>
-                            <th>Journal</th>
-                            <th>Sort date</th>
-                            <th>Groomed</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ranked-body"></tbody>
-                </table>
+                <h2 id="ranked">
+                    <button
+                        class="collapse-toggle"
+                        data-target="ranked-table-wrap"
+                        aria-expanded="true"
+                    >
+                        ▾
+                    </button>
+                    Ranked tasks (<span id="ranked-count">0</span>)
+                    <a
+                        class="section-jump"
+                        href="#unranked"
+                        title="Jump to Unranked tasks"
+                        >↓ Unranked</a
+                    >
+                </h2>
+                <div id="ranked-table-wrap">
+                    <table id="ranked-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <!-- drag handle column, no label -->
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Backlog</th>
+                                <th>Tags</th>
+                                <th>Status</th>
+                                <th>Overdue</th>
+                                <th>Scheduled</th>
+                                <th>Deadline</th>
+                                <th>Journal</th>
+                                <th>Sort date</th>
+                                <th>Groomed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ranked-body"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!--
-    Unranked tasks: tasks with rank = 0 (or null).
+    Unranked tasks: tasks with section >= 2 (unranked or orphan).
     Sorted client-side by the user-configurable sort bar above the table.
     No drag-to-rank here; use the ranked section for that.
   -->
             <div id="unranked-section" style="display: none">
-                <h2>Unranked tasks</h2>
+                <h2 id="unranked">
+                    <button
+                        class="collapse-toggle"
+                        data-target="unranked-table-wrap"
+                        aria-expanded="true"
+                    >
+                        ▾
+                    </button>
+                    Unranked tasks (<span id="unranked-count">0</span>)
+                    <a
+                        class="section-jump"
+                        href="#ranked"
+                        title="Jump to Ranked tasks"
+                        >↑ Ranked</a
+                    >
+                </h2>
                 <!--
       Sort bar: a row of draggable criterion chips rendered by renderSortBar().
       Each chip has a field selector, a direction selector (ASC/DESC), and a
       remove button. Chips themselves are drag-sortable (priority order).
     -->
-                <div class="sort-bar" id="sort-bar"></div>
-                <table id="unranked-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Backlog</th>
-                            <th>Tags</th>
-                            <th>Status</th>
-                            <th>Overdue</th>
-                            <th>Scheduled</th>
-                            <th>Deadline</th>
-                            <th>Journal</th>
-                            <th>Sort date</th>
-                            <th>Groomed</th>
-                        </tr>
-                    </thead>
-                    <tbody id="unranked-body"></tbody>
-                </table>
+                <div id="unranked-table-wrap">
+                    <div class="sort-bar" id="sort-bar"></div>
+                    <table id="unranked-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Backlog</th>
+                                <th>Tags</th>
+                                <th>Status</th>
+                                <th>Overdue</th>
+                                <th>Scheduled</th>
+                                <th>Deadline</th>
+                                <th>Journal</th>
+                                <th>Sort date</th>
+                                <th>Groomed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="unranked-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -432,12 +470,12 @@
             // The UUID comes from the task's `id` field in PocketBase.
             function taskNameCell(task) {
                 const cell = el("td", { className: "task-name" });
-                if (graphName && task.id) {
+                if (graphName && task.task_uuid) {
                     const url =
                         "logseq://graph/" +
                         encodeURIComponent(graphName) +
                         "?block-id=" +
-                        encodeURIComponent(task.id);
+                        encodeURIComponent(task.task_uuid);
                     cell.appendChild(
                         el(
                             "a",
@@ -510,7 +548,10 @@
             // ── State ────────────────────────────────────────────────────────────────────
             let allTasks = []; // flat array of all task records from PocketBase
             let tagSelect; // Tom Select instance for the tag picker
-            let sortCriteria = [{ field: "journal", dir: "ASC" }]; // default sort for unranked
+            let sortCriteria = [
+                { field: "backlog_index", dir: "ASC" },
+                { field: "section", dir: "ASC" },
+            ]; // default sort for unranked
             let graphName = ""; // basename of LOGSEQ_GRAPH_PATH, used in deep links
             let backlogPages = {}; // short name → full page title, e.g. "Focus" → "backlog/Focus"
             // populated from /internal/config, which reads the backlog config page
@@ -519,6 +560,8 @@
 
             // Fields available for sorting unranked tasks.
             const SORT_FIELDS = [
+                { value: "backlog_index", label: "Backlog order" },
+                { value: "section", label: "Section" },
                 { value: "journal", label: "Created date" },
                 { value: "name", label: "Name" },
                 { value: "tags", label: "Tags" },
@@ -654,7 +697,7 @@
 
             // ── Render ranked table ──────────────────────────────────────────────────────
             function renderRanked() {
-                const ranked = allTasks.filter((t) => t.rank > 0);
+                const ranked = allTasks.filter((t) => t.section === 1);
 
                 // Build posMap: task id → 1-based position within its backlog group.
                 // Position is computed from the full ranked set (not just visible tasks),
@@ -748,6 +791,8 @@
                     }
                 }
 
+                document.getElementById("ranked-count").textContent =
+                    visible.length;
                 document.getElementById("ranked-section").style.display =
                     visible.length ? "" : "none";
                 // SortableJS must be rebound after the DOM is rebuilt, because the old
@@ -858,7 +903,7 @@
             // ── Render unranked table ────────────────────────────────────────────────────
             function renderUnranked() {
                 const unranked = allTasks
-                    .filter((t) => !t.rank || t.rank === 0)
+                    .filter((t) => t.section >= 2)
                     .filter(matchesFilters);
                 // Client-side multi-key sort driven by sortCriteria[].
                 // localeCompare handles string comparison correctly for names and dates alike.
@@ -899,6 +944,8 @@
                     tbody.appendChild(row);
                 }
 
+                document.getElementById("unranked-count").textContent =
+                    unranked.length;
                 document.getElementById("unranked-section").style.display =
                     unranked.length ? "" : "none";
             }
@@ -1034,7 +1081,7 @@
 
                 try {
                     // POST to the Go server, which writes the unranked divider into the
-                    // Logseq markdown file and sets rank=0 on these records in PocketBase.
+                    // Logseq markdown file and sets section=2 on these records in PocketBase.
                     const resp = await fetch("/internal/move-to-unranked", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -1048,7 +1095,7 @@
                     // Update local state so the UI reflects the change without a full reload.
                     for (const id of toMove) {
                         const t = allTasks.find((x) => x.id === id);
-                        if (t) t.rank = 0;
+                        if (t) t.section = 2;
                     }
                     renderRanked();
                     renderUnranked();
@@ -1094,6 +1141,8 @@
                     }
 
                     allTasks = await fetchAllTasks();
+                    document.getElementById("total-count").textContent =
+                        allTasks.length + " total";
 
                     // Populate the backlog dropdown ordered by backlog_index (config page order),
                     // not alphabetically. We find the minimum backlog_index for each backlog name
@@ -1302,7 +1351,7 @@
             //   sort       comma-separated field:DIR pairs (omitted = journal:ASC default)
 
             const DEFAULT_STATUS = ["TODO", "DOING", "WAITING"];
-            const DEFAULT_SORT = "journal:ASC";
+            const DEFAULT_SORT = "backlog_index:ASC,section:ASC";
 
             // serializeState() — writes current filter+sort state to the URL (replaceState,
             // no history entry) and updates the page title. Called debounced after any change.
@@ -1495,6 +1544,20 @@
             }
 
             const syncURL = debounce(serializeState, 400);
+
+            // ── Collapse toggles ─────────────────────────────────────────────────────────
+            // Each .collapse-toggle button has data-target=<id of the wrapper div>.
+            // Clicking toggles display:none on the wrapper and rotates the arrow.
+            document.querySelectorAll(".collapse-toggle").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const wrap = document.getElementById(btn.dataset.target);
+                    if (!wrap) return;
+                    const collapsed = wrap.style.display === "none";
+                    wrap.style.display = collapsed ? "" : "none";
+                    btn.textContent = collapsed ? "▾" : "▸";
+                    btn.setAttribute("aria-expanded", String(collapsed));
+                });
+            });
 
             // ── Boot ─────────────────────────────────────────────────────────────────────
             restoreState();

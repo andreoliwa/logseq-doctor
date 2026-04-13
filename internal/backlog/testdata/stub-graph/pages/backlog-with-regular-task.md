@@ -1,6 +1,6 @@
 - ((a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1))
 - ((a2a2a2a2-a2a2-a2a2-a2a2-a2a2a2a2a2a2))
-- 🏷️ Triaged
+- 🏷️ Triaged tasks
   - ((a3a3a3a3-a3a3-a3a3-a3a3-a3a3a3a3a3a3))
 - ⏰ Scheduled tasks
   - ((a4a4a4a4-a4a4-a4a4-a4a4-a4a4a4a4a4a4))

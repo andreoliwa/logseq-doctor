@@ -27,7 +27,7 @@ func TestLqdTasksSchema_HasRequiredFields(t *testing.T) {
 	}
 
 	expectedFields := []string{"name", "status", "tags", "journal", "scheduled", "deadline",
-		"overdue", "backlog_name", "backlog_index", "rank", "sort_date", "groomed"}
+		"overdue", "backlog_name", "backlog_index", "section", "rank", "sort_date", "groomed"}
 	for _, expected := range expectedFields {
 		assert.Contains(t, fieldNames, expected, "missing field: %s", expected)
 	}
@@ -41,8 +41,8 @@ func TestLqdTasksSchema_IDPattern(t *testing.T) {
 
 	for _, f := range fields {
 		if f["name"] == "id" {
-			assert.Equal(t, "^[-a-z0-9]+$", f["pattern"])
-			assert.InDelta(t, float64(36), f["max"], 0)
+			assert.Equal(t, "^[-a-z0-9_]+$", f["pattern"])
+			assert.InDelta(t, float64(87), f["max"], 0)
 
 			return
 		}

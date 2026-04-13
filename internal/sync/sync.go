@@ -2,9 +2,11 @@ package lqdsync
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
+	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/internal/pocketbase"
 )
@@ -13,16 +15,16 @@ import (
 type RankInfo struct {
 	BacklogName  string
 	BacklogIndex int
+	Section      int // backlog.SectionRanked, SectionUnranked, or SectionOrphan
 	Rank         int
 }
 
-// CalculateRanks processes backlogs in reverse order and assigns ranks.
-// Tasks in earlier backlogs override later backlogs.
-func CalculateRanks(backlogs map[string][]string, backlogOrder []string) map[string]RankInfo {
-	rankMap := make(map[string]RankInfo)
+// CalculateRanks assigns ranks for all (uuid, backlog) pairs.
+// A task that appears in multiple backlogs gets one RankInfo per backlog.
+func CalculateRanks(backlogs map[string][]string, backlogOrder []string) map[string][]RankInfo {
+	rankMap := make(map[string][]RankInfo)
 
-	for idx := len(backlogOrder) - 1; idx >= 0; idx-- {
-		backlogName := backlogOrder[idx]
+	for idx, backlogName := range backlogOrder {
 		uuids, ok := backlogs[backlogName]
 
 		if !ok {
@@ -30,11 +32,12 @@ func CalculateRanks(backlogs map[string][]string, backlogOrder []string) map[str
 		}
 
 		for rank, uuid := range uuids {
-			rankMap[uuid] = RankInfo{
+			rankMap[uuid] = append(rankMap[uuid], RankInfo{
 				BacklogName:  backlogName,
 				BacklogIndex: idx + 1,
+				Section:      backlog.SectionRanked,
 				Rank:         rank + 1,
-			}
+			})
 		}
 	}
 
@@ -89,8 +92,8 @@ func yyyymmddToLocalISO(dateInt int) string {
 // rank is intentionally excluded — the UI owns rank after record creation.
 func syncUpdateFields() []string {
 	return []string{
-		"name", "status", "tags", "journal", "scheduled", "deadline",
-		"overdue", "backlog_name", "backlog_index", "sort_date", "groomed",
+		"task_uuid", "name", "status", "tags", "journal", "scheduled", "deadline",
+		"overdue", "backlog_name", "backlog_index", "section", "sort_date", "groomed",
 	}
 }
 
@@ -153,13 +156,13 @@ func parseGroomedDate(task logseqapi.TaskJSON) string {
 	return groomedTime.Format(pocketbase.DateFormat)
 }
 
-// extractRankFields returns backlog name, index, and rank from a RankInfo pointer.
-func extractRankFields(rank *RankInfo) (string, int, int) {
+// extractRankFields returns backlog name, index, section, and rank from a RankInfo pointer.
+func extractRankFields(rank *RankInfo) (string, int, int, int) {
 	if rank == nil {
-		return "", 0, 0
+		return "", 0, backlog.SectionOrphan, 0
 	}
 
-	return rank.BacklogName, rank.BacklogIndex, rank.Rank
+	return rank.BacklogName, rank.BacklogIndex, rank.Section, rank.Rank
 }
 
 // TaskToRecord converts a TaskJSON + optional RankInfo to a PocketBase record map.
@@ -174,10 +177,20 @@ func TaskToRecord(
 	overdue := isOverdue(scheduledISO, deadlineISO, currentTime)
 	groomedISO := parseGroomedDate(task)
 
-	backlogName, backlogIndex, rankValue := extractRankFields(rank)
+	backlogName, backlogIndex, section, rankValue := extractRankFields(rank)
+
+	// Composite record ID: uuid_backlogname (backlog name lowercased to satisfy
+	// the PocketBase id pattern ^[-a-z0-9_]+$). Tasks that appear in multiple
+	// backlogs each get their own row, while task_uuid preserves the raw UUID
+	// for Logseq deep links and cross-backlog lookups.
+	recordID := task.UUID
+	if backlogName != "" {
+		recordID = task.UUID + "_" + strings.ToLower(backlogName)
+	}
 
 	return map[string]any{
-		"id":            task.UUID,
+		"id":            recordID,
+		"task_uuid":     task.UUID,
 		"name":          logseqext.CleanTaskName(task.Content, task.Marker),
 		"status":        task.Marker,
 		"tags":          enrichedTags,
@@ -187,6 +200,7 @@ func TaskToRecord(
 		"overdue":       overdue,
 		"backlog_name":  backlogName,
 		"backlog_index": backlogIndex,
+		"section":       section,
 		"rank":          rankValue * rankSeedFactor,
 		"sort_date":     sortDate,
 		"groomed":       groomedISO,

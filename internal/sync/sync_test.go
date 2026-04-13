@@ -7,9 +7,11 @@ import (
 	"time"
 
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
+	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	lqdsync "github.com/andreoliwa/logseq-doctor/internal/sync"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCalculateRanks_SingleBacklog(t *testing.T) {
@@ -20,13 +22,16 @@ func TestCalculateRanks_SingleBacklog(t *testing.T) {
 	ranks := lqdsync.CalculateRanks(backlogs, []string{"self"})
 
 	assert.Len(t, ranks, 3)
-	assert.Equal(t, "self", ranks["uuid-1"].BacklogName)
-	assert.Equal(t, 1, ranks["uuid-1"].BacklogIndex)
-	assert.Equal(t, 1, ranks["uuid-1"].Rank)
-	assert.Equal(t, 3, ranks["uuid-3"].Rank)
+	require.Len(t, ranks["uuid-1"], 1)
+	assert.Equal(t, "self", ranks["uuid-1"][0].BacklogName)
+	assert.Equal(t, 1, ranks["uuid-1"][0].BacklogIndex)
+	assert.Equal(t, backlog.SectionRanked, ranks["uuid-1"][0].Section)
+	assert.Equal(t, 1, ranks["uuid-1"][0].Rank)
+	require.Len(t, ranks["uuid-3"], 1)
+	assert.Equal(t, 3, ranks["uuid-3"][0].Rank)
 }
 
-func TestCalculateRanks_MultipleBacklogs_EarlierOverrides(t *testing.T) {
+func TestCalculateRanks_MultipleBacklogs_SharedTask(t *testing.T) {
 	backlogs := map[string][]string{
 		"self": {"uuid-1", "uuid-shared"},
 		"fun":  {"uuid-shared", "uuid-2"},
@@ -35,9 +40,14 @@ func TestCalculateRanks_MultipleBacklogs_EarlierOverrides(t *testing.T) {
 
 	ranks := lqdsync.CalculateRanks(backlogs, order)
 
-	assert.Equal(t, "self", ranks["uuid-shared"].BacklogName)
-	assert.Equal(t, 1, ranks["uuid-shared"].BacklogIndex)
-	assert.Equal(t, 2, ranks["uuid-shared"].Rank)
+	// uuid-shared appears in both backlogs — two separate RankInfo entries.
+	require.Len(t, ranks["uuid-shared"], 2)
+	assert.Equal(t, "self", ranks["uuid-shared"][0].BacklogName)
+	assert.Equal(t, 1, ranks["uuid-shared"][0].BacklogIndex)
+	assert.Equal(t, 2, ranks["uuid-shared"][0].Rank)
+	assert.Equal(t, "fun", ranks["uuid-shared"][1].BacklogName)
+	assert.Equal(t, 2, ranks["uuid-shared"][1].BacklogIndex)
+	assert.Equal(t, 1, ranks["uuid-shared"][1].Rank)
 }
 
 func TestCalculateRanks_Empty(t *testing.T) {
@@ -136,7 +146,7 @@ func TestTaskToRecord_WithRankAndDates(t *testing.T) {
 		Deadline:  20250412,
 	}
 
-	rank := &lqdsync.RankInfo{BacklogName: "fun", BacklogIndex: 3, Rank: 5}
+	rank := &lqdsync.RankInfo{BacklogName: "fun", BacklogIndex: 3, Section: 1, Rank: 5}
 	now := func() time.Time { return time.Date(2025, 4, 13, 0, 0, 0, 0, time.UTC) }
 	record := lqdsync.TaskToRecord(task, rank, "#travel", now)
 
@@ -196,12 +206,12 @@ func TestRankNotClobberedOnUpdate(t *testing.T) {
 	existing := map[string]any{
 		"id": "task-x", "name": "Same", "status": "TODO", "rank": 7000,
 		"tags": "", "journal": "", "scheduled": "", "deadline": "", "overdue": false,
-		"backlog_name": "self", "backlog_index": 1, "sort_date": "2025-04-13", "groomed": "",
+		"backlog_name": "self", "backlog_index": 1, "section": 1, "sort_date": "2025-04-13", "groomed": "",
 	}
 	desired := map[string]any{
 		"id": "task-x", "name": "Same", "status": "TODO", "rank": 3000,
 		"tags": "", "journal": "", "scheduled": "", "deadline": "", "overdue": false,
-		"backlog_name": "self", "backlog_index": 1, "sort_date": "2025-04-13", "groomed": "",
+		"backlog_name": "self", "backlog_index": 1, "section": 1, "sort_date": "2025-04-13", "groomed": "",
 	}
 
 	toCreate, toUpdate, toDelete := lqdsync.DiffRecords([]map[string]any{existing}, []map[string]any{desired})

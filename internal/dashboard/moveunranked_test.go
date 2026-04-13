@@ -11,9 +11,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const testBacklogPage = "my-backlog"
+
 // makeTestGraph creates a minimal Logseq graph directory in a temp dir.
-// It writes a logseq/config.edn and a pages/<pageName>.md with the given content.
-func makeTestGraph(t *testing.T, pageName, pageContent string) string {
+// It writes logseq/config.edn and pages/my-backlog.md with the given content.
+func makeTestGraph(t *testing.T, pageContent string) string {
 	t.Helper()
 
 	graphDir := t.TempDir()
@@ -28,7 +30,7 @@ func makeTestGraph(t *testing.T, pageName, pageContent string) string {
 	require.NoError(t, os.WriteFile(filepath.Join(logseqDir, "config.edn"), []byte("{}\n"), 0o600))
 
 	// The backlog page
-	require.NoError(t, os.WriteFile(filepath.Join(pagesDir, pageName+".md"), []byte(pageContent), 0o600))
+	require.NoError(t, os.WriteFile(filepath.Join(pagesDir, testBacklogPage+".md"), []byte(pageContent), 0o600))
 
 	return graphDir
 }
@@ -41,13 +43,13 @@ const (
 
 func TestMoveToUnrankedDoesNothingForEmptyUUIDs(t *testing.T) {
 	pageContent := "- ((" + uuid1 + "))\n- ((" + uuid2 + "))\n"
-	graphDir := makeTestGraph(t, "my-backlog", pageContent)
+	graphDir := makeTestGraph(t, pageContent)
 
-	err := dashboard.MoveToUnranked(graphDir, "my-backlog", nil)
+	err := dashboard.MoveToUnranked(graphDir, testBacklogPage, nil)
 	require.NoError(t, err)
 
 	// File unchanged
-	got, err := os.ReadFile(filepath.Join(graphDir, "pages", "my-backlog.md"))
+	got, err := os.ReadFile(filepath.Join(graphDir, "pages", testBacklogPage+".md"))
 
 	require.NoError(t, err)
 	assert.Contains(t, string(got), uuid1)
@@ -57,12 +59,12 @@ func TestMoveToUnrankedDoesNothingForEmptyUUIDs(t *testing.T) {
 func TestMoveToUnrankedMovesTasksAndCreatesHeader(t *testing.T) {
 	// Page has three ranked tasks. We move the last two to unranked.
 	pageContent := "- ((" + uuid1 + "))\n- ((" + uuid2 + "))\n- ((" + uuid3 + "))\n"
-	graphDir := makeTestGraph(t, "my-backlog", pageContent)
+	graphDir := makeTestGraph(t, pageContent)
 
-	err := dashboard.MoveToUnranked(graphDir, "my-backlog", []string{uuid2, uuid3})
+	err := dashboard.MoveToUnranked(graphDir, testBacklogPage, []string{uuid2, uuid3})
 	require.NoError(t, err)
 
-	result, err := os.ReadFile(filepath.Join(graphDir, "pages", "my-backlog.md"))
+	result, err := os.ReadFile(filepath.Join(graphDir, "pages", testBacklogPage+".md"))
 
 	require.NoError(t, err)
 
@@ -86,15 +88,38 @@ func TestMoveToUnrankedMovesTasksAndCreatesHeader(t *testing.T) {
 	assert.Less(t, dividerIdx, task3Idx, "divider should come before uuid3")
 }
 
+func TestMoveToUnrankedFromSectionHeader(t *testing.T) {
+	// uuid2 lives under 🆕 New tasks (a section header child), not at the top level.
+	// Moving it to unranked must find it there.
+	pageContent := "- ((" + uuid1 + "))\n- 🆕 New tasks\n\t- ((" + uuid2 + "))\n"
+	graphDir := makeTestGraph(t, pageContent)
+
+	err := dashboard.MoveToUnranked(graphDir, testBacklogPage, []string{uuid2})
+	require.NoError(t, err)
+
+	result, err := os.ReadFile(filepath.Join(graphDir, "pages", testBacklogPage+".md"))
+	require.NoError(t, err)
+
+	resultStr := string(result)
+
+	assert.Contains(t, resultStr, "🔢 Unranked tasks", "unranked divider should be created")
+	assert.Contains(t, resultStr, uuid1)
+	assert.Contains(t, resultStr, uuid2)
+
+	dividerIdx := strings.Index(resultStr, "🔢 Unranked tasks")
+	task2Idx := strings.Index(resultStr, uuid2)
+	assert.Less(t, dividerIdx, task2Idx, "uuid2 should be under the unranked divider")
+}
+
 func TestMoveToUnrankedPreservesExistingDivider(t *testing.T) {
 	// Page already has an unranked divider with one task. We add another.
 	pageContent := "- ((" + uuid1 + "))\n- ((" + uuid2 + "))\n- 🔢 Unranked tasks\n\t- ((" + uuid3 + "))\n"
-	graphDir := makeTestGraph(t, "my-backlog", pageContent)
+	graphDir := makeTestGraph(t, pageContent)
 
-	err := dashboard.MoveToUnranked(graphDir, "my-backlog", []string{uuid2})
+	err := dashboard.MoveToUnranked(graphDir, testBacklogPage, []string{uuid2})
 	require.NoError(t, err)
 
-	result, err := os.ReadFile(filepath.Join(graphDir, "pages", "my-backlog.md"))
+	result, err := os.ReadFile(filepath.Join(graphDir, "pages", testBacklogPage+".md"))
 
 	require.NoError(t, err)
 

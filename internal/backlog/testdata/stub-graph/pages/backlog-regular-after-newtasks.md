@@ -3,5 +3,5 @@
 - 🆕 New tasks
   - ((b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2))
 - ((b3b3b3b3-b3b3-b3b3-b3b3-b3b3b3b3b3b3))
-- 🏷️ Triaged
+- 🏷️ Triaged tasks
   - ((b4b4b4b4-b4b4-b4b4-b4b4-b4b4b4b4b4b4))

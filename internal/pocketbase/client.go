@@ -44,6 +44,17 @@ func NewClient(baseURL, username, password string) (*Client, error) {
 	return client, nil
 }
 
+// NewClientWithToken returns a client pre-loaded with an existing auth token.
+// Use when a token has already been obtained (e.g. at dashboard startup) to
+// avoid a redundant authentication round-trip.
+func NewClientWithToken(baseURL, token string) *Client {
+	return &Client{
+		baseURL:    baseURL,
+		token:      token,
+		httpClient: &http.Client{Timeout: httpClientTimeout}, //nolint:exhaustruct // only Timeout needed
+	}
+}
+
 // Token returns the current authentication token.
 func (c *Client) Token() string {
 	return c.token

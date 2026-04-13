@@ -127,3 +127,97 @@ func ExtractBlockRefUUIDs(page logseq.Page) []string {
 
 	return uuids
 }
+
+// SectionedUUID pairs a block-ref UUID with whether it lives under a section
+// header (ranked=false means it is under Overdue, New tasks, Triaged, Scheduled,
+// or Unranked — any divider that is not the implicit "ranked" area at the top).
+type SectionedUUID struct {
+	UUID   string
+	Ranked bool
+}
+
+// ExtractSectionedBlockRefUUIDs scans a backlog page and returns every block-ref
+// UUID together with whether it is in the ranked area (above all section dividers)
+// or the unranked area (under any divider whose text matches one of
+// unrankedSectionTexts, case-insensitive substring).
+//
+// The ranked area is defined as top-level blocks that are NOT section-header
+// blocks and NOT descendants of any section-header block.
+func ExtractSectionedBlockRefUUIDs(page logseq.Page, unrankedSectionTexts []string) []SectionedUUID {
+	// First pass: find all section-header blocks.
+	sectionHeaders := make(map[*content.Block]bool)
+
+	for _, block := range page.Blocks() {
+		text := BlockContentText(block)
+		for _, headerText := range unrankedSectionTexts {
+			if strings.Contains(strings.ToLower(text), strings.ToLower(headerText)) {
+				sectionHeaders[block] = true
+
+				break
+			}
+		}
+	}
+
+	// Second pass: classify each ref.
+	var result []SectionedUUID
+
+	for _, block := range page.Blocks() {
+		if sectionHeaders[block] {
+			// This is a divider block itself — collect refs under it as unranked.
+			block.Children().FindDeep(func(n content.Node) bool {
+				if ref, ok := n.(*content.BlockRef); ok {
+					result = append(result, SectionedUUID{UUID: ref.ID, Ranked: false})
+				}
+
+				return false
+			})
+
+			continue
+		}
+
+		// Top-level block: ranked only if it is not a descendant of any header.
+		underHeader := false
+
+		for header := range sectionHeaders {
+			if isDescendantBlock(block, header) {
+				underHeader = true
+
+				break
+			}
+		}
+
+		block.Children().FindDeep(func(n content.Node) bool {
+			if ref, ok := n.(*content.BlockRef); ok {
+				result = append(result, SectionedUUID{UUID: ref.ID, Ranked: !underHeader})
+			}
+
+			return false
+		})
+	}
+
+	return result
+}
+
+// isDescendantBlock returns true if block is a descendant of ancestor
+// by traversing the parent chain upward.
+func isDescendantBlock(block, ancestor *content.Block) bool {
+	for block != nil {
+		parent := block.Parent()
+		if parent == nil {
+			break
+		}
+
+		parentBlock, ok := parent.(*content.Block)
+		if !ok {
+			break
+		}
+
+		if parentBlock == ancestor {
+			return true
+		}
+
+		block = parentBlock
+	}
+
+	return false
+}

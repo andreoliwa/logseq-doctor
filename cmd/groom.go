@@ -243,16 +243,16 @@ func processGroomTasks(
 		exists, upserted := groom.EnsureBlockOnDisk(graph, api, task)
 
 		if upserted {
-			taskID, _ := task["id"].(string)
+			taskUUID, _ := task["task_uuid"].(string)
 			fmt.Println(groomStyles.warning.Render(
-				" → Triggered Logseq to write id:: for block " + taskID,
+				" → Triggered Logseq to write id:: for block " + taskUUID,
 			))
 		}
 
 		if !exists {
-			taskID, _ := task["id"].(string)
+			taskUUID, _ := task["task_uuid"].(string)
 			fmt.Println(groomStyles.warning.Render(
-				" ⚠ Skipped (id:: not on disk after upsert): " + taskID + " — will be available on next run.",
+				" ⚠ Skipped (id:: not on disk after upsert): " + taskUUID + " — will be available on next run.",
 			))
 
 			counts.Skipped++
@@ -307,8 +307,8 @@ func groomHandleTask(
 		opts := &groom.WriteOpts{
 			FocusPageTitle:       backlogConfig.FocusPage,
 			BacklogPageTitle:     backlogConfig.FindBacklogPageTitle(backlogName),
-			TriagedSectionText:   backlog.SectionTriaged,
-			ScheduledSectionText: backlog.SectionScheduled,
+			TriagedSectionText:   backlog.HeaderTriaged.Text,
+			ScheduledSectionText: backlog.HeaderScheduled.Text,
 			CurrentTime:          time.Now,
 		}
 
@@ -364,7 +364,7 @@ func printTaskCard(task map[string]any, index, total int, now time.Time, termWid
 	backlogName, _ := task["backlog_name"].(string)
 	backlogIndex, _ := task["backlog_index"].(float64)
 	tags, _ := task["tags"].(string)
-	taskID, _ := task["id"].(string)
+	taskID, _ := task["task_uuid"].(string)
 	scheduledStr, _ := task["scheduled"].(string)
 	deadlineStr, _ := task["deadline"].(string)
 

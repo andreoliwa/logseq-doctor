@@ -58,10 +58,13 @@ func insertAndRemoveRefs(
 
 	state := newPageState()
 
+	normalised := NormaliseHeaderText(page)
 	scanPageBlocks(page, state, obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs)
 	insertOverdueTasks(page, state, overdueBlockRefs)
 
 	save := insertNewTasks(page, state, newBlockRefs, overdueBlockRefs, futureScheduledBlockRefs)
+	save = save || normalised
+
 	insertScheduledTasks(page, state, futureScheduledBlockRefs)
 
 	sortTriagedSection(state, taskLookup)
@@ -86,9 +89,57 @@ func insertAndRemoveRefs(
 	return state.result, nil
 }
 
-// scanPageBlocks is a two-pass coordinator: first it collects UUIDs already in
-// the Triaged section, then it processes all blocks (which uses those UUIDs for
-// deduplication in the regular area).
+// NormaliseHeaderText scans all top-level blocks on the page and normalises any
+// block whose text node (trimmed) is exactly a known header text (with or without
+// the canonical emoji, case-insensitively) to the canonical "🎯 Focus" / "🆕 New
+// tasks" form. Only the text node is updated; sibling nodes (e.g. [[quick capture]]
+// page links) are left intact. Returns true if any block was changed.
+//
+// A block whose text is "Focus" or "🎯 FOCUS" gets normalised to "🎯 Focus ".
+// A block whose text is "⏰ Scheduled tasks section already exists" is left alone
+// because it is not purely a header — it has extra words after the header text.
+func NormaliseHeaderText(page logseq.Page) bool {
+	changed := false
+
+	for _, block := range page.Blocks() {
+		block.Children().FindDeep(func(node content.Node) bool {
+			text, ok := node.(*content.Text)
+			if !ok {
+				return false
+			}
+
+			trimmed := strings.TrimSpace(text.Value)
+
+			for _, hdr := range allHeaders {
+				// Only match if the text node is exactly the header text (ignoring
+				// emoji prefix and case), not if it merely contains the header text.
+				if !strings.EqualFold(trimmed, hdr.Text) && !strings.EqualFold(trimmed, hdr.String()) {
+					continue
+				}
+
+				if trimmed == hdr.String() {
+					// Already canonical — nothing to do.
+					break
+				}
+
+				// Preserve any trailing whitespace (separates text from page-link sibling).
+				suffix := text.Value[len(trimmed):]
+				text.Value = hdr.String() + suffix
+				changed = true
+
+				break
+			}
+
+			return false
+		})
+	}
+
+	return changed
+}
+
+// scanPageBlocks is a two-pass coordinator: first it normalises headers, then
+// collects UUIDs already in the Triaged section, then processes all blocks
+// (which uses those UUIDs for deduplication in the regular area).
 func scanPageBlocks(
 	page logseq.Page, state *pageState,
 	obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
@@ -103,7 +154,7 @@ func collectTriagedRefs(page logseq.Page, state *pageState) {
 	for _, block := range page.Blocks() {
 		block.Children().FindDeep(func(node content.Node) bool {
 			if text, ok := node.(*content.Text); ok {
-				if strings.Contains(text.Value, SectionTriaged) {
+				if HeaderTriaged.Matches(text.Value) {
 					state.dividerTriaged = block
 				}
 			}
@@ -157,17 +208,17 @@ func processAllBlocks(
 // recordSectionDivider updates state with a block if its text matches a known section header.
 func recordSectionDivider(block *content.Block, textValue string, state *pageState) {
 	switch {
-	case strings.Contains(textValue, sectionNewTasksText):
+	case HeaderNewTasks.Matches(textValue):
 		state.dividerNewTasks = block
-	case strings.Contains(textValue, SectionOverdue):
+	case HeaderOverdue.Matches(textValue):
 		state.dividerOverdue = block
-	case textValue == SectionFocus:
+	case HeaderFocus.Matches(textValue):
 		state.dividerFocus = block
-	case strings.Contains(textValue, SectionScheduled):
+	case HeaderScheduled.Matches(textValue):
 		state.dividerScheduled = block
-	case strings.Contains(textValue, SectionTriaged):
+	case HeaderTriaged.Matches(textValue):
 		state.dividerTriaged = block
-	case strings.Contains(textValue, SectionUnranked):
+	case HeaderUnranked.Matches(textValue):
 		state.dividerUnranked = block
 	}
 }
@@ -256,10 +307,7 @@ func insertOverdueTasks(page logseq.Page, state *pageState, overdueBlockRefs *se
 		}
 
 		if state.dividerOverdue == nil {
-			state.dividerOverdue = content.NewBlock(content.NewParagraph(
-				content.NewText(SectionOverdue+" "),
-				content.NewPageLink(PageQuickCapture),
-			))
+			state.dividerOverdue = content.NewBlock(HeaderOverdue.NewParagraph())
 			logseqext.AddSibling(page, state.dividerOverdue, state.firstBlock, state.dividerFocus)
 		}
 
@@ -295,10 +343,7 @@ func insertNewTasks(
 		}
 
 		if state.dividerNewTasks == nil {
-			state.dividerNewTasks = content.NewBlock(content.NewParagraph(
-				content.NewText(SectionNewTasks+" "),
-				content.NewPageLink(PageQuickCapture),
-			))
+			state.dividerNewTasks = content.NewBlock(HeaderNewTasks.NewParagraph())
 			logseqext.AddSibling(page, state.dividerNewTasks, state.firstBlock, state.dividerOverdue, state.dividerFocus)
 		}
 
@@ -320,10 +365,7 @@ func insertScheduledTasks(page logseq.Page, state *pageState, futureScheduledBlo
 
 	for _, blockRef := range futureScheduledBlockRefs.ValuesSorted() {
 		if state.dividerScheduled == nil {
-			state.dividerScheduled = content.NewBlock(content.NewParagraph(
-				content.NewText(SectionScheduled+" "),
-				content.NewPageLink(PageQuickCapture),
-			))
+			state.dividerScheduled = content.NewBlock(HeaderScheduled.NewParagraph())
 			page.AddBlock(state.dividerScheduled)
 		}
 
@@ -464,10 +506,11 @@ func taskSortKeyLess(left, right taskSortKey) bool {
 	return left.id < right.id
 }
 
-// focusSectionTexts are text substrings that identify section dividers on the Focus page.
+// focusSectionHeaders are the section dividers on the Focus page.
+// Used to find the insertion point for new block refs.
 //
 //nolint:gochecknoglobals // constant lookup table for section detection
-var focusSectionTexts = []string{SectionOverdue, SectionNewTasks, SectionTriaged, SectionScheduled}
+var focusSectionHeaders = []Header{HeaderOverdue, HeaderNewTasks, HeaderTriaged, HeaderScheduled}
 
 // AddBlockRefToFocusPage adds a block ref ((uuid)) to the Focus page.
 func AddBlockRefToFocusPage(transaction *logseq.Transaction, focusPageTitle, uuid string) error {
@@ -488,13 +531,13 @@ func AddBlockRefToFocusPage(transaction *logseq.Transaction, focusPageTitle, uui
 	return nil
 }
 
-// FindFirstSectionDivider finds the first block whose text contains a known section header.
+// FindFirstSectionDivider finds the first block whose text matches a known section header.
 func FindFirstSectionDivider(page logseq.Page) *content.Block {
 	for _, block := range page.Blocks() {
 		blockText := logseqext.BlockContentText(block)
 
-		for _, sectionText := range focusSectionTexts {
-			if strings.Contains(blockText, sectionText) {
+		for _, header := range focusSectionHeaders {
+			if header.Matches(blockText) {
 				return block
 			}
 		}
@@ -503,12 +546,12 @@ func FindFirstSectionDivider(page logseq.Page) *content.Block {
 	return nil
 }
 
-// regularAreaSectionHeaders are section texts that mark the boundary of the regular area.
-// A top-level block containing any of these texts is a section divider, not part of the regular area.
+// regularAreaSectionHeaders are section headers that mark the boundary of the regular area.
+// A top-level block matching any of these is a section divider, not part of the regular area.
 //
 //nolint:gochecknoglobals // constant lookup table for regular area detection
-var regularAreaSectionHeaders = []string{
-	SectionFocus, SectionOverdue, sectionNewTasksText, SectionTriaged, SectionScheduled, SectionUnranked,
+var regularAreaSectionHeaders = []Header{
+	HeaderFocus, HeaderOverdue, HeaderNewTasks, HeaderTriaged, HeaderScheduled, HeaderUnranked,
 }
 
 // BlockRefExistsUnder returns true if a block ref with the given UUID exists
@@ -540,7 +583,7 @@ func RemoveBlockRefFromRegularArea(page logseq.Page, uuid logseqapi.TaskUUID) {
 		isDivider := false
 
 		for _, header := range regularAreaSectionHeaders {
-			if strings.Contains(blockText, header) {
+			if header.Matches(blockText) {
 				isDivider = true
 
 				break

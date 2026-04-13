@@ -28,7 +28,8 @@ func FormatDateLocal(utcStr string) string {
 	return t.Local().Format("2006-01-02 15:04") //nolint:gosmopolitan
 }
 
-const idMaxLength = float64(36)
+// idMaxLength is UUID (36) + underscore (1) + backlog name (up to 50) = 87.
+const idMaxLength = float64(87)
 
 // LqdTasksSchema returns the PocketBase collection schema for lqd_tasks.
 // Go code is the source of truth — not PB migrations.
@@ -41,12 +42,22 @@ func LqdTasksSchema() map[string]any {
 }
 
 func lqdTasksFields() []map[string]any {
+	return append(lqdTasksIdentityFields(), lqdTasksDataFields()...)
+}
+
+func lqdTasksIdentityFields() []map[string]any {
 	return []map[string]any{
 		{
 			"name":    "id",
 			"type":    "text",
-			"pattern": "^[-a-z0-9]+$",
+			"pattern": "^[-a-z0-9_]+$",
 			"max":     idMaxLength,
+		},
+		{
+			// task_uuid holds the raw Logseq block UUID so JS can build deep links
+			// even after the record id became a composite uuid_backlog key.
+			"name": "task_uuid",
+			"type": "text",
 		},
 		{
 			"name":     "name",
@@ -59,45 +70,21 @@ func lqdTasksFields() []map[string]any {
 			"required": true,
 			"values":   taskStatusValues,
 		},
-		{
-			"name": "tags",
-			"type": "text",
-		},
-		{
-			"name": "journal",
-			"type": "date",
-		},
-		{
-			"name": "scheduled",
-			"type": "date",
-		},
-		{
-			"name": "deadline",
-			"type": "date",
-		},
-		{
-			"name": "overdue",
-			"type": "bool",
-		},
-		{
-			"name": "backlog_name",
-			"type": "text",
-		},
-		{
-			"name": "backlog_index",
-			"type": "number",
-		},
-		{
-			"name": "rank",
-			"type": "number",
-		},
-		{
-			"name": "sort_date",
-			"type": "date",
-		},
-		{
-			"name": "groomed",
-			"type": "date",
-		},
+	}
+}
+
+func lqdTasksDataFields() []map[string]any {
+	return []map[string]any{
+		{"name": "tags", "type": "text"},
+		{"name": "journal", "type": "date"},
+		{"name": "scheduled", "type": "date"},
+		{"name": "deadline", "type": "date"},
+		{"name": "overdue", "type": "bool"},
+		{"name": "backlog_name", "type": "text"},
+		{"name": "backlog_index", "type": "number"},
+		{"name": "section", "type": "number"},
+		{"name": "rank", "type": "number"},
+		{"name": "sort_date", "type": "date"},
+		{"name": "groomed", "type": "date"},
 	}
 }
