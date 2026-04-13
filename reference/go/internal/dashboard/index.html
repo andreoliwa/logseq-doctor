@@ -1120,33 +1120,33 @@
 <h2 id="index">Index<a class="headerlink" href="#index" title="Permanent link">¶</a></h2>
 <ul>
 <li><a href="#MoveToUnranked">func MoveToUnranked(graphPath, backlogPageName string, uuids []string) error</a></li>
-<li><a href="#allSectionHeaders">func allSectionHeaders() []string</a></li>
+<li><a href="#allSectionHeaders">func allSectionHeaders() []backlog.Header</a></li>
 <li><a href="#collectBlocksToMove">func collectBlocksToMove(page logseq.Page, uuidSet map[string]bool) []*content.Block</a></li>
 <li><a href="#ensureUnrankedDivider">func ensureUnrankedDivider(page logseq.Page, existing *content.Block) *content.Block</a></li>
 <li><a href="#isSectionHeaderBlock">func isSectionHeaderBlock(block *content.Block) bool</a></li>
 </ul>
 <p><a name="MoveToUnranked"></a></p>
-<h2 id="func-movetounranked">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L28">MoveToUnranked</a><a class="headerlink" href="#func-movetounranked" title="Permanent link">¶</a></h2>
+<h2 id="func-movetounranked">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L27">MoveToUnranked</a><a class="headerlink" href="#func-movetounranked" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">MoveToUnranked</span><span class="p">(</span><span class="nx">graphPath</span><span class="p">,</span><span class="w"> </span><span class="nx">backlogPageName</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">uuids</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>MoveToUnranked moves the given task UUIDs from the regular area of backlogPage to under the "🔢 Unranked tasks" section divider, creating the divider if absent.</p>
 <p>graphPath is the path to the Logseq graph root directory. backlogPageName is the page name (e.g. "my-backlog", without .md extension). uuids is the list of task UUIDs to move.</p>
 <p><a name="allSectionHeaders"></a></p>
-<h2 id="func-allsectionheaders">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L15">allSectionHeaders</a><a class="headerlink" href="#func-allsectionheaders" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">allSectionHeaders</span><span class="p">()</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span>
+<h2 id="func-allsectionheaders">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L14">allSectionHeaders</a><a class="headerlink" href="#func-allsectionheaders" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">allSectionHeaders</span><span class="p">()</span><span class="w"> </span><span class="p">[]</span><span class="nx">backlog</span><span class="p">.</span><span class="nx">Header</span>
 </code></pre></div>
 <p><a name="collectBlocksToMove"></a></p>
-<h2 id="func-collectblockstomove">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L70">collectBlocksToMove</a><a class="headerlink" href="#func-collectblockstomove" title="Permanent link">¶</a></h2>
+<h2 id="func-collectblockstomove">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L69">collectBlocksToMove</a><a class="headerlink" href="#func-collectblockstomove" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">collectBlocksToMove</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">uuidSet</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="p">[]</span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span>
 </code></pre></div>
-<p>collectBlocksToMove returns all top-level page blocks (excluding section headers) whose block-ref UUID is in uuidSet.</p>
+<p>collectBlocksToMove returns all blocks (top-level or children of section headers) whose block-ref UUID is in uuidSet. Section header blocks themselves are skipped.</p>
 <p><a name="ensureUnrankedDivider"></a></p>
-<h2 id="func-ensureunrankeddivider">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L101">ensureUnrankedDivider</a><a class="headerlink" href="#func-ensureunrankeddivider" title="Permanent link">¶</a></h2>
+<h2 id="func-ensureunrankeddivider">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L115">ensureUnrankedDivider</a><a class="headerlink" href="#func-ensureunrankeddivider" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">ensureUnrankedDivider</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">existing</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span>
 </code></pre></div>
 <p>ensureUnrankedDivider returns the existing divider block, or creates and inserts one.</p>
 <p><a name="isSectionHeaderBlock"></a></p>
-<h2 id="func-issectionheaderblock">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L88">isSectionHeaderBlock</a><a class="headerlink" href="#func-issectionheaderblock" title="Permanent link">¶</a></h2>
+<h2 id="func-issectionheaderblock">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/dashboard/moveunranked.go#L102">isSectionHeaderBlock</a><a class="headerlink" href="#func-issectionheaderblock" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">isSectionHeaderBlock</span><span class="p">(</span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>isSectionHeaderBlock reports whether block's text matches any known section header.</p>

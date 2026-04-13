@@ -1349,6 +1349,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#func-isdescendantblock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func isDescendantBlock
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#func-replacecurrentpage" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1420,6 +1431,34 @@
     <span class="md-ellipsis">
       
         func NewLogseqFinder
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#type-sectioneduuid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        type SectionedUUID
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="type SectionedUUID">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#func-extractsectionedblockrefuuids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func ExtractSectionedBlockRefUUIDs
       
     </span>
   </a>
@@ -1537,6 +1576,7 @@
 <li><a href="#UniqueStrings">func UniqueStrings(items []string) []string</a></li>
 <li><a href="#blockHasIDProperty">func blockHasIDProperty(block *content.Block, uuid string) bool</a></li>
 <li><a href="#containsTextCaseInsensitive">func containsTextCaseInsensitive(node content.Node, searchTextLower string) bool</a></li>
+<li><a href="#isDescendantBlock">func isDescendantBlock(block, ancestor *content.Block) bool</a></li>
 <li><a href="#replaceCurrentPage">func replaceCurrentPage(query, pageTitle string) string</a></li>
 <li><a href="#slugifyTag">func slugifyTag(s string) string</a></li>
 <li><a href="#updateExistingTask">func updateExistingTask(existingTaskMarker *content.TaskMarker, opts *AddTaskOptions) error</a></li>
@@ -1544,6 +1584,8 @@
 <li><a href="#AddTaskOptions">type AddTaskOptions</a></li>
 <li><a href="#LogseqFinder">type LogseqFinder</a></li>
 <li><a href="#NewLogseqFinder">func NewLogseqFinder(graph *logseq.Graph) LogseqFinder</a></li>
+<li><a href="#SectionedUUID">type SectionedUUID</a></li>
+<li><a href="#ExtractSectionedBlockRefUUIDs">func ExtractSectionedBlockRefUUIDs(page logseq.Page, unrankedSectionTexts []string) []SectionedUUID</a></li>
 <li><a href="#logseqFinderImpl">type logseqFinderImpl</a></li>
 <li><a href="#logseqFinderImpl.FindFirstQuery">func (f logseqFinderImpl) FindFirstQuery(pageTitle string) string</a></li>
 </ul>
@@ -1719,58 +1761,77 @@
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">containsTextCaseInsensitive</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">searchTextLower</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>containsTextCaseInsensitive checks if a node contains the specified text (case-insensitive). It checks Text, PageLink, Hashtag, CodeSpan, and Link nodes (including link URLs and text content).</p>
+<p><a name="isDescendantBlock"></a></p>
+<h2 id="func-isdescendantblock">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/tags.go#L203">isDescendantBlock</a><a class="headerlink" href="#func-isdescendantblock" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">isDescendantBlock</span><span class="p">(</span><span class="nx">block</span><span class="p">,</span><span class="w"> </span><span class="nx">ancestor</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
+</code></pre></div>
+<p>isDescendantBlock returns true if block is a descendant of ancestor by traversing the parent chain upward.</p>
 <p><a name="replaceCurrentPage"></a></p>
 <h2 id="func-replacecurrentpage">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/finder.go#L60">replaceCurrentPage</a><a class="headerlink" href="#func-replacecurrentpage" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">replaceCurrentPage</span><span class="p">(</span><span class="nx">query</span><span class="p">,</span><span class="w"> </span><span class="nx">pageTitle</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">replaceCurrentPage</span><span class="p">(</span><span class="nx">query</span><span class="p">,</span><span class="w"> </span><span class="nx">pageTitle</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
 </code></pre></div>
 <p>replaceCurrentPage replaces the current page placeholder in the query with the actual page name.</p>
 <p><a name="slugifyTag"></a></p>
 <h2 id="func-slugifytag">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/tags.go#L80">slugifyTag</a><a class="headerlink" href="#func-slugifytag" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">slugifyTag</span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">slugifyTag</span><span class="p">(</span><span class="nx">s</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
 </code></pre></div>
 <p>slugifyTag removes accents and non-alphanumeric characters, then lowercases — matching Python's slugify(tag, separator=") behaviour.</p>
 <p><a name="updateExistingTask"></a></p>
 <h2 id="func-updateexistingtask">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/tasks.go#L81">updateExistingTask</a><a class="headerlink" href="#func-updateexistingtask" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">updateExistingTask</span><span class="p">(</span><span class="nx">existingTaskMarker</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskMarker</span><span class="p">,</span><span class="w"> </span><span class="nx">opts</span><span class="w"> </span><span class="o">*</span><span class="nx">AddTaskOptions</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">updateExistingTask</span><span class="p">(</span><span class="nx">existingTaskMarker</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskMarker</span><span class="p">,</span><span class="w"> </span><span class="nx">opts</span><span class="w"> </span><span class="o">*</span><span class="nx">AddTaskOptions</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p><a name="updateTaskBackToTodo"></a></p>
 <h2 id="func-updatetaskbacktotodo">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/tasks.go#L90">updateTaskBackToTodo</a><a class="headerlink" href="#func-updatetaskbacktotodo" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">updateTaskBackToTodo</span><span class="p">(</span><span class="nx">taskMarker</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskMarker</span><span class="p">,</span><span class="w"> </span><span class="nx">newName</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">updateTaskBackToTodo</span><span class="p">(</span><span class="nx">taskMarker</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">TaskMarker</span><span class="p">,</span><span class="w"> </span><span class="nx">newName</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p><a name="AddTaskOptions"></a></p>
 <h2 id="type-addtaskoptions">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/tasks.go#L12-L20">AddTaskOptions</a><a class="headerlink" href="#type-addtaskoptions" title="Permanent link">¶</a></h2>
 <p>AddTaskOptions contains options for adding a task to Logseq.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">AddTaskOptions</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="w">    </span><span class="nx">Graph</span><span class="w">     </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span>
-<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="w">    </span><span class="nx">Date</span><span class="w">      </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>
-<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a><span class="w">    </span><span class="nx">Page</span><span class="w">      </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Page name to add the task to (empty = journal)</span>
-<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a><span class="w">    </span><span class="nx">BlockText</span><span class="w"> </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Partial text to search for in parent blocks</span>
-<a id="__codelineno-41-6" name="__codelineno-41-6" href="#__codelineno-41-6"></a><span class="w">    </span><span class="nx">Key</span><span class="w">       </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Unique key to search for existing task (case-insensitive)</span>
-<a id="__codelineno-41-7" name="__codelineno-41-7" href="#__codelineno-41-7"></a><span class="w">    </span><span class="nx">Name</span><span class="w">      </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Short name of the task</span>
-<a id="__codelineno-41-8" name="__codelineno-41-8" href="#__codelineno-41-8"></a><span class="w">    </span><span class="nx">TimeNow</span><span class="w">   </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="w"> </span><span class="c1">// For testing</span>
-<a id="__codelineno-41-9" name="__codelineno-41-9" href="#__codelineno-41-9"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">AddTaskOptions</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="w">    </span><span class="nx">Graph</span><span class="w">     </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span>
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="w">    </span><span class="nx">Date</span><span class="w">      </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a><span class="w">    </span><span class="nx">Page</span><span class="w">      </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Page name to add the task to (empty = journal)</span>
+<a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a><span class="w">    </span><span class="nx">BlockText</span><span class="w"> </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Partial text to search for in parent blocks</span>
+<a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a><span class="w">    </span><span class="nx">Key</span><span class="w">       </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Unique key to search for existing task (case-insensitive)</span>
+<a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a><span class="w">    </span><span class="nx">Name</span><span class="w">      </span><span class="kt">string</span><span class="w">           </span><span class="c1">// Short name of the task</span>
+<a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a><span class="w">    </span><span class="nx">TimeNow</span><span class="w">   </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="w"> </span><span class="c1">// For testing</span>
+<a id="__codelineno-42-9" name="__codelineno-42-9" href="#__codelineno-42-9"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="LogseqFinder"></a></p>
 <h2 id="type-logseqfinder">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/finder.go#L11-L13">LogseqFinder</a><a class="headerlink" href="#type-logseqfinder" title="Permanent link">¶</a></h2>
 <p>LogseqFinder provides methods for searching within a Logseq graph.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">LogseqFinder</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="w">    </span><span class="nx">FindFirstQuery</span><span class="p">(</span><span class="nx">pageTitle</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
-<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">LogseqFinder</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="w">    </span><span class="nx">FindFirstQuery</span><span class="p">(</span><span class="nx">pageTitle</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="NewLogseqFinder"></a></p>
 <h3 id="func-newlogseqfinder">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/finder.go#L20">NewLogseqFinder</a><a class="headerlink" href="#func-newlogseqfinder" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NewLogseqFinder</span><span class="p">(</span><span class="nx">graph</span><span class="w"> </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span><span class="p">)</span><span class="w"> </span><span class="nx">LogseqFinder</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NewLogseqFinder</span><span class="p">(</span><span class="nx">graph</span><span class="w"> </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span><span class="p">)</span><span class="w"> </span><span class="nx">LogseqFinder</span>
 </code></pre></div>
 <p>NewLogseqFinder creates a new LogseqFinder backed by the given graph.</p>
+<p><a name="SectionedUUID"></a></p>
+<h2 id="type-sectioneduuid">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/tags.go#L134-L137">SectionedUUID</a><a class="headerlink" href="#type-sectioneduuid" title="Permanent link">¶</a></h2>
+<p>SectionedUUID pairs a block-ref UUID with whether it lives under a section header (ranked=false means it is under Overdue, New tasks, Triaged, Scheduled, or Unranked — any divider that is not the implicit "ranked" area at the top).</p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">SectionedUUID</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="w">    </span><span class="nx">UUID</span><span class="w">   </span><span class="kt">string</span>
+<a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="w">    </span><span class="nx">Ranked</span><span class="w"> </span><span class="kt">bool</span>
+<a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a><span class="p">}</span>
+</code></pre></div>
+<p><a name="ExtractSectionedBlockRefUUIDs"></a></p>
+<h3 id="func-extractsectionedblockrefuuids">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/tags.go#L146">ExtractSectionedBlockRefUUIDs</a><a class="headerlink" href="#func-extractsectionedblockrefuuids" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">ExtractSectionedBlockRefUUIDs</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">unrankedSectionTexts</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">[]</span><span class="nx">SectionedUUID</span>
+</code></pre></div>
+<p>ExtractSectionedBlockRefUUIDs scans a backlog page and returns every block-ref UUID together with whether it is in the ranked area (above all section dividers) or the unranked area (under any divider whose text matches one of unrankedSectionTexts, case-insensitive substring).</p>
+<p>The ranked area is defined as top-level blocks that are NOT section-header blocks and NOT descendants of any section-header block.</p>
 <p><a name="logseqFinderImpl"></a></p>
 <h2 id="type-logseqfinderimpl">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/finder.go#L15-L17">logseqFinderImpl</a><a class="headerlink" href="#type-logseqfinderimpl" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">logseqFinderImpl</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="w">    </span><span class="nx">graph</span><span class="w"> </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span>
-<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">logseqFinderImpl</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a><span class="w">    </span><span class="nx">graph</span><span class="w"> </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span>
+<a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="logseqFinderImpl.FindFirstQuery"></a></p>
 <h3 id="func-logseqfinderimpl-findfirstquery">func (logseqFinderImpl) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/logseqext/finder.go#L27">FindFirstQuery</a><a class="headerlink" href="#func-logseqfinderimpl-findfirstquery" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">f</span><span class="w"> </span><span class="nx">logseqFinderImpl</span><span class="p">)</span><span class="w"> </span><span class="nx">FindFirstQuery</span><span class="p">(</span><span class="nx">pageTitle</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">f</span><span class="w"> </span><span class="nx">logseqFinderImpl</span><span class="p">)</span><span class="w"> </span><span class="nx">FindFirstQuery</span><span class="p">(</span><span class="nx">pageTitle</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
 </code></pre></div>
 <p>FindFirstQuery returns the first query found on the given page, with the current page placeholder replaced by the actual page name. Returns empty string if no query is found or the page cannot be opened.</p>
 <p>Generated by <a href="https://github.com/princjef/gomarkdoc">gomarkdoc</a></p>
