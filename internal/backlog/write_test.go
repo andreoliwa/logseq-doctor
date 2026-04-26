@@ -3,6 +3,7 @@ package backlog_test
 import (
 	"testing"
 
+	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
@@ -422,6 +423,43 @@ func TestMoveBlockRefToTriagedSection_MovesFromNestedNamedSection(t *testing.T) 
 
 		return false
 	})
+}
+
+// uuidScheduledNoDate is the task in backlog-scheduled-no-date.md — it is listed under the
+// Scheduled divider but carries no scheduled date in the task data.
+const uuidScheduledNoDate = "aaaa0001-0000-0000-0000-000000000001"
+
+// TestProcessOne_UnscheduledTaskMovedFromScheduledDivider verifies that a task sitting under
+// the Scheduled divider that no longer has a future scheduled date is moved to New tasks.
+func TestProcessOne_UnscheduledTaskMovedFromScheduledDivider(t *testing.T) {
+	back := testutils.StubBacklog(t, "bk", "", &testutils.StubAPIResponses{})
+
+	tasks := logseqapi.NewCategorizedTasks()
+	tasks.All.Add(uuidScheduledNoDate)
+	tasks.TaskLookup[uuidScheduledNoDate] = logseqapi.TaskJSON{
+		UUID:   uuidScheduledNoDate,
+		Marker: "TODO",
+	}
+
+	_, err := back.ProcessOne("backlog-scheduled-no-date", func() (*logseqapi.CategorizedTasks, error) {
+		return &tasks, nil
+	})
+	require.NoError(t, err)
+
+	page, err := back.Graph().OpenPage("backlog-scheduled-no-date")
+	require.NoError(t, err)
+
+	newTasksBlock := logseqext.FindBlockContainingText(page, backlog.HeaderNewTasks.Label)
+	require.NotNil(t, newTasksBlock, "New tasks divider should be created")
+
+	uuidsInNew := collectBlockRefUUIDs(newTasksBlock)
+	assert.Contains(t, uuidsInNew, uuidScheduledNoDate, "task should be moved to New tasks")
+
+	scheduledBlock := logseqext.FindBlockContainingText(page, backlog.HeaderScheduled.Label)
+	if scheduledBlock != nil {
+		uuidsInScheduled := collectBlockRefUUIDs(scheduledBlock)
+		assert.NotContains(t, uuidsInScheduled, uuidScheduledNoDate, "task should not remain in Scheduled")
+	}
 }
 
 // collectRegularAreaBlockRefUUIDs returns all block-ref UUIDs in the regular area.

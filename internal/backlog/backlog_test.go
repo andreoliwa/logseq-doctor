@@ -247,6 +247,10 @@ func TestFutureScheduledTasks(t *testing.T) {
 			name:        "new scheduled task added directly to scheduled divider",
 			caseDirName: "scheduled-new-task-direct",
 		},
+		{
+			name:        "task without scheduled date moved out of scheduled divider to new tasks",
+			caseDirName: "scheduled-unscheduled-task",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

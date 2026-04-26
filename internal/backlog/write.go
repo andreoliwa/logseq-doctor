@@ -26,14 +26,16 @@ type pageState struct {
 	dividerTriaged   *content.Block
 	dividerUnranked  *content.Block
 
-	deletedCount        int
-	movedCount          int
-	movedScheduledCount int
-	unpinnedCount       int
+	deletedCount            int
+	movedCount              int
+	movedScheduledCount     int
+	movedFromScheduledCount int
+	unpinnedCount           int
 
 	result           *Result
 	pinnedBlockRefs  *set.Set[string]
 	triagedBlockRefs *set.Set[string] // UUIDs already in the Triaged section
+	unscheduledRefs  *set.Set[string] // UUIDs removed from Scheduled because they lost their scheduled date
 }
 
 func newPageState() *pageState {
@@ -41,6 +43,7 @@ func newPageState() *pageState {
 		result:           &Result{FocusRefsFromPage: set.NewSet[string](), ShowQuickCapture: false},
 		pinnedBlockRefs:  set.NewSet[string](),
 		triagedBlockRefs: set.NewSet[string](),
+		unscheduledRefs:  set.NewSet[string](),
 	}
 }
 
@@ -61,6 +64,9 @@ func insertAndRemoveRefs(
 	normalised := NormaliseHeaderText(page)
 	scanPageBlocks(page, state, obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs)
 	insertOverdueTasks(page, state, overdueBlockRefs)
+
+	// Merge refs removed from Scheduled (no longer future-dated) so they are re-inserted as new tasks.
+	newBlockRefs.Update(state.unscheduledRefs)
 
 	save := insertNewTasks(page, state, newBlockRefs, overdueBlockRefs, futureScheduledBlockRefs)
 	save = save || normalised
@@ -228,6 +234,7 @@ func processBlockRef(
 	shouldDelete := false
 	underTriaged := state.dividerTriaged != nil && internal.IsAncestor(block, state.dividerTriaged)
 	underUnranked := state.dividerUnranked != nil && internal.IsAncestor(block, state.dividerUnranked)
+	underScheduled := state.dividerScheduled != nil && internal.IsAncestor(block, state.dividerScheduled)
 
 	// Preserve tasks under the Unranked divider — they are intentionally unranked.
 	if underUnranked {
@@ -264,16 +271,7 @@ func processBlockRef(
 		}
 
 	default:
-		// Existing non-overdue task: remove the pin marker if present.
-		if nextChildHasPin(node) {
-			nextChild := node.NextSibling()
-
-			if nextChild != nil {
-				nextChild.RemoveSelf()
-
-				state.unpinnedCount++
-			}
-		}
+		shouldDelete = handleDefaultBlockRef(node, blockRef, state, underScheduled, futureScheduledBlockRefs)
 	}
 
 	if shouldDelete {
@@ -398,6 +396,14 @@ func reportCounts(state *pageState, save bool) bool {
 		save = true
 	}
 
+	if state.movedFromScheduledCount > 0 {
+		color.Yellow(" %s moved from scheduled to new tasks",
+			FormatCount(state.movedFromScheduledCount, "task was", "tasks were"))
+
+		save = true
+		state.result.ShowQuickCapture = true
+	}
+
 	if state.unpinnedCount > 0 {
 		color.Cyan(" %s unpinned", FormatCount(state.unpinnedCount, "task was", "tasks were"))
 
@@ -405,6 +411,36 @@ func reportCounts(state *pageState, save bool) bool {
 	}
 
 	return save
+}
+
+// handleDefaultBlockRef handles the default case in processBlockRef:
+// moves stale Scheduled tasks back to new, and unpins regular tasks.
+// Returns true if the block should be deleted.
+func handleDefaultBlockRef(
+	node content.Node, blockRef *content.BlockRef,
+	state *pageState, underScheduled bool, futureScheduledBlockRefs *set.Set[string],
+) bool {
+	// Task is under the Scheduled divider but no longer has a future scheduled date —
+	// remove it so it gets re-inserted as a new task.
+	if underScheduled && !futureScheduledBlockRefs.Contains(blockRef.ID) {
+		state.unscheduledRefs.Add(blockRef.ID)
+		state.movedFromScheduledCount++
+
+		return true
+	}
+
+	// Existing non-overdue task: remove the pin marker if present.
+	if nextChildHasPin(node) {
+		nextChild := node.NextSibling()
+
+		if nextChild != nil {
+			nextChild.RemoveSelf()
+
+			state.unpinnedCount++
+		}
+	}
+
+	return false
 }
 
 func nextChildHasPin(node content.Node) bool {
