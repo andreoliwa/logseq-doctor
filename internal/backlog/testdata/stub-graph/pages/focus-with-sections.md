@@ -1,6 +1,6 @@
 - ((task-uuid-1))
 - ((task-uuid-2))
-- 🆕 New tasks [[Quick Capture]]
+- ✨ New tasks [[quick capture]]
   - ((new-task-1))
-- ⏰ Scheduled tasks [[Quick Capture]]
+- ⏰ Scheduled tasks [[quick capture]]
   - ((sched-1))

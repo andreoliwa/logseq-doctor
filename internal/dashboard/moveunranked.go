@@ -42,7 +42,7 @@ func MoveToUnranked(graphPath, backlogPageName string, uuids []string) error {
 		uuidSet[u] = true
 	}
 
-	unrankedDivider := logseqext.FindBlockContainingText(page, backlog.HeaderUnranked.Text)
+	unrankedDivider := logseqext.FindBlockContainingText(page, backlog.HeaderUnranked.Label)
 	toMove := collectBlocksToMove(page, uuidSet)
 
 	if len(toMove) == 0 {
@@ -118,7 +118,7 @@ func ensureUnrankedDivider(page logseq.Page, existing *content.Block) *content.B
 	}
 
 	dividerBlock := content.NewBlock(content.NewParagraph(content.NewText(backlog.HeaderUnranked.String())))
-	scheduledDivider := logseqext.FindBlockContainingText(page, backlog.HeaderScheduled.Text)
+	scheduledDivider := logseqext.FindBlockContainingText(page, backlog.HeaderScheduled.Label)
 
 	if scheduledDivider != nil {
 		page.InsertBlockBefore(dividerBlock, scheduledDivider)

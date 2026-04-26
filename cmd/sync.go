@@ -156,11 +156,11 @@ func runSyncPipeline(
 // these headers is assigned SectionUnranked during sync.
 func backlogUnrankedSectionTexts() []string {
 	return []string{
-		backlog.HeaderOverdue.Text,
-		backlog.HeaderNewTasks.Text,
-		backlog.HeaderTriaged.Text,
-		backlog.HeaderScheduled.Text,
-		backlog.HeaderUnranked.Text,
+		backlog.HeaderOverdue.Label,
+		backlog.HeaderNewTasks.Label,
+		backlog.HeaderTriaged.Label,
+		backlog.HeaderScheduled.Label,
+		backlog.HeaderUnranked.Label,
 	}
 }
 

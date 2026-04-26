@@ -71,7 +71,7 @@ func TestMoveToUnrankedMovesTasksAndCreatesHeader(t *testing.T) {
 	resultStr := string(result)
 
 	// The unranked divider must appear.
-	assert.Contains(t, resultStr, "🔢 Unranked tasks", "unranked divider should be created")
+	assert.Contains(t, resultStr, "⤵️ Unranked tasks", "unranked divider should be created")
 
 	// All tasks must still be present.
 	assert.Contains(t, resultStr, uuid1)
@@ -80,7 +80,7 @@ func TestMoveToUnrankedMovesTasksAndCreatesHeader(t *testing.T) {
 
 	// The unranked divider must appear before uuid2 and uuid3
 	// (they are children of the divider block).
-	dividerIdx := strings.Index(resultStr, "🔢 Unranked tasks")
+	dividerIdx := strings.Index(resultStr, "⤵️ Unranked tasks")
 	task2Idx := strings.Index(resultStr, uuid2)
 	task3Idx := strings.Index(resultStr, uuid3)
 
@@ -89,9 +89,9 @@ func TestMoveToUnrankedMovesTasksAndCreatesHeader(t *testing.T) {
 }
 
 func TestMoveToUnrankedFromSectionHeader(t *testing.T) {
-	// uuid2 lives under 🆕 New tasks (a section header child), not at the top level.
+	// uuid2 lives under ✨ New tasks (a section header child), not at the top level.
 	// Moving it to unranked must find it there.
-	pageContent := "- ((" + uuid1 + "))\n- 🆕 New tasks\n\t- ((" + uuid2 + "))\n"
+	pageContent := "- ((" + uuid1 + "))\n- ✨ New tasks\n\t- ((" + uuid2 + "))\n"
 	graphDir := makeTestGraph(t, pageContent)
 
 	err := dashboard.MoveToUnranked(graphDir, testBacklogPage, []string{uuid2})
@@ -102,18 +102,18 @@ func TestMoveToUnrankedFromSectionHeader(t *testing.T) {
 
 	resultStr := string(result)
 
-	assert.Contains(t, resultStr, "🔢 Unranked tasks", "unranked divider should be created")
+	assert.Contains(t, resultStr, "⤵️ Unranked tasks", "unranked divider should be created")
 	assert.Contains(t, resultStr, uuid1)
 	assert.Contains(t, resultStr, uuid2)
 
-	dividerIdx := strings.Index(resultStr, "🔢 Unranked tasks")
+	dividerIdx := strings.Index(resultStr, "⤵️ Unranked tasks")
 	task2Idx := strings.Index(resultStr, uuid2)
 	assert.Less(t, dividerIdx, task2Idx, "uuid2 should be under the unranked divider")
 }
 
 func TestMoveToUnrankedPreservesExistingDivider(t *testing.T) {
 	// Page already has an unranked divider with one task. We add another.
-	pageContent := "- ((" + uuid1 + "))\n- ((" + uuid2 + "))\n- 🔢 Unranked tasks\n\t- ((" + uuid3 + "))\n"
+	pageContent := "- ((" + uuid1 + "))\n- ((" + uuid2 + "))\n- ⤵️ Unranked tasks\n\t- ((" + uuid3 + "))\n"
 	graphDir := makeTestGraph(t, pageContent)
 
 	err := dashboard.MoveToUnranked(graphDir, testBacklogPage, []string{uuid2})
@@ -126,7 +126,7 @@ func TestMoveToUnrankedPreservesExistingDivider(t *testing.T) {
 	resultStr := string(result)
 
 	// Only one divider header should exist.
-	assert.Equal(t, 1, strings.Count(resultStr, "🔢 Unranked tasks"))
+	assert.Equal(t, 1, strings.Count(resultStr, "⤵️ Unranked tasks"))
 
 	// All three tasks must still be present.
 	assert.Contains(t, resultStr, uuid1)

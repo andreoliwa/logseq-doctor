@@ -307,8 +307,8 @@ func groomHandleTask(
 		opts := &groom.WriteOpts{
 			FocusPageTitle:       backlogConfig.FocusPage,
 			BacklogPageTitle:     backlogConfig.FindBacklogPageTitle(backlogName),
-			TriagedSectionText:   backlog.HeaderTriaged.Text,
-			ScheduledSectionText: backlog.HeaderScheduled.Text,
+			TriagedSectionText:   backlog.HeaderTriaged.Label,
+			ScheduledSectionText: backlog.HeaderScheduled.Label,
 			CurrentTime:          time.Now,
 		}
 

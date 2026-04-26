@@ -90,14 +90,10 @@ func insertAndRemoveRefs(
 }
 
 // NormaliseHeaderText scans all top-level blocks on the page and normalises any
-// block whose text node (trimmed) is exactly a known header text (with or without
-// the canonical emoji, case-insensitively) to the canonical "🎯 Focus" / "🆕 New
-// tasks" form. Only the text node is updated; sibling nodes (e.g. [[quick capture]]
-// page links) are left intact. Returns true if any block was changed.
-//
-// A block whose text is "Focus" or "🎯 FOCUS" gets normalised to "🎯 Focus ".
-// A block whose text is "⏰ Scheduled tasks section already exists" is left alone
-// because it is not purely a header — it has extra words after the header text.
+// block whose text node (trimmed) contains a known header keyword to the canonical
+// "emoji Label tasks" form (e.g. "focus" → "🎯 Focus tasks", "🆕 New tasks" → "✨ New tasks").
+// Only the text node is updated; sibling nodes (e.g. [[quick capture]] page links) are left intact.
+// Returns true if any block was changed.
 func NormaliseHeaderText(page logseq.Page) bool {
 	changed := false
 
@@ -111,9 +107,7 @@ func NormaliseHeaderText(page logseq.Page) bool {
 			trimmed := strings.TrimSpace(text.Value)
 
 			for _, hdr := range allHeaders {
-				// Only match if the text node is exactly the header text (ignoring
-				// emoji prefix and case), not if it merely contains the header text.
-				if !strings.EqualFold(trimmed, hdr.Text) && !strings.EqualFold(trimmed, hdr.String()) {
+				if !hdr.Matches(trimmed) {
 					continue
 				}
 
@@ -344,7 +338,17 @@ func insertNewTasks(
 
 		if state.dividerNewTasks == nil {
 			state.dividerNewTasks = content.NewBlock(HeaderNewTasks.NewParagraph())
-			logseqext.AddSibling(page, state.dividerNewTasks, state.firstBlock, state.dividerOverdue, state.dividerFocus)
+
+			if state.dividerUnranked != nil {
+				// Always insert directly before Unranked — it is the definitive anchor,
+				// even if Focus or Overdue sections exist above it.
+				page.InsertBlockBefore(state.dividerNewTasks, state.dividerUnranked)
+			} else {
+				logseqext.AddSibling(
+					page, state.dividerNewTasks, state.firstBlock,
+					state.dividerOverdue, state.dividerFocus,
+				)
+			}
 		}
 
 		state.dividerNewTasks.AddChild(content.NewBlock(content.NewBlockRef(blockRef)))

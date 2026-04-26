@@ -102,7 +102,7 @@ func TestMoveBlockRefToTriagedSection_ExistingSection(t *testing.T) {
 	// backlog-with-triaged-child.md has a Triaged section divider with one child
 	err := backlog.MoveBlockRefToTriagedSection(
 		transaction, "backlog-with-triaged-child", "new-triaged-uuid",
-		backlog.HeaderTriaged.Text, backlog.HeaderScheduled.Text,
+		backlog.HeaderTriaged.Label, backlog.HeaderScheduled.Label,
 	)
 	require.NoError(t, err)
 
@@ -112,7 +112,7 @@ func TestMoveBlockRefToTriagedSection_ExistingSection(t *testing.T) {
 	page, err := graph.OpenPage("backlog-with-triaged-child")
 	require.NoError(t, err)
 
-	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Text)
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Label)
 	require.NotNil(t, triagedBlock, "Triaged section should exist")
 	assert.Len(t, triagedBlock.Blocks(), 2) // existing child + newly added
 }
@@ -124,7 +124,7 @@ func TestMoveBlockRefToTriagedSection_CreatesSectionBeforeScheduled(t *testing.T
 
 	err := backlog.MoveBlockRefToTriagedSection(
 		transaction, "backlog-no-someday", "new-triaged-uuid",
-		backlog.HeaderTriaged.Text, backlog.HeaderScheduled.Text,
+		backlog.HeaderTriaged.Label, backlog.HeaderScheduled.Label,
 	)
 	require.NoError(t, err)
 
@@ -134,11 +134,11 @@ func TestMoveBlockRefToTriagedSection_CreatesSectionBeforeScheduled(t *testing.T
 	page, err := graph.OpenPage("backlog-no-someday")
 	require.NoError(t, err)
 
-	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Text)
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Label)
 	require.NotNil(t, triagedBlock, "Triaged section should be created")
 	assert.Len(t, triagedBlock.Blocks(), 1)
 
-	scheduledDivider := logseqext.FindBlockContainingText(page, backlog.HeaderScheduled.Text)
+	scheduledDivider := logseqext.FindBlockContainingText(page, backlog.HeaderScheduled.Label)
 
 	if triagedBlock != nil && scheduledDivider != nil {
 		blocks := page.Blocks()
@@ -192,7 +192,7 @@ func TestMoveBlockRefToTriagedSection_MovesFromRegularArea(t *testing.T) {
 	// uuidRegularTask exists in regular area of backlog-with-regular-task
 	err := backlog.MoveBlockRefToTriagedSection(
 		transaction, "backlog-with-regular-task", uuidRegularTask,
-		backlog.HeaderTriaged.Text, backlog.HeaderScheduled.Text,
+		backlog.HeaderTriaged.Label, backlog.HeaderScheduled.Label,
 	)
 	require.NoError(t, err)
 
@@ -203,7 +203,7 @@ func TestMoveBlockRefToTriagedSection_MovesFromRegularArea(t *testing.T) {
 	require.NoError(t, err)
 
 	// Should be in Triaged
-	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Text)
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Label)
 	require.NotNil(t, triagedBlock)
 	uuidsInTriaged := collectBlockRefUUIDs(triagedBlock)
 	assert.Contains(t, uuidsInTriaged, uuidRegularTask, "task should be moved to Triaged")
@@ -220,7 +220,7 @@ func TestMoveBlockRefToTriagedSection_AlreadyInTriaged_Idempotent(t *testing.T) 
 
 	err := backlog.MoveBlockRefToTriagedSection(
 		transaction, "backlog-triaged-only", uuidAlreadyTriaged,
-		backlog.HeaderTriaged.Text, backlog.HeaderScheduled.Text,
+		backlog.HeaderTriaged.Label, backlog.HeaderScheduled.Label,
 	)
 	require.NoError(t, err)
 
@@ -230,7 +230,7 @@ func TestMoveBlockRefToTriagedSection_AlreadyInTriaged_Idempotent(t *testing.T) 
 	page, err := graph.OpenPage("backlog-triaged-only")
 	require.NoError(t, err)
 
-	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Text)
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Label)
 	require.NotNil(t, triagedBlock)
 
 	// Should appear exactly once
@@ -253,7 +253,7 @@ func TestMoveBlockRefToTriagedSection_InBothAreas_RemovesFromRegular(t *testing.
 
 	err := backlog.MoveBlockRefToTriagedSection(
 		transaction, "backlog-duplicate-task", uuidDupTask,
-		backlog.HeaderTriaged.Text, backlog.HeaderScheduled.Text,
+		backlog.HeaderTriaged.Label, backlog.HeaderScheduled.Label,
 	)
 	require.NoError(t, err)
 
@@ -263,7 +263,7 @@ func TestMoveBlockRefToTriagedSection_InBothAreas_RemovesFromRegular(t *testing.
 	page, err := graph.OpenPage("backlog-duplicate-task")
 	require.NoError(t, err)
 
-	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Text)
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Label)
 	require.NotNil(t, triagedBlock)
 
 	uuidsInTriaged := collectBlockRefUUIDs(triagedBlock)
@@ -304,7 +304,7 @@ func TestMoveBlockRefToTriagedSection_NestedInTriaged_Idempotent(t *testing.T) {
 	// It should be recognized as already in Triaged and not added again.
 	err := backlog.MoveBlockRefToTriagedSection(
 		transaction, "backlog-triaged-nested", uuidTriagedNested,
-		backlog.HeaderTriaged.Text, backlog.HeaderScheduled.Text,
+		backlog.HeaderTriaged.Label, backlog.HeaderScheduled.Label,
 	)
 	require.NoError(t, err)
 
@@ -314,7 +314,7 @@ func TestMoveBlockRefToTriagedSection_NestedInTriaged_Idempotent(t *testing.T) {
 	page, err := graph.OpenPage("backlog-triaged-nested")
 	require.NoError(t, err)
 
-	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Text)
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Label)
 	require.NotNil(t, triagedBlock)
 
 	// Count occurrences of the nested UUID across all descendants of Triaged.
@@ -342,7 +342,7 @@ func TestMoveBlockRefToTriagedSection_RegularAreaAfterNewTasks(t *testing.T) {
 	// It should still be considered part of the regular area and be moved to Triaged.
 	err := backlog.MoveBlockRefToTriagedSection(
 		transaction, "backlog-regular-after-newtasks", uuidRegularAfterNewTasks,
-		backlog.HeaderTriaged.Text, backlog.HeaderScheduled.Text,
+		backlog.HeaderTriaged.Label, backlog.HeaderScheduled.Label,
 	)
 	require.NoError(t, err)
 
@@ -352,7 +352,7 @@ func TestMoveBlockRefToTriagedSection_RegularAreaAfterNewTasks(t *testing.T) {
 	page, err := graph.OpenPage("backlog-regular-after-newtasks")
 	require.NoError(t, err)
 
-	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Text)
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Label)
 	require.NotNil(t, triagedBlock)
 
 	uuidsInTriaged := collectBlockRefUUIDs(triagedBlock)
@@ -372,7 +372,7 @@ func TestMoveBlockRefToTriagedSection_DoesNotRemoveFromNewTasksChildren(t *testi
 	// MoveBlockRefToTriagedSection should not remove it from there.
 	err := backlog.MoveBlockRefToTriagedSection(
 		transaction, "backlog-regular-after-newtasks", uuidUnderNewTasks,
-		backlog.HeaderTriaged.Text, backlog.HeaderScheduled.Text,
+		backlog.HeaderTriaged.Label, backlog.HeaderScheduled.Label,
 	)
 	require.NoError(t, err)
 
@@ -382,7 +382,7 @@ func TestMoveBlockRefToTriagedSection_DoesNotRemoveFromNewTasksChildren(t *testi
 	page, err := graph.OpenPage("backlog-regular-after-newtasks")
 	require.NoError(t, err)
 
-	newTasksBlock := logseqext.FindBlockContainingText(page, backlog.HeaderNewTasks.Text)
+	newTasksBlock := logseqext.FindBlockContainingText(page, backlog.HeaderNewTasks.Label)
 	require.NotNil(t, newTasksBlock, "New tasks section should still exist")
 
 	uuidsInNewTasks := collectBlockRefUUIDs(newTasksBlock)
@@ -398,7 +398,7 @@ func TestMoveBlockRefToTriagedSection_MovesFromNestedNamedSection(t *testing.T) 
 	// It should be removed from that nested position and added to Triaged.
 	err := backlog.MoveBlockRefToTriagedSection(
 		transaction, "backlog-nested-in-section", uuidNestedInSection,
-		backlog.HeaderTriaged.Text, backlog.HeaderScheduled.Text,
+		backlog.HeaderTriaged.Label, backlog.HeaderScheduled.Label,
 	)
 	require.NoError(t, err)
 
@@ -408,7 +408,7 @@ func TestMoveBlockRefToTriagedSection_MovesFromNestedNamedSection(t *testing.T) 
 	page, err := graph.OpenPage("backlog-nested-in-section")
 	require.NoError(t, err)
 
-	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Text)
+	triagedBlock := logseqext.FindBlockContainingText(page, backlog.HeaderTriaged.Label)
 	require.NotNil(t, triagedBlock, "Triaged section should be created")
 
 	uuidsInTriaged := collectBlockRefUUIDs(triagedBlock)

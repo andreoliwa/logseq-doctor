@@ -1,3 +1,3 @@
 - ((task-uuid-1))
-- ⏰ Scheduled tasks [[Quick Capture]]
+- ⏰ Scheduled tasks [[quick capture]]
   - ((sched-1))

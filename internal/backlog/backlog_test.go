@@ -72,6 +72,11 @@ func TestNewTasks(t *testing.T) {
 			caseDirName: "new-remove-empty-divider",
 			pagesExist:  true,
 		},
+		{
+			name:        "new tasks inserted before unranked divider",
+			caseDirName: "new-before-unranked",
+			pagesExist:  true,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
