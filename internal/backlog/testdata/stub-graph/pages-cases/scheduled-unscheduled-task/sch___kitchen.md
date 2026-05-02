@@ -1,3 +1,0 @@
-- ⏰ Scheduled tasks [[quick capture]]
-	- ((67c48e4d-c8a7-4976-b54f-6a640b14ef0a))
-	- ((67c48f01-1234-4567-8901-234567890123))

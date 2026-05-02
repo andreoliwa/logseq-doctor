@@ -1,0 +1,3 @@
+- New tasks [[quick capture]]
+	- (( work-monthly-report ))
+- (( work-tidy-papers ))

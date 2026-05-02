@@ -1,0 +1,6 @@
+- (( home-clean-windows ))
+- (( home-vacuum-carpets ))
+- next line will be deleted
+- ((67c48ea4-92cd-4b27-8202-ec1f4fe4ec59))
+- (( home-clean-basement ))
+- (( home-wash-bed-sheets ))

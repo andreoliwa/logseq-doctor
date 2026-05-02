@@ -1,0 +1,5 @@
+- (( computer-clean-desktop ))📅📌
+- (( computer-backup-files ))
+- (( computer-buy-laptop )) any text with a 📌 will be fully removed
+- This one should not be moved from here
+	- (( computer-delete-big-files )) text after block contains pin 📌

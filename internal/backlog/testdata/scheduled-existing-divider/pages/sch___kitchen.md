@@ -1,0 +1,5 @@
+- (( kitchen-supermarket ))
+- (( kitchen-unfreeze-meat ))
+- ⏰ Scheduled tasks [[quick capture]]
+	- (( kitchen-clean-oven ))
+- (( kitchen-buy-frying-pan ))

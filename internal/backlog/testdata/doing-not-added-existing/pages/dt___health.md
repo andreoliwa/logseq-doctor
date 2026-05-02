@@ -1,0 +1,2 @@
+- (( health-dentist ))
+- The other task in #health is DOING and shouldn't be added here

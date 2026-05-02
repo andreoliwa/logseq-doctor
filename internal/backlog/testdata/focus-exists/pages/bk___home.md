@@ -1,0 +1,5 @@
+- (( home-clean-basement ))
+- (( home-wash-bed-sheets ))
+- 🎯 Focus tasks
+- (( home-clean-windows ))
+- (( home-vacuum-carpets ))

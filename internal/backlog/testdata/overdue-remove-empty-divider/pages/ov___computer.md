@@ -1,0 +1,6 @@
+- (( computer-backup-files ))📅📌
+- (( computer-delete-big-files ))📅📌
+- 📅 Overdue tasks [[quick capture]]
+- (( computer-clean-desktop ))
+- (( computer-buy-laptop ))
+- ⏰ Scheduled tasks [[quick capture]]
