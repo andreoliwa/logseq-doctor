@@ -52,8 +52,7 @@ func TestIsValidMarkdownFile(t *testing.T) {
 
 func TestAppendRawMarkdownToJournal(t *testing.T) {
 	t.Run("empty content should be a no-op", func(t *testing.T) {
-		//nolint:staticcheck
-		graph := testutils.StubGraph(t, "")
+		graph := testutils.NewStubGraph(t, "stub-graph")
 		now := time.Now()
 
 		size, err := internal.AppendRawMarkdownToJournal(graph, now, "")
@@ -88,14 +87,13 @@ func TestAppendRawMarkdownToJournal(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			//nolint:staticcheck
-			graph := testutils.StubGraph(t, "")
+			graph := testutils.NewStubGraph(t, "stub-graph")
 			date := time.Date(2024, 12, test.day, 0, 0, 0, 0, time.UTC)
 
 			_, err := internal.AppendRawMarkdownToJournal(graph, date, string(contentToAppend))
 			require.NoError(t, err)
 
-			testutils.AssertGoldenJournals(t, graph, "", []string{test.expectedFilename})
+			testutils.AssertGoldenJournals(t, graph, "stub-graph", []string{test.expectedFilename})
 		})
 	}
 }

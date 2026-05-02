@@ -11,8 +11,7 @@ import (
 )
 
 func TestBlockContentText(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("finder")
 	require.NoError(t, err)
 
@@ -24,8 +23,7 @@ func TestBlockContentText(t *testing.T) {
 }
 
 func TestBlockContentText_EmptyBlock(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("empty-bullets")
 	require.NoError(t, err)
 
@@ -41,8 +39,7 @@ func TestBlockContentText_EmptyBlock(t *testing.T) {
 }
 
 func TestSetTaskCanceled(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("finder")
 	require.NoError(t, err)
 
@@ -70,8 +67,7 @@ func TestSetTaskCanceled(t *testing.T) {
 }
 
 func TestSetTaskCanceled_NonTaskBlock(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("finder")
 	require.NoError(t, err)
 
@@ -84,8 +80,7 @@ func TestSetTaskCanceled_NonTaskBlock(t *testing.T) {
 }
 
 func TestAddSibling_AppendsWhenNoAnchors(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("empty-bullets")
 	require.NoError(t, err)
 
@@ -97,8 +92,7 @@ func TestAddSibling_AppendsWhenNoAnchors(t *testing.T) {
 }
 
 func TestAddSibling_InsertsBeforeAnchor(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("finder")
 	require.NoError(t, err)
 
@@ -129,8 +123,7 @@ func TestAddSibling_InsertsBeforeAnchor(t *testing.T) {
 }
 
 func TestRemoveEmptyBlocks_RemovesEmpty(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("finder")
 	require.NoError(t, err)
 
@@ -144,8 +137,7 @@ func TestRemoveEmptyBlocks_RemovesEmpty(t *testing.T) {
 }
 
 func TestRemoveEmptyBlocks_SkipsNonEmpty(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("finder")
 	require.NoError(t, err)
 
@@ -170,8 +162,7 @@ func TestRemoveEmptyBlocks_PropagatesSaveTrue(t *testing.T) {
 }
 
 func TestSetPriority_InsertAfterTaskMarker(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("finder")
 	require.NoError(t, err)
 

@@ -12,8 +12,7 @@ import (
 )
 
 func TestFindFirstQuery(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	finder := logseqext.NewLogseqFinder(graph)
 
 	tests := []struct {
@@ -48,8 +47,7 @@ func TestFindFirstQuery(t *testing.T) {
 }
 
 func TestFindBlockContainingText(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("finder")
 	require.NoError(t, err)
 
@@ -112,8 +110,7 @@ func TestFindBlockContainingText(t *testing.T) {
 }
 
 func TestFindBlockContainingText_EmptyPage(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("empty-bullets")
 	require.NoError(t, err)
 
@@ -122,8 +119,7 @@ func TestFindBlockContainingText_EmptyPage(t *testing.T) {
 }
 
 func TestFindTaskMarkerByKey(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("finder")
 	require.NoError(t, err)
 
@@ -221,8 +217,7 @@ func getFindTaskByKeyTestCases() []struct {
 }
 
 func TestFindTaskByKey_EmptyPage(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("empty-bullets")
 	require.NoError(t, err)
 

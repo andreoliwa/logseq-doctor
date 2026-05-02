@@ -46,8 +46,7 @@ func TestSortAndRemoveDuplicates(t *testing.T) {
 func setupPage(t *testing.T, name string) logseq.Page {
 	t.Helper()
 
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page := logseqapi.OpenPage(graph, name)
 
 	return page

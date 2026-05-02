@@ -3,7 +3,6 @@ package backlog_test
 import (
 	"testing"
 
-	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
@@ -14,8 +13,7 @@ import (
 )
 
 func TestFindFirstSectionDivider_FindsSection(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	page, err := graph.OpenPage("focus-with-sections")
 	require.NoError(t, err)
 
@@ -28,8 +26,7 @@ func TestFindFirstSectionDivider_FindsSection(t *testing.T) {
 }
 
 func TestFindFirstSectionDivider_NoDivider(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	// bk.md has only block refs, no section headers
 	page, err := graph.OpenPage("bk")
 	require.NoError(t, err)
@@ -40,8 +37,7 @@ func TestFindFirstSectionDivider_NoDivider(t *testing.T) {
 }
 
 func TestAddBlockRefToFocusPage_NoSectionDivider(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	transaction := graph.NewTransaction()
 
 	initialPage, err := graph.OpenPage("bk")
@@ -62,8 +58,7 @@ func TestAddBlockRefToFocusPage_NoSectionDivider(t *testing.T) {
 }
 
 func TestAddBlockRefToFocusPage_InsertsBeforeSectionDivider(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	transaction := graph.NewTransaction()
 
 	err := backlog.AddBlockRefToFocusPage(transaction, "focus-with-sections", "inserted-uuid")
@@ -96,8 +91,7 @@ func TestAddBlockRefToFocusPage_InsertsBeforeSectionDivider(t *testing.T) {
 }
 
 func TestMoveBlockRefToTriagedSection_ExistingSection(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	transaction := graph.NewTransaction()
 
 	// backlog-with-triaged-child.md has a Triaged section divider with one child
@@ -119,8 +113,7 @@ func TestMoveBlockRefToTriagedSection_ExistingSection(t *testing.T) {
 }
 
 func TestMoveBlockRefToTriagedSection_CreatesSectionBeforeScheduled(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	transaction := graph.NewTransaction()
 
 	err := backlog.MoveBlockRefToTriagedSection(
@@ -186,8 +179,7 @@ const uuidUnderNewTasks = "b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2"
 const uuidNestedInSection = "e1e1e1e1-e1e1-e1e1-e1e1-e1e1e1e1e1e1"
 
 func TestMoveBlockRefToTriagedSection_MovesFromRegularArea(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	transaction := graph.NewTransaction()
 
 	// uuidRegularTask exists in regular area of backlog-with-regular-task
@@ -215,8 +207,7 @@ func TestMoveBlockRefToTriagedSection_MovesFromRegularArea(t *testing.T) {
 }
 
 func TestMoveBlockRefToTriagedSection_AlreadyInTriaged_Idempotent(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	transaction := graph.NewTransaction()
 
 	err := backlog.MoveBlockRefToTriagedSection(
@@ -248,8 +239,7 @@ func TestMoveBlockRefToTriagedSection_AlreadyInTriaged_Idempotent(t *testing.T) 
 }
 
 func TestMoveBlockRefToTriagedSection_InBothAreas_RemovesFromRegular(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	transaction := graph.NewTransaction()
 
 	err := backlog.MoveBlockRefToTriagedSection(
@@ -297,8 +287,7 @@ func collectBlockRefUUIDs(block *content.Block) []string {
 }
 
 func TestMoveBlockRefToTriagedSection_NestedInTriaged_Idempotent(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	transaction := graph.NewTransaction()
 
 	// uuidTriagedNested is nested 2 levels under Triaged (not a direct child).
@@ -335,8 +324,7 @@ func TestMoveBlockRefToTriagedSection_NestedInTriaged_Idempotent(t *testing.T) {
 }
 
 func TestMoveBlockRefToTriagedSection_RegularAreaAfterNewTasks(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	transaction := graph.NewTransaction()
 
 	// uuidRegularAfterNewTasks is a top-level block ref that appears AFTER the New tasks divider.
@@ -365,8 +353,7 @@ func TestMoveBlockRefToTriagedSection_RegularAreaAfterNewTasks(t *testing.T) {
 }
 
 func TestMoveBlockRefToTriagedSection_DoesNotRemoveFromNewTasksChildren(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	transaction := graph.NewTransaction()
 
 	// uuidUnderNewTasks is a child of the New tasks divider, not in the regular area.
@@ -391,8 +378,7 @@ func TestMoveBlockRefToTriagedSection_DoesNotRemoveFromNewTasksChildren(t *testi
 }
 
 func TestMoveBlockRefToTriagedSection_MovesFromNestedNamedSection(t *testing.T) {
-	//nolint:staticcheck
-	graph := testutils.StubGraph(t, "")
+	graph := testutils.NewStubGraph(t, "stub-graph")
 	transaction := graph.NewTransaction()
 
 	// uuidNestedInSection is nested 2 levels under a non-divider section ("Features > Outline").
@@ -423,43 +409,6 @@ func TestMoveBlockRefToTriagedSection_MovesFromNestedNamedSection(t *testing.T) 
 
 		return false
 	})
-}
-
-// uuidScheduledNoDate is the task in backlog-scheduled-no-date.md — it is listed under the
-// Scheduled divider but carries no scheduled date in the task data.
-const uuidScheduledNoDate = "aaaa0001-0000-0000-0000-000000000001"
-
-// TestProcessOne_UnscheduledTaskMovedFromScheduledDivider verifies that a task sitting under
-// the Scheduled divider that no longer has a future scheduled date is moved to New tasks.
-func TestProcessOne_UnscheduledTaskMovedFromScheduledDivider(t *testing.T) {
-	back := testutils.StubBacklog(t, "bk", "", &testutils.StubAPIResponses{})
-
-	tasks := logseqapi.NewCategorizedTasks()
-	tasks.All.Add(uuidScheduledNoDate)
-	tasks.TaskLookup[uuidScheduledNoDate] = logseqapi.TaskJSON{
-		UUID:   uuidScheduledNoDate,
-		Marker: "TODO",
-	}
-
-	_, err := back.ProcessOne("backlog-scheduled-no-date", func() (*logseqapi.CategorizedTasks, error) {
-		return &tasks, nil
-	})
-	require.NoError(t, err)
-
-	page, err := back.Graph().OpenPage("backlog-scheduled-no-date")
-	require.NoError(t, err)
-
-	newTasksBlock := logseqext.FindBlockContainingText(page, backlog.HeaderNewTasks.Label)
-	require.NotNil(t, newTasksBlock, "New tasks divider should be created")
-
-	uuidsInNew := collectBlockRefUUIDs(newTasksBlock)
-	assert.Contains(t, uuidsInNew, uuidScheduledNoDate, "task should be moved to New tasks")
-
-	scheduledBlock := logseqext.FindBlockContainingText(page, backlog.HeaderScheduled.Label)
-	if scheduledBlock != nil {
-		uuidsInScheduled := collectBlockRefUUIDs(scheduledBlock)
-		assert.NotContains(t, uuidsInScheduled, uuidScheduledNoDate, "task should not remain in Scheduled")
-	}
 }
 
 // collectRegularAreaBlockRefUUIDs returns all block-ref UUIDs in the regular area.

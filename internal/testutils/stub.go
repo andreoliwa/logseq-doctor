@@ -1,46 +1,17 @@
 package testutils
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
-	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/fs"
 )
-
-// StubGraph opens the example graph under "testdata" for testing.
-//
-// Deprecated: Use NewStubGraph instead. This function will be removed in a future PR.
-func StubGraph(t *testing.T, caseDirName string) *logseq.Graph {
-	t.Helper()
-
-	stubGraphDir, err := filepath.Abs(filepath.Join("testdata", "stub-graph"))
-	require.NoError(t, err)
-
-	pagesOps := []fs.PathOp{fs.FromDir(filepath.Join(stubGraphDir, "pages"))}
-
-	if caseDirName != "" {
-		caseDir, err := filepath.Abs(filepath.Join(stubGraphDir, "pages-cases", caseDirName))
-		require.NoError(t, err)
-
-		pagesOps = append(pagesOps, fs.FromDir(caseDir))
-	}
-
-	tempDir := fs.NewDir(t, "append-raw",
-		fs.WithDir("logseq", fs.FromDir(filepath.Join(stubGraphDir, "logseq"))),
-		fs.WithDir("journals", fs.FromDir(filepath.Join(stubGraphDir, "journals"))),
-		fs.WithDir("pages", pagesOps...),
-	)
-
-	return logseqapi.OpenGraphFromPath(tempDir.Path())
-}
 
 // NewStubGraph creates a test graph using the new directory structure.
 // It uses graph-template as the base and loads test data
@@ -66,55 +37,26 @@ func NewStubGraph(t *testing.T, subDir string) *logseq.Graph {
 type mockLogseqAPI struct {
 	mock.Mock
 
-	t            *testing.T
-	responses    *StubAPIResponses
 	tagResponses map[string]string
-}
-
-func newMockLogseqAPI(t *testing.T, responses StubAPIResponses) *mockLogseqAPI {
-	t.Helper()
-
-	api := mockLogseqAPI{t: t, responses: &responses} //nolint:exhaustruct
-	api.On("PostQuery", mock.Anything).Return("{}", nil)
-	api.On("PostDatascriptQuery", mock.Anything).Return("[]", nil)
-
-	return &api
 }
 
 // newMockLogseqAPIFromMap creates a mockLogseqAPI that returns pre-built JSON responses keyed by tag.
 func newMockLogseqAPIFromMap(t *testing.T, responses map[string]string) *mockLogseqAPI {
 	t.Helper()
 
-	api := mockLogseqAPI{t: t, tagResponses: responses} //nolint:exhaustruct
+	api := mockLogseqAPI{tagResponses: responses} //nolint:exhaustruct
 	api.On("PostQuery", mock.Anything).Return("{}", nil)
 	api.On("PostDatascriptQuery", mock.Anything).Return("[]", nil)
 
 	return &api
 }
 
-type StubAPIResponses struct {
-	Queries []QueryArg
-}
-type QueryArg struct {
-	Contains string
-}
-
 func (m *mockLogseqAPI) PostQuery(query string) (string, error) {
 	args := m.Called(query)
 
-	// Check tag-based responses first (new fixture framework).
 	for tag, resp := range m.tagResponses {
 		if strings.Contains(query, tag) {
 			return resp, nil
-		}
-	}
-
-	// Fall back to file-based responses (old stub framework).
-	if m.responses != nil {
-		for _, q := range m.responses.Queries {
-			if strings.Contains(query, q.Contains) {
-				return stubJSONResponse(m.t, q.Contains)
-			}
 		}
 	}
 
@@ -131,18 +73,6 @@ func (m *mockLogseqAPI) UpsertBlockProperty(_ string, _ string, _ string) error 
 	return nil
 }
 
-func stubJSONResponse(t *testing.T, basename string) (string, error) {
-	t.Helper()
-
-	path, err := filepath.Abs(filepath.Join("testdata", "stub-api", basename+".jsonl"))
-	require.NoError(t, err)
-
-	data, err := os.ReadFile(path)
-	require.NoError(t, err)
-
-	return string(data), nil
-}
-
 var testStartTime = time.Now()                                   //nolint:gochecknoglobals
 var baselineTime = time.Date(2025, 4, 13, 3, 33, 0, 0, time.UTC) //nolint:gochecknoglobals
 
@@ -150,14 +80,4 @@ func RelativeTime() time.Time {
 	elapsed := time.Since(testStartTime)
 
 	return baselineTime.Add(elapsed)
-}
-
-func StubBacklog(t *testing.T, configPage, caseDirName string, apiResponses *StubAPIResponses) backlog.Backlog {
-	t.Helper()
-
-	graph := StubGraph(t, caseDirName)
-	api := newMockLogseqAPI(t, *apiResponses)
-	reader := backlog.NewPageConfigReader(graph, configPage)
-
-	return backlog.NewBacklog(graph, api, reader, RelativeTime)
 }

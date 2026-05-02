@@ -41,20 +41,12 @@ func assertGoldenContent(t *testing.T, graph *logseq.Graph, journals bool, caseD
 		// However, when the backlog system doesn't modify a file (save=false), the original file is preserved as-is.
 		// We need to handle both cases: files that already end with newlines and files that don't.
 		// For pages (not journals), ensure content ends with exactly one newline to match
-		// what the end-of-file-fixer hook expects in golden files
+		// what the end-of-file-fixer hook expects in golden files.
 		if !journals {
-			// Remove any existing trailing newlines, then add exactly one
 			content = strings.TrimRight(content, "\r\n") + "\r\n"
 		}
 
-		var goldenPath string
-
-		if caseDirName != "" {
-			goldenPath = filepath.Join(caseDirName, pagesOrJournalsDir, filename+".golden")
-		} else {
-			goldenPath = filepath.Join("stub-graph", pagesOrJournalsDir, filename+".golden")
-		}
-
+		goldenPath := filepath.Join(caseDirName, pagesOrJournalsDir, filename+".golden")
 		golden.Assert(t, content, goldenPath)
 	}
 }

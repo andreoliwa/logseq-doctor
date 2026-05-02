@@ -126,8 +126,7 @@ func TestAddTaskToPageOrJournal(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			//nolint:staticcheck
-			graph := testutils.StubGraph(t, "")
+			graph := testutils.NewStubGraph(t, "stub-graph")
 
 			// Determine the target date
 			var targetDate time.Time
@@ -155,9 +154,9 @@ func TestAddTaskToPageOrJournal(t *testing.T) {
 			require.NoError(t, err)
 
 			if test.page != "" {
-				testutils.AssertGoldenPages(t, graph, "", []string{test.expectedFile})
+				testutils.AssertGoldenPages(t, graph, "stub-graph", []string{test.expectedFile})
 			} else {
-				testutils.AssertGoldenJournals(t, graph, "", []string{test.expectedFile})
+				testutils.AssertGoldenJournals(t, graph, "stub-graph", []string{test.expectedFile})
 			}
 		})
 	}
@@ -198,8 +197,7 @@ func TestAddTaskUnderBlock(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			//nolint:staticcheck
-			graph := testutils.StubGraph(t, "")
+			graph := testutils.NewStubGraph(t, "stub-graph")
 
 			opts := &logseqext.AddTaskOptions{
 				Graph:     graph,
@@ -214,7 +212,7 @@ func TestAddTaskUnderBlock(t *testing.T) {
 			err := logseqext.AddTask(opts)
 			require.NoError(t, err)
 
-			testutils.AssertGoldenPages(t, graph, "", []string{test.expectedFile})
+			testutils.AssertGoldenPages(t, graph, "stub-graph", []string{test.expectedFile})
 		})
 	}
 }
@@ -326,8 +324,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			//nolint:staticcheck
-			graph := testutils.StubGraph(t, "")
+			graph := testutils.NewStubGraph(t, "stub-graph")
 
 			testFrozenTime := defaultFrozenTime
 			if test.frozenTime != nil {
@@ -347,7 +344,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) {
 			err := logseqext.AddTask(opts)
 			require.NoError(t, err)
 
-			testutils.AssertGoldenPages(t, graph, "", []string{test.expectedFile})
+			testutils.AssertGoldenPages(t, graph, "stub-graph", []string{test.expectedFile})
 		})
 	}
 }
