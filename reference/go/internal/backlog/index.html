@@ -1096,10 +1096,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#func-normaliseheadertext" class="md-nav__link">
+  <a href="#func-normalizeheadertext" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func NormaliseHeaderText
+        func NormalizeHeaderText
       
     </span>
   </a>
@@ -1467,10 +1467,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#func-header-newparagraph" class="md-nav__link">
+  <a href="#func-header-newheading" class="md-nav__link">
     <span class="md-ellipsis">
       
-        func (Header) NewParagraph
+        func (Header) NewHeading
       
     </span>
   </a>
@@ -1719,7 +1719,7 @@
 <li><a href="#FindFirstSectionDivider">func FindFirstSectionDivider(page logseq.Page) *content.Block</a></li>
 <li><a href="#FormatCount">func FormatCount(count int, singular, plural string) string</a></li>
 <li><a href="#MoveBlockRefToTriagedSection">func MoveBlockRefToTriagedSection(transaction *logseq.Transaction, backlogPage string, uuid logseqapi.TaskUUID, triagedText, scheduledText string) error</a></li>
-<li><a href="#NormaliseHeaderText">func NormaliseHeaderText(page logseq.Page) bool</a></li>
+<li><a href="#NormalizeHeaderText">func NormalizeHeaderText(page logseq.Page) bool</a></li>
 <li><a href="#RemoveBlockRefFromRegularArea">func RemoveBlockRefFromRegularArea(page logseq.Page, uuid logseqapi.TaskUUID)</a></li>
 <li><a href="#addTasksToCategories">func addTasksToCategories(jsonTasks []logseqapi.TaskJSON, tasks *logseqapi.CategorizedTasks, currentTime func() time.Time)</a></li>
 <li><a href="#blockRefsFromPages">func blockRefsFromPages(page logseq.Page) *set.Set[string]</a></li>
@@ -1751,7 +1751,7 @@
 <li><a href="#NewPageConfigReader">func NewPageConfigReader(graph *logseq.Graph, configPage string) ConfigReader</a></li>
 <li><a href="#Header">type Header</a></li>
 <li><a href="#Header.Matches">func (h Header) Matches(blockText string) bool</a></li>
-<li><a href="#Header.NewParagraph">func (h Header) NewParagraph() *content.Paragraph</a></li>
+<li><a href="#Header.NewHeading">func (h Header) NewHeading() *content.Heading</a></li>
 <li><a href="#Header.String">func (h Header) String() string</a></li>
 <li><a href="#Result">type Result</a></li>
 <li><a href="#insertAndRemoveRefs">func insertAndRemoveRefs(graph *logseq.Graph, pageTitle string, newBlockRefs, obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs *set.Set[string], taskLookup map[logseqapi.TaskUUID]logseqapi.TaskJSON) (*Result, error)</a></li>
@@ -1789,7 +1789,7 @@
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="nx">HeaderUnranked</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="nx">Header</span><span class="p">{</span><span class="s">"⤵️"</span><span class="p">,</span><span class="w"> </span><span class="s">"Unranked"</span><span class="p">}</span>
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">)</span>
 </code></pre></div>
-<p><a name="allHeaders"></a>allHeaders is the full list used to normalise section dividers on write-back.</p>
+<p><a name="allHeaders"></a>allHeaders is the full list used to normalize section dividers on write-back.</p>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">allHeaders</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[]</span><span class="nx">Header</span><span class="p">{</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="nx">HeaderFocus</span><span class="p">,</span><span class="w"> </span><span class="nx">HeaderOverdue</span><span class="p">,</span><span class="w"> </span><span class="nx">HeaderNewTasks</span><span class="p">,</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nx">HeaderTriaged</span><span class="p">,</span><span class="w"> </span><span class="nx">HeaderScheduled</span><span class="p">,</span><span class="w"> </span><span class="nx">HeaderUnranked</span><span class="p">,</span>
@@ -1804,17 +1804,17 @@
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="AddBlockRefToFocusPage"></a></p>
-<h2 id="func-addblockreftofocuspage">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L556">AddBlockRefToFocusPage</a><a class="headerlink" href="#func-addblockreftofocuspage" title="Permanent link">¶</a></h2>
+<h2 id="func-addblockreftofocuspage">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L568">AddBlockRefToFocusPage</a><a class="headerlink" href="#func-addblockreftofocuspage" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">AddBlockRefToFocusPage</span><span class="p">(</span><span class="nx">transaction</span><span class="w"> </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">,</span><span class="w"> </span><span class="nx">focusPageTitle</span><span class="p">,</span><span class="w"> </span><span class="nx">uuid</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>AddBlockRefToFocusPage adds a block ref ((uuid)) to the Focus page.</p>
 <p><a name="BlockRefExistsUnder"></a></p>
-<h2 id="func-blockrefexistsunder">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L599">BlockRefExistsUnder</a><a class="headerlink" href="#func-blockrefexistsunder" title="Permanent link">¶</a></h2>
+<h2 id="func-blockrefexistsunder">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L611">BlockRefExistsUnder</a><a class="headerlink" href="#func-blockrefexistsunder" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">BlockRefExistsUnder</span><span class="p">(</span><span class="nx">parent</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">uuid</span><span class="w"> </span><span class="nx">logseqapi</span><span class="p">.</span><span class="nx">TaskUUID</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>BlockRefExistsUnder returns true if a block ref with the given UUID exists anywhere in the descendant tree of parent.</p>
 <p><a name="FindFirstSectionDivider"></a></p>
-<h2 id="func-findfirstsectiondivider">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L575">FindFirstSectionDivider</a><a class="headerlink" href="#func-findfirstsectiondivider" title="Permanent link">¶</a></h2>
+<h2 id="func-findfirstsectiondivider">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L587">FindFirstSectionDivider</a><a class="headerlink" href="#func-findfirstsectiondivider" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">FindFirstSectionDivider</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span>
 </code></pre></div>
 <p>FindFirstSectionDivider finds the first block whose text matches a known section header.</p>
@@ -1824,17 +1824,22 @@
 </code></pre></div>
 <p>FormatCount returns a string with the count and the singular or plural form of a word.</p>
 <p><a name="MoveBlockRefToTriagedSection"></a></p>
-<h2 id="func-moveblockreftotriagedsection">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L671-L673">MoveBlockRefToTriagedSection</a><a class="headerlink" href="#func-moveblockreftotriagedsection" title="Permanent link">¶</a></h2>
+<h2 id="func-moveblockreftotriagedsection">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L683-L685">MoveBlockRefToTriagedSection</a><a class="headerlink" href="#func-moveblockreftotriagedsection" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">MoveBlockRefToTriagedSection</span><span class="p">(</span><span class="nx">transaction</span><span class="w"> </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Transaction</span><span class="p">,</span><span class="w"> </span><span class="nx">backlogPage</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">uuid</span><span class="w"> </span><span class="nx">logseqapi</span><span class="p">.</span><span class="nx">TaskUUID</span><span class="p">,</span><span class="w"> </span><span class="nx">triagedText</span><span class="p">,</span><span class="w"> </span><span class="nx">scheduledText</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>MoveBlockRefToTriagedSection moves a block ref to the Triaged section of a backlog page. If the ref exists in the regular area (not under Focus, New tasks, Overdue, or Scheduled), it is removed from there. If it's already in Triaged, no duplicate is added. Creates the Triaged section if it doesn't exist.</p>
-<p><a name="NormaliseHeaderText"></a></p>
-<h2 id="func-normaliseheadertext">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L103">NormaliseHeaderText</a><a class="headerlink" href="#func-normaliseheadertext" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NormaliseHeaderText</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
+<p><a name="NormalizeHeaderText"></a></p>
+<h2 id="func-normalizeheadertext">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L104">NormalizeHeaderText</a><a class="headerlink" href="#func-normalizeheadertext" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">NormalizeHeaderText</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
-<p>NormaliseHeaderText scans all top-level blocks on the page and normalises any block whose text node (trimmed) contains a known header keyword to the canonical "emoji Label tasks" form (e.g. "focus" → "🎯 Focus tasks", "🆕 New tasks" → "✨ New tasks"). Only the text node is updated; sibling nodes (e.g. [[quick capture]] page links) are left intact. Returns true if any block was changed.</p>
+<p>NormalizeHeaderText scans all top-level blocks on the page and normalizes any block whose text node contains a known header keyword:</p>
+<ul>
+<li>fixes the text to the canonical "emoji Label tasks" form</li>
+<li>upgrades a plain Paragraph container to a Heading level 1</li>
+</ul>
+<p>Returns true if any block was changed.</p>
 <p><a name="RemoveBlockRefFromRegularArea"></a></p>
-<h2 id="func-removeblockreffromregulararea">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L619">RemoveBlockRefFromRegularArea</a><a class="headerlink" href="#func-removeblockreffromregulararea" title="Permanent link">¶</a></h2>
+<h2 id="func-removeblockreffromregulararea">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L631">RemoveBlockRefFromRegularArea</a><a class="headerlink" href="#func-removeblockreffromregulararea" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">RemoveBlockRefFromRegularArea</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">uuid</span><span class="w"> </span><span class="nx">logseqapi</span><span class="p">.</span><span class="nx">TaskUUID</span><span class="p">)</span>
 </code></pre></div>
 <p>RemoveBlockRefFromRegularArea removes the block ref with the given UUID from the regular area of the page. The regular area is any top-level block ref that is not itself a section divider. Section dividers (Focus, Overdue, New tasks, Triaged, Scheduled, Unranked) and their children are not part of the regular area. Since we walk only top-level blocks, child refs are never seen.</p>
@@ -1848,12 +1853,12 @@
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">blockRefsFromPages</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span>
 </code></pre></div>
 <p><a name="collectTriagedRefs"></a></p>
-<h2 id="func-collecttriagedrefs">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L153">collectTriagedRefs</a><a class="headerlink" href="#func-collecttriagedrefs" title="Permanent link">¶</a></h2>
+<h2 id="func-collecttriagedrefs">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L165">collectTriagedRefs</a><a class="headerlink" href="#func-collecttriagedrefs" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">collectTriagedRefs</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span><span class="p">)</span>
 </code></pre></div>
 <p>collectTriagedRefs performs a first pass over the page to find the Triaged section divider and record all block-ref UUIDs that are descendants of it.</p>
 <p><a name="createTriagedSectionWithRef"></a></p>
-<h2 id="func-createtriagedsectionwithref">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L702-L704">createTriagedSectionWithRef</a><a class="headerlink" href="#func-createtriagedsectionwithref" title="Permanent link">¶</a></h2>
+<h2 id="func-createtriagedsectionwithref">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L714-L716">createTriagedSectionWithRef</a><a class="headerlink" href="#func-createtriagedsectionwithref" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">createTriagedSectionWithRef</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">uuid</span><span class="w"> </span><span class="nx">logseqapi</span><span class="p">.</span><span class="nx">TaskUUID</span><span class="p">,</span><span class="w"> </span><span class="nx">triagedText</span><span class="p">,</span><span class="w"> </span><span class="nx">scheduledText</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>createTriagedSectionWithRef creates a new Triaged section with a block reference. It inserts the section before the Scheduled section if found, or appends to the end.</p>
@@ -1862,17 +1867,17 @@
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">defaultQuery</span><span class="p">(</span><span class="nx">pageTitle</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
 </code></pre></div>
 <p><a name="handleDefaultBlockRef"></a></p>
-<h2 id="func-handledefaultblockref">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L419-L422">handleDefaultBlockRef</a><a class="headerlink" href="#func-handledefaultblockref" title="Permanent link">¶</a></h2>
+<h2 id="func-handledefaultblockref">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L431-L434">handleDefaultBlockRef</a><a class="headerlink" href="#func-handledefaultblockref" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">handleDefaultBlockRef</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">blockRef</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">BlockRef</span><span class="p">,</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span><span class="p">,</span><span class="w"> </span><span class="nx">underScheduled</span><span class="w"> </span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="nx">futureScheduledBlockRefs</span><span class="w"> </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">])</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>handleDefaultBlockRef handles the default case in processBlockRef: moves stale Scheduled tasks back to new, and unpins regular tasks. Returns true if the block should be deleted.</p>
 <p><a name="insertNewTasks"></a></p>
-<h2 id="func-insertnewtasks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L316-L319">insertNewTasks</a><a class="headerlink" href="#func-insertnewtasks" title="Permanent link">¶</a></h2>
+<h2 id="func-insertnewtasks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L328-L331">insertNewTasks</a><a class="headerlink" href="#func-insertnewtasks" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">insertNewTasks</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span><span class="p">,</span><span class="w"> </span><span class="nx">newBlockRefs</span><span class="p">,</span><span class="w"> </span><span class="nx">overdueBlockRefs</span><span class="p">,</span><span class="w"> </span><span class="nx">futureScheduledBlockRefs</span><span class="w"> </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">])</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>insertNewTasks inserts new task refs under the new-tasks divider (creating it if needed). Returns updated save flag.</p>
 <p><a name="insertOverdueTasks"></a></p>
-<h2 id="func-insertoverduetasks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L295">insertOverdueTasks</a><a class="headerlink" href="#func-insertoverduetasks" title="Permanent link">¶</a></h2>
+<h2 id="func-insertoverduetasks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L307">insertOverdueTasks</a><a class="headerlink" href="#func-insertoverduetasks" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">insertOverdueTasks</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span><span class="p">,</span><span class="w"> </span><span class="nx">overdueBlockRefs</span><span class="w"> </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">])</span>
 </code></pre></div>
 <p>insertOverdueTasks inserts overdue task refs under the overdue divider (creating it if needed).</p>
@@ -1880,12 +1885,12 @@
 </code></pre></div>
 <p>Overdue tasks go after the focus section and before new ones so the user can manually decide which overdue tasks deserve focus.</p>
 <p><a name="insertScheduledTasks"></a></p>
-<h2 id="func-insertscheduledtasks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L363">insertScheduledTasks</a><a class="headerlink" href="#func-insertscheduledtasks" title="Permanent link">¶</a></h2>
+<h2 id="func-insertscheduledtasks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L375">insertScheduledTasks</a><a class="headerlink" href="#func-insertscheduledtasks" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">insertScheduledTasks</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span><span class="p">,</span><span class="w"> </span><span class="nx">futureScheduledBlockRefs</span><span class="w"> </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">])</span>
 </code></pre></div>
 <p>insertScheduledTasks moves future-scheduled tasks to the bottom of the page.</p>
 <p><a name="nextChildHasPin"></a></p>
-<h2 id="func-nextchildhaspin">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L446">nextChildHasPin</a><a class="headerlink" href="#func-nextchildhaspin" title="Permanent link">¶</a></h2>
+<h2 id="func-nextchildhaspin">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L458">nextChildHasPin</a><a class="headerlink" href="#func-nextchildhaspin" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">nextChildHasPin</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">Node</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p><a name="printQuickCaptureURL"></a></p>
@@ -1893,12 +1898,12 @@
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">printQuickCaptureURL</span><span class="p">(</span><span class="nx">graph</span><span class="w"> </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span><span class="p">)</span>
 </code></pre></div>
 <p><a name="processAllBlocks"></a></p>
-<h2 id="func-processallblocks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L185-L188">processAllBlocks</a><a class="headerlink" href="#func-processallblocks" title="Permanent link">¶</a></h2>
+<h2 id="func-processallblocks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L197-L200">processAllBlocks</a><a class="headerlink" href="#func-processallblocks" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">processAllBlocks</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span><span class="p">,</span><span class="w"> </span><span class="nx">obsoleteBlockRefs</span><span class="p">,</span><span class="w"> </span><span class="nx">overdueBlockRefs</span><span class="p">,</span><span class="w"> </span><span class="nx">futureScheduledBlockRefs</span><span class="w"> </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">])</span>
 </code></pre></div>
 <p>processAllBlocks iterates all blocks on the page, records section dividers, and removes or unpins block refs that are obsolete, overdue, or scheduled.</p>
 <p><a name="processBlockRef"></a></p>
-<h2 id="func-processblockref">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L229-L233">processBlockRef</a><a class="headerlink" href="#func-processblockref" title="Permanent link">¶</a></h2>
+<h2 id="func-processblockref">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L241-L245">processBlockRef</a><a class="headerlink" href="#func-processblockref" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">processBlockRef</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">blockRef</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">BlockRef</span><span class="p">,</span><span class="w"> </span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span><span class="p">,</span><span class="w"> </span><span class="nx">obsoleteBlockRefs</span><span class="p">,</span><span class="w"> </span><span class="nx">overdueBlockRefs</span><span class="p">,</span><span class="w"> </span><span class="nx">futureScheduledBlockRefs</span><span class="w"> </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">])</span>
 </code></pre></div>
 <p>processBlockRef decides whether to delete, pin, unpin, or keep a block ref.</p>
@@ -1923,27 +1928,27 @@
 </code></pre></div>
 <p>queryTasksFromSinglePage queries tasks from a single page and returns the JSON tasks.</p>
 <p><a name="recordSectionDivider"></a></p>
-<h2 id="func-recordsectiondivider">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L209">recordSectionDivider</a><a class="headerlink" href="#func-recordsectiondivider" title="Permanent link">¶</a></h2>
+<h2 id="func-recordsectiondivider">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L221">recordSectionDivider</a><a class="headerlink" href="#func-recordsectiondivider" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">recordSectionDivider</span><span class="p">(</span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">textValue</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span><span class="p">)</span>
 </code></pre></div>
 <p>recordSectionDivider updates state with a block if its text matches a known section header.</p>
 <p><a name="reportCounts"></a></p>
-<h2 id="func-reportcounts">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L379">reportCounts</a><a class="headerlink" href="#func-reportcounts" title="Permanent link">¶</a></h2>
+<h2 id="func-reportcounts">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L391">reportCounts</a><a class="headerlink" href="#func-reportcounts" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">reportCounts</span><span class="p">(</span><span class="nx">state</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span><span class="p">,</span><span class="w"> </span><span class="nx">save</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>reportCounts prints colored summaries and returns updated save flag.</p>
 <p><a name="scanPageBlocks"></a></p>
-<h2 id="func-scanpageblocks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L143-L146">scanPageBlocks</a><a class="headerlink" href="#func-scanpageblocks" title="Permanent link">¶</a></h2>
+<h2 id="func-scanpageblocks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L155-L158">scanPageBlocks</a><a class="headerlink" href="#func-scanpageblocks" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">scanPageBlocks</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">state</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span><span class="p">,</span><span class="w"> </span><span class="nx">obsoleteBlockRefs</span><span class="p">,</span><span class="w"> </span><span class="nx">overdueBlockRefs</span><span class="p">,</span><span class="w"> </span><span class="nx">futureScheduledBlockRefs</span><span class="w"> </span><span class="o">*</span><span class="nx">set</span><span class="p">.</span><span class="nx">Set</span><span class="p">[</span><span class="kt">string</span><span class="p">])</span>
 </code></pre></div>
-<p>scanPageBlocks is a two-pass coordinator: first it normalises headers, then collects UUIDs already in the Triaged section, then processes all blocks (which uses those UUIDs for deduplication in the regular area).</p>
+<p>scanPageBlocks is a two-pass coordinator: first it normalizes headers, then collects UUIDs already in the Triaged section, then processes all blocks (which uses those UUIDs for deduplication in the regular area).</p>
 <p><a name="sortTriagedSection"></a></p>
-<h2 id="func-sorttriagedsection">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L467">sortTriagedSection</a><a class="headerlink" href="#func-sorttriagedsection" title="Permanent link">¶</a></h2>
+<h2 id="func-sorttriagedsection">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L479">sortTriagedSection</a><a class="headerlink" href="#func-sorttriagedsection" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">sortTriagedSection</span><span class="p">(</span><span class="nx">state</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span><span class="p">,</span><span class="w"> </span><span class="nx">taskLookup</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="nx">logseqapi</span><span class="p">.</span><span class="nx">TaskUUID</span><span class="p">]</span><span class="nx">logseqapi</span><span class="p">.</span><span class="nx">TaskJSON</span><span class="p">)</span>
 </code></pre></div>
 <p>sortTriagedSection sorts children of the Triaged divider by priority, date, name, and ID.</p>
 <p><a name="taskSortKeyLess"></a></p>
-<h2 id="func-tasksortkeyless">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L533">taskSortKeyLess</a><a class="headerlink" href="#func-tasksortkeyless" title="Permanent link">¶</a></h2>
+<h2 id="func-tasksortkeyless">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L545">taskSortKeyLess</a><a class="headerlink" href="#func-tasksortkeyless" title="Permanent link">¶</a></h2>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">taskSortKeyLess</span><span class="p">(</span><span class="nx">left</span><span class="p">,</span><span class="w"> </span><span class="nx">right</span><span class="w"> </span><span class="nx">taskSortKey</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>taskSortKeyLess compares two sort keys for ordering in the Triaged section.</p>
@@ -1995,11 +2000,11 @@
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">h</span><span class="w"> </span><span class="nx">Header</span><span class="p">)</span><span class="w"> </span><span class="nx">Matches</span><span class="p">(</span><span class="nx">blockText</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>Matches reports whether blockText contains the label, case-insensitively.</p>
-<p><a name="Header.NewParagraph"></a></p>
-<h3 id="func-header-newparagraph">func (Header) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/constants.go#L28">NewParagraph</a><a class="headerlink" href="#func-header-newparagraph" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">h</span><span class="w"> </span><span class="nx">Header</span><span class="p">)</span><span class="w"> </span><span class="nx">NewParagraph</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Paragraph</span>
+<p><a name="Header.NewHeading"></a></p>
+<h3 id="func-header-newheading">func (Header) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/constants.go#L28">NewHeading</a><a class="headerlink" href="#func-header-newheading" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">h</span><span class="w"> </span><span class="nx">Header</span><span class="p">)</span><span class="w"> </span><span class="nx">NewHeading</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Heading</span>
 </code></pre></div>
-<p>NewParagraph returns a paragraph node with the canonical header text followed by a [[quick capture]] page link. Use this when creating a new section divider so the user can identify blocks inserted by lqd backlog.</p>
+<p>NewHeading returns a level-1 heading node with the canonical header text followed by a [[quick capture]] page link. Use this when creating a new section divider so the user can identify blocks inserted by lqd backlog.</p>
 <p><a name="Header.String"></a></p>
 <h3 id="func-header-string">func (Header) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/constants.go#L18">String</a><a class="headerlink" href="#func-header-string" title="Permanent link">¶</a></h3>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">h</span><span class="w"> </span><span class="nx">Header</span><span class="p">)</span><span class="w"> </span><span class="nx">String</span><span class="p">()</span><span class="w"> </span><span class="kt">string</span>
@@ -2086,7 +2091,7 @@
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">newPageState</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="nx">pageState</span>
 </code></pre></div>
 <p><a name="taskSortKey"></a></p>
-<h2 id="type-tasksortkey">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L458-L464">taskSortKey</a><a class="headerlink" href="#type-tasksortkey" title="Permanent link">¶</a></h2>
+<h2 id="type-tasksortkey">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L470-L476">taskSortKey</a><a class="headerlink" href="#type-tasksortkey" title="Permanent link">¶</a></h2>
 <p>taskSortKey holds the fields used to sort tasks in the Triaged section.</p>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">taskSortKey</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a><span class="w">    </span><span class="nx">priority</span><span class="w">    </span><span class="nx">content</span><span class="p">.</span><span class="nx">PriorityValue</span><span class="w"> </span><span class="c1">// PriorityNone=0 sorts FIRST (unprioritized at top)</span>
@@ -2097,7 +2102,7 @@
 <a id="__codelineno-58-7" name="__codelineno-58-7" href="#__codelineno-58-7"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="newSortKeys"></a></p>
-<h3 id="func-newsortkeys">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L506-L508">newSortKeys</a><a class="headerlink" href="#func-newsortkeys" title="Permanent link">¶</a></h3>
+<h3 id="func-newsortkeys">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/backlog/write.go#L518-L520">newSortKeys</a><a class="headerlink" href="#func-newsortkeys" title="Permanent link">¶</a></h3>
 <div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">newSortKeys</span><span class="p">(</span><span class="nx">children</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">BlockList</span><span class="p">,</span><span class="w"> </span><span class="nx">taskLookup</span><span class="w"> </span><span class="kd">map</span><span class="p">[</span><span class="nx">logseqapi</span><span class="p">.</span><span class="nx">TaskUUID</span><span class="p">]</span><span class="nx">logseqapi</span><span class="p">.</span><span class="nx">TaskJSON</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="nx">taskSortKey</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">)</span>
 </code></pre></div>
 <p>newSortKeys creates sort keys for all children of the Triaged section.</p>
