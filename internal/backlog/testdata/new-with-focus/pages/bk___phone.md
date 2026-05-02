@@ -1,3 +1,3 @@
 - (( phone-backup-photos ))
-- 🎯 Focus tasks
+- # 🎯 Focus
 - (( phone-remove-apps ))

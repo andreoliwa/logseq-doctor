@@ -1,3 +1,3 @@
 - (( home-wash-bed-sheets ))
-- 🎯 Focus tasks
+- # Focus
 - (( home-clean-windows ))

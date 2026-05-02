@@ -22,11 +22,11 @@ func (h Header) Matches(blockText string) bool {
 	return strings.Contains(strings.ToLower(blockText), strings.ToLower(h.Label))
 }
 
-// NewParagraph returns a paragraph node with the canonical header text followed
-// by a [[quick capture]] page link. Use this when creating a new section divider
-// so the user can identify blocks inserted by lqd backlog.
-func (h Header) NewParagraph() *content.Paragraph {
-	return content.NewParagraph(
+// NewHeading returns a level-1 heading node with the canonical header text
+// followed by a [[quick capture]] page link. Use this when creating a new
+// section divider so the user can identify blocks inserted by lqd backlog.
+func (h Header) NewHeading() *content.Heading {
+	return content.NewHeading(1,
 		content.NewText(h.String()+" "),
 		content.NewPageLink(quickCapturePageName),
 	)
@@ -50,7 +50,7 @@ var (
 	HeaderUnranked  = Header{"⤵️", "Unranked"}
 )
 
-// allHeaders is the full list used to normalise section dividers on write-back.
+// allHeaders is the full list used to normalize section dividers on write-back.
 //
 //nolint:gochecknoglobals // package-level list derived from the Header vars above
 var allHeaders = []Header{

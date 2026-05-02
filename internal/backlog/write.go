@@ -61,7 +61,7 @@ func insertAndRemoveRefs(
 
 	state := newPageState()
 
-	normalised := NormaliseHeaderText(page)
+	normalised := NormalizeHeaderText(page)
 	scanPageBlocks(page, state, obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs)
 	insertOverdueTasks(page, state, overdueBlockRefs)
 
@@ -95,12 +95,13 @@ func insertAndRemoveRefs(
 	return state.result, nil
 }
 
-// NormaliseHeaderText scans all top-level blocks on the page and normalises any
-// block whose text node (trimmed) contains a known header keyword to the canonical
-// "emoji Label tasks" form (e.g. "focus" → "🎯 Focus tasks", "🆕 New tasks" → "✨ New tasks").
-// Only the text node is updated; sibling nodes (e.g. [[quick capture]] page links) are left intact.
+// NormalizeHeaderText scans all top-level blocks on the page and normalizes any
+// block whose text node contains a known header keyword:
+//   - fixes the text to the canonical "emoji Label tasks" form
+//   - upgrades a plain Paragraph container to a Heading level 1
+//
 // Returns true if any block was changed.
-func NormaliseHeaderText(page logseq.Page) bool {
+func NormalizeHeaderText(page logseq.Page) bool {
 	changed := false
 
 	for _, block := range page.Blocks() {
@@ -117,15 +118,26 @@ func NormaliseHeaderText(page logseq.Page) bool {
 					continue
 				}
 
-				if trimmed == hdr.String() {
-					// Already canonical — nothing to do.
-					break
+				// Fix text to canonical form.
+				if trimmed != hdr.String() {
+					suffix := text.Value[len(trimmed):]
+					text.Value = hdr.String() + suffix
+					changed = true
 				}
 
-				// Preserve any trailing whitespace (separates text from page-link sibling).
-				suffix := text.Value[len(trimmed):]
-				text.Value = hdr.String() + suffix
-				changed = true
+				// Upgrade Paragraph → Heading(1) if needed.
+				if para, ok := node.Parent().(*content.Paragraph); ok {
+					heading := content.NewHeading(1)
+
+					for child := para.FirstChild(); child != nil; child = para.FirstChild() {
+						para.RemoveChild(child)
+						heading.AddChild(child)
+					}
+
+					para.ReplaceWith(heading)
+
+					changed = true
+				}
 
 				break
 			}
@@ -137,7 +149,7 @@ func NormaliseHeaderText(page logseq.Page) bool {
 	return changed
 }
 
-// scanPageBlocks is a two-pass coordinator: first it normalises headers, then
+// scanPageBlocks is a two-pass coordinator: first it normalizes headers, then
 // collects UUIDs already in the Triaged section, then processes all blocks
 // (which uses those UUIDs for deduplication in the regular area).
 func scanPageBlocks(
@@ -299,7 +311,7 @@ func insertOverdueTasks(page logseq.Page, state *pageState, overdueBlockRefs *se
 		}
 
 		if state.dividerOverdue == nil {
-			state.dividerOverdue = content.NewBlock(HeaderOverdue.NewParagraph())
+			state.dividerOverdue = content.NewBlock(HeaderOverdue.NewHeading())
 			logseqext.AddSibling(page, state.dividerOverdue, state.firstBlock, state.dividerFocus)
 		}
 
@@ -335,7 +347,7 @@ func insertNewTasks(
 		}
 
 		if state.dividerNewTasks == nil {
-			state.dividerNewTasks = content.NewBlock(HeaderNewTasks.NewParagraph())
+			state.dividerNewTasks = content.NewBlock(HeaderNewTasks.NewHeading())
 
 			if state.dividerUnranked != nil {
 				// Always insert directly before Unranked — it is the definitive anchor,
@@ -367,7 +379,7 @@ func insertScheduledTasks(page logseq.Page, state *pageState, futureScheduledBlo
 
 	for _, blockRef := range futureScheduledBlockRefs.ValuesSorted() {
 		if state.dividerScheduled == nil {
-			state.dividerScheduled = content.NewBlock(HeaderScheduled.NewParagraph())
+			state.dividerScheduled = content.NewBlock(HeaderScheduled.NewHeading())
 			page.AddBlock(state.dividerScheduled)
 		}
 
