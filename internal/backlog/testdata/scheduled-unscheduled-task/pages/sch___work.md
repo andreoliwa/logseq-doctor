@@ -1,0 +1,3 @@
+- ⏰ Scheduled tasks [[quick capture]]
+	- (( work-monthly-report ))
+	- (( work-quarterly-review ))

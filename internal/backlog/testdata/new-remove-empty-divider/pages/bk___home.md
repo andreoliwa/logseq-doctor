@@ -1,0 +1,5 @@
+- (( home-clean-windows ))
+- New tasks [[quick capture]]
+- (( home-vacuum-carpets ))
+- (( home-clean-basement ))
+- (( home-wash-bed-sheets ))

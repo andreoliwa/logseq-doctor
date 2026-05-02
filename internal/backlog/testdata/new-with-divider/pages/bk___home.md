@@ -1,0 +1,3 @@
+- (( home-clean-windows ))
+- New tasks
+- (( home-wash-bed-sheets ))

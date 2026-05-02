@@ -66,14 +66,26 @@ func NewStubGraph(t *testing.T, subDir string) *logseq.Graph {
 type mockLogseqAPI struct {
 	mock.Mock
 
-	t         *testing.T
-	responses *StubAPIResponses
+	t            *testing.T
+	responses    *StubAPIResponses
+	tagResponses map[string]string
 }
 
 func newMockLogseqAPI(t *testing.T, responses StubAPIResponses) *mockLogseqAPI {
 	t.Helper()
 
 	api := mockLogseqAPI{t: t, responses: &responses} //nolint:exhaustruct
+	api.On("PostQuery", mock.Anything).Return("{}", nil)
+	api.On("PostDatascriptQuery", mock.Anything).Return("[]", nil)
+
+	return &api
+}
+
+// newMockLogseqAPIFromMap creates a mockLogseqAPI that returns pre-built JSON responses keyed by tag.
+func newMockLogseqAPIFromMap(t *testing.T, responses map[string]string) *mockLogseqAPI {
+	t.Helper()
+
+	api := mockLogseqAPI{t: t, tagResponses: responses} //nolint:exhaustruct
 	api.On("PostQuery", mock.Anything).Return("{}", nil)
 	api.On("PostDatascriptQuery", mock.Anything).Return("[]", nil)
 
@@ -90,10 +102,19 @@ type QueryArg struct {
 func (m *mockLogseqAPI) PostQuery(query string) (string, error) {
 	args := m.Called(query)
 
-	// Return predefined test data based on query content.
-	for _, q := range m.responses.Queries {
-		if strings.Contains(query, q.Contains) {
-			return stubJSONResponse(m.t, q.Contains)
+	// Check tag-based responses first (new fixture framework).
+	for tag, resp := range m.tagResponses {
+		if strings.Contains(query, tag) {
+			return resp, nil
+		}
+	}
+
+	// Fall back to file-based responses (old stub framework).
+	if m.responses != nil {
+		for _, q := range m.responses.Queries {
+			if strings.Contains(query, q.Contains) {
+				return stubJSONResponse(m.t, q.Contains)
+			}
 		}
 	}
 

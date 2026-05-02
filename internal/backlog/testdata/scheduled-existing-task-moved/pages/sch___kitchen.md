@@ -1,0 +1,6 @@
+- (( kitchen-supermarket ))
+- (( kitchen-plan-menu ))
+- (( kitchen-unfreeze-meat ))
+- (( kitchen-clean-oven ))
+- (( kitchen-organize-spice ))
+- (( kitchen-buy-frying-pan ))

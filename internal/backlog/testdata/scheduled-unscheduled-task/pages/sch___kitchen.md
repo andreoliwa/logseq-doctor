@@ -1,0 +1,3 @@
+- ⏰ Scheduled tasks [[quick capture]]
+	- (( kitchen-supermarket ))
+	- (( kitchen-plan-menu ))

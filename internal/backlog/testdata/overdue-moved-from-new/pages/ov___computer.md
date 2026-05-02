@@ -1,0 +1,5 @@
+- New tasks [[quick capture]]
+	- (( computer-clean-desktop ))
+	- (( computer-delete-big-files ))
+	- (( computer-buy-laptop ))
+	- (( computer-backup-files ))

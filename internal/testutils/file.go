@@ -1,14 +1,15 @@
 package testutils
 
 import (
-	"github.com/andreoliwa/logseq-go"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"gotest.tools/v3/golden"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/andreoliwa/logseq-go"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"gotest.tools/v3/golden"
 )
 
 func AssertPagesDontExist(t *testing.T, graph *logseq.Graph, pages []string) {
@@ -46,25 +47,11 @@ func assertGoldenContent(t *testing.T, graph *logseq.Graph, journals bool, caseD
 			content = strings.TrimRight(content, "\r\n") + "\r\n"
 		}
 
-		// Determine the golden file path based on the directory structure.
-		// Try the new structure first (testdata/{caseDirName}/{pagesOrJournalsDir}/),
-		// fall back to the old structure (testdata/stub-graph/{subDir}/).
-		// TODO: Remove fallback to old structure once StubGraph() is removed.
 		var goldenPath string
 
 		if caseDirName != "" {
-			// New structure: testdata/{caseDirName}/pages/ or testdata/{caseDirName}/journals/
-			newStructurePath := filepath.Join(caseDirName, pagesOrJournalsDir, filename+".golden")
-
-			_, err := os.Stat(filepath.Join("testdata", newStructurePath))
-			if err == nil {
-				goldenPath = newStructurePath
-			} else {
-				// Old structure: testdata/stub-graph/pages-cases/{caseDirName}/
-				goldenPath = filepath.Join("stub-graph", "pages-cases", caseDirName, filename+".golden")
-			}
+			goldenPath = filepath.Join(caseDirName, pagesOrJournalsDir, filename+".golden")
 		} else {
-			// Old structure: testdata/stub-graph/pages/ or testdata/stub-graph/journals/
 			goldenPath = filepath.Join("stub-graph", pagesOrJournalsDir, filename+".golden")
 		}
 

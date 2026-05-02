@@ -1,0 +1,4 @@
+- (( kitchen-supermarket ))
+- (( kitchen-unfreeze-meat ))
+- (( kitchen-clean-oven ))
+- (( kitchen-buy-frying-pan ))
