@@ -1,3 +1,3 @@
 poetry 2.3.4
 pre-commit 4.6.0
-golangci-lint 2.11.4
+golangci-lint 2.12.1

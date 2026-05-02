@@ -32,9 +32,12 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: "stable"
+      - name: Read golangci-lint version from .tool-versions
+        id: tool_versions
+        run: echo "golangci_lint=$(grep '^golangci-lint ' .tool-versions | awk '{print $2}')" >> "$GITHUB_OUTPUT"
       - uses: golangci/golangci-lint-action@v9
         with:
-          version: "latest"
+          version: "v${{ steps.tool_versions.outputs.golangci_lint }}"
 
   test:
     needs: pre_job

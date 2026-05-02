@@ -15,11 +15,14 @@ linters:
     - forbidigo
     - gochecknoinits
     - godox
+    - gomodguard # replaced by gomodguard_v2
     - intrange
     - ireturn
     - paralleltest
     - wsl # replaced by wsl_v5
     # keep-sorted end
+  enable:
+    - gomodguard_v2
   exclusions:
     generated: lax
     presets:
@@ -35,7 +38,11 @@ linters:
       - linters:
           - exhaustruct
           - funlen
+          - goconst
         path: _test\.go
+      - linters:
+          - goconst
+        path: internal/pocketbase/schema\.go
       - linters:
           - revive
         text: "avoid meaningless package names"
