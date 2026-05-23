@@ -34,10 +34,6 @@ list-go: # List the installed Go packages
 	ls -l `go env GOPATH`/bin/
 .PHONY: list-go
 
-rehash: # Rehashing is needed (once) to make the [project.scripts] section of pyproject.toml available in the PATH
-	pyenv rehash
-.PHONY: rehash
-
 setup: # Set up the local development environment
 	uv sync
 # TODO: keep the list of dev packages in a single place; this was copied from tox.ini
@@ -45,9 +41,8 @@ setup: # Set up the local development environment
 	@echo "Run 'make smoke' to check if the development environment is working"
 .PHONY: setup
 
-install: build-go # Install the package with pipx in editable mode. Do this when you want to use "lqdpy" outside of the development environment
-	-pipx install -e --force .
-	$(MAKE) rehash
+install: build-go # Install the package with uv in editable mode. Do this when you want to use "lqdpy" outside of the development environment
+	-uv tool install -e --force .
 	$(MAKE) which
 .PHONY: install
 
@@ -58,14 +53,13 @@ which: # Run the main executables to confirm they are installed properly in the 
 	-lqdpy
 .PHONY: which
 
-uninstall: clean uninstall-pipx # Remove both local and global (virtualenv and pipx)
+uninstall: clean uninstall-uv # Remove both local and global (virtualenv and uv)
 	-rm -rf .python-version .tox .venv
 .PHONY: uninstall
 
-uninstall-pipx: # Uninstall pipx virtualenv. Use this when developing, so the local venv "lqdpy" is available instead of the pipx one
-	-pipx uninstall logseq-doctor
-	$(MAKE) rehash
-.PHONY: .uninstall-pipx
+uninstall-uv: # Uninstall uv virtualenv. Use this when developing, so the local venv "lqdpy" is available instead of the uv one
+	-uv tool uninstall logseq-doctor
+.PHONY: .uninstall-uv
 
 test: test-go # Run tests on Python and Go
 	tox -e py311
@@ -104,7 +98,7 @@ release: # Create a GitHub release for the Go package only
 	gh repo view --web
 .PHONY: .release-post-bump
 
-smoke: rehash test which # Run simple tests to make sure the package is working
+smoke: test which # Run simple tests to make sure the package is working
 	uv run lqdpy --help
 .PHONY: smoke
 
