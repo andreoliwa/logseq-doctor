@@ -53,13 +53,7 @@ Logseq Doctor is a command-line tool with commands to manipulate your [Logseq](h
 
 ## Installation
 
-### Go binary executable
-
-The recommended way for macOS and Linux is to install with Homebrew:
-
-    brew install andreoliwa/formulae/logseq-doctor
-
-Or you can install manually:
+Run this to install:
 
     go install github.com/andreoliwa/logseq-doctor/cmd/lqd@latest
 
@@ -73,7 +67,7 @@ Confirm if it's in your path:
 
 To build and install the `lqd` binary from source, clone the repository and run:
 
-    make build-go
+    make install
 
 <!-- --8<-- [end:installation] -->
 
