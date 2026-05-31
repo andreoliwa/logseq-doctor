@@ -9,8 +9,11 @@ import (
 )
 
 const (
-	outlineIndentUnit = "  " // 2 spaces per indent level
-	outlineBullet     = "-"
+	outlineIndentUnit      = "\t" // one tab per indent level, matching Logseq's native format
+	outlineBullet          = "-"
+	outlineOrderedListProp = "logseq.order-list-type:: number"
+	// outlinePropertyPrefix is the indent for a block property line: tab(s) + 2 spaces.
+	outlinePropertySpaces = "  "
 )
 
 // OutlineOptions configures the flat-Markdown-to-outline conversion.
@@ -132,7 +135,8 @@ func (c *converter) walk(node ast.Node, entering bool) (ast.WalkStatus, error) {
 
 	case ast.KindListItem:
 		if entering {
-			c.handleListItem(node)
+			list := node.Parent().(*ast.List) //nolint:forcetypeassert
+			c.handleListItem(node, list.IsOrdered())
 
 			return ast.WalkSkipChildren, nil
 		}
@@ -147,23 +151,35 @@ func (c *converter) walk(node ast.Node, entering bool) (ast.WalkStatus, error) {
 }
 
 // handleListItem emits the list item text and manages level for nested lists.
-func (c *converter) handleListItem(node ast.Node) {
+// isOrdered indicates whether the parent list is an ordered list; when true, the
+// Logseq block property "logseq.order-list-type:: number" is written after the bullet
+// as a plain indented line (no "- " prefix).
+//
+// On re-parse the converted output uses unordered "-" bullets, so isOrdered is false.
+// The property line appears as a soft-line-break continuation inside the TextBlock.
+// We detect it directly in itemText to preserve it on re-parse (idempotency).
+func (c *converter) handleListItem(node ast.Node, isOrdered bool) {
 	itemText := c.listItemText(node)
+
+	// Detect property already present from a previous conversion pass.
+	bulletText, _, alreadyHasProp := strings.Cut(itemText, "\n")
+	emitProp := isOrdered || alreadyHasProp
 
 	nestedList := findNestedList(node)
 
-	if nestedList == nil {
-		// Leaf item: emit at current level.
-		c.sb.WriteString(outlineLine(c.currentLevel, itemText))
+	c.sb.WriteString(outlineLine(c.currentLevel, bulletText))
 
-		return
+	if emitProp {
+		// Block property: tab(s) matching bullet level + 2 spaces, no "- " prefix.
+		indent := strings.Repeat(outlineIndentUnit, c.currentLevel) + outlinePropertySpaces
+		c.sb.WriteString(indent + outlineOrderedListProp + "\n")
 	}
 
-	// Item has a nested list: emit item text at current level, then recurse.
-	c.sb.WriteString(outlineLine(c.currentLevel, itemText))
-	c.currentLevel++
-	c.walkNestedList(nestedList)
-	c.currentLevel--
+	if nestedList != nil {
+		c.currentLevel++
+		c.walkNestedList(nestedList)
+		c.currentLevel--
+	}
 }
 
 // findNestedList returns the first *ast.List child of a list item, or nil.
@@ -199,7 +215,7 @@ func (c *converter) listItemText(item ast.Node) string {
 // walkNestedList recursively processes a nested list and its items.
 func (c *converter) walkNestedList(list *ast.List) {
 	for item := list.FirstChild(); item != nil; item = item.NextSibling() {
-		c.handleListItem(item)
+		c.handleListItem(item, list.IsOrdered())
 	}
 }
 
