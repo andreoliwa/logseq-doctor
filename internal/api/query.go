@@ -4,7 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
+	"strings"
 	"time"
+
+	"github.com/andreoliwa/logseq-go/content"
 
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 )
@@ -78,4 +82,45 @@ func extractBlockInfo(page map[string]any) *BlockQueryInfo {
 	}
 
 	return info
+}
+
+// BuildTaskListQuery assembles the Logseq Datalog query for listing tasks.
+// It matches the Python `lqdpy tasks` query format exactly.
+func BuildTaskListQuery(tags []string, includeCanceled, includeDone bool) string {
+	condition := ""
+
+	switch {
+	case len(tags) == 1:
+		condition = " [[" + tags[0] + "]]"
+	case len(tags) > 1:
+		parts := make([]string, len(tags))
+		for i, t := range tags {
+			parts[i] = "[[" + t + "]]"
+		}
+
+		condition = " (or " + strings.Join(parts, " ") + ")"
+	}
+
+	statuses := "TODO DOING WAITING NOW LATER"
+	if includeCanceled {
+		statuses += " " + content.TaskStringCanceled
+	}
+
+	if includeDone {
+		statuses += " " + content.TaskStringDone
+	}
+
+	return "(and" + condition + " (task " + statuses + "))"
+}
+
+// SortTasksByDate sorts tasks in place by (JournalDay, Content) ascending,
+// matching Python's Block.sort_by_date behavior.
+func SortTasksByDate(tasks []TaskJSON) {
+	sort.SliceStable(tasks, func(i, j int) bool {
+		if tasks[i].Page.JournalDay != tasks[j].Page.JournalDay {
+			return tasks[i].Page.JournalDay < tasks[j].Page.JournalDay
+		}
+
+		return tasks[i].Content < tasks[j].Content
+	})
 }

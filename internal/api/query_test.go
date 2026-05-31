@@ -153,6 +153,7 @@ func TestBuildTaskListQuery(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+
 			got := logseqapi.BuildTaskListQuery(tc.tags, tc.includeCanceled, tc.includeDone)
 			assert.Equal(t, tc.want, got)
 		})
@@ -162,10 +163,10 @@ func TestBuildTaskListQuery(t *testing.T) {
 func TestSortTasksByDate(t *testing.T) {
 	t.Parallel()
 
-	tasks := []logseqapi.TaskJSON{ //nolint:exhaustruct
-		{Page: logseqapi.PageJSON{JournalDay: 20241215}, Content: "b"}, //nolint:exhaustruct
-		{Page: logseqapi.PageJSON{JournalDay: 20241201}, Content: "a"}, //nolint:exhaustruct
-		{Page: logseqapi.PageJSON{JournalDay: 20241215}, Content: "a"}, //nolint:exhaustruct
+	tasks := []logseqapi.TaskJSON{
+		{Page: logseqapi.PageJSON{JournalDay: 20241215}, Content: "b"},
+		{Page: logseqapi.PageJSON{JournalDay: 20241201}, Content: "a"},
+		{Page: logseqapi.PageJSON{JournalDay: 20241215}, Content: "a"},
 	}
 
 	logseqapi.SortTasksByDate(tasks)
@@ -181,9 +182,9 @@ func TestSortTasksByDate(t *testing.T) {
 func TestSortTasksByDate_ZeroJournalDaySortFirst(t *testing.T) {
 	t.Parallel()
 
-	tasks := []logseqapi.TaskJSON{ //nolint:exhaustruct
-		{Page: logseqapi.PageJSON{JournalDay: 20241215}, Content: "task"}, //nolint:exhaustruct
-		{Page: logseqapi.PageJSON{JournalDay: 0}, Content: "no date"},     //nolint:exhaustruct
+	tasks := []logseqapi.TaskJSON{
+		{Page: logseqapi.PageJSON{JournalDay: 20241215}, Content: "task"},
+		{Page: logseqapi.PageJSON{JournalDay: 0}, Content: "no date"},
 	}
 
 	logseqapi.SortTasksByDate(tasks)
