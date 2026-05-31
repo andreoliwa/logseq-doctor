@@ -74,12 +74,10 @@ nav:
       - md: reference/cli/#md
       - outline: reference/cli/#outline
       - task: reference/cli/#task
-      - tasks: reference/cli/#tasks
       - tidy-up: reference/cli/#tidy-up
       # keep-sorted end
   - Internal API Reference:
       - Go API: reference/go.md
-      - Python API: reference/python.md
   - Development:
       - Contributing: contributing.md
       - Changelog: changelog.md
@@ -90,29 +88,8 @@ extra_css:
 plugins:
   - search
   - glightbox
-  - gen-files:
-      scripts:
-        - docs/gen_ref_pages.py
-  - literate-nav:
-      nav_file: SUMMARY.md
-  - section-index
-  - mkdocstrings:
-      handlers:
-        python:
-          paths: [src]
-          options:
-            docstring_style: google
-            show_source: true
-            show_root_heading: true
-            show_root_full_path: false
-            show_symbol_type_heading: true
-            show_symbol_type_toc: true
-            members_order: source
-            heading_level: 2
 
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/andreoliwa/logseq-doctor
-    - icon: fontawesome/brands/python
-      link: https://pypi.org/project/logseq-doctor/
