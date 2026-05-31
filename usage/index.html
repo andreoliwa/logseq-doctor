@@ -559,6 +559,28 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#outline-convert-flat-markdown-to-logseq-outline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        outline - Convert Flat Markdown to Logseq Outline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-ls-list-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        task ls - List Tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#content-append-raw-markdown-content" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1430,6 +1452,28 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#outline-convert-flat-markdown-to-logseq-outline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        outline - Convert Flat Markdown to Logseq Outline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-ls-list-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        task ls - List Tasks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#content-append-raw-markdown-content" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1735,48 +1779,90 @@
 <a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>Use "lqd [command] --help" for more information about a command.
 </code></pre></div>
 <h3 id="commands_1">Commands<a class="headerlink" href="#commands_1" title="Permanent link">¶</a></h3>
+<h4 id="outline-convert-flat-markdown-to-logseq-outline"><code>outline</code> - Convert Flat Markdown to Logseq Outline<a class="headerlink" href="#outline-convert-flat-markdown-to-logseq-outline" title="Permanent link">¶</a></h4>
+<p>Convert flat Markdown files to Logseq's bullet outline format:</p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># From stdin</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">'# Header\n\nParagraph.\n'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>lqd<span class="w"> </span>outline
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Single file to stdout</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>lqd<span class="w"> </span>outline<span class="w"> </span>notes.md
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># Multiple files to stdout</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>lqd<span class="w"> </span>outline<span class="w"> </span>a.md<span class="w"> </span>b.md
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># Edit in place</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>lqd<span class="w"> </span>outline<span class="w"> </span>--in-place<span class="w"> </span>notes.md
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="c1"># Move converted file to a directory (fails if destination already exists)</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>lqd<span class="w"> </span>outline<span class="w"> </span>--move-to<span class="w"> </span>~/logseq/pages<span class="w"> </span>notes.md
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="c1"># Preserve blank lines as empty bullet lines</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>lqd<span class="w"> </span>outline<span class="w"> </span>--keep-breaks<span class="w"> </span>notes.md
+</code></pre></div>
+<p>Ordered lists are converted to Logseq's native ordered list format using the
+<code>logseq.order-list-type:: number</code> block property. The conversion is idempotent:
+running it twice produces the same result.</p>
+<h4 id="task-ls-list-tasks"><code>task ls</code> - List Tasks<a class="headerlink" href="#task-ls-list-tasks" title="Permanent link">¶</a></h4>
+<p>List tasks from your Logseq graph via the HTTP API:</p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># All active tasks</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>lqd<span class="w"> </span>task<span class="w"> </span>ls
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Filter by tag or page</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>lqd<span class="w"> </span>task<span class="w"> </span>ls<span class="w"> </span>work
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># Include completed tasks</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>lqd<span class="w"> </span>task<span class="w"> </span>ls<span class="w"> </span>--done<span class="w"> </span>--canceled
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>lqd<span class="w"> </span>task<span class="w"> </span>ls<span class="w"> </span>--completed<span class="w">   </span><span class="c1"># shorthand for both</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="c1"># JSON output for scripting</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>lqd<span class="w"> </span>task<span class="w"> </span>ls<span class="w"> </span>--json
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="c1"># Print the Datalog query before results</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>lqd<span class="w"> </span>task<span class="w"> </span>ls<span class="w"> </span>-v<span class="w"> </span>work
+</code></pre></div>
+<p>Requires <code>LOGSEQ_HOST_URL</code> and <code>LOGSEQ_API_TOKEN</code> environment variables.</p>
 <h4 id="content-append-raw-markdown-content"><code>content</code> - Append Raw Markdown Content<a class="headerlink" href="#content-append-raw-markdown-content" title="Permanent link">¶</a></h4>
 <p>Append raw Markdown content to your Logseq graph:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>lqd<span class="w"> </span>content<span class="w"> </span>--help
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>lqd<span class="w"> </span>content<span class="w"> </span>--help
 </code></pre></div>
 <p>This command allows you to add content to your Logseq pages programmatically.</p>
 <h4 id="tidy-up-tidy-up-markdown-files"><code>tidy-up</code> - Tidy Up Markdown Files<a class="headerlink" href="#tidy-up-tidy-up-markdown-files" title="Permanent link">¶</a></h4>
 <p>Clean up and standardize your Markdown files:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>--help
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>--help
 </code></pre></div>
 <p>This command helps ensure your Markdown files follow consistent formatting rules.</p>
 <h4 id="completion-shell-completion"><code>completion</code> - Shell Completion<a class="headerlink" href="#completion-shell-completion" title="Permanent link">¶</a></h4>
 <p>Generate autocompletion scripts for your shell:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># For bash</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>lqd<span class="w"> </span>completion<span class="w"> </span>bash<span class="w"> </span>&gt;<span class="w"> </span>/etc/bash_completion.d/lqd
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># For zsh</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>lqd<span class="w"> </span>completion<span class="w"> </span>zsh<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">fpath</span><span class="p">[1]</span><span class="si">}</span><span class="s2">/_lqd"</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># For fish</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>lqd<span class="w"> </span>completion<span class="w"> </span>fish<span class="w"> </span>&gt;<span class="w"> </span>~/.config/fish/completions/lqd.fish
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># For bash</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>lqd<span class="w"> </span>completion<span class="w"> </span>bash<span class="w"> </span>&gt;<span class="w"> </span>/etc/bash_completion.d/lqd
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># For zsh</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>lqd<span class="w"> </span>completion<span class="w"> </span>zsh<span class="w"> </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="si">${</span><span class="nv">fpath</span><span class="p">[1]</span><span class="si">}</span><span class="s2">/_lqd"</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1"># For fish</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>lqd<span class="w"> </span>completion<span class="w"> </span>fish<span class="w"> </span>&gt;<span class="w"> </span>~/.config/fish/completions/lqd.fish
 </code></pre></div>
 <h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">¶</a></h2>
 <h3 id="converting-a-flat-markdown-file">Converting a Flat Markdown File<a class="headerlink" href="#converting-a-flat-markdown-file" title="Permanent link">¶</a></h3>
 <p>If you have a flat Markdown file like this:</p>
-<div class="highlight"><span class="filename">Markdown</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="gh"># My Notes</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Some content here.
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="gu">## Section 1</span>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>More content.
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="gu">### Subsection</span>
-<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>
-<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>Details.
+<div class="highlight"><span class="filename">Markdown</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="gh"># My Notes</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>Some content here.
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="gu">## Section 1</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>More content.
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="gu">### Subsection</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>Details.
 </code></pre></div>
 <p>You can convert it to Logseq's outline format:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>outline<span class="w"> </span>my-notes.md
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>outline<span class="w"> </span>my-notes.md
 </code></pre></div>
 <h3 id="tidying-up-markdown-files">Tidying Up Markdown Files<a class="headerlink" href="#tidying-up-markdown-files" title="Permanent link">¶</a></h3>
 <p>To clean up and standardize your Markdown files:</p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/your/markdown/files
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/your/markdown/files
 </code></pre></div>
 <h2 id="tips">Tips<a class="headerlink" href="#tips" title="Permanent link">¶</a></h2>
 <div class="admonition tip">

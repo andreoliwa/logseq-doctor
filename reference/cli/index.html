@@ -632,6 +632,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#task-ls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        task ls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#task-add" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1356,6 +1367,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#task-ls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        task ls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#task-add" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1703,31 +1725,78 @@
 <a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a><span class="s2">:END:"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>lqd<span class="w"> </span>md<span class="w"> </span>--parent<span class="w"> </span><span class="s2">"work"</span>
 </code></pre></div>
 <h3 id="outline"><code>outline</code><a class="headerlink" href="#outline" title="Permanent link">¶</a></h3>
-<p>Convert flat Markdown files to Logseq's outline format.</p>
+<p>Convert flat Markdown files to Logseq's bullet outline format.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>outline<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>INPUT_FILE
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>lqd<span class="w"> </span>outline<span class="w"> </span><span class="o">[</span>file<span class="w"> </span>...<span class="o">]</span><span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
 </code></pre></div>
-<p><strong>Arguments:</strong></p>
-<ul>
-<li><code>INPUT_FILE</code>: Path to the Markdown file to convert</li>
-</ul>
 <p><strong>Description:</strong></p>
-<p>This command reads a flat Markdown file and converts it to Logseq's indented outline structure. It processes headings and content to create a hierarchical outline that works well with Logseq's outliner interface.</p>
-<p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>~/logseq/my-graph<span class="w"> </span>outline<span class="w"> </span>notes.md
+<p>Converts flat Markdown to Logseq's indented bullet outline. With no file arguments, reads from stdin. With files, writes to stdout by default. Ordered lists are converted to Logseq's native ordered list format (<code>logseq.order-list-type:: number</code> property). The conversion is idempotent.</p>
+<p><strong>Flags:</strong></p>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>-i, --in-place         Overwrite each file with its converted output
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    --keep-breaks      Preserve blank lines as empty bullet lines
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    --move-to string   Write converted output to this directory; remove original
+</code></pre></div>
+<p><strong>Notes:</strong></p>
+<ul>
+<li><code>--in-place</code> and <code>--move-to</code> are mutually exclusive</li>
+<li><code>--move-to</code> fails if the destination file already exists (never overwrites)</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Stdin to stdout</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">'# Header\n\nParagraph.\n'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>lqd<span class="w"> </span>outline
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># Single file to stdout</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>lqd<span class="w"> </span>outline<span class="w"> </span>notes.md
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="c1"># Edit in place</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>lqd<span class="w"> </span>outline<span class="w"> </span>--in-place<span class="w"> </span>notes.md
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="c1"># Move converted file to Logseq graph directory</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>lqd<span class="w"> </span>outline<span class="w"> </span>--move-to<span class="w"> </span>~/logseq/pages<span class="w"> </span>notes.md
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="c1"># Preserve blank lines as empty bullet lines</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a>lqd<span class="w"> </span>outline<span class="w"> </span>--keep-breaks<span class="w"> </span>notes.md
 </code></pre></div>
 <h3 id="task"><code>task</code><a class="headerlink" href="#task" title="Permanent link">¶</a></h3>
 <p>Manage tasks in your Logseq graph.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>lqd<span class="w"> </span>task<span class="w"> </span><span class="o">[</span>subcommand<span class="o">]</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>lqd<span class="w"> </span>task<span class="w"> </span><span class="o">[</span>subcommand<span class="o">]</span>
 </code></pre></div>
 <p><strong>Description:</strong></p>
 <p>Parent command for task management operations. Use subcommands to add, list, or modify tasks in your Logseq graph.</p>
 <p><strong>Subcommands:</strong></p>
+<h4 id="task-ls"><code>task ls</code><a class="headerlink" href="#task-ls" title="Permanent link">¶</a></h4>
+<p>List tasks from your Logseq graph via the HTTP API.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>lqd<span class="w"> </span>task<span class="w"> </span>ls<span class="w"> </span><span class="o">[</span>tag...<span class="o">]</span><span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
+</code></pre></div>
+<p><strong>Description:</strong></p>
+<p>Queries tasks from your running Logseq instance. Positional arguments filter by tag or page reference (combined with OR). By default only active tasks (TODO, DOING, WAITING) are shown.</p>
+<p><strong>Flags:</strong></p>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>    --canceled    Include CANCELED tasks
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>-c, --completed   Include canceled and done tasks (shorthand for --canceled --done)
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    --done        Include DONE tasks
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    --json        Output raw JSON
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>-v, --verbose     Print the Datalog query before results
+</code></pre></div>
+<p><strong>Environment Variables:</strong> <code>LOGSEQ_HOST_URL</code>, <code>LOGSEQ_API_TOKEN</code></p>
+<p><strong>Examples:</strong></p>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># All active tasks</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>lqd<span class="w"> </span>task<span class="w"> </span>ls
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># Filter by tag</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>lqd<span class="w"> </span>task<span class="w"> </span>ls<span class="w"> </span>work
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="c1"># Include completed tasks</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>lqd<span class="w"> </span>task<span class="w"> </span>ls<span class="w"> </span>--completed
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="c1"># JSON output for scripting</span>
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a>lqd<span class="w"> </span>task<span class="w"> </span>ls<span class="w"> </span>--json
+</code></pre></div>
 <h4 id="task-add"><code>task add</code><a class="headerlink" href="#task-add" title="Permanent link">¶</a></h4>
 <p>Add a new task to Logseq or update an existing one.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="o">[</span>task<span class="w"> </span>description<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="o">[</span>task<span class="w"> </span>description<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </code></pre></div>
 <p><strong>Description:</strong></p>
 <p>Adds a new TODO task to your Logseq graph. By default, tasks are added to today's journal page. You can specify a different target using flags.</p>
@@ -1739,45 +1808,45 @@
 <li><strong>Preserve structure</strong>: When updating tasks, preserves children, properties, and logbook entries</li>
 </ul>
 <p><strong>Flags:</strong></p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>-j, --journal YYYY-MM-DD    Journal date (default: today)
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>-p, --page NAME             Page name to add the task to
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>   --parent TEXT            Partial text of a block to use as parent
-<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>-k, --key TEXT              Unique key to search for existing task
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>-j, --journal YYYY-MM-DD    Journal date (default: today)
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>-p, --page NAME             Page name to add the task to
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>   --parent TEXT            Partial text of a block to use as parent
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>-k, --key TEXT              Unique key to search for existing task
 </code></pre></div>
 <p><strong>Examples:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Add a task to today's journal</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Review pull request"</span>
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># Add a task to a specific page</span>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Call client"</span><span class="w"> </span>--page<span class="w"> </span><span class="s2">"Work"</span>
-<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>
-<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="c1"># Add a task to a specific journal date</span>
-<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Buy groceries"</span><span class="w"> </span>--journal<span class="w"> </span><span class="m">2024</span>-12-25
-<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>
-<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="c1"># Update an existing task by key (preserves children and properties)</span>
-<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Water plants in living room"</span><span class="w"> </span>--key<span class="w"> </span><span class="s2">"water plants"</span>
-<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>
-<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="c1"># Add a task under a specific block</span>
-<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Meeting notes"</span><span class="w"> </span>--parent<span class="w"> </span><span class="s2">"Project A"</span>
-<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>
-<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="c1"># Update a task within a specific block scope</span>
-<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Updated task name"</span><span class="w"> </span>--parent<span class="w"> </span><span class="s2">"Project A"</span><span class="w"> </span>--key<span class="w"> </span><span class="s2">"task"</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Add a task to today's journal</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Review pull request"</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Add a task to a specific page</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Call client"</span><span class="w"> </span>--page<span class="w"> </span><span class="s2">"Work"</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="c1"># Add a task to a specific journal date</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Buy groceries"</span><span class="w"> </span>--journal<span class="w"> </span><span class="m">2024</span>-12-25
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="c1"># Update an existing task by key (preserves children and properties)</span>
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Water plants in living room"</span><span class="w"> </span>--key<span class="w"> </span><span class="s2">"water plants"</span>
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a>
+<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="c1"># Add a task under a specific block</span>
+<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Meeting notes"</span><span class="w"> </span>--parent<span class="w"> </span><span class="s2">"Project A"</span>
+<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a>
+<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="c1"># Update a task within a specific block scope</span>
+<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a>lqd<span class="w"> </span>task<span class="w"> </span>add<span class="w"> </span><span class="s2">"Updated task name"</span><span class="w"> </span>--parent<span class="w"> </span><span class="s2">"Project A"</span><span class="w"> </span>--key<span class="w"> </span><span class="s2">"task"</span>
 </code></pre></div>
 <h3 id="tasks"><code>tasks</code><a class="headerlink" href="#tasks" title="Permanent link">¶</a></h3>
 <p>List all tasks in your Logseq graph.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>tasks<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>/path/to/graph<span class="w"> </span>tasks<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </code></pre></div>
 <p><strong>Description:</strong></p>
 <p>This command scans your Logseq graph and lists all tasks found in your pages. It helps you get an overview of your TODO items across all your notes.</p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>~/logseq/my-graph<span class="w"> </span>tasks
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>lqdpy<span class="w"> </span>-g<span class="w"> </span>~/logseq/my-graph<span class="w"> </span>tasks
 </code></pre></div>
 <h3 id="dashboard"><code>dashboard</code><a class="headerlink" href="#dashboard" title="Permanent link">¶</a></h3>
 <p>Start PocketBase and the backlog web UI.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>lqd<span class="w"> </span>dashboard<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>lqd<span class="w"> </span>dash<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w">        </span><span class="c1"># short alias</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>lqd<span class="w"> </span>dashboard<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>lqd<span class="w"> </span>dash<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w">        </span><span class="c1"># short alias</span>
 </code></pre></div>
 <p><strong>Description:</strong></p>
 <p>Starts PocketBase as a managed subprocess, waits for it to be ready, then serves
@@ -1832,21 +1901,21 @@ to propagate them back to Logseq <code>.md</code> files.</p>
 </tbody>
 </table>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Start with defaults (port 8091)</span>
-<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>lqd<span class="w"> </span>dashboard
-<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
-<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Start on a custom port</span>
-<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>lqd<span class="w"> </span>dash<span class="w"> </span>--port<span class="w"> </span><span class="m">9000</span>
-<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>
-<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="c1"># Start with explicit credentials</span>
-<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="nv">POCKETBASE_USERNAME</span><span class="o">=</span>admin@example.com<span class="w"> </span><span class="nv">POCKETBASE_PASSWORD</span><span class="o">=</span>secret<span class="w"> </span>lqd<span class="w"> </span>dashboard
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="c1"># Start with defaults (port 8091)</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>lqd<span class="w"> </span>dashboard
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="c1"># Start on a custom port</span>
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>lqd<span class="w"> </span>dash<span class="w"> </span>--port<span class="w"> </span><span class="m">9000</span>
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>
+<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="c1"># Start with explicit credentials</span>
+<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="nv">POCKETBASE_USERNAME</span><span class="o">=</span>admin@example.com<span class="w"> </span><span class="nv">POCKETBASE_PASSWORD</span><span class="o">=</span>secret<span class="w"> </span>lqd<span class="w"> </span>dashboard
 </code></pre></div>
 <p>See <a href="../../dashboard/">Dashboard Guide</a> for a full walkthrough of the web UI.</p>
 <hr>
 <h3 id="tidy-up"><code>tidy-up</code><a class="headerlink" href="#tidy-up" title="Permanent link">¶</a></h3>
 <p>Clean up and standardize your Markdown files.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[</span>FILES...<span class="o">]</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[</span>FILES...<span class="o">]</span>
 </code></pre></div>
 <p><strong>Description:</strong></p>
 <p>This command helps ensure your Markdown files follow consistent formatting rules. It performs various cleanup operations:</p>
@@ -1857,15 +1926,15 @@ to propagate them back to Logseq <code>.md</code> files.</p>
 <li>Standardizes formatting</li>
 </ul>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/markdown/files/*.md
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/markdown/files/*.md
 </code></pre></div>
 <h2 id="global-flags">Global Flags<a class="headerlink" href="#global-flags" title="Permanent link">¶</a></h2>
 <p><strong>Go CLI (<code>lqd</code>):</strong></p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>-h, --help
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>-h, --help
 </code></pre></div>
 <p>Show help information for any command.</p>
 <p><strong>Python CLI (<code>lqdpy</code>):</strong></p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>-g, --graph DIRECTORY
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>-g, --graph DIRECTORY
 </code></pre></div>
 <p>Path to your Logseq graph directory. Can also be set via the <code>LOGSEQ_GRAPH_PATH</code> environment variable.</p>
 <p><strong>Required:</strong> Yes (for most commands)</p>
@@ -1873,21 +1942,21 @@ to propagate them back to Logseq <code>.md</code> files.</p>
 <h3 id="logseq_graph_path"><code>LOGSEQ_GRAPH_PATH</code><a class="headerlink" href="#logseq_graph_path" title="Permanent link">¶</a></h3>
 <p>Path to your Logseq graph directory. Used by the Python CLI (<code>lqdpy</code>) as the default value for the <code>-g</code> flag, and by the <code>backlog</code> command to locate your graph.</p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_GRAPH_PATH</span><span class="o">=</span>~/logseq/my-graph
-<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>lqdpy<span class="w"> </span>tasks<span class="w">  </span><span class="c1"># No need to specify -g flag</span>
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_GRAPH_PATH</span><span class="o">=</span>~/logseq/my-graph
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>lqdpy<span class="w"> </span>tasks<span class="w">  </span><span class="c1"># No need to specify -g flag</span>
 </code></pre></div>
 <h3 id="logseq_host_url"><code>LOGSEQ_HOST_URL</code><a class="headerlink" href="#logseq_host_url" title="Permanent link">¶</a></h3>
 <p>Logseq API host URL. Used by the <code>backlog</code> command to connect to the Logseq API.</p>
 <p><strong>Default:</strong> <code>http://localhost:12315</code></p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_HOST_URL</span><span class="o">=</span>http://localhost:12315
-<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>lqd<span class="w"> </span>backlog
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_HOST_URL</span><span class="o">=</span>http://localhost:12315
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>lqd<span class="w"> </span>backlog
 </code></pre></div>
 <h3 id="logseq_api_token"><code>LOGSEQ_API_TOKEN</code><a class="headerlink" href="#logseq_api_token" title="Permanent link">¶</a></h3>
 <p>Logseq API authentication token. Required by the <code>backlog</code> command to authenticate with the Logseq API.</p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_API_TOKEN</span><span class="o">=</span>your-api-token-here
-<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>lqd<span class="w"> </span>backlog
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_API_TOKEN</span><span class="o">=</span>your-api-token-here
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>lqd<span class="w"> </span>backlog
 </code></pre></div>
 <h2 id="exit-code">Exit Code<a class="headerlink" href="#exit-code" title="Permanent link">¶</a></h2>
 <p>Both CLIs use standard exit codes:</p>
