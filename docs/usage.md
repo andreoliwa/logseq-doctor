@@ -113,6 +113,58 @@ Use "lqd [command] --help" for more information about a command.
 
 ### Commands
 
+#### `outline` - Convert Flat Markdown to Logseq Outline
+
+Convert flat Markdown files to Logseq's bullet outline format:
+
+```bash
+# From stdin
+printf '# Header\n\nParagraph.\n' | lqd outline
+
+# Single file to stdout
+lqd outline notes.md
+
+# Multiple files to stdout
+lqd outline a.md b.md
+
+# Edit in place
+lqd outline --in-place notes.md
+
+# Move converted file to a directory (fails if destination already exists)
+lqd outline --move-to ~/logseq/pages notes.md
+
+# Preserve blank lines as empty bullet lines
+lqd outline --keep-breaks notes.md
+```
+
+Ordered lists are converted to Logseq's native ordered list format using the
+`logseq.order-list-type:: number` block property. The conversion is idempotent:
+running it twice produces the same result.
+
+#### `task ls` - List Tasks
+
+List tasks from your Logseq graph via the HTTP API:
+
+```bash
+# All active tasks
+lqd task ls
+
+# Filter by tag or page
+lqd task ls work
+
+# Include completed tasks
+lqd task ls --done --canceled
+lqd task ls --completed   # shorthand for both
+
+# JSON output for scripting
+lqd task ls --json
+
+# Print the Datalog query before results
+lqd task ls -v work
+```
+
+Requires `LOGSEQ_HOST_URL` and `LOGSEQ_API_TOKEN` environment variables.
+
 #### `content` - Append Raw Markdown Content
 
 Append raw Markdown content to your Logseq graph:

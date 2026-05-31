@@ -204,26 +204,48 @@ CLOCK: [2025-08-27 Wed 21:12:50]
 
 ### `outline`
 
-Convert flat Markdown files to Logseq's outline format.
+Convert flat Markdown files to Logseq's bullet outline format.
 
 **Usage:**
 
 ```bash
-lqdpy -g /path/to/graph outline [OPTIONS] INPUT_FILE
+lqd outline [file ...] [flags]
 ```
-
-**Arguments:**
-
-- `INPUT_FILE`: Path to the Markdown file to convert
 
 **Description:**
 
-This command reads a flat Markdown file and converts it to Logseq's indented outline structure. It processes headings and content to create a hierarchical outline that works well with Logseq's outliner interface.
+Converts flat Markdown to Logseq's indented bullet outline. With no file arguments, reads from stdin. With files, writes to stdout by default. Ordered lists are converted to Logseq's native ordered list format (`logseq.order-list-type:: number` property). The conversion is idempotent.
 
-**Example:**
+**Flags:**
+
+```
+-i, --in-place         Overwrite each file with its converted output
+    --keep-breaks      Preserve blank lines as empty bullet lines
+    --move-to string   Write converted output to this directory; remove original
+```
+
+**Notes:**
+
+- `--in-place` and `--move-to` are mutually exclusive
+- `--move-to` fails if the destination file already exists (never overwrites)
+
+**Examples:**
 
 ```bash
-lqdpy -g ~/logseq/my-graph outline notes.md
+# Stdin to stdout
+printf '# Header\n\nParagraph.\n' | lqd outline
+
+# Single file to stdout
+lqd outline notes.md
+
+# Edit in place
+lqd outline --in-place notes.md
+
+# Move converted file to Logseq graph directory
+lqd outline --move-to ~/logseq/pages notes.md
+
+# Preserve blank lines as empty bullet lines
+lqd outline --keep-breaks notes.md
 ```
 
 ### `task`
@@ -241,6 +263,48 @@ lqd task [subcommand]
 Parent command for task management operations. Use subcommands to add, list, or modify tasks in your Logseq graph.
 
 **Subcommands:**
+
+#### `task ls`
+
+List tasks from your Logseq graph via the HTTP API.
+
+**Usage:**
+
+```bash
+lqd task ls [tag...] [flags]
+```
+
+**Description:**
+
+Queries tasks from your running Logseq instance. Positional arguments filter by tag or page reference (combined with OR). By default only active tasks (TODO, DOING, WAITING) are shown.
+
+**Flags:**
+
+```
+    --canceled    Include CANCELED tasks
+-c, --completed   Include canceled and done tasks (shorthand for --canceled --done)
+    --done        Include DONE tasks
+    --json        Output raw JSON
+-v, --verbose     Print the Datalog query before results
+```
+
+**Environment Variables:** `LOGSEQ_HOST_URL`, `LOGSEQ_API_TOKEN`
+
+**Examples:**
+
+```bash
+# All active tasks
+lqd task ls
+
+# Filter by tag
+lqd task ls work
+
+# Include completed tasks
+lqd task ls --completed
+
+# JSON output for scripting
+lqd task ls --json
+```
 
 #### `task add`
 
