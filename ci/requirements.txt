@@ -1,4 +1,4 @@
-virtualenv==21.4.1
+virtualenv==21.4.2
 pip==26.1
 setuptools==82.0.1
 six==1.17.0
