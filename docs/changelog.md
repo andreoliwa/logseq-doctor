@@ -1,3 +1,37 @@
+# [0.8.0](https://github.com/andreoliwa/logseq-doctor/compare/v0.7.0...v0.8.0) (2026-05-31)
+
+### Bug Fixes
+
+- **backlog:** move unscheduled tasks to new tasks header ([a37f814](https://github.com/andreoliwa/logseq-doctor/commit/a37f814cdceecf54d6359ad45e085d69c6f1c4ca))
+- bug when adding deep nested tasks ([3ca5e2c](https://github.com/andreoliwa/logseq-doctor/commit/3ca5e2c1db03e14df1a3b533feba2a403d8e8bc8))
+- **dashboard:** properly sync unranked tasks ([3047724](https://github.com/andreoliwa/logseq-doctor/commit/3047724d989a24bf0ce8ad58341574be97bf185c))
+- **deps:** update module github.com/andreoliwa/logseq-go to v1 ([a0921dd](https://github.com/andreoliwa/logseq-doctor/commit/a0921ddcdb89257ceafddcb367f82651a5a76c27))
+- **deps:** update module github.com/fatih/color to v1.19.0 ([041f094](https://github.com/andreoliwa/logseq-doctor/commit/041f094d407610d698f7d1d29668b8aea8241515))
+- **deps:** update module github.com/spf13/cobra to v1.10.2 ([fea9983](https://github.com/andreoliwa/logseq-doctor/commit/fea9983e6c845bed5caff1b98be53ff52a7404b8))
+- **deps:** update module github.com/yuin/goldmark to v1.8.2 ([e36d6cd](https://github.com/andreoliwa/logseq-doctor/commit/e36d6cd0ca42c850271b52207df1ddf86c7789b7))
+- **deps:** update module golang.org/x/text to v0.35.0 ([d029d17](https://github.com/andreoliwa/logseq-doctor/commit/d029d171af08f28dd3f1156bf70b07906f8420cd))
+- **deps:** update module golang.org/x/text to v0.36.0 ([0583bff](https://github.com/andreoliwa/logseq-doctor/commit/0583bff2dc2ef4fe3eea9e4c02321dfe99ff33ab))
+- **deps:** update module golang.org/x/text to v0.37.0 ([7c7e04a](https://github.com/andreoliwa/logseq-doctor/commit/7c7e04a7e22d40dd5721dbe1d0e76240611704c6))
+- find text inside backticks ([#138](https://github.com/andreoliwa/logseq-doctor/issues/138)) ([e5050e6](https://github.com/andreoliwa/logseq-doctor/commit/e5050e634c1b5c8b4c0342a8137945a8a90cd7cd))
+- **groom:** ignore tasks with recent dates ([a4a3e1e](https://github.com/andreoliwa/logseq-doctor/commit/a4a3e1e05550b7ac0f93a68ba4ee48559b7d0bcc))
+- **outline:** use tab indent and emit logseq.order-list-type:: number for ordered lists ([3a3b5b9](https://github.com/andreoliwa/logseq-doctor/commit/3a3b5b9f5e451046a15e6829aec995787ae33c47))
+- rename --block to --parent (explicit and generic) ([9412bfa](https://github.com/andreoliwa/logseq-doctor/commit/9412bfa8edac1974f72d9d355e51ccafaa0015a5))
+- update task when the key is in a Markdown link ([1984ded](https://github.com/andreoliwa/logseq-doctor/commit/1984ded4827ec242aae0af844e52b09fb5f91126))
+
+### Features
+
+- auto-sorting of triaged tasks by priority ([9dfb157](https://github.com/andreoliwa/logseq-doctor/commit/9dfb157ad8e2370ef10613389bf91bb9c1f2fa0f))
+- **backlog:** new tasks before unranked ([422ce2d](https://github.com/andreoliwa/logseq-doctor/commit/422ce2d10592dbaa54070f84b8ee741b329e5040))
+- **backlog:** normalize dividers as headers ([461f0ab](https://github.com/andreoliwa/logseq-doctor/commit/461f0ab5895b310f1108d7de37bbb8eeea19b6b3))
+- **dashboard:** web UI to filter, rank and sort tasks ([8e31a6b](https://github.com/andreoliwa/logseq-doctor/commit/8e31a6b8012ae9f9c119c58f647732cb3f9a9b4b))
+- groom old tasks ([b557f8f](https://github.com/andreoliwa/logseq-doctor/commit/b557f8f66f0e542b2d860249fcb3a6258a31a18a))
+- **md:** --key and --page flags to update Markdown content ([#139](https://github.com/andreoliwa/logseq-doctor/issues/139)) ([32c4cda](https://github.com/andreoliwa/logseq-doctor/commit/32c4cdacc75daaad7698c4a3c964c764e28cdf0a))
+- **outline:** add lqd outline command ([4427a7f](https://github.com/andreoliwa/logseq-doctor/commit/4427a7ff33edc4dd58fe20795912758c628eb83b))
+- **outline:** implement FlatMarkdownToOutline conversion ([3f9d088](https://github.com/andreoliwa/logseq-doctor/commit/3f9d08840bf8d04dc50db4f43032674e007bb80e))
+- **query:** implement BuildTaskListQuery and SortTasksByDate ([97657e5](https://github.com/andreoliwa/logseq-doctor/commit/97657e53da649c646878610c0336d45cc61c80b3))
+- sync tasks with PocketBase ([7ac9776](https://github.com/andreoliwa/logseq-doctor/commit/7ac9776c7df2040db3faa4161ecae971fdd06eac))
+- **task:** add task ls subcommand with flags, query, sort, and output ([57f7ab3](https://github.com/andreoliwa/logseq-doctor/commit/57f7ab37a0d49fd29dcb3eeec574e05c36fa208c))
+
 # [0.7.0](https://github.com/andreoliwa/logseq-doctor/compare/v0.6.2...v0.7.0) (2025-11-01)
 
 ### Features
