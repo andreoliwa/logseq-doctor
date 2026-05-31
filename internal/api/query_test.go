@@ -99,3 +99,95 @@ func TestFindBlockByUUID_EmptyResultsReturnsError(t *testing.T) {
 
 	assert.ErrorIs(t, err, logseqapi.ErrBlockNotFoundViaAPI)
 }
+
+func TestBuildTaskListQuery(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name            string
+		tags            []string
+		includeCanceled bool
+		includeDone     bool
+		want            string
+	}{
+		{
+			name: "no tags no flags",
+			tags: nil,
+			want: "(and (task TODO DOING WAITING NOW LATER))",
+		},
+		{
+			name: "single tag no flags",
+			tags: []string{"work"},
+			want: "(and [[work]] (task TODO DOING WAITING NOW LATER))",
+		},
+		{
+			name: "two tags no flags",
+			tags: []string{"work", "home"},
+			want: "(and (or [[work]] [[home]]) (task TODO DOING WAITING NOW LATER))",
+		},
+		{
+			name:            "no tags includeCanceled",
+			includeCanceled: true,
+			want:            "(and (task TODO DOING WAITING NOW LATER CANCELED))",
+		},
+		{
+			name:        "no tags includeDone",
+			includeDone: true,
+			want:        "(and (task TODO DOING WAITING NOW LATER DONE))",
+		},
+		{
+			name:            "no tags includeCanceled and includeDone",
+			includeCanceled: true,
+			includeDone:     true,
+			want:            "(and (task TODO DOING WAITING NOW LATER CANCELED DONE))",
+		},
+		{
+			name:            "single tag includeCanceled and includeDone",
+			tags:            []string{"work"},
+			includeCanceled: true,
+			includeDone:     true,
+			want:            "(and [[work]] (task TODO DOING WAITING NOW LATER CANCELED DONE))",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			got := logseqapi.BuildTaskListQuery(tc.tags, tc.includeCanceled, tc.includeDone)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+func TestSortTasksByDate(t *testing.T) {
+	t.Parallel()
+
+	tasks := []logseqapi.TaskJSON{ //nolint:exhaustruct
+		{Page: logseqapi.PageJSON{JournalDay: 20241215}, Content: "b"}, //nolint:exhaustruct
+		{Page: logseqapi.PageJSON{JournalDay: 20241201}, Content: "a"}, //nolint:exhaustruct
+		{Page: logseqapi.PageJSON{JournalDay: 20241215}, Content: "a"}, //nolint:exhaustruct
+	}
+
+	logseqapi.SortTasksByDate(tasks)
+
+	assert.Equal(t, 20241201, tasks[0].Page.JournalDay)
+	assert.Equal(t, "a", tasks[0].Content)
+	assert.Equal(t, 20241215, tasks[1].Page.JournalDay)
+	assert.Equal(t, "a", tasks[1].Content)
+	assert.Equal(t, 20241215, tasks[2].Page.JournalDay)
+	assert.Equal(t, "b", tasks[2].Content)
+}
+
+func TestSortTasksByDate_ZeroJournalDaySortFirst(t *testing.T) {
+	t.Parallel()
+
+	tasks := []logseqapi.TaskJSON{ //nolint:exhaustruct
+		{Page: logseqapi.PageJSON{JournalDay: 20241215}, Content: "task"}, //nolint:exhaustruct
+		{Page: logseqapi.PageJSON{JournalDay: 0}, Content: "no date"},     //nolint:exhaustruct
+	}
+
+	logseqapi.SortTasksByDate(tasks)
+
+	assert.Equal(t, 0, tasks[0].Page.JournalDay)
+	assert.Equal(t, 20241215, tasks[1].Page.JournalDay)
+}
