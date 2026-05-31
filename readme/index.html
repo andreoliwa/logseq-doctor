@@ -980,17 +980,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#go-binary-executable" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Go binary executable
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#build-from-source" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1098,11 +1087,7 @@
 <li><strong>Task Listing</strong> (<code>tasks</code>): List and manage tasks in your Logseq graph</li>
 </ul>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">¶</a></h2>
-<h3 id="go-binary-executable">Go binary executable<a class="headerlink" href="#go-binary-executable" title="Permanent link">¶</a></h3>
-<p>The recommended way for macOS and Linux is to install with Homebrew:</p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>brew install andreoliwa/formulae/logseq-doctor
-</code></pre></div>
-<p>Or you can install manually:</p>
+<p>Run this to install:</p>
 <div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>go install github.com/andreoliwa/logseq-doctor/cmd/lqd@latest
 </code></pre></div>
 <p>Confirm if it's in your path:</p>
@@ -1112,7 +1097,7 @@ ls -l $(go env GOPATH)/bin/lqd
 </code></pre></div>
 <h3 id="build-from-source">Build from source<a class="headerlink" href="#build-from-source" title="Permanent link">¶</a></h3>
 <p>To build and install the <code>lqd</code> binary from source, clone the repository and run:</p>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>make build-go
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code>make install
 </code></pre></div>
 <h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">¶</a></h2>
 <p>Type <code>lqd</code> without arguments to check the current commands and options:</p>
