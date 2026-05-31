@@ -1,7 +1,14 @@
 - # Header 1
-  - Item 1
-  - Item 2
-  - ## Header 2
-    - Item 3
-    - ### Header 3
-      - Item 4
+	- Item 1
+	- Item 2
+	- ## Header 2
+		- Item 3
+		- ### Header 3
+			- Item 4
+	- ## Ordered Section
+		- First ordered
+		  logseq.order-list-type:: number
+		- Second ordered
+		  logseq.order-list-type:: number
+		- Third ordered
+		  logseq.order-list-type:: number
