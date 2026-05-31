@@ -11,9 +11,8 @@ ci:
   skip: [golangci-lint]
 
 default_language_version:
-  python: python3.11
+  python: python3.14
 
-exclude: '^(\.tox|ci/templates|\.bumpversion\.cfg)(/|$)'
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -33,17 +32,6 @@ repos:
     rev: v0.8.0
     hooks:
       - id: keep-sorted
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.15
-    hooks:
-      - id: ruff-format
-      - id: ruff-check
-        args: [--fix]
-  - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.10.0
-    hooks:
-      - id: python-check-mock-methods
-      - id: rst-backticks
   - repo: https://github.com/openstack/bashate
     rev: 2.1.1
     hooks:

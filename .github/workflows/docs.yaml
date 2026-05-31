@@ -10,7 +10,6 @@ on:
       - "cmd/**"
       - "pkg/**"
       - "internal/**"
-      - "src/**"
       - ".github/workflows/docs.yaml"
   workflow_dispatch:
 
@@ -31,17 +30,26 @@ jobs:
 
       - uses: actions/setup-go@v6
         with:
-          go-version: "1.23"
-
-      - name: Install tox
-        run: |
-          pip install tox
+          go-version: "1.25"
 
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Build and deploy documentation
+      # MkDocs build tools (mkdocs-material, plugins) - not Python project code
+      - name: Install docs dependencies
         run: |
-          tox -e docs -- mkdocs gh-deploy --force
+          pip install -r docs/requirements.txt
+
+      - name: Install gomarkdoc
+        run: |
+          go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
+
+      - name: Generate Go API docs
+        run: |
+          gomarkdoc --output docs/reference/go.md ./...
+
+      - name: Deploy documentation
+        run: |
+          mkdocs gh-deploy --force
