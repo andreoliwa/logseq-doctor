@@ -13,10 +13,7 @@ var rootCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
 	Long: `Logseq Doctor heals your Markdown files for Logseq.
 
 Convert flat Markdown to Logseq outline, clean up Markdown,
-prevent invalid content, and more stuff to come.
-
-"lqdpy" is the CLI tool originally written in Python; "lqd" is the Go version.
-The intention is to slowly convert everything to Go.`,
+prevent invalid content, and more stuff to come.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

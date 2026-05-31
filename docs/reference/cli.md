@@ -89,34 +89,6 @@ lqd completion fish > ~/.config/fish/completions/lqd.fish
 lqd completion powershell > lqd.ps1
 ```
 
-**Usage (Python CLI):**
-
-Install shell completion for easier command-line usage:
-
-**Bash:**
-
-```bash
-lqdpy --install-completion bash
-```
-
-**Zsh:**
-
-```bash
-lqdpy --install-completion zsh
-```
-
-**Fish:**
-
-```bash
-lqdpy --install-completion fish
-```
-
-**PowerShell:**
-
-```bash
-lqdpy --install-completion powershell
-```
-
 ### `content`
 
 Append raw Markdown content to your Logseq graph.
@@ -358,26 +330,6 @@ lqd task add "Meeting notes" --parent "Project A"
 lqd task add "Updated task name" --parent "Project A" --key "task"
 ```
 
-### `tasks`
-
-List all tasks in your Logseq graph.
-
-**Usage:**
-
-```bash
-lqdpy -g /path/to/graph tasks [OPTIONS]
-```
-
-**Description:**
-
-This command scans your Logseq graph and lists all tasks found in your pages. It helps you get an overview of your TODO items across all your notes.
-
-**Example:**
-
-```bash
-lqdpy -g ~/logseq/my-graph tasks
-```
-
 ### `dashboard`
 
 Start PocketBase and the backlog web UI.
@@ -457,35 +409,23 @@ lqd tidy-up /path/to/markdown/files/*.md
 
 ## Global Flags
 
-**Go CLI (`lqd`):**
-
 ```
 -h, --help
 ```
 
 Show help information for any command.
 
-**Python CLI (`lqdpy`):**
-
-```
--g, --graph DIRECTORY
-```
-
-Path to your Logseq graph directory. Can also be set via the `LOGSEQ_GRAPH_PATH` environment variable.
-
-**Required:** Yes (for most commands)
-
 ## Environment Variables
 
 ### `LOGSEQ_GRAPH_PATH`
 
-Path to your Logseq graph directory. Used by the Python CLI (`lqdpy`) as the default value for the `-g` flag, and by the `backlog` command to locate your graph.
+Path to your Logseq graph directory. Used by the `backlog` command to locate your graph.
 
 **Example:**
 
 ```bash
 export LOGSEQ_GRAPH_PATH=~/logseq/my-graph
-lqdpy tasks  # No need to specify -g flag
+lqd backlog
 ```
 
 ### `LOGSEQ_HOST_URL`
@@ -514,7 +454,7 @@ lqd backlog
 
 ## Exit Code
 
-Both CLIs use standard exit codes:
+The CLI uses standard exit codes:
 
 - `0`: Success
 - `1`: General error
@@ -544,6 +484,6 @@ Create shell aliases for frequently used commands:
 
     ```bash
     # Add to ~/.bashrc or ~/.zshrc
-    alias lqd-tasks='lqdpy -g ~/logseq/my-graph tasks'
+    alias lqd-tasks='lqd task ls'
     alias lqd-tidy='lqd tidy-up'
     ```

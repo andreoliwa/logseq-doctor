@@ -44,9 +44,7 @@ To set up `logseq-doctor` for local development:
    ```
 
    This will:
-   - Create a Python virtual environment
-   - Install Python dependencies
-   - Set up Go dependencies
+   - Download Go module dependencies
    - Install development tools
 
 4. Create a branch for local development:
@@ -59,23 +57,9 @@ To set up `logseq-doctor` for local development:
 
 5. When you're done making changes, run all the checks:
 
-   **For Python changes:**
-
-   ```bash
-   tox
-   ```
-
-   **For Go changes:**
-
-   ```bash
-   make test-go
-   make lint-go
-   ```
-
-   **Run all tests:**
-
    ```bash
    make test
+   golangci-lint run
    ```
 
 6. Commit your changes and push your branch to GitHub:
@@ -94,7 +78,7 @@ If you need some code review or feedback while you're developing the code, just 
 
 For merging, you should:
 
-1. Include passing tests (run `tox` for Python, `make test-go` for Go)
+1. Include passing tests (run `make test`)
 2. Update documentation when there's new API, functionality, etc.
 3. Add a note to the changelog about the changes
 
@@ -102,27 +86,11 @@ For merging, you should:
 
 ### Running a Subset of Tests
 
-**Python:**
-
-```bash
-tox -e envname -- pytest -k test_myfeature
-```
-
-**Go:**
-
 ```bash
 go test -v -run TestMyFeature ./...
 ```
 
 ### Running Tests in Parallel
-
-**Python:**
-
-```bash
-tox -p auto
-```
-
-**Go:**
 
 ```bash
 go test -v -parallel 4 ./...
@@ -130,17 +98,9 @@ go test -v -parallel 4 ./...
 
 ### Code Style
 
-**Python:**
-
-- We use `black` for code formatting
-- We use `ruff` for linting
-- Run `tox -e check` to check code style
-
-**Go:**
-
 - We use `gofmt` for code formatting
 - We use `golangci-lint` for linting
-- Run `make lint-go` to check code style
+- Run `golangci-lint run` to check code style
 
 ### Building Documentation Locally
 
@@ -163,11 +123,8 @@ logseq-doctor/
 ├── cmd/              # Go CLI commands
 ├── internal/         # Go internal packages
 ├── pkg/              # Go public packages
-├── src/              # Python source code
-├── tests/            # Python tests
 ├── docs/             # Documentation (MkDocs)
-├── main.go           # Go main entry point
-└── pyproject.toml    # Python project configuration
+└── go.mod            # Go module definition
 ```
 
 ## Code of Conduct

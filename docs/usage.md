@@ -1,81 +1,8 @@
 # Usage
 
-Logseq Doctor provides two CLI tools: `lqdpy` (Python) and `lqd` (Go). This guide covers both.
+Logseq Doctor provides a single Go CLI tool: `lqd`.
 
-!!! info
-The Go CLI (`lqd`) is the recommended version for new features. The Python CLI (`lqdpy`) is maintained for backward compatibility but new features will only be added to the Go version.
-
-## Python CLI (`lqdpy`)
-
-### Overview
-
-Type `lqdpy` without arguments to check the current commands and options:
-
-```bash
-lqdpy --help
-```
-
-Output:
-
-```
-Usage: lqdpy [OPTIONS] COMMAND [ARGS]...
-
-Logseq Doctor: heal your flat old Markdown files before importing them.
-
-Options:
-  -g, --graph DIRECTORY           Logseq graph  [env var: LOGSEQ_GRAPH_PATH; required]
-  --install-completion [bash|zsh|fish|powershell|pwsh]
-                                  Install completion for the specified shell.
-  --show-completion [bash|zsh|fish|powershell|pwsh]
-                                  Show completion for the specified shell, to
-                                  copy it or customize the installation.
-  --help                          Show this message and exit.
-
-Commands:
-  outline  Convert flat Markdown to outline.
-  tasks    List tasks in Logseq.
-```
-
-### Setting the Logseq Graph Path
-
-Most commands require you to specify your Logseq graph directory. You can do this in two ways:
-
-1. **Using the `-g` flag:**
-
-```bash
-lqdpy -g /path/to/your/logseq/graph outline input.md
-```
-
-2. **Using the environment variable:**
-
-```bash
-export LOGSEQ_GRAPH_PATH=/path/to/your/logseq/graph
-lqdpy outline input.md
-```
-
-### Commands
-
-#### `outline` - Convert Flat Markdown to Outline
-
-Convert flat Markdown files to Logseq's outline format:
-
-```bash
-lqdpy -g /path/to/graph outline input.md
-```
-
-This command reads a flat Markdown file and converts it to Logseq's indented outline structure.
-
-#### `tasks` - List Tasks in Logseq
-
-List all tasks in your Logseq graph:
-
-```bash
-lqdpy -g /path/to/graph tasks
-```
-
-This will display all tasks found in your Logseq pages.
-
-## Go CLI (`lqd`)
+## Commands
 
 ### Overview
 
@@ -92,9 +19,6 @@ Logseq Doctor heals your Markdown files for Logseq.
 
 Convert flat Markdown to Logseq outline, clean up Markdown,
 prevent invalid content, and more stuff to come.
-
-"lqdpy" is the CLI tool originally written in Python; "lqd" is the Go version.
-The intention is to slowly convert everything to Go.
 
 Usage:
   lqd [command]
@@ -223,7 +147,7 @@ Details.
 You can convert it to Logseq's outline format:
 
 ```bash
-lqdpy -g /path/to/graph outline my-notes.md
+lqd outline my-notes.md
 ```
 
 ### Tidying Up Markdown Files

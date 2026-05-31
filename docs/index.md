@@ -7,11 +7,6 @@
 !!! note "Project Status"
 This project is still in alpha, so it's very rough on the edges (documentation and feature-wise).
 
-    At the moment, it has both a Python and Go CLI.
-
-    The long-term plan is to convert it to Go and slowly remove Python.
-    New features will be added to the Go CLI only.
-
 --8<-- "readme.md:description"
 
 --8<-- "readme.md:features"
