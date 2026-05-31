@@ -6,90 +6,51 @@ help: # Display this help
 .PHONY: help
 
 upgrade: # Upgrade all dependencies
-	uv lock
-	uv sync
 	go get -u -t ./...
 	go mod tidy
 .PHONY: upgrade
 
-build: build-go # Build the Python package
-	uv build
-.PHONY: build
-
-build-go: # Build the Golang executable
+build: # Build the Go binary
 	go mod tidy
 	go build ./cmd/lqd
-	mv lqd `go env GOPATH`/bin/
-	$(MAKE) list-go
-.PHONY: build-go
+.PHONY: build
 
 clean: # Clean the build artifacts
 	-rm `go env GOPATH`/bin/logseq-doctor
 	-rm `go env GOPATH`/bin/lqd
-	-rm -rf .pytest_cache .ruff_cache build/
-	$(MAKE) list-go
+	-rm -rf .ruff_cache build/
+	$(MAKE) list
 .PHONY: clean
 
-list-go: # List the installed Go packages
+list: # List the installed Go packages
 	ls -l `go env GOPATH`/bin/
-.PHONY: list-go
+.PHONY: list
 
-setup: # Set up the local development environment
-	uv sync
-# TODO: keep the list of dev packages in a single place; this was copied from tox.ini
-	uv add --dev pytest pytest-cov pytest-datadir responses pytest-env pytest-watch pytest-testmon
-	@echo "Run 'make smoke' to check if the development environment is working"
+install: build
+	mv lqd `go env GOPATH`/bin/
+	$(MAKE) list
+
+setup: # Set up Go development dependencies
+	go mod download
 .PHONY: setup
 
-install: build-go # Install the package with uv in editable mode. Do this when you want to use "lqdpy" outside of the development environment
-	-uv tool install -e --force .
-	$(MAKE) which
-.PHONY: install
-
-which: # Run the main executables to confirm they are installed properly in the PATH
+which: # Run the main executable to confirm it is installed properly in the PATH
 	-which lqd
 	-lqd
-	-which lqdpy
-	-lqdpy
 .PHONY: which
 
-uninstall: clean uninstall-uv # Remove both local and global (virtualenv and uv)
-	-rm -rf .python-version .tox .venv
-.PHONY: uninstall
-
-uninstall-uv: # Uninstall uv virtualenv. Use this when developing, so the local venv "lqdpy" is available instead of the uv one
-	-uv tool uninstall logseq-doctor
-.PHONY: .uninstall-uv
-
-test: test-go # Run tests on Python and Go
-	tox -e py311
-.PHONY: test
-
-test-go: # Run Go tests
+test: # Run Go tests
 	$(GO_TEST) $(opt)
-.PHONY: test-go
+.PHONY: test
 
 test-go-coverage: # Run Go tests with coverage
 	$(GO_TEST) -coverprofile=coverage-go.out
 .PHONY: test-go-coverage
 
-watch: # Run tests and watch for changes
-	uv run ptw --runner "pytest --testmon"
-.PHONY: watch
-
-pytest: # Run tests with pytest
-	uv run pytest --cov --cov-report=term-missing -vv tests
-.PHONY: pytest
-
-release: # Create a GitHub release for the Go package only
-# TODO: create a release for the Python package as well
+release: # Create a GitHub release for the Go package
 	gh workflow run release.yaml
 	# https://commitizen-tools.github.io/commitizen/bump/#configuration
 	# See also: cz bump --help
-	#@echo "THIS IS ONLY A DRY-RUN. Remove --dry-run to actually bump the version when some bug fix or new feature is ready to publish"
-	# TODO: remove --dry-run when there is some bug fix or new feature ready to publish
-	# Bump the version, create a tag, commit and push. This will trigger the PyPI release on GitHub Actions
-	#cz bump --dry-run --check-consistency
 .PHONY: release
 
 .release-post-bump: # This is called in .cz.toml in post_bump_hooks
@@ -98,10 +59,8 @@ release: # Create a GitHub release for the Go package only
 	gh repo view --web
 .PHONY: .release-post-bump
 
-smoke: test which # Run simple tests to make sure the package is working
-	uv run lqdpy --help
-.PHONY: smoke
-
-docs: # Generate documentation (Go and Python)
-	tox -e docs
+docs: # Generate Go API docs and build the MkDocs site
+	go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
+	gomarkdoc --output docs/reference/go.md ./...
+	mkdocs build
 .PHONY: docs
