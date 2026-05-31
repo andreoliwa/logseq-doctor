@@ -1019,6 +1019,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#constants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constants
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#variables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1034,6 +1045,17 @@
     <span class="md-ellipsis">
       
         func AppendRawMarkdownToJournal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#func-flatmarkdowntooutline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func FlatMarkdownToOutline
       
     </span>
   </a>
@@ -1118,6 +1140,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#func-convertonce" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func convertOnce
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#func-findfirstchildblock" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1129,10 +1162,32 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#func-findnestedlist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func findNestedList
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#func-insertnewcontentnodes" class="md-nav__link">
     <span class="md-ellipsis">
       
         func insertNewContentNodes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#func-outlineline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func outlineLine
       
     </span>
   </a>
@@ -1155,6 +1210,17 @@
     <span class="md-ellipsis">
       
         func shouldPreserveNode
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#func-stripfrontmatter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func stripFrontmatter
       
     </span>
   </a>
@@ -1272,6 +1338,100 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#type-outlineoptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        type OutlineOptions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#type-converter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        type converter
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="type converter">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#func-converter-collectinline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func (*converter) collectInline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#func-converter-handlelistitem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func (*converter) handleListItem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#func-converter-inlinetext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func (*converter) inlineText
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#func-converter-listitemtext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func (*converter) listItemText
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#func-converter-walk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func (*converter) walk
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#func-converter-walknestedlist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        func (*converter) walkNestedList
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1318,8 +1478,10 @@
 </code></pre></div>
 <h2 id="index">Index<a class="headerlink" href="#index" title="Permanent link">¶</a></h2>
 <ul>
+<li><a href="#constants">Constants</a></li>
 <li><a href="#variables">Variables</a></li>
 <li><a href="#AppendRawMarkdownToJournal">func AppendRawMarkdownToJournal(graph *logseq.Graph, date time.Time, rawMarkdown string) (int, error)</a></li>
+<li><a href="#FlatMarkdownToOutline">func FlatMarkdownToOutline(input string, opts OutlineOptions) string</a></li>
 <li><a href="#InsertMarkdown">func InsertMarkdown(opts *InsertMarkdownOptions) error</a></li>
 <li><a href="#IsAncestor">func IsAncestor(block, ancestor *content.Block) bool</a></li>
 <li><a href="#IsValidMarkdownFile">func IsValidMarkdownFile(filePath string) bool</a></li>
@@ -1327,10 +1489,14 @@
 <li><a href="#SortAndRemoveDuplicates">func SortAndRemoveDuplicates(elements []string) []string</a></li>
 <li><a href="#TidyUpOneFile">func TidyUpOneFile(graph *logseq.Graph, path string) int</a></li>
 <li><a href="#addContent">func addContent(page logseq.Page, parentBlock *content.Block, contentText string) error</a></li>
+<li><a href="#convertOnce">func convertOnce(body string, opts OutlineOptions) string</a></li>
 <li><a href="#findFirstChildBlock">func findFirstChildBlock(block *content.Block) *content.Block</a></li>
+<li><a href="#findNestedList">func findNestedList(item ast.Node) *ast.List</a></li>
 <li><a href="#insertNewContentNodes">func insertNewContentNodes(block *content.Block, parsedBlock *content.Block, firstChildBlock *content.Block)</a></li>
+<li><a href="#outlineLine">func outlineLine(level int, lineText string) string</a></li>
 <li><a href="#removeOldContentNodes">func removeOldContentNodes(block *content.Block)</a></li>
 <li><a href="#shouldPreserveNode">func shouldPreserveNode(node content.Node) bool</a></li>
+<li><a href="#stripFrontmatter">func stripFrontmatter(input string) (string, string)</a></li>
 <li><a href="#updateExistingBlock">func updateExistingBlock(block *content.Block, newContent string) error</a></li>
 <li><a href="#ChangedContents">type ChangedContents</a></li>
 <li><a href="#RemoveUnnecessaryBracketsFromTags">func RemoveUnnecessaryBracketsFromTags(oldContents string) ChangedContents</a></li>
@@ -1340,129 +1506,217 @@
 <li><a href="#RemoveDoubleSpaces">func RemoveDoubleSpaces(page logseq.Page) ChangedPage</a></li>
 <li><a href="#RemoveEmptyBullets">func RemoveEmptyBullets(page logseq.Page) ChangedPage</a></li>
 <li><a href="#InsertMarkdownOptions">type InsertMarkdownOptions</a></li>
+<li><a href="#OutlineOptions">type OutlineOptions</a></li>
+<li><a href="#converter">type converter</a></li>
+<li><a href="#converter.collectInline">func (c *converter) collectInline(node ast.Node, builder *strings.Builder)</a></li>
+<li><a href="#converter.handleListItem">func (c *converter) handleListItem(node ast.Node)</a></li>
+<li><a href="#converter.inlineText">func (c *converter) inlineText(node ast.Node) string</a></li>
+<li><a href="#converter.listItemText">func (c *converter) listItemText(item ast.Node) string</a></li>
+<li><a href="#converter.walk">func (c *converter) walk(node ast.Node, entering bool) (ast.WalkStatus, error)</a></li>
+<li><a href="#converter.walkNestedList">func (c *converter) walkNestedList(list *ast.List)</a></li>
 </ul>
+<h2 id="constants">Constants<a class="headerlink" href="#constants" title="Permanent link">¶</a></h2>
+<p><a name="outlineIndentUnit"></a></p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nx">outlineIndentUnit</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"  "</span><span class="w"> </span><span class="c1">// 2 spaces per indent level</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nx">outlineBullet</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">"-"</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span>
+</code></pre></div>
 <h2 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">¶</a></h2>
 <p><a name="ErrPageIsNil"></a>ErrPageIsNil is returned when a page is nil.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">ErrPageIsNil</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"page is nil"</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">ErrPageIsNil</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">"page is nil"</span><span class="p">)</span>
 </code></pre></div>
 <p><a name="PageColor"></a>PageColor is a color function for page names.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">PageColor</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">color</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="nx">color</span><span class="p">.</span><span class="nx">FgHiWhite</span><span class="p">).</span><span class="nx">SprintfFunc</span><span class="p">()</span><span class="w"> </span><span class="c1">//nolint:gochecknoglobals</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">var</span><span class="w"> </span><span class="nx">PageColor</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">color</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="nx">color</span><span class="p">.</span><span class="nx">FgHiWhite</span><span class="p">).</span><span class="nx">SprintfFunc</span><span class="p">()</span><span class="w"> </span><span class="c1">//nolint:gochecknoglobals</span>
 </code></pre></div>
 <p><a name="AppendRawMarkdownToJournal"></a></p>
 <h2 id="func-appendrawmarkdowntojournal">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/content.go#L32-L33">AppendRawMarkdownToJournal</a><a class="headerlink" href="#func-appendrawmarkdowntojournal" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">AppendRawMarkdownToJournal</span><span class="p">(</span><span class="nx">graph</span><span class="w"> </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span><span class="p">,</span><span class="w"> </span><span class="nx">date</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span><span class="w"> </span><span class="nx">rawMarkdown</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">AppendRawMarkdownToJournal</span><span class="p">(</span><span class="nx">graph</span><span class="w"> </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span><span class="p">,</span><span class="w"> </span><span class="nx">date</span><span class="w"> </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span><span class="w"> </span><span class="nx">rawMarkdown</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
 </code></pre></div>
 <p>AppendRawMarkdownToJournal appends raw Markdown content to the journal page for the given date. I tried appending blocks with `logseq-go` but there is and with text containing brackets. e.g. "[something]" is escaped like "\[something\]" and this breaks links.</p>
+<p><a name="FlatMarkdownToOutline"></a></p>
+<h2 id="func-flatmarkdowntooutline">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L53">FlatMarkdownToOutline</a><a class="headerlink" href="#func-flatmarkdowntooutline" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">FlatMarkdownToOutline</span><span class="p">(</span><span class="nx">input</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">opts</span><span class="w"> </span><span class="nx">OutlineOptions</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+</code></pre></div>
+<p>FlatMarkdownToOutline converts flat Markdown to a Logseq bullet outline. It strips YAML frontmatter before parsing and prepends it unchanged to the result. It is idempotent: if the conversion is a no-op, the original input is returned.</p>
 <p><a name="InsertMarkdown"></a></p>
 <h2 id="func-insertmarkdown">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/md.go#L34">InsertMarkdown</a><a class="headerlink" href="#func-insertmarkdown" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">InsertMarkdown</span><span class="p">(</span><span class="nx">opts</span><span class="w"> </span><span class="o">*</span><span class="nx">InsertMarkdownOptions</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">InsertMarkdown</span><span class="p">(</span><span class="nx">opts</span><span class="w"> </span><span class="o">*</span><span class="nx">InsertMarkdownOptions</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>InsertMarkdown inserts Markdown content to a page or journal. If Page is provided, adds to that page. Otherwise, adds to journal for Date. If Key is provided, it searches for an existing block containing that key (case-insensitive) and updates it. Otherwise, creates a new block. If ParentText is provided, it searches for the first block containing that text and inserts the content as a child block. Otherwise, appends to the end.</p>
 <p><a name="IsAncestor"></a></p>
 <h2 id="func-isancestor">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/nodes.go#L8">IsAncestor</a><a class="headerlink" href="#func-isancestor" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">IsAncestor</span><span class="p">(</span><span class="nx">block</span><span class="p">,</span><span class="w"> </span><span class="nx">ancestor</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">IsAncestor</span><span class="p">(</span><span class="nx">block</span><span class="p">,</span><span class="w"> </span><span class="nx">ancestor</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>IsAncestor checks if ancestor is an ancestor of block by traversing up the parent chain. Returns true if ancestor is found in the parent hierarchy of block, false otherwise. Returns true if block and ancestor are the same block.</p>
 <p><a name="IsValidMarkdownFile"></a></p>
 <h2 id="func-isvalidmarkdownfile">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/content.go#L12">IsValidMarkdownFile</a><a class="headerlink" href="#func-isvalidmarkdownfile" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">IsValidMarkdownFile</span><span class="p">(</span><span class="nx">filePath</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">IsValidMarkdownFile</span><span class="p">(</span><span class="nx">filePath</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>IsValidMarkdownFile checks if a file is a Markdown file, by looking at its extension, not its content.</p>
 <p><a name="ReadFromStdin"></a></p>
 <h2 id="func-readfromstdin">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/stdin.go#L12">ReadFromStdin</a><a class="headerlink" href="#func-readfromstdin" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">ReadFromStdin</span><span class="p">()</span><span class="w"> </span><span class="kt">string</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">ReadFromStdin</span><span class="p">()</span><span class="w"> </span><span class="kt">string</span>
 </code></pre></div>
 <p>ReadFromStdin reads from stdin and returns the content as a string. It doesn't return an error and aborts the program if it fails because it's an internal function.</p>
 <p><a name="SortAndRemoveDuplicates"></a></p>
 <h2 id="func-sortandremoveduplicates">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L160">SortAndRemoveDuplicates</a><a class="headerlink" href="#func-sortandremoveduplicates" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">SortAndRemoveDuplicates</span><span class="p">(</span><span class="nx">elements</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">SortAndRemoveDuplicates</span><span class="p">(</span><span class="nx">elements</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span>
 </code></pre></div>
 <p><a name="TidyUpOneFile"></a></p>
 <h2 id="func-tidyuponefile">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L14">TidyUpOneFile</a><a class="headerlink" href="#func-tidyuponefile" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">TidyUpOneFile</span><span class="p">(</span><span class="nx">graph</span><span class="w"> </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span><span class="p">,</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">int</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">TidyUpOneFile</span><span class="p">(</span><span class="nx">graph</span><span class="w"> </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span><span class="p">,</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">int</span>
 </code></pre></div>
 <p><a name="addContent"></a></p>
 <h2 id="func-addcontent">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/md.go#L195">addContent</a><a class="headerlink" href="#func-addcontent" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">addContent</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">parentBlock</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">contentText</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">addContent</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">,</span><span class="w"> </span><span class="nx">parentBlock</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">contentText</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>addContent adds content either as a child block to the specified parent or as a top-level block to the page.</p>
+<p><a name="convertOnce"></a></p>
+<h2 id="func-convertonce">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L74">convertOnce</a><a class="headerlink" href="#func-convertonce" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">convertOnce</span><span class="p">(</span><span class="nx">body</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">opts</span><span class="w"> </span><span class="nx">OutlineOptions</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+</code></pre></div>
+<p>convertOnce parses and converts a Markdown body (without frontmatter) to outline form.</p>
 <p><a name="findFirstChildBlock"></a></p>
 <h2 id="func-findfirstchildblock">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/md.go#L146">findFirstChildBlock</a><a class="headerlink" href="#func-findfirstchildblock" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">findFirstChildBlock</span><span class="p">(</span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">findFirstChildBlock</span><span class="p">(</span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span>
 </code></pre></div>
 <p>findFirstChildBlock finds the first child block in a block.</p>
+<p><a name="findNestedList"></a></p>
+<h2 id="func-findnestedlist">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L170">findNestedList</a><a class="headerlink" href="#func-findnestedlist" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">findNestedList</span><span class="p">(</span><span class="nx">item</span><span class="w"> </span><span class="nx">ast</span><span class="p">.</span><span class="nx">Node</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">ast</span><span class="p">.</span><span class="nx">List</span>
+</code></pre></div>
+<p>findNestedList returns the first *ast.List child of a list item, or nil.</p>
 <p><a name="insertNewContentNodes"></a></p>
 <h2 id="func-insertnewcontentnodes">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/md.go#L157">insertNewContentNodes</a><a class="headerlink" href="#func-insertnewcontentnodes" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">insertNewContentNodes</span><span class="p">(</span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">parsedBlock</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">firstChildBlock</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">insertNewContentNodes</span><span class="p">(</span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">parsedBlock</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">firstChildBlock</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span>
 </code></pre></div>
 <p>insertNewContentNodes inserts new content nodes from parsedBlock into block.</p>
+<p><a name="outlineLine"></a></p>
+<h2 id="func-outlineline">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L23">outlineLine</a><a class="headerlink" href="#func-outlineline" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">outlineLine</span><span class="p">(</span><span class="nx">level</span><span class="w"> </span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="nx">lineText</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+</code></pre></div>
+<p>outlineLine formats a single outline bullet at the given nesting level.</p>
 <p><a name="removeOldContentNodes"></a></p>
 <h2 id="func-removeoldcontentnodes">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/md.go#L111">removeOldContentNodes</a><a class="headerlink" href="#func-removeoldcontentnodes" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">removeOldContentNodes</span><span class="p">(</span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">removeOldContentNodes</span><span class="p">(</span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">)</span>
 </code></pre></div>
 <p>removeOldContentNodes removes content nodes from a block while preserving Properties, Logbook, and child Blocks.</p>
 <p><a name="shouldPreserveNode"></a></p>
 <h2 id="func-shouldpreservenode">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/md.go#L129">shouldPreserveNode</a><a class="headerlink" href="#func-shouldpreservenode" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">shouldPreserveNode</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">Node</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">shouldPreserveNode</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="nx">content</span><span class="p">.</span><span class="nx">Node</span><span class="p">)</span><span class="w"> </span><span class="kt">bool</span>
 </code></pre></div>
 <p>shouldPreserveNode returns true if the node should be preserved (Properties, Logbook, or child Blocks).</p>
+<p><a name="stripFrontmatter"></a></p>
+<h2 id="func-stripfrontmatter">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L32">stripFrontmatter</a><a class="headerlink" href="#func-stripfrontmatter" title="Permanent link">¶</a></h2>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">stripFrontmatter</span><span class="p">(</span><span class="nx">input</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span>
+</code></pre></div>
+<p>stripFrontmatter splits YAML frontmatter from the body. If the input starts with "---\n" and contains a closing "\n---\n", the frontmatter (including fences) is returned separately from the body. This must run before goldmark sees the input so that "---" is not parsed as a thematic break or setext heading underline.</p>
 <p><a name="updateExistingBlock"></a></p>
 <h2 id="func-updateexistingblock">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/md.go#L87">updateExistingBlock</a><a class="headerlink" href="#func-updateexistingblock" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">updateExistingBlock</span><span class="p">(</span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">newContent</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">updateExistingBlock</span><span class="p">(</span><span class="nx">block</span><span class="w"> </span><span class="o">*</span><span class="nx">content</span><span class="p">.</span><span class="nx">Block</span><span class="p">,</span><span class="w"> </span><span class="nx">newContent</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span>
 </code></pre></div>
 <p>updateExistingBlock updates an existing block's content while preserving children, properties, and logbook.</p>
 <p><a name="ChangedContents"></a></p>
 <h2 id="type-changedcontents">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L108-L111">ChangedContents</a><a class="headerlink" href="#type-changedcontents" title="Permanent link">¶</a></h2>
 <p>ChangedContents is the result of a check function that modifies file contents directly without a transaction.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">ChangedContents</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="nx">Msg</span><span class="w">         </span><span class="kt">string</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span><span class="nx">NewContents</span><span class="w"> </span><span class="kt">string</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">ChangedContents</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">    </span><span class="nx">Msg</span><span class="w">         </span><span class="kt">string</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="nx">NewContents</span><span class="w"> </span><span class="kt">string</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="RemoveUnnecessaryBracketsFromTags"></a></p>
 <h3 id="func-removeunnecessarybracketsfromtags">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L258">RemoveUnnecessaryBracketsFromTags</a><a class="headerlink" href="#func-removeunnecessarybracketsfromtags" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">RemoveUnnecessaryBracketsFromTags</span><span class="p">(</span><span class="nx">oldContents</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedContents</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">RemoveUnnecessaryBracketsFromTags</span><span class="p">(</span><span class="nx">oldContents</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedContents</span>
 </code></pre></div>
 <p>RemoveUnnecessaryBracketsFromTags removes unnecessary brackets from hashtags. logseq-go rewrites tags correctly when saving the transaction, removing unnecessary brackets. But, when reading the file, the AST doesn't provide the information if a tag has brackets or not. So I would have to rewrite the file to fix them, and I don't want to do it every time there is a tag without spaces. Also, as of 2024-12-30, logseq-go has a bug when reading properties with spaces in values, which causes them to be partially removed from the file, destroying data. I will report it soon.</p>
 <p><a name="ChangedPage"></a></p>
 <h2 id="type-changedpage">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L114-L117">ChangedPage</a><a class="headerlink" href="#type-changedpage" title="Permanent link">¶</a></h2>
 <p>ChangedPage is the result of a check function that modifies Markdown through a Page and a transaction.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">ChangedPage</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="nx">Msg</span><span class="w">     </span><span class="kt">string</span>
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="nx">Changed</span><span class="w"> </span><span class="kt">bool</span>
-<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">ChangedPage</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">    </span><span class="nx">Msg</span><span class="w">     </span><span class="kt">string</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">    </span><span class="nx">Changed</span><span class="w"> </span><span class="kt">bool</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="p">}</span>
 </code></pre></div>
 <p><a name="CheckForbiddenReferences"></a></p>
 <h3 id="func-checkforbiddenreferences">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L120">CheckForbiddenReferences</a><a class="headerlink" href="#func-checkforbiddenreferences" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">CheckForbiddenReferences</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedPage</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">CheckForbiddenReferences</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedPage</span>
 </code></pre></div>
 <p>CheckForbiddenReferences checks if a page has forbidden references to other pages or tags.</p>
 <p><a name="CheckRunningTasks"></a></p>
 <h3 id="func-checkrunningtasks">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L178">CheckRunningTasks</a><a class="headerlink" href="#func-checkrunningtasks" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">CheckRunningTasks</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedPage</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">CheckRunningTasks</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedPage</span>
 </code></pre></div>
 <p>CheckRunningTasks checks if a page has running tasks (DOING, etc.).</p>
 <p><a name="RemoveDoubleSpaces"></a></p>
 <h3 id="func-removedoublespaces">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L203">RemoveDoubleSpaces</a><a class="headerlink" href="#func-removedoublespaces" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">RemoveDoubleSpaces</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedPage</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">RemoveDoubleSpaces</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedPage</span>
 </code></pre></div>
 <p>RemoveDoubleSpaces removes double spaces from text, page links, and tags, except for tables.</p>
 <p><a name="RemoveEmptyBullets"></a></p>
 <h3 id="func-removeemptybullets">func <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/tidy_up.go#L269">RemoveEmptyBullets</a><a class="headerlink" href="#func-removeemptybullets" title="Permanent link">¶</a></h3>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">RemoveEmptyBullets</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedPage</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kd">func</span><span class="w"> </span><span class="nx">RemoveEmptyBullets</span><span class="p">(</span><span class="nx">page</span><span class="w"> </span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Page</span><span class="p">)</span><span class="w"> </span><span class="nx">ChangedPage</span>
 </code></pre></div>
 <p><a name="InsertMarkdownOptions"></a></p>
 <h2 id="type-insertmarkdownoptions">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/md.go#L19-L26">InsertMarkdownOptions</a><a class="headerlink" href="#type-insertmarkdownoptions" title="Permanent link">¶</a></h2>
 <p>InsertMarkdownOptions contains options for inserting Markdown content.</p>
-<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">InsertMarkdownOptions</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">    </span><span class="nx">Graph</span><span class="w">      </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span>
-<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">    </span><span class="nx">Date</span><span class="w">       </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>
-<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">    </span><span class="nx">Page</span><span class="w">       </span><span class="kt">string</span><span class="w"> </span><span class="c1">// Page name to add content to (empty = journal)</span>
-<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">    </span><span class="nx">Content</span><span class="w">    </span><span class="kt">string</span>
-<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="w">    </span><span class="nx">ParentText</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="c1">// Partial text to search for in parent blocks</span>
-<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">    </span><span class="nx">Key</span><span class="w">        </span><span class="kt">string</span><span class="w"> </span><span class="c1">// Unique key to search for existing block (case-insensitive)</span>
-<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="p">}</span>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">InsertMarkdownOptions</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">    </span><span class="nx">Graph</span><span class="w">      </span><span class="o">*</span><span class="nx">logseq</span><span class="p">.</span><span class="nx">Graph</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">    </span><span class="nx">Date</span><span class="w">       </span><span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="w">    </span><span class="nx">Page</span><span class="w">       </span><span class="kt">string</span><span class="w"> </span><span class="c1">// Page name to add content to (empty = journal)</span>
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="w">    </span><span class="nx">Content</span><span class="w">    </span><span class="kt">string</span>
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="w">    </span><span class="nx">ParentText</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="c1">// Partial text to search for in parent blocks</span>
+<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="w">    </span><span class="nx">Key</span><span class="w">        </span><span class="kt">string</span><span class="w"> </span><span class="c1">// Unique key to search for existing block (case-insensitive)</span>
+<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="p">}</span>
 </code></pre></div>
+<p><a name="OutlineOptions"></a></p>
+<h2 id="type-outlineoptions">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L17-L20">OutlineOptions</a><a class="headerlink" href="#type-outlineoptions" title="Permanent link">¶</a></h2>
+<p>OutlineOptions configures the flat-Markdown-to-outline conversion.</p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">OutlineOptions</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">    </span><span class="c1">// KeepBreaks preserves blank lines between blocks as empty "- " bullet lines.</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="nx">KeepBreaks</span><span class="w"> </span><span class="kt">bool</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="p">}</span>
+</code></pre></div>
+<p><a name="converter"></a></p>
+<h2 id="type-converter">type <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L66-L71">converter</a><a class="headerlink" href="#type-converter" title="Permanent link">¶</a></h2>
+<p>converter walks the goldmark AST and builds the outline string.</p>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">converter</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">    </span><span class="nx">source</span><span class="w">       </span><span class="p">[]</span><span class="kt">byte</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">    </span><span class="nx">currentLevel</span><span class="w"> </span><span class="kt">int</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">    </span><span class="nx">sb</span><span class="w">           </span><span class="nx">strings</span><span class="p">.</span><span class="nx">Builder</span>
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w">    </span><span class="nx">keepBreaks</span><span class="w">   </span><span class="kt">bool</span>
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="p">}</span>
+</code></pre></div>
+<p><a name="converter.collectInline"></a></p>
+<h3 id="func-converter-collectinline">func (*converter) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L219">collectInline</a><a class="headerlink" href="#func-converter-collectinline" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">converter</span><span class="p">)</span><span class="w"> </span><span class="nx">collectInline</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="nx">ast</span><span class="p">.</span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">builder</span><span class="w"> </span><span class="o">*</span><span class="nx">strings</span><span class="p">.</span><span class="nx">Builder</span><span class="p">)</span>
+</code></pre></div>
+<p>collectInline recursively renders inline nodes into builder.</p>
+<p><a name="converter.handleListItem"></a></p>
+<h3 id="func-converter-handlelistitem">func (*converter) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L150">handleListItem</a><a class="headerlink" href="#func-converter-handlelistitem" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">converter</span><span class="p">)</span><span class="w"> </span><span class="nx">handleListItem</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="nx">ast</span><span class="p">.</span><span class="nx">Node</span><span class="p">)</span>
+</code></pre></div>
+<p>handleListItem emits the list item text and manages level for nested lists.</p>
+<p><a name="converter.inlineText"></a></p>
+<h3 id="func-converter-inlinetext">func (*converter) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L208">inlineText</a><a class="headerlink" href="#func-converter-inlinetext" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">converter</span><span class="p">)</span><span class="w"> </span><span class="nx">inlineText</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="nx">ast</span><span class="p">.</span><span class="nx">Node</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+</code></pre></div>
+<p>inlineText collects the rendered text of all inline children of a node. It replicates the Python LogseqRenderer.render_inner / render_link behavior.</p>
+<p><a name="converter.listItemText"></a></p>
+<h3 id="func-converter-listitemtext">func (*converter) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L181">listItemText</a><a class="headerlink" href="#func-converter-listitemtext" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">converter</span><span class="p">)</span><span class="w"> </span><span class="nx">listItemText</span><span class="p">(</span><span class="nx">item</span><span class="w"> </span><span class="nx">ast</span><span class="p">.</span><span class="nx">Node</span><span class="p">)</span><span class="w"> </span><span class="kt">string</span>
+</code></pre></div>
+<p>listItemText extracts the text content from a list item's first paragraph or inline block.</p>
+<p><a name="converter.walk"></a></p>
+<h3 id="func-converter-walk">func (*converter) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L92">walk</a><a class="headerlink" href="#func-converter-walk" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">converter</span><span class="p">)</span><span class="w"> </span><span class="nx">walk</span><span class="p">(</span><span class="nx">node</span><span class="w"> </span><span class="nx">ast</span><span class="p">.</span><span class="nx">Node</span><span class="p">,</span><span class="w"> </span><span class="nx">entering</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">WalkStatus</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+</code></pre></div>
+<p>walk is the goldmark AST visitor function.</p>
+<p><a name="converter.walkNestedList"></a></p>
+<h3 id="func-converter-walknestedlist">func (*converter) <a href="https://github.com/andreoliwa/logseq-doctor/blob/master/internal/outline.go#L200">walkNestedList</a><a class="headerlink" href="#func-converter-walknestedlist" title="Permanent link">¶</a></h3>
+<div class="highlight"><span class="filename">Go</span><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="w"> </span><span class="o">*</span><span class="nx">converter</span><span class="p">)</span><span class="w"> </span><span class="nx">walkNestedList</span><span class="p">(</span><span class="nx">list</span><span class="w"> </span><span class="o">*</span><span class="nx">ast</span><span class="p">.</span><span class="nx">List</span><span class="p">)</span>
+</code></pre></div>
+<p>walkNestedList recursively processes a nested list and its items.</p>
 <p>Generated by <a href="https://github.com/princjef/gomarkdoc">gomarkdoc</a></p>
 
 
