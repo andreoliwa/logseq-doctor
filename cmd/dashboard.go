@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"strconv"
@@ -71,22 +72,28 @@ func runDashboard(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("get home dir: %w", err)
 	}
 
-	pbCmd, err := pocketbase.StartPocketBase(homeDir)
-	if err != nil {
-		return fmt.Errorf("start pocketbase: %w", err)
-	}
-
-	defer func() {
-		if pbCmd.Process != nil {
-			_ = pbCmd.Process.Kill()
-		}
-	}()
-
 	healthURL := pbURL + "/api/health"
 
-	err = pocketbase.WaitForReady(healthURL, pbReadyTimeout)
-	if err != nil {
-		return fmt.Errorf("pocketbase not ready: %w", err)
+	var pbCmd *exec.Cmd
+
+	if pocketbase.IsReady(healthURL) {
+		fmt.Fprintf(os.Stderr, "PocketBase already running at %s\n", pbURL)
+	} else {
+		pbCmd, err = pocketbase.StartPocketBase(homeDir)
+		if err != nil {
+			return fmt.Errorf("start pocketbase: %w", err)
+		}
+
+		defer func() {
+			if pbCmd != nil && pbCmd.Process != nil {
+				_ = pbCmd.Process.Kill()
+			}
+		}()
+
+		err = pocketbase.WaitForReady(healthURL, pbReadyTimeout)
+		if err != nil {
+			return fmt.Errorf("pocketbase not ready: %w (check output above for details)", err)
+		}
 	}
 
 	fmt.Fprintf(os.Stderr, "PocketBase ready at %s\n", pbURL)

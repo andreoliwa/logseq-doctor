@@ -22,7 +22,7 @@ var ErrWaitTimeout = errors.New("timed out waiting for service to be ready")
 var ErrPocketBaseNotFound = errors.New("pocketbase executable not found in $PATH or ~/.local/bin")
 
 // StartPocketBase starts pocketbase serve as a managed subprocess from workDir.
-// Stdout and stderr are inherited so PocketBase logs appear in the same terminal.
+// Stdout and stderr are inherited so PocketBase logs appear in the same terminal with color.
 // The caller is responsible for calling cmd.Process.Kill() on shutdown.
 func StartPocketBase(workDir string) (*exec.Cmd, error) {
 	pbPath, err := findPocketBase()
@@ -65,6 +65,22 @@ func findPocketBase() (string, error) {
 	}
 
 	return "", ErrPocketBaseNotFound
+}
+
+// IsReady returns true if healthURL responds with 200 OK within one poll timeout.
+func IsReady(healthURL string) bool {
+	client := &http.Client{ //nolint:exhaustruct
+		Timeout: pbPollTimeout,
+	}
+
+	resp, err := client.Get(healthURL) //nolint:noctx
+	if err != nil {
+		return false
+	}
+
+	_ = resp.Body.Close()
+
+	return resp.StatusCode == http.StatusOK
 }
 
 // WaitForReady polls healthURL until it returns 200 OK or timeout elapses.
