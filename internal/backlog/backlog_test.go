@@ -202,6 +202,18 @@ func TestDeletedTasks(t *testing.T) {
 	}
 }
 
+func TestUnrankedTasks(t *testing.T) {
+	t.Run("obsolete tasks in unranked section are removed", func(t *testing.T) {
+		fixture := homePhoneFixture(t)
+		back := fixture.FakeBacklog(t, "bk", "unranked-remove-obsolete")
+
+		err := back.ProcessAll([]string{})
+		require.NoError(t, err)
+
+		fixture.AssertGoldenPages(t, back.Graph(), "unranked-remove-obsolete", []string{"bk___home"})
+	})
+}
+
 func TestOverdueTasks(t *testing.T) {
 	tests := []struct {
 		name        string

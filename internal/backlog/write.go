@@ -249,7 +249,8 @@ func processBlockRef(
 	underScheduled := state.dividerScheduled != nil && internal.IsAncestor(block, state.dividerScheduled)
 
 	// Preserve tasks under the Unranked divider — they are intentionally unranked.
-	if underUnranked {
+	// Exception: obsolete tasks (completed/canceled) must still be removed.
+	if underUnranked && !obsoleteBlockRefs.Contains(blockRef.ID) {
 		return
 	}
 

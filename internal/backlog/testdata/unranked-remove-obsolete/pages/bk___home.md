@@ -1,0 +1,5 @@
+- (( home-clean-basement ))
+- # ⤵️ Unranked tasks
+	- (( home-clean-windows ))
+	- ((67c48ea4-92cd-4b27-8202-ec1f4fe4ec59)) <!-- obsolete: not returned by the API; could be DONE or CANCELED -->
+	- ((67c490ad-f00e-480f-bead-0dcab66c3173)) <!-- obsolete: not returned by the API; could be DONE or CANCELED -->
