@@ -27,6 +27,31 @@ This command aggregates tasks from one or more pages into a unified backlog page
 - **Pin support**: Tasks marked with 📌 emoji are preserved and not removed
 - **Overdue detection**: Identifies and highlights tasks past their deadline or scheduled date
 - **Focus page**: Aggregates focus tasks from all backlogs into a central focus page
+- **Directives**: Modify tasks directly from the backlog page (see below)
+
+**Directives:**
+
+Directives let you modify tasks without leaving the backlog page. Prepend a keyword to any block-ref line, then run `lqd backlog` - the directive is applied to the real task and the prefix is stripped automatically.
+
+| Syntax              | Effect on the real task                                                             |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| `CANCELED ((uuid))` | Sets status to CANCELED, adds `cancelled:: [[date]]` property, removes from backlog |
+| `WAITING ((uuid))`  | Sets status to WAITING                                                              |
+| `[#A] ((uuid))`     | Sets priority to A (High)                                                           |
+| `[#B] ((uuid))`     | Sets priority to B (Medium)                                                         |
+| `[#C] ((uuid))`     | Sets priority to C (Low)                                                            |
+
+Example backlog page before running `lqd backlog`:
+
+```markdown
+- CANCELED ((a1b2c3d4-...))
+- WAITING ((e5f6a7b8-...))
+- [#A] ((c9d0e1f2-...))
+```
+
+After running, the directives are applied and the lines revert to plain `((uuid))` refs (or are removed for CANCELED tasks).
+
+If the task block has not yet been written to disk by Logseq, the command forces a UUID write-back via the HTTP API before applying the directive. If Logseq is not running, the directive is skipped with a warning and the prefix is left in place for the next run.
 
 **Configuration:**
 
