@@ -138,8 +138,9 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 	allValidRefs.Update(blockRefsFromQuery.FutureScheduled)
 	obsoleteBlockRefs := existingBlockRefs.Diff(allValidRefs)
 
-	result, err := insertAndRemoveRefs(b.graph, pageTitle, newBlockRefs, obsoleteBlockRefs,
-		blockRefsFromQuery.Overdue, blockRefsFromQuery.FutureScheduled, blockRefsFromQuery.TaskLookup)
+	result, err := insertAndRemoveRefs(b.graph, b.logseqAPI, pageTitle, newBlockRefs, obsoleteBlockRefs,
+		blockRefsFromQuery.Overdue, blockRefsFromQuery.FutureScheduled, blockRefsFromQuery.TaskLookup,
+		b.currentTime)
 	if err != nil {
 		return nil, err
 	}

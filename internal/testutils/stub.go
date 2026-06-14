@@ -37,18 +37,30 @@ func NewStubGraph(t *testing.T, subDir string) *logseq.Graph {
 type mockLogseqAPI struct {
 	mock.Mock
 
-	tagResponses map[string]string
+	tagResponses  map[string]string
+	uuidResponses map[string]string // uuid -> page JSON response for FindBlockByUUID
 }
 
 // newMockLogseqAPIFromMap creates a mockLogseqAPI that returns pre-built JSON responses keyed by tag.
 func newMockLogseqAPIFromMap(t *testing.T, responses map[string]string) *mockLogseqAPI {
 	t.Helper()
 
-	api := mockLogseqAPI{tagResponses: responses} //nolint:exhaustruct
+	api := mockLogseqAPI{tagResponses: responses, uuidResponses: map[string]string{}} //nolint:exhaustruct
 	api.On("PostQuery", mock.Anything).Return("{}", nil)
 	api.On("PostDatascriptQuery", mock.Anything).Return("[]", nil)
 
 	return &api
+}
+
+// WithUUIDPageResponse registers a page-info JSON response for a given UUID.
+// When FindBlockByUUID queries for this UUID, the mock returns the provided response.
+// The response format matches Logseq's datascript pull result, e.g.:
+//
+//	[[{"uuid":"<uuid>","page":{"id":1,"original-name":"PageTitle"}}]]
+func (m *mockLogseqAPI) WithUUIDPageResponse(uuid, pageJSON string) *mockLogseqAPI {
+	m.uuidResponses[uuid] = pageJSON
+
+	return m
 }
 
 func (m *mockLogseqAPI) PostQuery(query string) (string, error) {
@@ -64,6 +76,12 @@ func (m *mockLogseqAPI) PostQuery(query string) (string, error) {
 }
 
 func (m *mockLogseqAPI) PostDatascriptQuery(query string) (string, error) {
+	for uuid, resp := range m.uuidResponses {
+		if strings.Contains(query, uuid) {
+			return resp, nil
+		}
+	}
+
 	args := m.Called(query)
 
 	return args.String(0), args.Error(1)

@@ -138,6 +138,33 @@ func (f *TaskFixture) FakeBacklog(t *testing.T, configPage, caseDirName string) 
 	return backlog.NewBacklog(graph, api, reader, RelativeTime)
 }
 
+// FakeBacklogWithUUIDPages creates a backlog.Backlog like FakeBacklog, but also registers
+// UUID-to-page-name mappings in the mock API for FindBlockByUUID calls (used by directives).
+// uuidPageNames maps slug -> page name (e.g. "home-clean-windows" -> "home").
+func (f *TaskFixture) FakeBacklogWithUUIDPages(
+	t *testing.T, configPage, caseDirName string,
+	uuidPageNames map[string]string,
+) backlog.Backlog {
+	t.Helper()
+
+	graph := f.fakeGraph(t, caseDirName)
+	api := f.fakeAPI(t)
+
+	for slug, pageName := range uuidPageNames {
+		uuid := f.slugToUUID[slug]
+		if uuid == "" {
+			continue
+		}
+
+		resp := `[[{"uuid":"` + uuid + `","page":{"id":1,"original-name":"` + pageName + `"}}]]`
+		api.WithUUIDPageResponse(uuid, resp)
+	}
+
+	reader := backlog.NewPageConfigReader(graph, configPage)
+
+	return backlog.NewBacklog(graph, api, reader, RelativeTime)
+}
+
 // AssertGoldenPages collapses UUIDs back to slugs in each output page, then
 // compares against golden files in testdata/{caseDirName}/pages/.
 func (f *TaskFixture) AssertGoldenPages(

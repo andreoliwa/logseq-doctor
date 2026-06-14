@@ -1,0 +1,8 @@
+- CANCELED (( task-cancel ))
+  cancelled:: this property must be removed if it exists
+- WAITING (( task-waiting ))
+- [#A] (( task-priority-a ))
+- [#B] (( task-priority-b ))
+- [#C] (( task-priority-c ))
+- [#B] (( task-a-to-b ))
+- (( task-plain ))

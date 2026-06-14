@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	logseq "github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
@@ -15,6 +16,88 @@ import (
 
 // ErrBlockNotFoundViaAPI is returned when a block UUID query returns no results from the Logseq API.
 var ErrBlockNotFoundViaAPI = errors.New("block not found via API")
+
+// ErrBlockNotOnDiskAfterWriteback is returned when a block is still missing from disk after a write-back attempt.
+var ErrBlockNotOnDiskAfterWriteback = errors.New("block still not found on disk after write-back")
+
+// OpenPageForBlock opens the appropriate page (journal or regular) for a block described by blockInfo.
+func OpenPageForBlock(transaction *logseq.Transaction, blockInfo *BlockQueryInfo) (logseq.Page, error) {
+	if blockInfo.IsJournal {
+		page, err := transaction.OpenJournal(blockInfo.JournalDate)
+		if err != nil {
+			return nil, fmt.Errorf("failed to open journal page: %w", err)
+		}
+
+		return page, nil
+	}
+
+	page, err := transaction.OpenPage(blockInfo.PageName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open page %s: %w", blockInfo.PageName, err)
+	}
+
+	return page, nil
+}
+
+// FindBlockOnDisk locates a task block in the graph by querying the Logseq API for its page,
+// then opening that page and finding the block by its id:: property.
+// If the block is not on disk yet and the API is available, it forces a UUID write-back.
+// This is a future candidate to move into logseq-go once the library supports graph queries directly.
+func FindBlockOnDisk(
+	graph *logseq.Graph,
+	api LogseqAPI,
+	uuid string,
+) (*content.Block, *logseq.Transaction, error) {
+	blockInfo, err := FindBlockByUUID(api, uuid)
+	if err != nil {
+		return nil, nil, fmt.Errorf("block %s: API lookup failed: %w", uuid, err)
+	}
+
+	block, transaction, err := openBlockFromInfo(graph, blockInfo, uuid)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if block != nil {
+		return block, transaction, nil
+	}
+
+	// Block not on disk yet - force write-back via the Logseq Editor API.
+	upsertErr := api.UpsertBlockProperty(uuid, "id", uuid)
+	if upsertErr != nil {
+		return nil, nil, fmt.Errorf("block %s not on disk and write-back failed: %w", uuid, upsertErr)
+	}
+
+	// Re-open page after write-back to pick up the newly written id:: property.
+	block, transaction2, err := openBlockFromInfo(graph, blockInfo, uuid)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if block == nil {
+		return nil, nil, fmt.Errorf("%w: %s", ErrBlockNotOnDiskAfterWriteback, uuid)
+	}
+
+	return block, transaction2, nil
+}
+
+// openBlockFromInfo opens the page described by blockInfo and finds the block by its id:: property.
+func openBlockFromInfo(
+	graph *logseq.Graph,
+	blockInfo *BlockQueryInfo,
+	uuid string,
+) (*content.Block, *logseq.Transaction, error) {
+	transaction := graph.NewTransaction()
+
+	page, err := OpenPageForBlock(transaction, blockInfo)
+	if err != nil {
+		return nil, nil, fmt.Errorf("block %s: failed to open page %s: %w", uuid, blockInfo.PageName, err)
+	}
+
+	block := logseqext.FindBlockByIDProperty(page, uuid)
+
+	return block, transaction, nil
+}
 
 // BlockQueryInfo holds the result of a UUID lookup via Logseq API.
 type BlockQueryInfo struct {

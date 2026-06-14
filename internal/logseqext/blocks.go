@@ -7,6 +7,7 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"time"
 
 	logseq "github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
@@ -20,6 +21,9 @@ const JournalDayDivisorYear = 10000
 
 // JournalDayDivisorMonth is used to extract the month from a journalDay integer (YYYYMMDD).
 const JournalDayDivisorMonth = 100
+
+// PropertyCancelled is the Logseq block property key written when a task is cancelled.
+const PropertyCancelled = "cancelled"
 
 // BlockProperties returns the Properties node for a task block.
 // logseq-go's block.Properties() only checks the first child — task blocks have a
@@ -98,8 +102,9 @@ func BlockContentText(block *content.Block) string {
 	return text
 }
 
-// SetTaskCanceled changes the task marker to CANCELED using logseq-go's WithStatus API.
-func SetTaskCanceled(block *content.Block) error {
+// SetTaskCanceled changes the task marker to CANCELED and sets the cancelled:: date property.
+// An optional date argument overrides the default (today). The cancelled:: property is always set.
+func SetTaskCanceled(block *content.Block, date ...time.Time) error {
 	var taskMarker *content.TaskMarker
 
 	block.Content().FindDeep(func(node content.Node) bool {
@@ -119,6 +124,39 @@ func SetTaskCanceled(block *content.Block) error {
 	_, err := taskMarker.WithStatus(content.TaskStatusCanceled)
 	if err != nil {
 		return fmt.Errorf("failed to change task status to canceled: %w", err)
+	}
+
+	cancelDate := time.Now()
+	if len(date) > 0 {
+		cancelDate = date[0]
+	}
+
+	BlockProperties(block).Set(PropertyCancelled, content.NewText(FormatLogseqDate(cancelDate)))
+
+	return nil
+}
+
+// SetTaskWaiting changes the task marker to WAITING using logseq-go's WithStatus API.
+func SetTaskWaiting(block *content.Block) error {
+	var taskMarker *content.TaskMarker
+
+	block.Content().FindDeep(func(node content.Node) bool {
+		if marker, ok := node.(*content.TaskMarker); ok {
+			taskMarker = marker
+
+			return true
+		}
+
+		return false
+	})
+
+	if taskMarker == nil {
+		return nil // No task marker found, nothing to change
+	}
+
+	_, err := taskMarker.WithStatus(content.TaskStatusWaiting)
+	if err != nil {
+		return fmt.Errorf("failed to change task status to waiting: %w", err)
 	}
 
 	return nil
@@ -151,6 +189,8 @@ func SetPriority(block *content.Block, priority content.PriorityValue) error {
 
 	if existingPriority != nil {
 		existingPriority.WithPriority(priority)
+		// Clear OriginalText so the serializer uses the Priority field, not the stale parsed text.
+		existingPriority.OriginalText = ""
 
 		return nil
 	}

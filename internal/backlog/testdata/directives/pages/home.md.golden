@@ -1,0 +1,15 @@
+- CANCELED Cancel this task #home
+  id:: (( task-cancel ))
+  cancelled:: [[Sunday, 13.04.2025]]
+- WAITING Set this task as waiting #home
+  id:: (( task-waiting ))
+- TODO [#A] Set priority A on this task #home
+  id:: (( task-priority-a ))
+- TODO [#B] Set priority B on this task #home
+  id:: (( task-priority-b ))
+- TODO [#C] Set priority C on this task #home
+  id:: (( task-priority-c ))
+- TODO [#B] Change priority from A to B #home
+  id:: (( task-a-to-b ))
+- TODO Leave this task unchanged #home
+  id:: (( task-plain ))

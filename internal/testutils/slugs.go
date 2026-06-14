@@ -61,20 +61,34 @@ func expandSlugs(content string, slugToUUIDMap map[string]string) string {
 	})
 }
 
-// collapseSlugs replaces ((uuid)) with (( slug )) in content.
+// collapseSlugs replaces UUIDs with (( slug )) in content.
+// Handles both ((uuid)) block refs and bare UUIDs (e.g. in id:: property lines).
 // UUIDs not present in uuidToSlugMap are left unchanged.
 func collapseSlugs(content string, uuidToSlugMap map[string]string) string {
 	const minSubLen = 2
 
+	// Replace ((uuid)) block refs.
 	uuidRefPattern := regexp.MustCompile(`\(\(([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\)\)`)
 
-	return uuidRefPattern.ReplaceAllStringFunc(content, func(match string) string {
+	result := uuidRefPattern.ReplaceAllStringFunc(content, func(match string) string {
 		sub := uuidRefPattern.FindStringSubmatch(match)
 		if len(sub) < minSubLen {
 			return match
 		}
 
 		slug, ok := uuidToSlugMap[sub[1]]
+		if !ok {
+			return match
+		}
+
+		return "(( " + slug + " ))"
+	})
+
+	// Replace bare UUIDs (e.g. id:: <uuid> property lines).
+	bareUUIDPattern := regexp.MustCompile(`[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`)
+
+	return bareUUIDPattern.ReplaceAllStringFunc(result, func(match string) string {
+		slug, ok := uuidToSlugMap[match]
 		if !ok {
 			return match
 		}

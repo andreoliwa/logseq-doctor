@@ -187,11 +187,8 @@ const (
 	GroomActionQuit           = "quit"
 )
 
-// Logseq block property key constants written by groom actions.
-const (
-	GroomPropertyGroomed   = "groomed"
-	GroomPropertyCancelled = "cancelled"
-)
+// GroomPropertyGroomed is the Logseq block property key written when a task is groomed.
+const GroomPropertyGroomed = "groomed"
 
 // Action represents a user's grooming decision.
 type Action struct {
@@ -296,7 +293,7 @@ func EnsureBlockOnDisk(graph *logseq.Graph, groomAPI logseqapi.LogseqAPI, task m
 
 	transaction := graph.NewTransaction()
 
-	page, err := openPageForBlock(transaction, blockInfo)
+	page, err := logseqapi.OpenPageForBlock(transaction, blockInfo)
 	if err != nil {
 		return false, false
 	}
@@ -318,7 +315,7 @@ func EnsureBlockOnDisk(graph *logseq.Graph, groomAPI logseqapi.LogseqAPI, task m
 	// Re-open the page to pick up the freshly-written file.
 	transaction2 := graph.NewTransaction()
 
-	page2, err := openPageForBlock(transaction2, blockInfo)
+	page2, err := logseqapi.OpenPageForBlock(transaction2, blockInfo)
 	if err != nil {
 		return false, true // upserted but can't verify yet
 	}
@@ -345,7 +342,7 @@ func ApplyGroomAction(
 
 	transaction := graph.NewTransaction()
 
-	page, err := openPageForBlock(transaction, blockInfo)
+	page, err := logseqapi.OpenPageForBlock(transaction, blockInfo)
 	if err != nil {
 		return fmt.Errorf("failed to open page for block %s: %w", uuid, err)
 	}
@@ -368,25 +365,6 @@ func ApplyGroomAction(
 	return nil
 }
 
-// openPageForBlock opens the appropriate page (journal or regular) for a block.
-func openPageForBlock(transaction *logseq.Transaction, blockInfo *logseqapi.BlockQueryInfo) (logseq.Page, error) {
-	if blockInfo.IsJournal {
-		page, err := transaction.OpenJournal(blockInfo.JournalDate)
-		if err != nil {
-			return nil, fmt.Errorf("failed to open journal page: %w", err)
-		}
-
-		return page, nil
-	}
-
-	page, err := transaction.OpenPage(blockInfo.PageName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open page %s: %w", blockInfo.PageName, err)
-	}
-
-	return page, nil
-}
-
 // applyActionToBlock applies the specific groom action to a block.
 func applyActionToBlock(
 	transaction *logseq.Transaction, action *Action,
@@ -394,7 +372,7 @@ func applyActionToBlock(
 ) error {
 	switch action.Name {
 	case GroomActionCancel:
-		return applyCancelAction(block, groomedDate)
+		return applyCancelAction(block, opts.CurrentTime())
 	case GroomActionFocus:
 		return applyFocusAction(transaction, block, groomedDate, uuid, opts.FocusPageTitle)
 	case GroomActionPriorityHigh, GroomActionPriorityMedium, GroomActionPriorityLow:
@@ -404,15 +382,14 @@ func applyActionToBlock(
 	return nil
 }
 
-// applyCancelAction sets the task as canceled with a cancelled:: date property.
-// The groomed:: property is intentionally omitted — cancelled:: is sufficient and avoids clutter.
-func applyCancelAction(block *content.Block, groomedDate string) error {
-	cancelErr := logseqext.SetTaskCanceled(block)
+// applyCancelAction sets the task as canceled.
+// cancelled:: date property is set by SetTaskCanceled; groomed:: is intentionally omitted.
+// Kept as a named function for symmetry with applyFocusAction and applyPriorityAction.
+func applyCancelAction(block *content.Block, cancelTime time.Time) error {
+	cancelErr := logseqext.SetTaskCanceled(block, cancelTime)
 	if cancelErr != nil {
 		return fmt.Errorf("failed to set task canceled: %w", cancelErr)
 	}
-
-	logseqext.BlockProperties(block).Set(GroomPropertyCancelled, content.NewText(groomedDate))
 
 	return nil
 }

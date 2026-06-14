@@ -36,6 +36,7 @@ type pageState struct {
 	pinnedBlockRefs  *set.Set[string]
 	triagedBlockRefs *set.Set[string] // UUIDs already in the Triaged section
 	unscheduledRefs  *set.Set[string] // UUIDs removed from Scheduled because they lost their scheduled date
+	directives       []blockDirective // pending task modifications found on the backlog page
 }
 
 func newPageState() *pageState {
@@ -48,9 +49,10 @@ func newPageState() *pageState {
 }
 
 func insertAndRemoveRefs(
-	graph *logseq.Graph, pageTitle string, newBlockRefs, obsoleteBlockRefs,
-	overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
+	graph *logseq.Graph, logseqAPI logseqapi.LogseqAPI, pageTitle string,
+	newBlockRefs, obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
 	taskLookup map[logseqapi.TaskUUID]logseqapi.TaskJSON,
+	currentTime func() time.Time,
 ) (*Result, error) {
 	transaction := graph.NewTransaction()
 
@@ -63,13 +65,14 @@ func insertAndRemoveRefs(
 
 	normalised := NormalizeHeaderText(page)
 	scanPageBlocks(page, state, obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs)
+	directivesApplied := applyDirectives(graph, logseqAPI, state.directives, currentTime)
 	insertOverdueTasks(page, state, overdueBlockRefs)
 
 	// Merge refs removed from Scheduled (no longer future-dated) so they are re-inserted as new tasks.
 	newBlockRefs.Update(state.unscheduledRefs)
 
 	save := insertNewTasks(page, state, newBlockRefs, overdueBlockRefs, futureScheduledBlockRefs)
-	save = save || normalised
+	save = save || normalised || directivesApplied
 
 	insertScheduledTasks(page, state, futureScheduledBlockRefs)
 
@@ -236,6 +239,7 @@ func recordSectionDivider(block *content.Block, textValue string, state *pageSta
 }
 
 // processBlockRef decides whether to delete, pin, unpin, or keep a block ref.
+// It also collects directive annotations (CANCELED, WAITING, priority) prepended to the ref.
 //
 //nolint:cyclop // complexity comes from the inherent number of cases, not poor structure
 func processBlockRef(
@@ -243,6 +247,10 @@ func processBlockRef(
 	state *pageState,
 	obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
 ) {
+	if d := detectDirective(blockRef); d != nil {
+		state.directives = append(state.directives, *d)
+	}
+
 	shouldDelete := false
 	underTriaged := state.dividerTriaged != nil && internal.IsAncestor(block, state.dividerTriaged)
 	underUnranked := state.dividerUnranked != nil && internal.IsAncestor(block, state.dividerUnranked)
