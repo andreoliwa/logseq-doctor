@@ -37,21 +37,42 @@ Directives let you modify tasks without leaving the backlog page. Prepend a keyw
 | ------------------- | ----------------------------------------------------------------------------------- |
 | `CANCELED ((uuid))` | Sets status to CANCELED, adds `cancelled:: [[date]]` property, removes from backlog |
 | `WAITING ((uuid))`  | Sets status to WAITING                                                              |
+| `TODO ((uuid))`     | Resets status to TODO (useful to revert a DOING or WAITING task)                    |
 | `[#A] ((uuid))`     | Sets priority to A (High)                                                           |
 | `[#B] ((uuid))`     | Sets priority to B (Medium)                                                         |
 | `[#C] ((uuid))`     | Sets priority to C (Low)                                                            |
+
+Multiple directives can be combined on the same block ref by prepending them in sequence:
+
+```markdown
+- WAITING [#B] ((uuid))
+```
+
+This sets the task to WAITING and priority B in a single run. Directives are processed left-to-right and all applied atomically (the task file is opened and saved once per UUID).
 
 Example backlog page before running `lqd backlog`:
 
 ```markdown
 - CANCELED ((a1b2c3d4-...))
 - WAITING ((e5f6a7b8-...))
+- TODO ((f0a1b2c3-...))
 - [#A] ((c9d0e1f2-...))
+- WAITING [#B] ((e5f6a7b8-...))
 ```
 
 After running, the directives are applied and the lines revert to plain `((uuid))` refs (or are removed for CANCELED tasks).
 
 If the task block has not yet been written to disk by Logseq, the command forces a UUID write-back via the HTTP API before applying the directive. If Logseq is not running, the directive is skipped with a warning and the prefix is left in place for the next run.
+
+**Deduplication:**
+
+When the same block ref `((uuid))` appears more than once on a backlog page, `lqd backlog` keeps only one copy and removes the rest. The rules for which copy survives:
+
+1. **Scheduled section wins**: if the ref exists under the `⏰ Scheduled tasks` divider, that copy is kept and any copy elsewhere (Unranked, regular area) is removed.
+2. **Triaged section wins**: if the ref exists under the `🏷️ Triaged tasks` divider, copies in the regular area are removed.
+3. **First occurrence wins**: for all other areas, the first copy encountered top-to-bottom is kept; subsequent duplicates are removed.
+
+This runs automatically on every `lqd backlog` call, so manually placing a ref in two sections (e.g. Unranked and a Future sub-group) will converge to a single canonical location on the next run.
 
 **Configuration:**
 
