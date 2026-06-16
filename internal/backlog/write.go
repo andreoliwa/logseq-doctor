@@ -32,19 +32,23 @@ type pageState struct {
 	movedFromScheduledCount int
 	unpinnedCount           int
 
-	result           *Result
-	pinnedBlockRefs  *set.Set[string]
-	triagedBlockRefs *set.Set[string] // UUIDs already in the Triaged section
-	unscheduledRefs  *set.Set[string] // UUIDs removed from Scheduled because they lost their scheduled date
-	directives       []blockDirective // pending task modifications found on the backlog page
+	result            *Result
+	pinnedBlockRefs   *set.Set[string]
+	triagedBlockRefs  *set.Set[string] // UUIDs already in the Triaged section
+	scheduledBlockRefs *set.Set[string] // UUIDs already in the Scheduled section
+	seenBlockRefs     *set.Set[string] // UUIDs seen during the current scan (for deduplication)
+	unscheduledRefs   *set.Set[string] // UUIDs removed from Scheduled because they lost their scheduled date
+	directives        []blockDirective // pending task modifications found on the backlog page
 }
 
 func newPageState() *pageState {
 	return &pageState{ //nolint:exhaustruct // zero values for all pointer/int fields are correct defaults
-		result:           &Result{FocusRefsFromPage: set.NewSet[string](), ShowQuickCapture: false},
-		pinnedBlockRefs:  set.NewSet[string](),
-		triagedBlockRefs: set.NewSet[string](),
-		unscheduledRefs:  set.NewSet[string](),
+		result:             &Result{FocusRefsFromPage: set.NewSet[string](), ShowQuickCapture: false},
+		pinnedBlockRefs:    set.NewSet[string](),
+		triagedBlockRefs:   set.NewSet[string](),
+		scheduledBlockRefs: set.NewSet[string](),
+		seenBlockRefs:      set.NewSet[string](),
+		unscheduledRefs:    set.NewSet[string](),
 	}
 }
 
@@ -152,15 +156,50 @@ func NormalizeHeaderText(page logseq.Page) bool {
 	return changed
 }
 
-// scanPageBlocks is a two-pass coordinator: first it normalizes headers, then
-// collects UUIDs already in the Triaged section, then processes all blocks
-// (which uses those UUIDs for deduplication in the regular area).
+// scanPageBlocks is a two-pass coordinator: first it collects UUIDs already in
+// the Triaged and Scheduled sections, then processes all blocks (which uses
+// those UUIDs for deduplication in the regular area).
 func scanPageBlocks(
 	page logseq.Page, state *pageState,
 	obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
 ) {
 	collectTriagedRefs(page, state)
+	collectScheduledRefs(page, state)
 	processAllBlocks(page, state, obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs)
+}
+
+// collectScheduledRefs performs a first pass to find the Scheduled section divider
+// and record all block-ref UUIDs that are descendants of it.
+func collectScheduledRefs(page logseq.Page, state *pageState) {
+	var scheduledBlock *content.Block
+
+	for _, block := range page.Blocks() {
+		block.Children().FindDeep(func(node content.Node) bool {
+			if text, ok := node.(*content.Text); ok {
+				if HeaderScheduled.Matches(text.Value) {
+					scheduledBlock = block
+				}
+			}
+
+			return false
+		})
+
+		if scheduledBlock != nil {
+			break
+		}
+	}
+
+	if scheduledBlock == nil {
+		return
+	}
+
+	scheduledBlock.Children().FindDeep(func(node content.Node) bool {
+		if blockRef, ok := node.(*content.BlockRef); ok {
+			state.scheduledBlockRefs.Add(blockRef.ID)
+		}
+
+		return false
+	})
 }
 
 // collectTriagedRefs performs a first pass over the page to find the Triaged
@@ -240,8 +279,6 @@ func recordSectionDivider(block *content.Block, textValue string, state *pageSta
 
 // processBlockRef decides whether to delete, pin, unpin, or keep a block ref.
 // It also collects directive annotations (CANCELED, WAITING, priority) prepended to the ref.
-//
-//nolint:cyclop // complexity comes from the inherent number of cases, not poor structure
 func processBlockRef(
 	node content.Node, blockRef *content.BlockRef, block *content.Block,
 	state *pageState,
@@ -249,49 +286,16 @@ func processBlockRef(
 ) {
 	state.directives = append(state.directives, detectDirectives(blockRef)...)
 
-	shouldDelete := false
 	underTriaged := state.dividerTriaged != nil && internal.IsAncestor(block, state.dividerTriaged)
 	underUnranked := state.dividerUnranked != nil && internal.IsAncestor(block, state.dividerUnranked)
 	underScheduled := state.dividerScheduled != nil && internal.IsAncestor(block, state.dividerScheduled)
 
-	// Preserve tasks under the Unranked divider — they are intentionally unranked.
-	// Exception: obsolete tasks (completed/canceled) must still be removed.
-	if underUnranked && !obsoleteBlockRefs.Contains(blockRef.ID) {
+	if handleBlockRefGuards(blockRef, state, underTriaged, underUnranked, underScheduled, obsoleteBlockRefs) {
 		return
 	}
 
-	// If already in Triaged and this ref is in the regular area, remove it (deduplication).
-	if state.triagedBlockRefs.Contains(blockRef.ID) && !underTriaged {
-		blockRef.Parent().Parent().RemoveSelf()
-
-		state.deletedCount++
-
-		return
-	}
-
-	switch {
-	case obsoleteBlockRefs.Contains(blockRef.ID) && !underTriaged:
-		shouldDelete = true
-		state.deletedCount++
-
-	case overdueBlockRefs.Contains(blockRef.ID):
-		if nextChildHasPin(node) {
-			state.pinnedBlockRefs.Add(blockRef.ID)
-		} else {
-			shouldDelete = true
-			state.movedCount++
-		}
-
-	case futureScheduledBlockRefs.Contains(blockRef.ID):
-		shouldDelete = true
-
-		if state.dividerScheduled == nil || !internal.IsAncestor(block, state.dividerScheduled) {
-			state.movedScheduledCount++
-		}
-
-	default:
-		shouldDelete = handleDefaultBlockRef(node, blockRef, state, underScheduled, futureScheduledBlockRefs)
-	}
+	shouldDelete := categorizeBlockRef(node, blockRef, block, state, underScheduled,
+		obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs, underTriaged)
 
 	if shouldDelete {
 		// Block ref's parents are: paragraph and block
@@ -299,9 +303,92 @@ func processBlockRef(
 		//  This will remove the obsolete block and its children.
 		//  Should I show a warning message to the user and prevent the block from being deleted?
 		blockRef.Parent().Parent().RemoveSelf()
-	} else if state.dividerFocus == nil {
-		// Keep adding tasks to the focus section until the divider is found.
-		state.result.FocusRefsFromPage.Add(blockRef.ID)
+	} else {
+		state.seenBlockRefs.Add(blockRef.ID)
+
+		if state.dividerFocus == nil {
+			// Keep adding tasks to the focus section until the divider is found.
+			state.result.FocusRefsFromPage.Add(blockRef.ID)
+		}
+	}
+}
+
+// handleBlockRefGuards applies early-exit guards for block refs before categorization.
+// Returns true if the caller should return immediately (the ref was handled or preserved as-is).
+func handleBlockRefGuards(
+	blockRef *content.BlockRef, state *pageState,
+	underTriaged, underUnranked, underScheduled bool, obsoleteBlockRefs *set.Set[string],
+) bool {
+	if isDuplicateRef(blockRef.ID, state, underTriaged, underScheduled) {
+		blockRef.Parent().Parent().RemoveSelf()
+
+		state.deletedCount++
+
+		return true
+	}
+
+	// Preserve tasks under the Unranked divider — they are intentionally unranked.
+	// Exception: obsolete tasks (completed/canceled) must still be removed.
+	if underUnranked && !obsoleteBlockRefs.Contains(blockRef.ID) {
+		state.seenBlockRefs.Add(blockRef.ID)
+
+		return true
+	}
+
+	return false
+}
+
+// isDuplicateRef returns true if blockRef should be removed as a duplicate.
+// Priority order: Scheduled section wins over all others; Triaged section wins over regular area;
+// first-seen wins in the regular/Unranked area.
+func isDuplicateRef(uuid string, state *pageState, underTriaged, underScheduled bool) bool {
+	// A ref already in Scheduled: remove any copy outside Scheduled (Scheduled wins).
+	if state.scheduledBlockRefs.Contains(uuid) && !underScheduled && !underTriaged {
+		return true
+	}
+
+	// A ref already in Triaged: remove any copy outside Triaged.
+	if state.triagedBlockRefs.Contains(uuid) && !underTriaged {
+		return true
+	}
+
+	// General dedup: remove subsequent occurrences in regular/Unranked area.
+	return !underTriaged && !underScheduled && state.seenBlockRefs.Contains(uuid)
+}
+
+// categorizeBlockRef determines whether a block ref should be deleted based on its category.
+func categorizeBlockRef(
+	node content.Node, blockRef *content.BlockRef, block *content.Block,
+	state *pageState, underScheduled bool,
+	obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
+	underTriaged bool,
+) bool {
+	switch {
+	case obsoleteBlockRefs.Contains(blockRef.ID) && !underTriaged:
+		state.deletedCount++
+
+		return true
+
+	case overdueBlockRefs.Contains(blockRef.ID):
+		if nextChildHasPin(node) {
+			state.pinnedBlockRefs.Add(blockRef.ID)
+
+			return false
+		}
+
+		state.movedCount++
+
+		return true
+
+	case futureScheduledBlockRefs.Contains(blockRef.ID):
+		if state.dividerScheduled == nil || !internal.IsAncestor(block, state.dividerScheduled) {
+			state.movedScheduledCount++
+		}
+
+		return true
+
+	default:
+		return handleDefaultBlockRef(node, blockRef, state, underScheduled, futureScheduledBlockRefs)
 	}
 }
 

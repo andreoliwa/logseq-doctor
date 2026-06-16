@@ -283,6 +283,28 @@ func TestTriagedDedup(t *testing.T) {
 	fixture.AssertGoldenPages(t, back.Graph(), "triaged-dedup", pages)
 }
 
+func TestDedupExistingRefs(t *testing.T) {
+	fixture := homePhoneFixture(t)
+	back := fixture.FakeBacklog(t, "bk", "dedup-existing-refs")
+	pages := []string{"bk___home"}
+
+	err := back.ProcessAll([]string{})
+	require.NoError(t, err)
+
+	fixture.AssertGoldenPages(t, back.Graph(), "dedup-existing-refs", pages)
+}
+
+func TestDedupScheduledWins(t *testing.T) {
+	fixture := kitchenWorkFixture(t)
+	back := fixture.FakeBacklog(t, "sch", "dedup-scheduled-wins")
+	pages := []string{"sch___kitchen"}
+
+	err := back.ProcessAll([]string{})
+	require.NoError(t, err)
+
+	fixture.AssertGoldenPages(t, back.Graph(), "dedup-scheduled-wins", pages)
+}
+
 func TestDoingTasks(t *testing.T) {
 	tests := []struct {
 		name        string

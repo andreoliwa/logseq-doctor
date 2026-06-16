@@ -1,0 +1,7 @@
+- (( home-clean-windows ))
+- (( home-vacuum-carpets ))
+- # ⤵️ Unranked tasks
+	- (( home-wash-bed-sheets ))
+	- Future
+		- (( home-clean-windows ))
+		- (( home-vacuum-carpets ))
