@@ -162,6 +162,32 @@ func SetTaskWaiting(block *content.Block) error {
 	return nil
 }
 
+// SetTaskTodo changes the task marker to TODO using logseq-go's WithStatus API.
+func SetTaskTodo(block *content.Block) error {
+	var taskMarker *content.TaskMarker
+
+	block.Content().FindDeep(func(node content.Node) bool {
+		if marker, ok := node.(*content.TaskMarker); ok {
+			taskMarker = marker
+
+			return true
+		}
+
+		return false
+	})
+
+	if taskMarker == nil {
+		return nil // No task marker found, nothing to change
+	}
+
+	_, err := taskMarker.WithStatus(content.TaskStatusTodo)
+	if err != nil {
+		return fmt.Errorf("failed to change task status to todo: %w", err)
+	}
+
+	return nil
+}
+
 // SetPriority sets or replaces the priority marker ([#A]/[#B]/[#C]) on a block.
 // If a Priority node exists, it is updated in place. Otherwise, a new Priority node
 // is inserted after the TaskMarker (or at the start of the first paragraph for plain blocks).

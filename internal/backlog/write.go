@@ -247,9 +247,7 @@ func processBlockRef(
 	state *pageState,
 	obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
 ) {
-	if d := detectDirective(blockRef); d != nil {
-		state.directives = append(state.directives, *d)
-	}
+	state.directives = append(state.directives, detectDirectives(blockRef)...)
 
 	shouldDelete := false
 	underTriaged := state.dividerTriaged != nil && internal.IsAncestor(block, state.dividerTriaged)

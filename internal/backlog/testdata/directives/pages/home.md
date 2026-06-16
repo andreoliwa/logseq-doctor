@@ -12,3 +12,7 @@
   id:: 98beff2f-0000-0000-0000-98beff2f0000
 - TODO Leave this task unchanged #home
   id:: 91b117d5-0000-0000-0000-91b117d50000
+- WAITING Change waiting task to todo #home
+  id:: b4f48887-0000-0000-0000-b4f488870000
+- TODO Set waiting and priority B #home
+  id:: 983da558-0000-0000-0000-983da5580000

@@ -13,3 +13,7 @@
   id:: (( task-a-to-b ))
 - TODO Leave this task unchanged #home
   id:: (( task-plain ))
+- TODO Change waiting task to todo #home
+  id:: (( task-waiting-to-todo ))
+- WAITING [#B] Set waiting and priority B #home
+  id:: (( task-multi-directive ))

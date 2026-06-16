@@ -4,3 +4,5 @@
 - (( task-priority-c ))
 - (( task-a-to-b ))
 - (( task-plain ))
+- (( task-waiting-to-todo ))
+- (( task-multi-directive ))

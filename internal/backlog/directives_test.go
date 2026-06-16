@@ -12,6 +12,7 @@ func directivesFixture(t *testing.T) *testutils.TaskFixture {
 	t.Helper()
 
 	todo := content.TaskStringTodo
+	waiting := content.TaskStringWaiting
 
 	return testutils.NewFixture(t,
 		testutils.Task("task-cancel", todo, "Cancel this task", testutils.WithTags("home")),
@@ -22,6 +23,8 @@ func directivesFixture(t *testing.T) *testutils.TaskFixture {
 		testutils.Task("task-a-to-b", todo, "Change priority from A to B",
 			testutils.WithTags("home"), testutils.WithPriority("A")),
 		testutils.Task("task-plain", todo, "Leave this task unchanged", testutils.WithTags("home")),
+		testutils.Task("task-waiting-to-todo", waiting, "Change waiting task to todo", testutils.WithTags("home")),
+		testutils.Task("task-multi-directive", todo, "Set waiting and priority B", testutils.WithTags("home")),
 	)
 }
 
@@ -31,12 +34,14 @@ func TestDirectives_StripsDirectivesAndTransformsTasks(t *testing.T) {
 	back := fixture.FakeBacklogWithUUIDPages(
 		t, "bk", "directives",
 		map[string]string{
-			"task-cancel":     "home",
-			"task-waiting":    "home",
-			"task-priority-a": "home",
-			"task-priority-b": "home",
-			"task-priority-c": "home",
-			"task-a-to-b":     "home",
+			"task-cancel":          "home",
+			"task-waiting":         "home",
+			"task-priority-a":      "home",
+			"task-priority-b":      "home",
+			"task-priority-c":      "home",
+			"task-a-to-b":          "home",
+			"task-waiting-to-todo": "home",
+			"task-multi-directive": "home",
 		},
 	)
 

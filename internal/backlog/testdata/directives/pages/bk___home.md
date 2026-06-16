@@ -6,3 +6,5 @@
 - [#C] (( task-priority-c ))
 - [#B] (( task-a-to-b ))
 - (( task-plain ))
+- TODO (( task-waiting-to-todo ))
+- WAITING [#B] (( task-multi-directive ))
