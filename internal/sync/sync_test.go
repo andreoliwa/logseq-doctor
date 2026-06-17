@@ -134,6 +134,35 @@ func TestTaskToRecord_Basic(t *testing.T) {
 	assert.True(t, strings.HasPrefix(fmt.Sprint(record["journal"]), "2025-03-15"), "journal should be 2025-03-15")
 	assert.Equal(t, 0, record["rank"])
 	assert.Empty(t, record["backlog_name"])
+	assert.Empty(t, record["priority"])
+}
+
+func TestTaskToRecord_WithPriorityA(t *testing.T) {
+	task := logseqapi.TaskJSON{
+		UUID:    "abc-123",
+		Marker:  "TODO",
+		Content: "TODO [#A] Buy groceries\nid:: abc-123",
+		Page:    testPageJSON(20250315),
+	}
+
+	now := func() time.Time { return time.Date(2025, 4, 13, 0, 0, 0, 0, time.UTC) }
+	record := lqdsync.TaskToRecord(task, nil, "", now)
+
+	assert.Equal(t, "A", record["priority"])
+}
+
+func TestTaskToRecord_NoPriority(t *testing.T) {
+	task := logseqapi.TaskJSON{
+		UUID:    "abc-123",
+		Marker:  "TODO",
+		Content: "TODO Buy groceries\nid:: abc-123",
+		Page:    testPageJSON(20250315),
+	}
+
+	now := func() time.Time { return time.Date(2025, 4, 13, 0, 0, 0, 0, time.UTC) }
+	record := lqdsync.TaskToRecord(task, nil, "", now)
+
+	assert.Empty(t, record["priority"])
 }
 
 func TestTaskToRecord_WithRankAndDates(t *testing.T) {

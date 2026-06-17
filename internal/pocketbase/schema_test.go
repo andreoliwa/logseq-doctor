@@ -27,7 +27,7 @@ func TestLqdTasksSchema_HasRequiredFields(t *testing.T) {
 	}
 
 	expectedFields := []string{"name", "status", "tags", "journal", "scheduled", "deadline",
-		"overdue", "backlog_name", "backlog_index", "section", "rank", "sort_date", "groomed"}
+		"overdue", "backlog_name", "backlog_index", "section", "rank", "sort_date", "groomed", "priority"}
 	for _, expected := range expectedFields {
 		assert.Contains(t, fieldNames, expected, "missing field: %s", expected)
 	}

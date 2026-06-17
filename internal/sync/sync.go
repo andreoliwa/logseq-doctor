@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/andreoliwa/logseq-go/content"
+
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
@@ -93,7 +95,7 @@ func yyyymmddToLocalISO(dateInt int) string {
 func syncUpdateFields() []string {
 	return []string{
 		"task_uuid", "name", "status", "tags", "journal", "scheduled", "deadline",
-		"overdue", "backlog_name", "backlog_index", "section", "sort_date", "groomed",
+		"overdue", "backlog_name", "backlog_index", "section", "sort_date", "groomed", "priority",
 	}
 }
 
@@ -165,6 +167,23 @@ func extractRankFields(rank *RankInfo) (string, int, int, int) {
 	return rank.BacklogName, rank.BacklogIndex, rank.Section, rank.Rank
 }
 
+// priorityLetter converts a PriorityValue to its single-letter string ("A", "B", "C")
+// or empty string for PriorityNone. Used to store priority as a text field in PocketBase.
+func priorityLetter(p content.PriorityValue) string {
+	switch p {
+	case content.PriorityHigh:
+		return "A"
+	case content.PriorityMedium:
+		return "B"
+	case content.PriorityLow:
+		return "C"
+	case content.PriorityNone:
+		return ""
+	}
+
+	return ""
+}
+
 // TaskToRecord converts a TaskJSON + optional RankInfo to a PocketBase record map.
 func TaskToRecord(
 	task logseqapi.TaskJSON, rank *RankInfo, enrichedTags string, currentTime func() time.Time,
@@ -178,6 +197,7 @@ func TaskToRecord(
 	groomedISO := parseGroomedDate(task)
 
 	backlogName, backlogIndex, section, rankValue := extractRankFields(rank)
+	priority := priorityLetter(logseqext.ParsePriorityFromContent(task.Content))
 
 	// Composite record ID: uuid_backlogname (backlog name lowercased to satisfy
 	// the PocketBase id pattern ^[-a-z0-9_]+$). Tasks that appear in multiple
@@ -204,6 +224,7 @@ func TaskToRecord(
 		"rank":          rankValue * rankSeedFactor,
 		"sort_date":     sortDate,
 		"groomed":       groomedISO,
+		"priority":      priority,
 	}
 }
 

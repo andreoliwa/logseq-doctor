@@ -86,5 +86,6 @@ func lqdTasksDataFields() []map[string]any {
 		{"name": "rank", "type": "number"},
 		{"name": "sort_date", "type": "date"},
 		{"name": "groomed", "type": "date"},
+		{"name": "priority", "type": "text"},
 	}
 }
