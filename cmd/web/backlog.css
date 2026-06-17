@@ -409,6 +409,47 @@ tr:hover .unrank-action {
     }
 }
 
+/* ── Priority badges ────────────────────────────────────────────────────────
+   A = High (red), B = Medium (orange), C = Low (blue).
+   Colours mirror the status badge convention: tinted background + matching
+   foreground, with lighter dark-mode overrides.
+   ─────────────────────────────────────────────────────────────────────────── */
+.priority-badge {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.priority-A {
+    background: rgba(224, 49, 49, 0.15);
+    color: #c92a2a;
+}
+.priority-B {
+    background: rgba(230, 176, 0, 0.15);
+    color: #b38600;
+}
+.priority-C {
+    background: rgba(47, 158, 68, 0.15);
+    color: #2b8a3e;
+}
+
+@media (prefers-color-scheme: dark) {
+    .priority-A {
+        background: rgba(224, 49, 49, 0.25);
+        color: #ff6b6b;
+    }
+    .priority-B {
+        background: rgba(230, 176, 0, 0.25);
+        color: #ffd43b;
+    }
+    .priority-C {
+        background: rgba(47, 158, 68, 0.25);
+        color: #69db7c;
+    }
+}
+
 /* ── Drag ghost ─────────────────────────────────────────────────────────────
    SortableJS adds .sortable-ghost to the element being dragged. We fade it
    and tint it so the user can see where the row will land.
