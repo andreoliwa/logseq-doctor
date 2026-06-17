@@ -41,6 +41,7 @@
       Quick filter: preset combinations that override the individual checkboxes.
       Selecting a quick filter resets all filters first, then applies the preset.
     -->
+                <button class="clear-btn" id="clear-btn">Clear filters</button>
                 <select id="quick-select">
                     <option value="">(no quick filter)</option>
                     <option value="overdue">Overdue</option>
@@ -48,6 +49,9 @@
                     <option value="waiting-no-due-date">
                         Waiting without due date
                     </option>
+                    <option value="priority-a">A (top priority)</option>
+                    <option value="priority-b">B (medium priority)</option>
+                    <option value="priority-c">C (low priority)</option>
                 </select>
 
                 <!-- Backlog dropdown; options are populated dynamically from loaded tasks. -->
@@ -95,12 +99,11 @@
             </div>
 
             <!--
-              Row 2: status checkboxes on the left | date checkboxes + clear button on the right.
-              `justify-content: space-between` pushes the two groups to opposite ends.
+              Row 2: four filter groups — status, priority, date type, page type.
               Each group is its own flex container so its items stay together when the row wraps.
             -->
             <div class="filter-row filter-row-split">
-                <!-- Status checkboxes — left side. -->
+                <!-- Status checkboxes. -->
                 <div class="filter-group">
                     <label
                         ><input
@@ -131,9 +134,47 @@
                     >
                 </div>
 
-                <!-- Date-type filters + clear button — right side.
-                     Each checkbox independently controls visibility based on whether
-                     the task has that field set. All checked by default. -->
+                <!-- Priority checkboxes. -->
+                <div class="filter-group">
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="priority-cb"
+                            value="A"
+                            checked
+                        />
+                        A</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="priority-cb"
+                            value="B"
+                            checked
+                        />
+                        B</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="priority-cb"
+                            value="C"
+                            checked
+                        />
+                        C</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="priority-cb"
+                            value=""
+                            checked
+                        />
+                        None</label
+                    >
+                </div>
+
+                <!-- Date-type filters — overdue/scheduled/deadline/no-due-date. -->
                 <div class="filter-group">
                     <label
                         ><input
@@ -171,6 +212,10 @@
                         />
                         No due date</label
                     >
+                </div>
+
+                <!-- Page-type filters — journal vs page, plus total count. -->
+                <div class="filter-group">
                     <label
                         ><input
                             type="checkbox"
@@ -193,9 +238,6 @@
                         id="total-count"
                         title="Total records in PocketBase"
                     ></span>
-                    <button class="clear-btn" id="clear-btn">
-                        Clear filters
-                    </button>
                 </div>
             </div>
         </div>
@@ -244,6 +286,7 @@
                                 <th>Backlog</th>
                                 <th>Tags</th>
                                 <th>Status</th>
+                                <th>Priority</th>
                                 <th>Overdue</th>
                                 <th>Scheduled</th>
                                 <th>Deadline</th>
@@ -293,6 +336,7 @@
                                 <th>Backlog</th>
                                 <th>Tags</th>
                                 <th>Status</th>
+                                <th>Priority</th>
                                 <th>Overdue</th>
                                 <th>Scheduled</th>
                                 <th>Deadline</th>
@@ -545,6 +589,18 @@
                 return cell;
             }
 
+            function priorityBadgeCell(t) {
+                if (!t.priority) return td("priority-cell", "");
+                return td(
+                    "priority-cell",
+                    el(
+                        "span",
+                        { className: "priority-badge priority-" + t.priority },
+                        t.priority,
+                    ),
+                );
+            }
+
             // ── State ────────────────────────────────────────────────────────────────────
             let allTasks = []; // flat array of all task records from PocketBase
             let tagSelect; // Tom Select instance for the tag picker
@@ -622,6 +678,16 @@
                 );
             }
 
+            function getPriorityFilter() {
+                return new Set(
+                    [
+                        ...document.querySelectorAll(
+                            ".priority-cb:not(:checked)",
+                        ),
+                    ].map((c) => c.value),
+                );
+            }
+
             // matchesFilters(task) — returns true if the task passes all active filters.
             // All filtering is done in-memory; no network requests are involved.
             function matchesFilters(task) {
@@ -692,6 +758,12 @@
                         return false;
                 }
 
+                const priorityHidden = getPriorityFilter();
+                if (priorityHidden.size > 0) {
+                    const p = task.priority || "";
+                    if (priorityHidden.has(p)) return false;
+                }
+
                 return true;
             }
 
@@ -742,7 +814,7 @@
                     const headerRow = document.createElement("tr");
                     headerRow.className = "backlog-group-header";
                     const headerCell = document.createElement("td");
-                    headerCell.setAttribute("colspan", "12");
+                    headerCell.setAttribute("colspan", "13");
                     const blURL = logseqPageURL(bl);
                     if (blURL) {
                         const link = el("a", { href: blURL }, bl);
@@ -775,6 +847,7 @@
                             blCell,
                             td("tags", t.tags || ""),
                             td("", badge),
+                            priorityBadgeCell(t),
                             overdueBadgeCell(t),
                             journalDateCell(t.scheduled),
                             journalDateCell(t.deadline),
@@ -933,6 +1006,7 @@
                         backlogCell(t, false),
                         td("tags", t.tags || ""),
                         td("", badge),
+                        priorityBadgeCell(t),
                         overdueBadgeCell(t),
                         journalDateCell(t.scheduled),
                         journalDateCell(t.deadline),
@@ -1249,6 +1323,12 @@
                     syncURL();
                 }),
             );
+            document.querySelectorAll(".priority-cb").forEach((cb) =>
+                cb.addEventListener("change", () => {
+                    rerender();
+                    syncURL();
+                }),
+            );
             document
                 .getElementById("backlog-select")
                 .addEventListener("change", () => {
@@ -1271,6 +1351,9 @@
                     document.querySelectorAll(".date-type-cb").forEach((cb) => {
                         cb.checked = true;
                     });
+                    document.querySelectorAll(".priority-cb").forEach((cb) => {
+                        cb.checked = true;
+                    });
                     document.getElementById("backlog-select").value = "";
                     rerender();
                     serializeState();
@@ -1285,7 +1368,10 @@
                 if (
                     value === "overdue" ||
                     value === "waiting" ||
-                    value === "waiting-no-due-date"
+                    value === "waiting-no-due-date" ||
+                    value === "priority-a" ||
+                    value === "priority-b" ||
+                    value === "priority-c"
                 ) {
                     // Reset all filters to defaults first.
                     document.getElementById("text-filter").value = "";
@@ -1298,6 +1384,9 @@
                         cb.checked = DEFAULT_STATUS.includes(cb.value);
                     });
                     document.querySelectorAll(".date-type-cb").forEach((cb) => {
+                        cb.checked = true;
+                    });
+                    document.querySelectorAll(".priority-cb").forEach((cb) => {
                         cb.checked = true;
                     });
                 }
@@ -1324,6 +1413,18 @@
                     ]);
                     document.querySelectorAll(".date-type-cb").forEach((cb) => {
                         cb.checked = showOnly.has(cb.value);
+                    });
+                } else if (value === "priority-a") {
+                    document.querySelectorAll(".priority-cb").forEach((cb) => {
+                        cb.checked = cb.value === "A";
+                    });
+                } else if (value === "priority-b") {
+                    document.querySelectorAll(".priority-cb").forEach((cb) => {
+                        cb.checked = cb.value === "B";
+                    });
+                } else if (value === "priority-c") {
+                    document.querySelectorAll(".priority-cb").forEach((cb) => {
+                        cb.checked = cb.value === "C";
                     });
                 }
                 rerender();
@@ -1390,6 +1491,12 @@
                 if (dateHidden.length > 0)
                     params.set("dateHidden", dateHidden.join(","));
 
+                const priorityHidden = [
+                    ...document.querySelectorAll(".priority-cb:not(:checked)"),
+                ].map((c) => c.value);
+                if (priorityHidden.length > 0)
+                    params.set("priorities", priorityHidden.join(","));
+
                 const sortStr = sortCriteria
                     .map((c) => c.field + ":" + c.dir)
                     .join(",");
@@ -1401,12 +1508,28 @@
                     "",
                     qs ? "?" + qs : location.pathname,
                 );
-                updateTitle(q, backlog, quick, tags, status, dateHidden);
+                updateTitle(
+                    q,
+                    backlog,
+                    quick,
+                    tags,
+                    status,
+                    dateHidden,
+                    priorityHidden,
+                );
             }
 
             // updateTitle() — sets document.title to a human-readable summary of
             // non-default filter state: "{parts} — Logseq Doctor Dashboard".
-            function updateTitle(q, backlog, quick, tags, status, dateHidden) {
+            function updateTitle(
+                q,
+                backlog,
+                quick,
+                tags,
+                status,
+                dateHidden,
+                priorityHidden = [],
+            ) {
                 const parts = [];
                 if (backlog) parts.push(backlog);
                 if (quick)
@@ -1415,6 +1538,9 @@
                             overdue: "Overdue",
                             waiting: "Waiting",
                             "waiting-no-due-date": "Waiting without due date",
+                            "priority-a": "A (top priority)",
+                            "priority-b": "B (medium priority)",
+                            "priority-c": "C (low priority)",
                         }[quick] || quick,
                     );
                 if (q) parts.push("\u201C" + q + "\u201D"); // "quoted"
@@ -1426,7 +1552,7 @@
                 ) {
                     parts.push(status.length ? status.join("/") : "no status");
                 }
-                // Date: mention each hidden filter as −Name
+                // Date: mention each hidden filter as -Name
                 dateHidden.forEach((v) => {
                     const label = {
                         overdue: "Overdue",
@@ -1436,7 +1562,16 @@
                         journal: "Journal",
                         page: "Page",
                     }[v];
-                    if (label) parts.push("\u2212" + label); // −Label
+                    if (label) parts.push("\u2212" + label); // -Label
+                });
+                priorityHidden.forEach((v) => {
+                    const label = {
+                        A: "Priority A",
+                        B: "Priority B",
+                        C: "Priority C",
+                        "": "No priority",
+                    }[v];
+                    if (label) parts.push("\u2212" + label);
                 });
                 document.title =
                     (parts.length ? parts.join(", ") + " \u2014 " : "") +
@@ -1498,6 +1633,17 @@
                                 cb.checked = !hidden.has(cb.value);
                             });
                     }
+
+                    if (params.has("priorities")) {
+                        const hidden = new Set(
+                            params.get("priorities").split(","),
+                        );
+                        document
+                            .querySelectorAll(".priority-cb")
+                            .forEach((cb) => {
+                                cb.checked = !hidden.has(cb.value);
+                            });
+                    }
                 }
 
                 if (params.has("sort")) {
@@ -1527,6 +1673,11 @@
                     [
                         ...document.querySelectorAll(
                             ".date-type-cb:not(:checked)",
+                        ),
+                    ].map((c) => c.value),
+                    [
+                        ...document.querySelectorAll(
+                            ".priority-cb:not(:checked)",
                         ),
                     ].map((c) => c.value),
                 );
