@@ -180,6 +180,21 @@ func TestFocus(t *testing.T) {
 	}
 }
 
+func TestFocusOnlyShowsQuickCapture(t *testing.T) {
+	// Regression: when only the focus page gains new tasks (backlog pages unchanged),
+	// the QuickCapture URL must still be printed.
+	// focus-exists has all tasks already on the backlog pages (backlogChanged=false),
+	// but the focus page is missing some refs -> result.ShowQuickCapture=true.
+	fixture := homePhoneFixture(t)
+	back := fixture.FakeBacklog(t, "bk", "focus-exists")
+
+	output := testutils.CaptureOutput(func() {
+		require.NoError(t, back.ProcessAll([]string{}))
+	})
+
+	require.Contains(t, output, "logseq://graph/")
+}
+
 func TestDeletedTasks(t *testing.T) {
 	tests := []struct {
 		name        string

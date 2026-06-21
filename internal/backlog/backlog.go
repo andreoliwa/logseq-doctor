@@ -42,7 +42,7 @@ func (b *backlogImpl) Graph() *logseq.Graph {
 	return b.graph
 }
 
-func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
+func (b *backlogImpl) ProcessAll(partialNames []string) error {
 	config, err := b.configReader.ReadConfig()
 	if err != nil {
 		return fmt.Errorf("failed to read config: %w", err)
@@ -88,24 +88,13 @@ func (b *backlogImpl) ProcessAll(partialNames []string) error { //nolint:cyclop
 		}
 	}
 
-	if showQuickCapture {
-		// The original idea was to wait for a keypress while the user checks the quick capture page,
-		// so they can move tasks to the focus section. But new focus tasks would not be detected at this point,
-		// we would have to refresh the list of focus tasks after the keypress.
-		defer printQuickCaptureURL(b.graph)
-	}
-
 	if !processAllPages {
 		color.Yellow("Skipping focus page because not all pages were processed")
 
-		return nil
+		return b.maybeShowQuickCapture(showQuickCapture)
 	}
 
-	_, err = b.ProcessOne(config.FocusPage, func() (*logseqapi.CategorizedTasks, error) {
-		return &allFocusTasks, nil
-	})
-
-	return err
+	return b.processFocusPage(config.FocusPage, &allFocusTasks, showQuickCapture)
 }
 
 func printQuickCaptureURL(graph *logseq.Graph) {
@@ -146,6 +135,27 @@ func (b *backlogImpl) ProcessOne(pageTitle string,
 	}
 
 	return result, nil
+}
+
+func (b *backlogImpl) processFocusPage(
+	focusPage string, allFocusTasks *logseqapi.CategorizedTasks, backlogChanged bool,
+) error {
+	result, err := b.ProcessOne(focusPage, func() (*logseqapi.CategorizedTasks, error) {
+		return allFocusTasks, nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return b.maybeShowQuickCapture(backlogChanged || result.ShowQuickCapture)
+}
+
+func (b *backlogImpl) maybeShowQuickCapture(show bool) error {
+	if show {
+		printQuickCaptureURL(b.graph)
+	}
+
+	return nil
 }
 
 func blockRefsFromPages(page logseq.Page) *set.Set[string] {
