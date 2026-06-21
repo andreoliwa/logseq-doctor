@@ -1,10 +1,12 @@
 package logseqext_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
+	logseq "github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -64,6 +66,40 @@ func TestSetTaskCanceled(t *testing.T) {
 	})
 	require.NotNil(t, marker)
 	assert.Equal(t, content.TaskStatusCanceled, marker.Status)
+}
+
+func TestSetTaskCanceled_HeadingBlock(t *testing.T) {
+	block := parseBlock(t, "#### TODO 1. Fix the config")
+
+	err := logseqext.SetTaskCanceled(block)
+	require.NoError(t, err)
+
+	out, err := logseq.AsString(block)
+	require.NoError(t, err)
+	assert.Contains(t, out, "#### CANCELED 1. Fix the config")
+	assert.Contains(t, out, "cancelled::")
+}
+
+func TestSetTaskWaiting_HeadingBlock(t *testing.T) {
+	block := parseBlock(t, "#### TODO 1. Fix the config")
+
+	err := logseqext.SetTaskWaiting(block)
+	require.NoError(t, err)
+
+	out, err := logseq.AsString(block)
+	require.NoError(t, err)
+	assert.Equal(t, "#### WAITING 1. Fix the config", strings.TrimSpace(out))
+}
+
+func TestSetTaskTodo_HeadingBlock(t *testing.T) {
+	block := parseBlock(t, "#### WAITING 1. Fix the config")
+
+	err := logseqext.SetTaskTodo(block)
+	require.NoError(t, err)
+
+	out, err := logseq.AsString(block)
+	require.NoError(t, err)
+	assert.Equal(t, "#### TODO 1. Fix the config", strings.TrimSpace(out))
 }
 
 func TestSetTaskCanceled_NonTaskBlock(t *testing.T) {
@@ -237,6 +273,50 @@ func TestSetPriority_PlainBlock(t *testing.T) {
 	})
 	require.NotNil(t, priority)
 	assert.Equal(t, content.PriorityMedium, priority.Priority)
+}
+
+func parseBlock(t *testing.T, markdown string) *content.Block {
+	t.Helper()
+
+	block, err := logseq.ParseBlock(markdown)
+	require.NoError(t, err)
+
+	return block
+}
+
+func TestSetPriority_HeadingBlock(t *testing.T) {
+	// Parsed from markdown so the AST matches what logseq-go produces from real files.
+	// Note: logseq-go does not parse TaskMarker inside headings; the keyword stays as Text.
+	block := parseBlock(t, "#### WAITING 2. Task description")
+
+	err := logseqext.SetPriority(block, content.PriorityMedium)
+	require.NoError(t, err)
+
+	// Round-trip: priority must appear between the task keyword and the rest of the text.
+	out, err := logseq.AsString(block)
+	require.NoError(t, err)
+	assert.Equal(t, "#### WAITING [#B] 2. Task description", strings.TrimSpace(out))
+}
+
+func TestSetPriority_HeadingBlock_ReplaceExisting(t *testing.T) {
+	block := parseBlock(t, "#### WAITING [#A] 2. Task description")
+
+	err := logseqext.SetPriority(block, content.PriorityLow)
+	require.NoError(t, err)
+
+	var priority *content.Priority
+
+	block.Content().FindDeep(func(node content.Node) bool {
+		if p, ok := node.(*content.Priority); ok {
+			priority = p
+
+			return true
+		}
+
+		return false
+	})
+	require.NotNil(t, priority)
+	assert.Equal(t, content.PriorityLow, priority.Priority)
 }
 
 func TestParsePriorityFromContent(t *testing.T) {

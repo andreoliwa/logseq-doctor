@@ -13,7 +13,7 @@ import (
 	"github.com/andreoliwa/logseq-go/content"
 )
 
-// ErrNoParagraph is returned when SetPriority is called on a block with no paragraph.
+// ErrNoParagraph is returned when SetPriority is called on a block with no paragraph or heading.
 var ErrNoParagraph = errors.New("block has no paragraph to insert priority into")
 
 // JournalDayDivisorYear is used to extract the year from a journalDay integer (YYYYMMDD).
@@ -102,9 +102,13 @@ func BlockContentText(block *content.Block) string {
 	return text
 }
 
-// SetTaskCanceled changes the task marker to CANCELED and sets the cancelled:: date property.
-// An optional date argument overrides the default (today). The cancelled:: property is always set.
-func SetTaskCanceled(block *content.Block, date ...time.Time) error {
+// headingTaskKeywords lists task status strings that logseq-go embeds as Text inside heading nodes.
+//
+//nolint:gochecknoglobals
+var headingTaskKeywords = content.TaskStatusStrings()
+
+// findTaskMarker returns the TaskMarker node in a block, or nil if absent.
+func findTaskMarker(block *content.Block) *content.TaskMarker {
 	var taskMarker *content.TaskMarker
 
 	block.Content().FindDeep(func(node content.Node) bool {
@@ -117,13 +121,54 @@ func SetTaskCanceled(block *content.Block, date ...time.Time) error {
 		return false
 	})
 
-	if taskMarker == nil {
-		return nil // No task marker found, nothing to change
+	return taskMarker
+}
+
+// replaceHeadingTaskKeyword replaces the leading task keyword in a heading block's first Text node.
+func replaceHeadingTaskKeyword(block *content.Block, newKeyword string) {
+    // TODO: heading blocks parsed by [[logseq-go]] embed the task keyword as plain Text rather than TaskMarker
+	var heading *content.Heading
+
+	block.Content().FindDeep(func(node content.Node) bool {
+		if h, ok := node.(*content.Heading); ok {
+			heading = h
+
+			return true
+		}
+
+		return false
+	})
+
+	if heading == nil {
+		return
 	}
 
-	_, err := taskMarker.WithStatus(content.TaskStatusCanceled)
-	if err != nil {
-		return fmt.Errorf("failed to change task status to canceled: %w", err)
+	firstText, ok := heading.FirstChild().(*content.Text)
+	if !ok {
+		return
+	}
+
+	for _, kw := range headingTaskKeywords {
+		if strings.HasPrefix(firstText.Value, kw+" ") {
+			firstText.Value = newKeyword + firstText.Value[len(kw):]
+
+			return
+		}
+	}
+}
+
+// SetTaskCanceled changes the task marker to CANCELED and sets the cancelled:: date property.
+// An optional date argument overrides the default (today). The cancelled:: property is always set.
+func SetTaskCanceled(block *content.Block, date ...time.Time) error {
+	taskMarker := findTaskMarker(block)
+
+	if taskMarker == nil {
+		replaceHeadingTaskKeyword(block, content.TaskStatusCanceled.String())
+	} else {
+		_, err := taskMarker.WithStatus(content.TaskStatusCanceled)
+		if err != nil {
+			return fmt.Errorf("failed to change task status to canceled: %w", err)
+		}
 	}
 
 	cancelDate := time.Now()
@@ -136,22 +181,14 @@ func SetTaskCanceled(block *content.Block, date ...time.Time) error {
 	return nil
 }
 
-// SetTaskWaiting changes the task marker to WAITING using logseq-go's WithStatus API.
+// SetTaskWaiting changes the task marker to WAITING.
 func SetTaskWaiting(block *content.Block) error {
-	var taskMarker *content.TaskMarker
-
-	block.Content().FindDeep(func(node content.Node) bool {
-		if marker, ok := node.(*content.TaskMarker); ok {
-			taskMarker = marker
-
-			return true
-		}
-
-		return false
-	})
+	taskMarker := findTaskMarker(block)
 
 	if taskMarker == nil {
-		return nil // No task marker found, nothing to change
+		replaceHeadingTaskKeyword(block, content.TaskStatusWaiting.String())
+
+		return nil
 	}
 
 	_, err := taskMarker.WithStatus(content.TaskStatusWaiting)
@@ -162,22 +199,14 @@ func SetTaskWaiting(block *content.Block) error {
 	return nil
 }
 
-// SetTaskTodo changes the task marker to TODO using logseq-go's WithStatus API.
+// SetTaskTodo changes the task marker to TODO.
 func SetTaskTodo(block *content.Block) error {
-	var taskMarker *content.TaskMarker
-
-	block.Content().FindDeep(func(node content.Node) bool {
-		if marker, ok := node.(*content.TaskMarker); ok {
-			taskMarker = marker
-
-			return true
-		}
-
-		return false
-	})
+	taskMarker := findTaskMarker(block)
 
 	if taskMarker == nil {
-		return nil // No task marker found, nothing to change
+		replaceHeadingTaskKeyword(block, content.TaskStatusTodo.String())
+
+		return nil
 	}
 
 	_, err := taskMarker.WithStatus(content.TaskStatusTodo)
@@ -190,19 +219,23 @@ func SetTaskTodo(block *content.Block) error {
 
 // SetPriority sets or replaces the priority marker ([#A]/[#B]/[#C]) on a block.
 // If a Priority node exists, it is updated in place. Otherwise, a new Priority node
-// is inserted after the TaskMarker (or at the start of the first paragraph for plain blocks).
+// is inserted after the TaskMarker (or at the start of the first paragraph or heading).
 func SetPriority(block *content.Block, priority content.PriorityValue) error {
 	var existingPriority *content.Priority
 
 	var taskMarker *content.TaskMarker
 
-	var firstParagraph *content.Paragraph
+	var firstContainer content.HasChildren
 
 	block.Content().FindDeep(func(node content.Node) bool {
 		switch typedNode := node.(type) {
 		case *content.Paragraph:
-			if firstParagraph == nil {
-				firstParagraph = typedNode
+			if firstContainer == nil {
+				firstContainer = typedNode
+			}
+		case *content.Heading:
+			if firstContainer == nil {
+				firstContainer = typedNode
 			}
 		case *content.Priority:
 			existingPriority = typedNode
@@ -221,23 +254,48 @@ func SetPriority(block *content.Block, priority content.PriorityValue) error {
 		return nil
 	}
 
-	if firstParagraph == nil {
+	if firstContainer == nil {
 		return ErrNoParagraph
 	}
 
-	newPriority := content.NewPriority(priority)
+	return insertPriority(content.NewPriority(priority), taskMarker, firstContainer)
+}
 
+// insertPriority places a new Priority node after the TaskMarker (or task keyword text) in the container.
+// Falls back to prepending when no task anchor is found.
+func insertPriority(
+	newPriority *content.Priority, taskMarker *content.TaskMarker, container content.HasChildren,
+) error {
 	if taskMarker != nil {
-		// Use the TaskMarker's parent paragraph, not firstParagraph,
+		// Use the TaskMarker's own parent, not container,
 		// because a block can have multiple paragraphs (e.g. SCHEDULED line).
-		if parent, ok := taskMarker.Parent().(*content.Paragraph); ok {
-			parent.InsertChildAfter(newPriority, taskMarker)
-		} else {
-			firstParagraph.InsertChildAfter(newPriority, taskMarker)
-		}
-	} else {
-		firstParagraph.PrependChild(newPriority)
+		taskMarker.Parent().InsertChildAfter(newPriority, taskMarker)
+
+		return nil
 	}
+
+	// Heading blocks: parser embeds the task keyword in a Text node rather than a TaskMarker.
+	// Find that text node and split it so the priority sits right after the keyword.
+	firstText, ok := container.FirstChild().(*content.Text)
+	if !ok {
+		container.PrependChild(newPriority)
+
+		return nil
+	}
+
+	for _, kw := range headingTaskKeywords {
+		if strings.HasPrefix(firstText.Value, kw+" ") {
+			// Split "KEYWORD rest" into "KEYWORD " + [#X] + " rest".
+			remainder := firstText.Value[len(kw)+1:]
+			firstText.Value = kw + " "
+			container.InsertChildAfter(content.NewText(remainder), firstText)
+			container.InsertChildAfter(newPriority, firstText)
+
+			return nil
+		}
+	}
+
+	container.PrependChild(newPriority)
 
 	return nil
 }
