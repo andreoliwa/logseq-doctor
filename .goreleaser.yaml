@@ -23,6 +23,18 @@ builds:
       - amd64
       - arm64
 
+  - main: ./cmd/lqd-statusbar/main.go
+    binary: lqd-statusbar
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+    env:
+      - CGO_ENABLED=1
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
 archives:
   - name_template: >-
       {{ .ProjectName }}_{{ .Version }}_{{- title .Os }}_

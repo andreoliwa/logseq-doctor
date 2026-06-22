@@ -10,9 +10,10 @@ upgrade: # Upgrade all dependencies
 	go mod tidy
 .PHONY: upgrade
 
-build: # Build the Go binary
+build: # Build the Go binary (and lqd-statusbar on macOS)
 	go mod tidy
 	go build ./cmd/lqd
+	if [ "$$(uname)" = "Darwin" ]; then go build ./cmd/lqd-statusbar; fi
 .PHONY: build
 
 clean: # Clean the build artifacts
@@ -26,9 +27,11 @@ list: # List the installed Go packages
 	ls -l `go env GOPATH`/bin/
 .PHONY: list
 
-install: build
+install: build # Build and install all binaries to ~/go/bin
 	mv lqd `go env GOPATH`/bin/
+	if [ "$$(uname)" = "Darwin" ] && [ -f lqd-statusbar ]; then mv lqd-statusbar `go env GOPATH`/bin/; fi
 	$(MAKE) list
+.PHONY: install
 
 setup: # Set up Go development dependencies
 	go mod download
@@ -43,9 +46,9 @@ test: # Run Go tests
 	$(GO_TEST) $(opt)
 .PHONY: test
 
-test-go-coverage: # Run Go tests with coverage
+test-cov: # Run Go tests with coverage
 	$(GO_TEST) -coverprofile=coverage-go.out
-.PHONY: test-go-coverage
+.PHONY: test-cov
 
 release: # Create a GitHub release for the Go package
 	gh workflow run release.yaml
