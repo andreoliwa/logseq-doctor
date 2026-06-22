@@ -18,6 +18,11 @@ This project is still in alpha, so it's very rough on the edges (documentation a
 - [Contributing](contributing.md) - Help improve Logseq Doctor
 - [GitHub Repository](https://github.com/andreoliwa/logseq-doctor)
 
+## Features
+
+- [Status Bar](features/status-bar.md) - macOS menu bar app showing live DOING task count
+- [Dashboard](features/dashboard.md) - web UI for browsing, filtering, and reordering tasks
+
 ## Installation
 
 --8<-- "readme.md:installation"

@@ -424,7 +424,7 @@ lqd dash --port 9000
 POCKETBASE_USERNAME=admin@example.com POCKETBASE_PASSWORD=secret lqd dashboard
 ```
 
-See [Dashboard Guide](../dashboard.md) for a full walkthrough of the web UI.
+See [Dashboard Guide](../features/dashboard.md) for a full walkthrough of the web UI.
 
 ---
 
