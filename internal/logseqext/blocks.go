@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -396,6 +397,19 @@ func ExtractBlockRefUUID(block *content.Block) string {
 	})
 
 	return uuid
+}
+
+// OpenPageInApp opens a page in the Logseq desktop app via the logseq:// URL scheme.
+// graphName is the graph name as it appears in Logseq (e.g. "captains-log").
+// pageName is the page title to open (e.g. "DOING").
+// Uses the system `open` command; errors are printed to stderr and do not abort.
+func OpenPageInApp(graphName, pageName string) {
+	url := fmt.Sprintf("logseq://graph/%s?page=%s", graphName, pageName)
+
+	err := exec.CommandContext(context.Background(), "open", url).Start()
+	if err != nil {
+		fmt.Fprintf(log.Writer(), "failed to open Logseq: %v\n", err)
+	}
 }
 
 // ExtractFirstLine extracts the first line of task content, stripping the marker and priority.
