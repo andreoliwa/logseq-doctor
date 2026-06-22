@@ -68,7 +68,7 @@ jobs:
           go-version: ${{ matrix.go }}
       - name: Run tests with coverage
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
-        run: make test-go-coverage
+        run: make test-cov
         env:
           GO111MODULE: "auto"
           # Golden files should be treated differently on Windows
