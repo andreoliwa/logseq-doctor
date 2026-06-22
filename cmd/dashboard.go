@@ -38,6 +38,7 @@ const (
 func init() { //nolint:gochecknoinits
 	rootCmd.AddCommand(dashboardCmd)
 	dashboardCmd.Flags().IntP("port", "p", defaultServePort, "HTTP server port (also LQD_SERVE_PORT env var)")
+	dashboardCmd.Flags().Bool("status", false, "Also start lqd-statusbar as a background subprocess")
 }
 
 // DashboardAliases returns the Cobra aliases for the dashboard command.
@@ -66,6 +67,11 @@ func runDashboard(cmd *cobra.Command, _ []string) error {
 	pbUser := os.Getenv("POCKETBASE_USERNAME")
 	pbPass := os.Getenv("POCKETBASE_PASSWORD")
 	graphPath := os.Getenv("LOGSEQ_GRAPH_PATH")
+
+	statusFlag, _ := cmd.Flags().GetBool("status")
+	if statusFlag {
+		defer maybeStartStatusBar()()
+	}
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -254,6 +260,34 @@ func resolveBacklogPage(graphPath, shortName string) string {
 	}
 
 	return shortName
+}
+
+// maybeStartStatusBar starts lqd-statusbar as a background subprocess if it is on PATH.
+// It returns a cleanup function that kills the process; the caller should defer it.
+// If lqd-statusbar is not found or fails to start, the cleanup is a no-op.
+func maybeStartStatusBar() func() {
+	_, lookErr := exec.LookPath("lqd-statusbar")
+	if lookErr != nil {
+		fmt.Fprintln(os.Stderr, "warning: lqd-statusbar not found on PATH; skipping status bar")
+
+		return func() {}
+	}
+
+	sbCmd := exec.CommandContext(context.Background(), "lqd-statusbar")
+	sbCmd.Stderr = os.Stderr
+
+	startErr := sbCmd.Start()
+	if startErr != nil {
+		fmt.Fprintf(os.Stderr, "warning: could not start lqd-statusbar: %v\n", startErr)
+
+		return func() {}
+	}
+
+	return func() {
+		if sbCmd.Process != nil {
+			_ = sbCmd.Process.Kill()
+		}
+	}
 }
 
 // startHTTPServer runs the server until a signal arrives or a listen error occurs.
