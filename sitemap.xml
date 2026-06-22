@@ -2,38 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/changelog/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/contributing/</loc>
-         <lastmod>2026-06-21</lastmod>
-    </url>
-    <url>
-         <loc>https://andreoliwa.github.io/logseq-doctor/dashboard/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/installation/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/readme/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/usage/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
+    </url>
+    <url>
+         <loc>https://andreoliwa.github.io/logseq-doctor/features/dashboard/</loc>
+         <lastmod>2026-06-22</lastmod>
+    </url>
+    <url>
+         <loc>https://andreoliwa.github.io/logseq-doctor/features/status-bar/</loc>
+         <lastmod>2026-06-22</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/cli/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
     </url>
     <url>
          <loc>https://andreoliwa.github.io/logseq-doctor/reference/go/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
     </url>
 </urlset>
