@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v7
         with:
           go-version: "stable"
       - name: Read golangci-lint version from .tool-versions
@@ -62,7 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v7
         if: ${{ needs.pre_job.outputs.should_skip != 'true' || matrix.codecov }}
         with:
           go-version: ${{ matrix.go }}
