@@ -33,6 +33,7 @@ Logseq Doctor is a command-line tool with commands to manipulate your [Logseq](h
 - Clean up and tidy Markdown files
 - Prevent invalid content to be committed
 - And more stuff to come...
+
 <!-- --8<-- [end:description] -->
 
 <!-- --8<-- [start:features] -->
@@ -47,6 +48,7 @@ Logseq Doctor is a command-line tool with commands to manipulate your [Logseq](h
 - **Fast Performance**: Written in Go for speed and efficiency
 - **Outline Conversion** (`outline`): Convert flat Markdown files to Logseq's outline format
 - **Task Listing** (`tasks`): List and manage tasks in your Logseq graph
+
 <!-- --8<-- [end:features] -->
 
 <!-- --8<-- [start:installation] -->
