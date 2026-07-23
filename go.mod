@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	fyne.io/systray v1.12.2
 	github.com/andreoliwa/logseq-go v1.2.0
-	github.com/charmbracelet/lipgloss v1.1.0
+	github.com/charmbracelet/lipgloss/v2 v2.0.4
 	github.com/fatih/color v1.19.0
 	github.com/karrick/tparse/v2 v2.8.2
 	github.com/spf13/cobra v1.10.2
