@@ -9,7 +9,7 @@ require (
 	github.com/fatih/color v1.19.0
 	github.com/karrick/tparse/v2 v2.8.2
 	github.com/spf13/cobra v1.10.2
-	github.com/stretchr/testify v1.11.1
+	github.com/stretchr/testify v1.12.0
 	github.com/yuin/goldmark v1.8.5
 	golang.org/x/text v0.41.0
 	gotest.tools/v3 v3.5.2
