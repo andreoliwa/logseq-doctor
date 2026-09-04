@@ -1086,7 +1086,7 @@
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">¶</a></h2>
 <ul>
 <li><strong>macOS only</strong> - <code>lqd-statusbar</code> is a Darwin-only binary (build constraint <code>//go:build darwin</code>).</li>
-<li><strong><code>rg</code> (ripgrep) on PATH</strong> - the app counts <code>DOING</code> tasks by running <code>rg</code> against your graph directory. Install with <code>brew install ripgrep</code>.</li>
+<li><strong><code>rg</code> (ripgrep) on PATH</strong> - the app finds <code>DOING</code> tasks with <code>rg</code>. Install with <code>brew install ripgrep</code>.</li>
 <li><strong><code>LOGSEQ_GRAPH_PATH</code> set</strong> - the app exits immediately on startup if this variable is missing.</li>
 </ul>
 <hr>
@@ -1145,7 +1145,7 @@
 <tbody>
 <tr>
 <td><code>🛑</code></td>
-<td>No <code>DOING</code> tasks found (or <code>rg</code> errored)</td>
+<td>No <code>DOING</code> tasks found (or the graph scan fails)</td>
 </tr>
 <tr>
 <td><code>🟢 N</code></td>
@@ -1153,7 +1153,7 @@
 </tr>
 </tbody>
 </table>
-<p>The count updates every 2 seconds. If <code>rg</code> fails for any reason (missing binary, unreadable path), the icon falls back to <code>🛑</code> silently.</p>
+<p>The count updates every 2 seconds. Each scan adds a block reference for every current <code>DOING</code> task to the top of the <code>DOING</code> page. Existing references are left unchanged. If the graph scan fails, the icon falls back to <code>🛑</code> silently.</p>
 <hr>
 <h2 id="menu-items">Menu items<a class="headerlink" href="#menu-items" title="Permanent link">¶</a></h2>
 <table>
@@ -1185,7 +1185,7 @@
 <li><strong>macOS only</strong> - the binary will not compile or run on Linux or Windows.</li>
 <li><strong>Requires <code>rg</code></strong> - if ripgrep is not on PATH, all polls return 0 and the icon stays <code>🛑</code> with no error shown.</li>
 <li><strong>Poll interval</strong> - fixed at 2 seconds; there is no configuration option to change it.</li>
-<li><strong>No authentication</strong> - reads <code>.md</code> files directly from disk; does not connect to the Logseq HTTP API or PocketBase.</li>
+<li><strong>No authentication</strong> - reads and writes <code>.md</code> files directly on disk; does not connect to the Logseq HTTP API or PocketBase.</li>
 </ul>
 
 
