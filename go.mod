@@ -11,7 +11,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
 	github.com/yuin/goldmark v1.8.6
-	github.com/yuin/goldmark/v2 v2.0.0
+	github.com/yuin/goldmark/v2 v2.0.1
 	golang.org/x/text v0.41.0
 	gotest.tools/v3 v3.5.2
 )
