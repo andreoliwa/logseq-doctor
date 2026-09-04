@@ -45,7 +45,7 @@ func NewGroomCmd(deps *GroomDependencies) *cobra.Command {
 		limit     int
 	)
 
-	cmd := &cobra.Command{ //nolint:exhaustruct
+	cmd := &cobra.Command{ //nolint:exhaustruct_v5
 		Use:   "groom",
 		Short: "Interactively review and groom stale tasks",
 		Long:  "Queries PocketBase for old ungroomed tasks and presents them one at a time for action.",
@@ -368,7 +368,7 @@ func printTaskCard(task map[string]any, index, total int, now time.Time, termWid
 	scheduledStr, _ := task["scheduled"].(string)
 	deadlineStr, _ := task["deadline"].(string)
 
-	journalDate := strings.Split(journalStr, " ")[0]
+	journalDate, _, _ := strings.Cut(journalStr, " ")
 	age := groom.FormatTaskAge(journalStr, now)
 	hasBacklog := backlogName != ""
 	sep := groomStyles.separator.Render(groomSep)

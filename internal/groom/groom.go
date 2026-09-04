@@ -105,7 +105,7 @@ func FormatGroomTask(task map[string]any, index, total int, now time.Time) strin
 	fmt.Fprintf(&buf, "%s\n", groomSeparator)
 	fmt.Fprintf(&buf, " %s\n\n", name)
 
-	journalDate := strings.Split(journalStr, " ")[0]
+	journalDate, _, _ := strings.Cut(journalStr, " ")
 	age := FormatTaskAge(journalStr, now)
 	fmt.Fprintf(&buf, " Created:  %s  (%s)\n", journalDate, age)
 
@@ -202,13 +202,13 @@ type Action struct {
 //
 //nolint:gochecknoglobals // lookup table used by ParseAction
 var groomActions = map[string]*Action{
-	"x": {Name: GroomActionCancel, SetsGroomed: true, RequiresFile: true},
-	"f": {Name: GroomActionFocus, SetsGroomed: true, RequiresFile: true},
+	"x": {Name: GroomActionCancel, SetsGroomed: true, RequiresFile: true, Priority: content.PriorityNone},
+	"f": {Name: GroomActionFocus, SetsGroomed: true, RequiresFile: true, Priority: content.PriorityNone},
 	"a": {Name: GroomActionPriorityHigh, SetsGroomed: true, RequiresFile: true, Priority: content.PriorityHigh},
 	"b": {Name: GroomActionPriorityMedium, SetsGroomed: true, RequiresFile: true, Priority: content.PriorityMedium},
 	"c": {Name: GroomActionPriorityLow, SetsGroomed: true, RequiresFile: true, Priority: content.PriorityLow},
-	"s": {Name: GroomActionSkip, SetsGroomed: false, RequiresFile: false},
-	"q": {Name: GroomActionQuit, SetsGroomed: false, RequiresFile: false},
+	"s": {Name: GroomActionSkip, SetsGroomed: false, RequiresFile: false, Priority: content.PriorityNone},
+	"q": {Name: GroomActionQuit, SetsGroomed: false, RequiresFile: false, Priority: content.PriorityNone},
 }
 
 // ParseAction converts a single-letter input to an Action.

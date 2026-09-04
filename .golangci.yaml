@@ -12,6 +12,7 @@ linters:
     # keep-sorted start
     - copyloopvar
     - depguard
+    - exhaustruct # replaced by exhaustruct_v5
     - forbidigo
     - gochecknoinits
     - godox
@@ -36,7 +37,7 @@ linters:
       - examples$
     rules:
       - linters:
-          - exhaustruct
+          - exhaustruct_v5
           - funlen
           - goconst
         path: _test\.go

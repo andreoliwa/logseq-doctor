@@ -32,7 +32,7 @@ func NewMdCmd(deps *MdDependencies) *cobra.Command {
 
 	var journalFlag, parentFlag, pageFlag, keyFlag string
 
-	cmd := &cobra.Command{ //nolint:exhaustruct
+	cmd := &cobra.Command{ //nolint:exhaustruct_v5
 		Use:   "md",
 		Short: "Add Markdown content to Logseq using the DOM",
 		Long: `Add Markdown content to Logseq using the DOM.

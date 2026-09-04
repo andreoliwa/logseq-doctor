@@ -79,7 +79,7 @@ func convertOnce(body string, opts OutlineOptions) string {
 	reader := text.NewReader(source)
 	doc := goldmark.DefaultParser().Parse(reader)
 
-	conv := &converter{ //nolint:exhaustruct
+	conv := &converter{ //nolint:exhaustruct_v5
 		source:     source,
 		keepBreaks: opts.KeepBreaks,
 	}

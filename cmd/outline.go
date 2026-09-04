@@ -74,7 +74,7 @@ func fillOutlineDeps(deps *OutlineDependencies) {
 // to their defaults, so tests can inject only the fields they need.
 func NewOutlineCmd(deps *OutlineDependencies) *cobra.Command {
 	if deps == nil {
-		deps = &OutlineDependencies{} //nolint:exhaustruct
+		deps = &OutlineDependencies{} //nolint:exhaustruct_v5
 	}
 
 	fillOutlineDeps(deps)
@@ -85,7 +85,7 @@ func NewOutlineCmd(deps *OutlineDependencies) *cobra.Command {
 
 	var keepBreaks bool
 
-	outlineCmd := &cobra.Command{ //nolint:exhaustruct
+	outlineCmd := &cobra.Command{ //nolint:exhaustruct_v5
 		Use:   "outline [file ...]",
 		Short: "Convert flat Markdown to a Logseq bullet outline",
 		Long: `Convert flat Markdown to a Logseq bullet outline.

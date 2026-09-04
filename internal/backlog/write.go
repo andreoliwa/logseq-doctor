@@ -32,17 +32,17 @@ type pageState struct {
 	movedFromScheduledCount int
 	unpinnedCount           int
 
-	result            *Result
-	pinnedBlockRefs   *set.Set[string]
-	triagedBlockRefs  *set.Set[string] // UUIDs already in the Triaged section
+	result             *Result
+	pinnedBlockRefs    *set.Set[string]
+	triagedBlockRefs   *set.Set[string] // UUIDs already in the Triaged section
 	scheduledBlockRefs *set.Set[string] // UUIDs already in the Scheduled section
-	seenBlockRefs     *set.Set[string] // UUIDs seen during the current scan (for deduplication)
-	unscheduledRefs   *set.Set[string] // UUIDs removed from Scheduled because they lost their scheduled date
-	directives        []blockDirective // pending task modifications found on the backlog page
+	seenBlockRefs      *set.Set[string] // UUIDs seen during the current scan (for deduplication)
+	unscheduledRefs    *set.Set[string] // UUIDs removed from Scheduled because they lost their scheduled date
+	directives         []blockDirective // pending task modifications found on the backlog page
 }
 
 func newPageState() *pageState {
-	return &pageState{ //nolint:exhaustruct // zero values for all pointer/int fields are correct defaults
+	return &pageState{ //nolint:exhaustruct_v5 // zero values for all pointer/int fields are correct defaults
 		result:             &Result{FocusRefsFromPage: set.NewSet[string](), ShowQuickCapture: false},
 		pinnedBlockRefs:    set.NewSet[string](),
 		triagedBlockRefs:   set.NewSet[string](),
@@ -617,7 +617,7 @@ func newSortKeys(
 
 	for _, child := range children {
 		uuid := logseqext.ExtractBlockRefUUID(child)
-		key := taskSortKey{block: child, id: uuid} //nolint:exhaustruct // zero values are correct defaults
+		key := taskSortKey{block: child, id: uuid} //nolint:exhaustruct_v5 // zero values are correct defaults
 
 		if task, ok := taskLookup[uuid]; ok {
 			key.priority = logseqext.ParsePriorityFromContent(task.Content)

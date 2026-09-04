@@ -7,7 +7,7 @@ import (
 )
 
 // rootCmd represents the base command when called without any subcommands.
-var rootCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
+var rootCmd = &cobra.Command{ //nolint:exhaustruct_v5,gochecknoglobals
 	Use:   "lqd",
 	Short: "Logseq Doctor heals your Markdown files for Logseq",
 	Long: `Logseq Doctor heals your Markdown files for Logseq.

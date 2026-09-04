@@ -43,7 +43,7 @@ type BlockOpt func(*Block)
 
 // Task constructs a Block with Marker set. Use BlockOpts for optional fields.
 func Task(slug, status, text string, opts ...BlockOpt) Block {
-	b := Block{Slug: slug, Marker: status, Text: text} //nolint:exhaustruct
+	b := Block{Slug: slug, Marker: status, Text: text} //nolint:exhaustruct_v5
 	for _, o := range opts {
 		o(&b)
 	}
@@ -98,7 +98,7 @@ type TaskFixture struct {
 func NewFixture(t *testing.T, blocks ...Block) *TaskFixture {
 	t.Helper()
 
-	f := &TaskFixture{t: t} //nolint:exhaustruct
+	f := &TaskFixture{t: t} //nolint:exhaustruct_v5
 	f.slugToUUID, f.uuidToSlug = buildSlugMap(blocks)
 	f.blocks = blocks
 

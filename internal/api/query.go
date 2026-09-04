@@ -147,7 +147,7 @@ func parseBlockQueryResponse(jsonStr, uuid string) (*BlockQueryInfo, error) {
 // extractBlockInfo extracts page name and journal info from a page map.
 // Logseq's datascript API returns hyphenated keys: "journal-day", "original-name".
 func extractBlockInfo(page map[string]any) *BlockQueryInfo {
-	info := &BlockQueryInfo{} //nolint:exhaustruct // fields set conditionally below
+	info := &BlockQueryInfo{} //nolint:exhaustruct_v5 // fields set conditionally below
 
 	if journalDay, ok := page["journal-day"].(float64); ok && journalDay > 0 {
 		info.IsJournal = true

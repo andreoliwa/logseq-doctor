@@ -45,7 +45,7 @@ type mockLogseqAPI struct {
 func newMockLogseqAPIFromMap(t *testing.T, responses map[string]string) *mockLogseqAPI {
 	t.Helper()
 
-	api := mockLogseqAPI{tagResponses: responses, uuidResponses: map[string]string{}} //nolint:exhaustruct
+	api := mockLogseqAPI{tagResponses: responses, uuidResponses: map[string]string{}} //nolint:exhaustruct_v5
 	api.On("PostQuery", mock.Anything).Return("{}", nil)
 	api.On("PostDatascriptQuery", mock.Anything).Return("[]", nil)
 

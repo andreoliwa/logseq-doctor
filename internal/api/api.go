@@ -105,7 +105,7 @@ func (l *logseqAPIImpl) UpsertBlockProperty(uuid, key, value string) error {
 	req.Header.Set("Authorization", "Bearer "+l.apiToken)
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{} //nolint:exhaustruct
+	client := &http.Client{} //nolint:exhaustruct_v5
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -127,7 +127,7 @@ func (l *logseqAPIImpl) postAPI(method, query string) (string, error) {
 		return "", ErrMissingConfig
 	}
 
-	client := &http.Client{} //nolint:exhaustruct
+	client := &http.Client{} //nolint:exhaustruct_v5
 
 	jsonQuery, err := json.Marshal(query)
 	if err != nil {

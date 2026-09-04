@@ -12,7 +12,7 @@ import (
 func NewProxy(pbURL, token string) http.Handler {
 	target, _ := url.Parse(pbURL)
 
-	return &httputil.ReverseProxy{ //nolint:exhaustruct // only Rewrite needed; all other fields have safe zero values
+	return &httputil.ReverseProxy{ //nolint:exhaustruct_v5 // only Rewrite needed; all other fields have safe zero values
 		Rewrite: func(req *httputil.ProxyRequest) {
 			req.SetURL(target)
 			req.Out.Host = target.Host

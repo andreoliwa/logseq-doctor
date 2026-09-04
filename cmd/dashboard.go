@@ -45,7 +45,7 @@ func init() { //nolint:gochecknoinits
 // Exported so tests can verify the alias without accessing the unexported global.
 func DashboardAliases() []string { return []string{"dash"} }
 
-var dashboardCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
+var dashboardCmd = &cobra.Command{ //nolint:exhaustruct_v5,gochecknoglobals
 	Use:     "dashboard",
 	Aliases: DashboardAliases(),
 	Short:   "Start PocketBase and the backlog web UI",
@@ -174,6 +174,7 @@ func BuildHTTPMux(pbURL, token, graphPath string) *http.ServeMux {
 	})
 
 	mux.HandleFunc("GET /internal/config", func(writer http.ResponseWriter, _ *http.Request) {
+		//nolint:contextcheck // logseq-go graph API has no context support
 		handleConfig(writer, graphPath)
 	})
 
@@ -295,7 +296,7 @@ func startHTTPServer(ctx context.Context, port int, mux http.Handler) error {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	srv := &http.Server{ //nolint:exhaustruct
+	srv := &http.Server{ //nolint:exhaustruct_v5
 		Addr:              fmt.Sprintf(":%d", port),
 		Handler:           mux,
 		ReadHeaderTimeout: readHeaderTimeout,

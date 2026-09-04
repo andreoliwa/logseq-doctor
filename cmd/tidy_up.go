@@ -8,7 +8,7 @@ import (
 )
 
 // tidyUpCmd represents the tidyUp command.
-var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
+var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct_v5,gochecknoglobals
 	Use:   "tidy-up file1.md [file2.md ...]",
 	Short: "Tidy up your Markdown files.",
 	// TODO: dynamically generate the long description based on the functions in the code.

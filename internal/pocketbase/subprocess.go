@@ -69,7 +69,7 @@ func findPocketBase() (string, error) {
 
 // IsReady returns true if healthURL responds with 200 OK within one poll timeout.
 func IsReady(healthURL string) bool {
-	client := &http.Client{ //nolint:exhaustruct
+	client := &http.Client{ //nolint:exhaustruct_v5
 		Timeout: pbPollTimeout,
 	}
 
@@ -86,7 +86,7 @@ func IsReady(healthURL string) bool {
 // WaitForReady polls healthURL until it returns 200 OK or timeout elapses.
 func WaitForReady(healthURL string, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
-	client := &http.Client{ //nolint:exhaustruct // only Timeout needed for short-lived polling
+	client := &http.Client{ //nolint:exhaustruct_v5 // only Timeout needed for short-lived polling
 		Timeout: pbPollTimeout,
 	}
 

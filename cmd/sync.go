@@ -32,7 +32,7 @@ func NewSyncCmd(deps *SyncDependencies) *cobra.Command {
 
 	var initFlag bool
 
-	cmd := &cobra.Command{ //nolint:exhaustruct
+	cmd := &cobra.Command{ //nolint:exhaustruct_v5
 		Use:   "sync",
 		Short: "Sync Logseq tasks to PocketBase",
 		Long:  "Reads backlog config and tasks from Logseq, calculates ranks, and upserts to PocketBase.",

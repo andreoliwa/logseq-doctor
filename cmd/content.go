@@ -11,7 +11,7 @@ import (
 )
 
 // contentCmd represents the content command.
-var contentCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
+var contentCmd = &cobra.Command{ //nolint:exhaustruct_v5,gochecknoglobals
 	Use:   "content",
 	Short: "Append raw Markdown content to Logseq",
 	Long: `Append raw Markdown content to Logseq.

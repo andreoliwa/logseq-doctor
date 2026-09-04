@@ -15,9 +15,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// firstLineCount is the split limit used to extract the first line of block content.
-const firstLineCount = 2
-
 // TaskAddDependencies holds all the dependencies for the task add command.
 type TaskAddDependencies struct {
 	AddTaskFn func(*logseqext.AddTaskOptions) error
@@ -34,7 +31,7 @@ type TaskLsDependencies struct {
 
 // NewTaskCmd creates the parent task command.
 func NewTaskCmd() *cobra.Command {
-	cmd := &cobra.Command{ //nolint:exhaustruct
+	cmd := &cobra.Command{ //nolint:exhaustruct_v5
 		Use:   "task",
 		Short: "Manage tasks in Logseq",
 		Long:  `Manage tasks in your Logseq graph. Use subcommands to add, list, or modify tasks.`,
@@ -56,7 +53,7 @@ func NewTaskAddCmd(deps *TaskAddDependencies) *cobra.Command {
 
 	var journalFlag, parentFlag, pageFlag, keyFlag string
 
-	cmd := &cobra.Command{ //nolint:exhaustruct
+	cmd := &cobra.Command{ //nolint:exhaustruct_v5
 		Use:   "add [task description]",
 		Short: "Add a new task to Logseq",
 		Long: `Add a new task to your Logseq graph.
@@ -154,7 +151,7 @@ func runTaskLs(deps *TaskLsDependencies, flags *taskLsFlags, args []string) erro
 	blueBold := color.New(color.FgBlue, color.Bold)
 
 	for _, task := range tasks {
-		firstLine := strings.SplitN(task.Content, "\n", firstLineCount)[0]
+		firstLine, _, _ := strings.Cut(task.Content, "\n")
 		url := fmt.Sprintf("logseq://graph/%s?block-id=%s", graphName, task.UUID)
 		fmt.Fprintf(out, "%s%s%s\n",
 			green.Sprint(task.Page.OriginalName+"§"),
@@ -198,7 +195,7 @@ func NewTaskLsCmd(deps *TaskLsDependencies) *cobra.Command {
 
 	var flags taskLsFlags
 
-	cmd := &cobra.Command{ //nolint:exhaustruct
+	cmd := &cobra.Command{ //nolint:exhaustruct_v5
 		Use:   "ls [tag...]",
 		Short: "List tasks from Logseq",
 		Long: `List tasks from your Logseq graph via the HTTP API.

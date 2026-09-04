@@ -33,7 +33,7 @@ func NewClient(baseURL, username, password string) (*Client, error) {
 	client := &Client{
 		baseURL:    baseURL,
 		token:      "",
-		httpClient: &http.Client{Timeout: httpClientTimeout}, //nolint:exhaustruct // only Timeout needed
+		httpClient: &http.Client{Timeout: httpClientTimeout}, //nolint:exhaustruct_v5 // only Timeout needed
 	}
 
 	err := client.authenticate(username, password)
@@ -51,7 +51,7 @@ func NewClientWithToken(baseURL, token string) *Client {
 	return &Client{
 		baseURL:    baseURL,
 		token:      token,
-		httpClient: &http.Client{Timeout: httpClientTimeout}, //nolint:exhaustruct // only Timeout needed
+		httpClient: &http.Client{Timeout: httpClientTimeout}, //nolint:exhaustruct_v5 // only Timeout needed
 	}
 }
 

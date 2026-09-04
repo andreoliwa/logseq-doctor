@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var backlogCmd = &cobra.Command{ //nolint:exhaustruct,gochecknoglobals
+var backlogCmd = &cobra.Command{ //nolint:exhaustruct_v5,gochecknoglobals
 	Use:   "backlog [partial page names]",
 	Short: "Aggregate tasks from multiple pages into a backlog",
 	Long: `The backlog command aggregates tasks from one or more pages into a unified backlog.
