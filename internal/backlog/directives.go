@@ -50,7 +50,8 @@ func detectDirectives(blockRef *content.BlockRef) []blockDirective {
 	for prev := blockRef.PreviousSibling(); prev != nil; prev = prev.PreviousSibling() {
 		switch node := prev.(type) {
 		case *content.TaskMarker:
-			switch node.Status { //nolint:exhaustive // only CANCELED/WAITING/TODO are valid directives; others are ignored
+			//exhaustive:ignore only directive statuses are handled
+			switch node.Status {
 			case content.TaskStatusCanceled, content.TaskStatusCancelled:
 				found = append(found, blockDirective{
 					UUID:          blockRef.ID,
@@ -161,7 +162,6 @@ func groupDirectivesByUUID(directives []blockDirective) []directiveGroup {
 
 // applyDirectiveGroupAndCleanup applies all directives in a group and strips their nodes.
 // Returns true if the group was successfully applied.
-//
 func applyDirectiveGroupAndCleanup(
 	graph *logseq.Graph,
 	logseqAPI logseqapi.LogseqAPI,

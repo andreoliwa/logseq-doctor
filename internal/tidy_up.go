@@ -2,13 +2,14 @@ package internal
 
 import (
 	"fmt"
-	"github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
 	"log"
 	"os"
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/content"
 )
 
 func TidyUpOneFile(graph *logseq.Graph, path string) int { //nolint:cyclop,funlen
@@ -121,24 +122,8 @@ func CheckForbiddenReferences(page logseq.Page) ChangedPage {
 	all := make([]string, 0)
 
 	for _, block := range page.Blocks() {
-		block.Children().FindDeep(func(n content.Node) bool {
-			var reference string
-			if pageLink, ok := n.(*content.PageLink); ok {
-				reference = pageLink.To
-			} else if tag, ok := n.(*content.Hashtag); ok {
-				reference = tag.To
-			}
-
-			// TODO: these values should be read from a config file or env var
-			forbidden := false
-
-			switch strings.ToLower(reference) {
-			case "quick capture":
-				forbidden = true
-			case "inbox":
-				forbidden = true
-			}
-
+		block.Children().FindDeep(func(node content.Node) bool {
+			reference, forbidden := forbiddenReference(node)
 			if forbidden {
 				all = append(all, reference)
 			}
@@ -155,6 +140,31 @@ func CheckForbiddenReferences(page logseq.Page) ChangedPage {
 	}
 
 	return ChangedPage{"", false}
+}
+
+func forbiddenReference(node content.Node) (string, bool) {
+	// TODO: these values should be read from a config file or env var
+	switch value := node.(type) {
+	case *content.PageLink:
+		return value.To, isForbiddenReference(value.To)
+	case *content.Hashtag:
+		return value.To, isForbiddenReference(value.To)
+	case *content.Link:
+		return value.URL, strings.Contains(value.URL, "utm_source")
+	case *content.Text:
+		return value.Value, strings.Contains(value.Value, "📍")
+	default:
+		return "", false
+	}
+}
+
+func isForbiddenReference(reference string) bool {
+	switch strings.ToLower(reference) {
+	case "quick capture", "inbox":
+		return true
+	default:
+		return false
+	}
 }
 
 func SortAndRemoveDuplicates(elements []string) []string {

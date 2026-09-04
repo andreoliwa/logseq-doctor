@@ -174,7 +174,7 @@ func BuildHTTPMux(pbURL, token, graphPath string) *http.ServeMux {
 	})
 
 	mux.HandleFunc("GET /internal/config", func(writer http.ResponseWriter, _ *http.Request) {
-		handleConfig(writer, graphPath) //nolint:contextcheck // logseq-go graph API has no context support
+		handleConfig(writer, graphPath)
 	})
 
 	mux.HandleFunc("POST /internal/move-to-unranked", func(writer http.ResponseWriter, req *http.Request) {
