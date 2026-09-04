@@ -7,7 +7,7 @@
 ## Prerequisites
 
 - **macOS only** - `lqd-statusbar` is a Darwin-only binary (build constraint `//go:build darwin`).
-- **`rg` (ripgrep) on PATH** - the app counts `DOING` tasks by running `rg` against your graph directory. Install with `brew install ripgrep`.
+- **`rg` (ripgrep) on PATH** - the app finds `DOING` tasks with `rg`. Install with `brew install ripgrep`.
 - **`LOGSEQ_GRAPH_PATH` set** - the app exits immediately on startup if this variable is missing.
 
 ---
@@ -57,12 +57,12 @@ The status bar process is tied to the dashboard - it is killed automatically whe
 
 ## Status bar icons
 
-| Icon   | Meaning                                  |
-| ------ | ---------------------------------------- |
-| `🛑`   | No `DOING` tasks found (or `rg` errored) |
-| `🟢 N` | N tasks currently marked `DOING`         |
+| Icon   | Meaning                                          |
+| ------ | ------------------------------------------------ |
+| `🛑`   | No `DOING` tasks found (or the graph scan fails) |
+| `🟢 N` | N tasks currently marked `DOING`                 |
 
-The count updates every 2 seconds. If `rg` fails for any reason (missing binary, unreadable path), the icon falls back to `🛑` silently.
+The count updates every 2 seconds. Each scan adds a block reference for every current `DOING` task to the top of the `DOING` page. Existing references are left unchanged. If the graph scan fails, the icon falls back to `🛑` silently.
 
 ---
 
@@ -83,4 +83,4 @@ The graph name in the deep-link URL is always the last path component of `LOGSEQ
 - **macOS only** - the binary will not compile or run on Linux or Windows.
 - **Requires `rg`** - if ripgrep is not on PATH, all polls return 0 and the icon stays `🛑` with no error shown.
 - **Poll interval** - fixed at 2 seconds; there is no configuration option to change it.
-- **No authentication** - reads `.md` files directly from disk; does not connect to the Logseq HTTP API or PocketBase.
+- **No authentication** - reads and writes `.md` files directly on disk; does not connect to the Logseq HTTP API or PocketBase.

@@ -47,8 +47,17 @@ func BlockProperties(block *content.Block) *content.Properties {
 		}
 	}
 
-	// No properties after a paragraph — fall back to block.Properties() which creates one.
-	// This path is taken for blocks that truly have no properties yet.
+	// Task properties must follow the task paragraph. block.Properties() creates
+	// a properties node before it, which Logseq treats as a page property.
+	for _, node := range block.Content() {
+		if paragraph, ok := node.(*content.Paragraph); ok {
+			properties := content.NewProperties()
+			block.InsertChildAfter(properties, paragraph)
+
+			return properties
+		}
+	}
+
 	return block.Properties()
 }
 
@@ -127,7 +136,7 @@ func findTaskMarker(block *content.Block) *content.TaskMarker {
 
 // replaceHeadingTaskKeyword replaces the leading task keyword in a heading block's first Text node.
 func replaceHeadingTaskKeyword(block *content.Block, newKeyword string) {
-    // TODO: heading blocks parsed by [[logseq-go]] embed the task keyword as plain Text rather than TaskMarker
+	// TODO: heading blocks parsed by [[logseq-go]] embed the task keyword as plain Text rather than TaskMarker
 	var heading *content.Heading
 
 	block.Content().FindDeep(func(node content.Node) bool {
