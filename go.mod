@@ -1,6 +1,6 @@
 module github.com/andreoliwa/logseq-doctor
 
-go 1.25.0
+go 1.26.0
 
 require (
 	fyne.io/systray v1.12.2
@@ -13,7 +13,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/yuin/goldmark v1.8.6
 	github.com/yuin/goldmark/v2 v2.0.1
-	golang.org/x/text v0.41.0
+	golang.org/x/text v0.42.0
 	gotest.tools/v3 v3.5.2
 )
 
