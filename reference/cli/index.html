@@ -1875,32 +1875,42 @@ to propagate them back to Logseq <code>.md</code> files.</p>
 <li>Removes unnecessary brackets from tags</li>
 <li>Standardizes formatting</li>
 </ul>
+<p>Before running this command, create a config file at <code>~/.config/lqd/config.toml</code> on Linux,
+<code>~/Library/Application Support/lqd/config.toml</code> on macOS, or <code>%AppData%\\lqd\\config.toml</code> on Windows.
+The command exits with an error if the file does not exist.</p>
+<div class="highlight"><span class="filename">TOML</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">[tidy-up.forbidden]</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="n">page_references</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"quick capture"</span><span class="p">,</span><span class="w"> </span><span class="s2">"inbox"</span><span class="p">]</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="n">url_substrings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"utm_source"</span><span class="p">]</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="n">text_substrings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"📍"</span><span class="p">]</span>
+</code></pre></div>
+<p><code>page_references</code> matches page links and tags without regard to case. <code>url_substrings</code> and
+<code>text_substrings</code> match text within URLs and ordinary text nodes.</p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/markdown/files/*.md
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>lqd<span class="w"> </span>tidy-up<span class="w"> </span>/path/to/markdown/files/*.md
 </code></pre></div>
 <h2 id="global-flags">Global Flags<a class="headerlink" href="#global-flags" title="Permanent link">¶</a></h2>
-<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>-h, --help
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>-h, --help
 </code></pre></div>
 <p>Show help information for any command.</p>
 <h2 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">¶</a></h2>
 <h3 id="logseq_graph_path"><code>LOGSEQ_GRAPH_PATH</code><a class="headerlink" href="#logseq_graph_path" title="Permanent link">¶</a></h3>
 <p>Path to your Logseq graph directory. Used by the <code>backlog</code> command to locate your graph.</p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_GRAPH_PATH</span><span class="o">=</span>~/logseq/my-graph
-<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>lqd<span class="w"> </span>backlog
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_GRAPH_PATH</span><span class="o">=</span>~/logseq/my-graph
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>lqd<span class="w"> </span>backlog
 </code></pre></div>
 <h3 id="logseq_host_url"><code>LOGSEQ_HOST_URL</code><a class="headerlink" href="#logseq_host_url" title="Permanent link">¶</a></h3>
 <p>Logseq API host URL. Used by the <code>backlog</code> command to connect to the Logseq API.</p>
 <p><strong>Default:</strong> <code>http://localhost:12315</code></p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_HOST_URL</span><span class="o">=</span>http://localhost:12315
-<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>lqd<span class="w"> </span>backlog
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_HOST_URL</span><span class="o">=</span>http://localhost:12315
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>lqd<span class="w"> </span>backlog
 </code></pre></div>
 <h3 id="logseq_api_token"><code>LOGSEQ_API_TOKEN</code><a class="headerlink" href="#logseq_api_token" title="Permanent link">¶</a></h3>
 <p>Logseq API authentication token. Required by the <code>backlog</code> command to authenticate with the Logseq API.</p>
 <p><strong>Example:</strong></p>
-<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_API_TOKEN</span><span class="o">=</span>your-api-token-here
-<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>lqd<span class="w"> </span>backlog
+<div class="highlight"><span class="filename">Bash</span><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LOGSEQ_API_TOKEN</span><span class="o">=</span>your-api-token-here
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>lqd<span class="w"> </span>backlog
 </code></pre></div>
 <h2 id="exit-code">Exit Code<a class="headerlink" href="#exit-code" title="Permanent link">¶</a></h2>
 <p>The CLI uses standard exit codes:</p>
