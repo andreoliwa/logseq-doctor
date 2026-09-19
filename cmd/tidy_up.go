@@ -1,38 +1,74 @@
 package cmd
 
 import (
+	"errors"
+	"fmt"
+	"os"
+
 	"github.com/andreoliwa/logseq-doctor/internal"
 	"github.com/andreoliwa/logseq-doctor/internal/api"
+	"github.com/andreoliwa/logseq-doctor/internal/config"
+	"github.com/andreoliwa/logseq-go"
 	"github.com/spf13/cobra"
-	"os"
 )
 
-// tidyUpCmd represents the tidyUp command.
-var tidyUpCmd = &cobra.Command{ //nolint:exhaustruct_v5,gochecknoglobals
-	Use:   "tidy-up file1.md [file2.md ...]",
-	Short: "Tidy up your Markdown files.",
-	// TODO: dynamically generate the long description based on the functions in the code.
-	Long: `Tidy up your Markdown files, checking for invalid content and fixing some of them automatically.
+var errForbiddenContent = errors.New("tidy-up found forbidden content")
 
-- Check for forbidden references to pages/tags
-- Check for running tasks (DOING)
-- Check for double spaces`,
-	Args: cobra.MinimumNArgs(1),
-	Run: func(_ *cobra.Command, args []string) {
-		graph := api.OpenGraphFromPath(os.Getenv("LOGSEQ_GRAPH_PATH"))
+// TidyUpDependencies supplies dependencies for the tidy-up command.
+type TidyUpDependencies struct {
+	OpenGraphFromPath func(string) *logseq.Graph
+	LoadPolicy        func() (config.ForbiddenContentPolicy, error)
+	TidyUpOneFile     func(*logseq.Graph, string, config.ForbiddenContentPolicy) int
+}
 
-		exitCode := 0
+// NewTidyUpCmd creates the tidy-up command.
+func NewTidyUpCmd(deps *TidyUpDependencies) *cobra.Command {
+	if deps == nil {
+		deps = &TidyUpDependencies{
+			OpenGraphFromPath: api.OpenGraphFromPath,
+			LoadPolicy: func() (config.ForbiddenContentPolicy, error) {
+				path, err := config.TidyUpConfigPath()
+				if err != nil {
+					return config.ForbiddenContentPolicy{}, fmt.Errorf("get tidy-up config path: %w", err)
+				}
 
-		for _, path := range args {
-			if internal.TidyUpOneFile(graph, path) != 0 {
-				exitCode = 1
-			}
+				return config.LoadTidyUpPolicy(path)
+			},
+			TidyUpOneFile: internal.TidyUpOneFile,
 		}
+	}
 
-		os.Exit(exitCode)
-	},
+	return &cobra.Command{ //nolint:exhaustruct_v5
+		Use:           "tidy-up file1.md [file2.md ...]",
+		Short:         "Tidy up your Markdown files.",
+		SilenceErrors: true,
+		SilenceUsage:  true,
+		Long: `Tidy up your Markdown files, checking for invalid content and fixing some of them automatically.
+
+- Check forbidden references and configured URL and text strings
+- Check running tasks (DOING)
+- Check double spaces`,
+		Args: cobra.MinimumNArgs(1),
+		RunE: func(command *cobra.Command, args []string) error {
+			policy, err := deps.LoadPolicy()
+			if err != nil {
+				_, _ = fmt.Fprintln(command.ErrOrStderr(), err)
+
+				return err
+			}
+
+			graph := deps.OpenGraphFromPath(os.Getenv("LOGSEQ_GRAPH_PATH"))
+			for _, path := range args {
+				if deps.TidyUpOneFile(graph, path, policy) != 0 {
+					return errForbiddenContent
+				}
+			}
+
+			return nil
+		},
+	}
 }
 
 func init() {
-	rootCmd.AddCommand(tidyUpCmd)
+	rootCmd.AddCommand(NewTidyUpCmd(nil))
 }

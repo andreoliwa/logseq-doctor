@@ -447,6 +447,20 @@ This command helps ensure your Markdown files follow consistent formatting rules
 - Removes unnecessary brackets from tags
 - Standardizes formatting
 
+Before running this command, create a config file at `~/.config/lqd/config.toml` on Linux,
+`~/Library/Application Support/lqd/config.toml` on macOS, or `%AppData%\\lqd\\config.toml` on Windows.
+The command exits with an error if the file does not exist.
+
+```toml
+[tidy-up.forbidden]
+page_references = ["quick capture", "inbox"]
+url_substrings = ["utm_source"]
+text_substrings = ["📍"]
+```
+
+`page_references` matches page links and tags without regard to case. `url_substrings` and
+`text_substrings` match text within URLs and ordinary text nodes.
+
 **Example:**
 
 ```bash

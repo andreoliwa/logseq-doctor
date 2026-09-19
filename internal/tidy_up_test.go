@@ -8,6 +8,7 @@ import (
 
 	"github.com/andreoliwa/logseq-doctor/internal"
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
+	"github.com/andreoliwa/logseq-doctor/internal/config"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
 	"github.com/stretchr/testify/require"
 
@@ -70,12 +71,43 @@ func setupFileContents(t *testing.T, name string) resultSetupFileContents {
 }
 
 func TestCheckForbiddenReferences(t *testing.T) {
+	policy := config.ForbiddenContentPolicy{
+		PageReferences: []string{"quick capture", "inbox"},
+		URLSubstrings:  []string{"utm_source"},
+		TextSubstrings: []string{"📍"},
+	}
 	invalid := setupPage(t, "forbidden")
 	assert.Equal(t, internal.ChangedPage{"remove 4 forbidden references to pages/tags: Inbox, quick capture", false},
-		internal.CheckForbiddenReferences(invalid))
+		internal.CheckForbiddenReferences(invalid, policy))
 
 	valid := setupPage(t, "valid")
-	assert.Equal(t, internal.ChangedPage{"", false}, internal.CheckForbiddenReferences(valid))
+	assert.Equal(t, internal.ChangedPage{"", false}, internal.CheckForbiddenReferences(valid, policy))
+}
+
+func TestCheckForbiddenReferencesUsesConfiguredCategories(t *testing.T) {
+	page := setupPage(t, "forbidden")
+	policy := config.ForbiddenContentPolicy{
+		PageReferences: []string{"inbox"},
+		URLSubstrings:  []string{"example.com"},
+		TextSubstrings: []string{"pin"},
+	}
+
+	assert.Equal(t, internal.ChangedPage{"remove 2 forbidden references to pages/tags: Inbox", false},
+		internal.CheckForbiddenReferences(page, policy))
+}
+
+func TestCheckForbiddenReferencesMatchesURLsAndText(t *testing.T) {
+	page := setupPage(t, "forbidden-categories")
+	policy := config.ForbiddenContentPolicy{
+		URLSubstrings:  []string{"utm_source"},
+		TextSubstrings: []string{"📍"},
+	}
+
+	result := internal.CheckForbiddenReferences(page, policy)
+
+	assert.False(t, result.Changed)
+	assert.Contains(t, result.Msg, "https://example.com/?utm_source=newsletter")
+	assert.Contains(t, result.Msg, "Pinned 📍")
 }
 
 func TestCheckRunningTasks(t *testing.T) {

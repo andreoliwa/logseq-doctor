@@ -107,7 +107,16 @@ Clean up and standardize your Markdown files:
 lqd tidy-up --help
 ```
 
-This command helps ensure your Markdown files follow consistent formatting rules.
+This command helps ensure your Markdown files follow consistent formatting rules. It requires a
+config file at `~/.config/lqd/config.toml` on Linux, `~/Library/Application Support/lqd/config.toml`
+on macOS, or `%AppData%\\lqd\\config.toml` on Windows:
+
+```toml
+[tidy-up.forbidden]
+page_references = ["quick capture", "inbox"]
+url_substrings = ["utm_source"]
+text_substrings = ["📍"]
+```
 
 #### `completion` - Shell Completion
 

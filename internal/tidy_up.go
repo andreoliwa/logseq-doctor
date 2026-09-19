@@ -8,11 +8,12 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/andreoliwa/logseq-doctor/internal/config"
 	"github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 )
 
-func TidyUpOneFile(graph *logseq.Graph, path string) int { //nolint:cyclop,funlen
+func TidyUpOneFile(graph *logseq.Graph, path string, policy config.ForbiddenContentPolicy) int { //nolint:cyclop,funlen
 	if !IsValidMarkdownFile(path) {
 		fmt.Printf("%s: skipping, not a Markdown file\n", path)
 
@@ -72,7 +73,8 @@ func TidyUpOneFile(graph *logseq.Graph, path string) int { //nolint:cyclop,funle
 	}
 
 	for _, f := range []func(logseq.Page) ChangedPage{
-		CheckForbiddenReferences, CheckRunningTasks, RemoveDoubleSpaces, RemoveEmptyBullets,
+		func(page logseq.Page) ChangedPage { return CheckForbiddenReferences(page, policy) },
+		CheckRunningTasks, RemoveDoubleSpaces, RemoveEmptyBullets,
 	} {
 		result := f(page)
 		if result.Msg != "" {
@@ -118,12 +120,12 @@ type ChangedPage struct {
 }
 
 // CheckForbiddenReferences checks if a page has forbidden references to other pages or tags.
-func CheckForbiddenReferences(page logseq.Page) ChangedPage {
+func CheckForbiddenReferences(page logseq.Page, policy config.ForbiddenContentPolicy) ChangedPage {
 	all := make([]string, 0)
 
 	for _, block := range page.Blocks() {
 		block.Children().FindDeep(func(node content.Node) bool {
-			reference, forbidden := forbiddenReference(node)
+			reference, forbidden := forbiddenReference(node, policy)
 			if forbidden {
 				all = append(all, reference)
 			}
@@ -142,29 +144,39 @@ func CheckForbiddenReferences(page logseq.Page) ChangedPage {
 	return ChangedPage{"", false}
 }
 
-func forbiddenReference(node content.Node) (string, bool) {
-	// TODO: these values should be read from a config file or env var
+func forbiddenReference(node content.Node, policy config.ForbiddenContentPolicy) (string, bool) {
 	switch value := node.(type) {
 	case *content.PageLink:
-		return value.To, isForbiddenReference(value.To)
+		return value.To, isForbiddenPageReference(value.To, policy.PageReferences)
 	case *content.Hashtag:
-		return value.To, isForbiddenReference(value.To)
+		return value.To, isForbiddenPageReference(value.To, policy.PageReferences)
 	case *content.Link:
-		return value.URL, strings.Contains(value.URL, "utm_source")
+		return value.URL, containsSubstring(value.URL, policy.URLSubstrings)
 	case *content.Text:
-		return value.Value, strings.Contains(value.Value, "📍")
+		return value.Value, containsSubstring(value.Value, policy.TextSubstrings)
 	default:
 		return "", false
 	}
 }
 
-func isForbiddenReference(reference string) bool {
-	switch strings.ToLower(reference) {
-	case "quick capture", "inbox":
-		return true
-	default:
-		return false
+func isForbiddenPageReference(reference string, forbiddenReferences []string) bool {
+	for _, forbidden := range forbiddenReferences {
+		if strings.EqualFold(reference, forbidden) {
+			return true
+		}
 	}
+
+	return false
+}
+
+func containsSubstring(value string, forbiddenSubstrings []string) bool {
+	for _, forbidden := range forbiddenSubstrings {
+		if strings.Contains(value, forbidden) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func SortAndRemoveDuplicates(elements []string) []string {
