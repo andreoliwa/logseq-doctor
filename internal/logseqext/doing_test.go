@@ -25,7 +25,7 @@ func TestSyncDoingTasks(t *testing.T) {
 `), 0o600)
 	require.NoError(t, err)
 
-	err = os.WriteFile(filepath.Join(pagesDir, "doing.md"), []byte(`- Existing note
+	err = os.WriteFile(filepath.Join(pagesDir, "DOING.md"), []byte(`- Existing note
   - ((22222222-2222-2222-2222-222222222222))
 `), 0o600)
 	require.NoError(t, err)
@@ -36,7 +36,7 @@ func TestSyncDoingTasks(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 2, count)
 
-	contents, err := os.ReadFile(filepath.Join(pagesDir, "doing.md"))
+	contents, err := os.ReadFile(filepath.Join(pagesDir, "DOING.md"))
 	require.NoError(t, err)
 
 	expected := "- ((11111111-1111-1111-1111-111111111111))\n" +
@@ -48,7 +48,7 @@ func TestSyncDoingTasks(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 2, count)
 
-	contents, err = os.ReadFile(filepath.Join(pagesDir, "doing.md"))
+	contents, err = os.ReadFile(filepath.Join(pagesDir, "DOING.md"))
 	require.NoError(t, err)
 	assert.Equal(t, before, string(contents))
 }
@@ -73,7 +73,7 @@ func TestSyncDoingTasksInFiles(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 1, count)
 
-	contents, err := os.ReadFile(filepath.Join(pagesDir, "doing.md"))
+	contents, err := os.ReadFile(filepath.Join(pagesDir, "DOING.md"))
 	require.NoError(t, err)
 	assert.Equal(t, "- ((33333333-3333-3333-3333-333333333333))", string(contents))
 }
@@ -92,7 +92,7 @@ func TestSyncDoingTasksIncludesJournalTasks(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 1, count)
 
-	contents, err := os.ReadFile(filepath.Join(graph.Directory(), "pages", "doing.md"))
+	contents, err := os.ReadFile(filepath.Join(graph.Directory(), "pages", "DOING.md"))
 	require.NoError(t, err)
 	assert.Equal(t, "- ((33333333-3333-3333-3333-333333333333))", string(contents))
 }
@@ -116,7 +116,7 @@ func TestSyncDoingTasksAssignsID(t *testing.T) {
 	require.Len(t, taskID, 2)
 	assert.Equal(t, "- DOING Task without an ID\n  id:: "+taskID[1], string(taskContents))
 
-	doingContents, err := os.ReadFile(filepath.Join(pagesDir, "doing.md"))
+	doingContents, err := os.ReadFile(filepath.Join(pagesDir, "DOING.md"))
 	require.NoError(t, err)
 	assert.Equal(t, "- (("+taskID[1]+"))", string(doingContents))
 }
