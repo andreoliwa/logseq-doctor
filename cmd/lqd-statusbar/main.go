@@ -25,7 +25,7 @@ const defaultDashboardPort = "8091"
 
 const (
 	tickerIntervalSecs = 2
-	iconIdle           = "🛑"
+	iconIdle           = "❌"
 	iconActive         = "🟢"
 )
 

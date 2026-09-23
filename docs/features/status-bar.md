@@ -59,10 +59,10 @@ The status bar process is tied to the dashboard - it is killed automatically whe
 
 | Icon   | Meaning                                          |
 | ------ | ------------------------------------------------ |
-| `🛑`   | No `DOING` tasks found (or the graph scan fails) |
+| `❌`   | No `DOING` tasks found (or the graph scan fails) |
 | `🟢 N` | N tasks currently marked `DOING`                 |
 
-The count updates every 2 seconds. Each scan adds a block reference for every current `DOING` task to the top of the `DOING` page. Existing references are left unchanged. If the graph scan fails, the icon falls back to `🛑` silently.
+The count updates every 2 seconds. Each scan adds a block reference for every current `DOING` task to the top of the `DOING` page. Existing references are left unchanged. If the graph scan fails, the icon falls back to `❌` silently.
 
 ---
 
