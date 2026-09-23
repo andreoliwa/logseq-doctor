@@ -11,15 +11,22 @@ import (
 )
 
 const (
-	pbPollInterval = 200 * time.Millisecond
-	pbPollTimeout  = 500 * time.Millisecond
+	pbInitialPollInterval = 100 * time.Millisecond
+	pbMaxPollInterval     = time.Second
+	pbPollTimeout         = 500 * time.Millisecond
+	pbBackoffMultiplier   = 2
 )
 
-// ErrWaitTimeout is returned when WaitForReady times out.
-var ErrWaitTimeout = errors.New("timed out waiting for service to be ready")
+var (
+	// ErrWaitTimeout is returned when WaitForReady times out.
+	ErrWaitTimeout = errors.New("timed out waiting for service to be ready")
 
-// ErrPocketBaseNotFound is returned when the pocketbase binary cannot be located.
-var ErrPocketBaseNotFound = errors.New("pocketbase executable not found in $PATH or ~/.local/bin")
+	// ErrPocketBaseNotFound is returned when the pocketbase binary cannot be located.
+	ErrPocketBaseNotFound = errors.New("pocketbase executable not found in $PATH or ~/.local/bin")
+
+	errNoHealthCheck          = errors.New("no health check completed")
+	errUnexpectedHealthStatus = errors.New("unexpected health-check status")
+)
 
 // StartPocketBase starts pocketbase serve as a managed subprocess from workDir.
 // Stdout and stderr are inherited so PocketBase logs appear in the same terminal with color.
@@ -83,14 +90,27 @@ func IsReady(healthURL string) bool {
 	return resp.StatusCode == http.StatusOK
 }
 
-// WaitForReady polls healthURL until it returns 200 OK or timeout elapses.
+// WaitForReady polls healthURL with exponential backoff until it returns 200 OK
+// or timeout elapses. On failure, the error includes the last health-check
+// result to make startup failures actionable.
 func WaitForReady(healthURL string, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 	client := &http.Client{ //nolint:exhaustruct_v5 // only Timeout needed for short-lived polling
 		Timeout: pbPollTimeout,
 	}
+	interval := pbInitialPollInterval
+	attempts := 0
+	lastErr := errNoHealthCheck
 
-	for time.Now().Before(deadline) {
+	for {
+		remaining := time.Until(deadline)
+		if remaining <= 0 {
+			break
+		}
+
+		attempts++
+		client.Timeout = min(pbPollTimeout, remaining)
+
 		resp, err := client.Get(healthURL) //nolint:noctx // short-lived polling, context not needed
 		if err == nil {
 			_ = resp.Body.Close()
@@ -98,10 +118,20 @@ func WaitForReady(healthURL string, timeout time.Duration) error {
 			if resp.StatusCode == http.StatusOK {
 				return nil
 			}
+
+			lastErr = fmt.Errorf("%w: %s", errUnexpectedHealthStatus, resp.Status)
+		} else {
+			lastErr = err
 		}
 
-		time.Sleep(pbPollInterval)
+		wait := min(interval, time.Until(deadline))
+		if wait > 0 {
+			time.Sleep(wait)
+		}
+
+		interval = min(interval*pbBackoffMultiplier, pbMaxPollInterval)
 	}
 
-	return fmt.Errorf("%w: %s", ErrWaitTimeout, healthURL)
+	return fmt.Errorf("%w after %d attempts in %s: %s (last health check: %w)",
+		ErrWaitTimeout, attempts, timeout, healthURL, lastErr)
 }

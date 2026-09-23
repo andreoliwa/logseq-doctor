@@ -30,7 +30,7 @@ import (
 const (
 	defaultServePort     = 8091
 	defaultPocketBaseURL = "http://127.0.0.1:8090"
-	pbReadyTimeout       = 10 * time.Second
+	pbReadyTimeout       = 30 * time.Second
 	shutdownTimeout      = 5 * time.Second
 	readHeaderTimeout    = 5 * time.Second
 )
@@ -85,6 +85,8 @@ func runDashboard(cmd *cobra.Command, _ []string) error {
 	if pocketbase.IsReady(healthURL) {
 		fmt.Fprintf(os.Stderr, "PocketBase already running at %s\n", pbURL)
 	} else {
+		fmt.Fprintf(os.Stderr, "Starting PocketBase; waiting up to %s for %s\n", pbReadyTimeout, healthURL)
+
 		pbCmd, err = pocketbase.StartPocketBase(homeDir)
 		if err != nil {
 			return fmt.Errorf("start pocketbase: %w", err)

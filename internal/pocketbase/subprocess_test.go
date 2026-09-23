@@ -25,4 +25,24 @@ func TestWaitForReadyTimesOut(t *testing.T) {
 	err := pocketbase.WaitForReady("http://127.0.0.1:19999", 300*time.Millisecond)
 	require.Error(t, err)
 	require.ErrorIs(t, err, pocketbase.ErrWaitTimeout)
+	require.ErrorContains(t, err, "last health check")
+}
+
+func TestWaitForReadyRetriesNonOKResponses(t *testing.T) {
+	attempts := 0
+
+	srv := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		attempts++
+		if attempts < 3 {
+			writer.WriteHeader(http.StatusServiceUnavailable)
+
+			return
+		}
+
+		writer.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	require.NoError(t, pocketbase.WaitForReady(srv.URL, time.Second))
+	require.Equal(t, 3, attempts)
 }
