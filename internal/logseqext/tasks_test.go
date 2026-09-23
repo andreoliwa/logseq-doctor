@@ -219,6 +219,8 @@ func TestAddTaskUnderBlock(t *testing.T) {
 
 func TestAddOrUpdateTaskByKey(t *testing.T) {
 	defaultFrozenTime := time.Date(2025, 1, 4, 0, 0, 0, 0, time.UTC)
+	//nolint:gosmopolitan // Test data uses Local time
+	doingTime := time.Date(2025, 11, 1, 19, 29, 57, 0, time.Local)
 
 	tests := []struct {
 		name         string
@@ -299,8 +301,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) {
 			blockText:    "",
 			key:          "week",
 			expectedFile: "update-doing-task",
-			//nolint:gosmopolitan // Test data uses Local time
-			frozenTime: ptrTime(time.Date(2025, 11, 1, 19, 29, 57, 0, time.Local)),
+			frozenTime: &doingTime,
 		},
 		{
 			name:         "update task with key in a link",
@@ -347,9 +348,4 @@ func TestAddOrUpdateTaskByKey(t *testing.T) {
 			testutils.AssertGoldenPages(t, graph, "stub-graph", []string{test.expectedFile})
 		})
 	}
-}
-
-// ptrTime is a helper function to create a pointer to a time.Time value.
-func ptrTime(t time.Time) *time.Time {
-	return &t
 }
