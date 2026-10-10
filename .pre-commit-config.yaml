@@ -38,7 +38,7 @@ repos:
       - id: bashate
         args: [-i, E006]
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.11.0.1
+    rev: v0.11.0.1-1
     hooks:
       - id: shellcheck
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
@@ -64,7 +64,7 @@ repos:
     hooks:
       - id: sync-pre-commit-deps
   - repo: https://github.com/golangci/golangci-lint
-    rev: v2.11.4
+    rev: v2.14.0
     hooks:
       - id: golangci-lint
         name: golangci-lint
