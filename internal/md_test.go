@@ -1,6 +1,9 @@
 package internal_test
 
 import (
+	"fmt"
+	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -158,4 +161,57 @@ func TestInsertMarkdownToPage(t *testing.T) {
 			testutils.AssertGoldenPages(t, graph, "md", []string{test.expectedGolden})
 		})
 	}
+}
+
+func TestMarkdownTimedKeyUpdate(t *testing.T) {
+	for _, test := range []struct{ name, input, want string }{
+		{
+			name:  "untimed retains position",
+			input: "DOING key",
+			want: "- 09:00 First\n" +
+				"- DOING key\n" +
+				"  id:: 12345678-1234-1234-1234-123456789abc\n" +
+				"  custom:: keep\n" +
+				"  :LOGBOOK:\n" +
+				"  CLOCK: [2026-10-16 Fri 10:00:00]\n" +
+				"  :END:\n" +
+				"\t- Child\n" +
+				"- 11:00 Last\n",
+		},
+	} {
+		for _, nested := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/nested=%t", test.name, nested), func(t *testing.T) {
+				before := "- 09:00 First\n- DOING 10:00 key\n" +
+					"  id:: 12345678-1234-1234-1234-123456789abc\n  custom:: keep\n" +
+					"  :LOGBOOK:\n  CLOCK: [2026-10-16 Fri 10:00:00]\n  :END:\n  - Child\n- 11:00 Last\n"
+				want := test.want
+
+				if nested {
+					before = "- Project\n\t" + strings.ReplaceAll(strings.TrimSuffix(before, "\n"), "\n", "\n\t") +
+						"\n- 07:00 Outside\n"
+					want = "- Project\n\t" + strings.ReplaceAll(strings.TrimSuffix(want, "\n"), "\n", "\n\t") + "\n- 07:00 Outside\n"
+				}
+
+				graph, path := testutils.NewMarkdownGraph(t, before)
+				require.NoError(t, internal.InsertMarkdown(&internal.InsertMarkdownOptions{
+					Graph: graph, Page: "timeline", Key: "key", Content: test.input,
+				}))
+
+				actual, err := os.ReadFile(path)
+				require.NoError(t, err)
+				require.Equal(t, strings.TrimSuffix(want, "\n"), string(actual))
+			})
+		}
+	}
+}
+
+func TestMarkdownWhitespaceKeyUpdateDoesNotMoveExistingTime(t *testing.T) {
+	graph, path := testutils.NewMarkdownGraph(t, "- 11:00 key\n- 09:00 Earlier\n")
+	require.NoError(t, internal.InsertMarkdown(&internal.InsertMarkdownOptions{
+		Graph: graph, Page: "timeline", Key: "key", Content: " \n\t ",
+	}))
+
+	actual, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.Equal(t, "- 11:00 key\n- 09:00 Earlier\n", string(actual))
 }

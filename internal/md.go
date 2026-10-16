@@ -32,7 +32,7 @@ type InsertMarkdownOptions struct {
 // If ParentText is provided, it searches for the first block containing that text
 // and inserts the content as a child block. Otherwise, appends to the end.
 func InsertMarkdown(opts *InsertMarkdownOptions) error {
-	if opts.Content == "" {
+	if strings.TrimSpace(opts.Content) == "" {
 		return nil
 	}
 
@@ -101,8 +101,7 @@ func updateExistingBlock(block *content.Block, newContent string) error {
 	}
 
 	removeOldContentNodes(block)
-	firstChildBlock := findFirstChildBlock(block)
-	insertNewContentNodes(block, parsedBlock, firstChildBlock)
+	insertNewContentNodes(block, parsedBlock)
 
 	return nil
 }
@@ -142,35 +141,21 @@ func shouldPreserveNode(node content.Node) bool {
 	return false
 }
 
-// findFirstChildBlock finds the first child block in a block.
-func findFirstChildBlock(block *content.Block) *content.Block {
-	for node := block.FirstChild(); node != nil; node = node.NextSibling() {
-		if childBlock, ok := node.(*content.Block); ok {
-			return childBlock
-		}
-	}
-
-	return nil
-}
-
 // insertNewContentNodes inserts new content nodes from parsedBlock into block.
-func insertNewContentNodes(block *content.Block, parsedBlock *content.Block, firstChildBlock *content.Block) {
+func insertNewContentNodes(block *content.Block, parsedBlock *content.Block) {
 	if len(parsedBlock.Children()) == 0 {
 		return
 	}
 
-	// Find the insertion point: before the first child block, or before the first preserved node (Properties/Logbook)
+	// Place visible content before metadata as well as children so the first
+	// paragraph remains the block's first line after a key update.
 	var insertBefore content.Node
-	if firstChildBlock != nil {
-		insertBefore = firstChildBlock
-	} else {
-		// No child blocks, find the first Properties or Logbook node to insert before
-		for node := block.FirstChild(); node != nil; node = node.NextSibling() {
-			if shouldPreserveNode(node) {
-				insertBefore = node
 
-				break
-			}
+	for node := block.FirstChild(); node != nil; node = node.NextSibling() {
+		if shouldPreserveNode(node) {
+			insertBefore = node
+
+			break
 		}
 	}
 
