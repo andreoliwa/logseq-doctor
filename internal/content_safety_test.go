@@ -1,11 +1,28 @@
-package internal //nolint:testpackage // Exercise atomic-replacement guards directly.
+package internal //nolint:testpackage // Exercise unsafe-range and atomic-replacement guards directly.
 
 import (
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"testing"
+
+	logseq "github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/content"
+	"github.com/stretchr/testify/require"
 )
+
+func TestRejectInvalidSourceRanges(t *testing.T) {
+	block := content.NewBlock()
+	for _, ranges := range [][]logseq.BlockSourceRange{
+		{{Block: block, Start: -1, End: 2}},
+		{{Block: block, Start: 0, End: 4}},
+		{{Block: block, Start: 1, End: 1}},
+		{{Block: nil, Start: 0, End: 3}},
+		{{Block: block, Start: 0, End: 1}, {Block: block, Start: 2, End: 3}},
+		{{Block: block, Start: 0, End: 2}},
+	} {
+		require.Error(t, validateSourceRanges("abc", ranges))
+	}
+}
 
 func TestReplaceJournalFailureLeavesTargetAndNoTemporaryFile(t *testing.T) {
 	directory := t.TempDir()

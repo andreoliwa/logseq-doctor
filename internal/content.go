@@ -34,8 +34,8 @@ func IsValidMarkdownFile(filePath string) bool {
 	return !info.IsDir()
 }
 
-// AppendRawMarkdownToJournal appends raw Markdown while preparing a safe replacement.
-// Avoid serializing: the serializer escapes literal brackets
+// AppendRawMarkdownToJournal inserts outlined roots chronologically, preserving raw bytes.
+// Keep source slices instead of serializing: the serializer escapes literal brackets
 // such as "[something]", which has broken links on this path in the past.
 func AppendRawMarkdownToJournal(graph *logseq.Graph, date time.Time, rawMarkdown string) (int, error) {
 	if rawMarkdown == "" {
@@ -65,7 +65,10 @@ func AppendRawMarkdownToJournal(graph *logseq.Graph, date time.Time, rawMarkdown
 		mode = snapshot.info.Mode().Perm()
 	}
 
-	result := appendRaw(string(original), rawMarkdown)
+	result, err := placeRawContent(string(original), rawMarkdown)
+	if err != nil {
+		return 0, err
+	}
 
 	err = replaceJournal(path, []byte(result), mode, snapshot)
 	if err != nil {
@@ -211,26 +214,4 @@ func replacementSnapshot(path string, expected []journalSnapshot) (journalSnapsh
 	}
 
 	return readJournalSnapshot(path)
-}
-
-func joinRaw(before, after string) string {
-	if before == "" || after == "" || strings.HasSuffix(before, "\n") {
-		return before + after
-	}
-
-	newline := "\n"
-	if strings.Contains(before, "\r\n") || strings.Contains(after, "\r\n") {
-		newline = "\r\n"
-	}
-
-	return before + newline + after
-}
-
-func appendRaw(original, incoming string) string {
-	// Preserve the old empty-journal placeholder behavior for unoutlined input.
-	if strings.TrimLeft(strings.TrimRight(original, "\n"), "- ") == "" {
-		return incoming
-	}
-
-	return joinRaw(original, incoming)
 }

@@ -41,7 +41,7 @@ func TestContentPreservesJournalSymlink(t *testing.T) {
 
 	actual, err := os.ReadFile(target)
 	require.NoError(t, err)
-	require.Equal(t, "- 10:00 Existing\n- 09:00 New\n", string(actual))
+	require.Equal(t, "- 09:00 New\n- 10:00 Existing\n", string(actual))
 }
 
 func TestJournalRejectsChangedSnapshot(t *testing.T) {

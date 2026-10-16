@@ -97,3 +97,122 @@ func TestAppendRawMarkdownToJournal(t *testing.T) {
 		})
 	}
 }
+
+// These fixtures catch append-only placement, byte rewriting and subtree flattening.
+func TestRawChronologicalBatches(t *testing.T) {
+	const ref = "((12345678-1234-1234-1234-123456789abc))"
+	for _, testCase := range []struct{ name, before, incoming, want string }{
+		{
+			"interleave",
+			"- 10:00 Existing\n",
+			"- **9h00** Early\n- 11:00 Late\n",
+			"- **9h00** Early\n- 10:00 Existing\n- 11:00 Late\n",
+		},
+		{
+			"equal arrival",
+			"- 10:00 Existing\n- 11:00 Later\n",
+			"- 10:00 First\n- 10:00 Second\n",
+			"- 10:00 Existing\n- 10:00 First\n- 10:00 Second\n- 11:00 Later\n",
+		},
+		{"disorder", "- 11:00 Later\n- 09:00 Earlier\n", "- 10:00 New\n", "- 10:00 New\n- 11:00 Later\n- 09:00 Earlier\n"},
+		{
+			"evolving",
+			"- 12:00 Existing\n",
+			"- 11:00 First\n- 09:00 Second\n- 11:00 Third\n",
+			"- 09:00 Second\n- 11:00 First\n- 11:00 Third\n- 12:00 Existing\n",
+		},
+		{
+			"subtree",
+			"- 10:00 Existing [literal] [link](https://example.com)\r\n",
+			"- *9h00* Early\r\n  id:: abc\r\n  supporting [text]\r\n\t- 12:00 Child\r\n",
+			"- *9h00* Early\r\n  id:: abc\r\n  supporting [text]\r\n\t- 12:00 Child\r\n" +
+				"- 10:00 Existing [literal] [link](https://example.com)\r\n",
+		},
+		{"untimed group", "- 10:00 Existing\n", "- Group\n  - 09:00 Child\n", "- 10:00 Existing\n- Group\n  - 09:00 Child\n"},
+		{
+			"ref unit",
+			"- " + ref + "\n  - 12:00 First\n  - 12:20 Second\n- 12:27 Later\n",
+			"- 12:10 New\n",
+			"- " + ref + "\n  - 12:00 First\n  - 12:20 Second\n- 12:10 New\n- 12:27 Later\n",
+		},
+		{
+			"fenced",
+			"- 10:00 Existing\n  ```md\n  - 07:00 Not a root\n  ```\n",
+			"- 09:00 New\n",
+			"- 09:00 New\n- 10:00 Existing\n  ```md\n  - 07:00 Not a root\n  ```\n",
+		},
+		{"raw unoutlined", "- 10:00 Existing", "09:00 raw [literal]", "- 10:00 Existing\n09:00 raw [literal]"},
+		{"missing final newline", "- 10:00 Existing", "- 09:00 New", "- 09:00 New\n- 10:00 Existing"},
+		{"empty journal", "", "- 09:00 New", "- 09:00 New"},
+		{"empty input", "- 10:00 Existing\n", "", "- 10:00 Existing\n"},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			graph, _ := testutils.NewMarkdownGraph(t, "")
+			date := time.Date(2026, 10, 16, 0, 0, 0, 0, time.UTC)
+			path, err := graph.JournalPath(date)
+			require.NoError(t, err)
+			// Group-readable mode verifies replacement preserves existing permissions.
+			require.NoError(t, os.WriteFile(path, []byte(testCase.before), 0o640)) //nolint:gosec
+			_, err = internal.AppendRawMarkdownToJournal(graph, date, testCase.incoming)
+			require.NoError(t, err)
+			got, err := os.ReadFile(path)
+			require.NoError(t, err)
+			require.Equal(t, testCase.want, string(got))
+
+			info, err := os.Stat(path)
+			require.NoError(t, err)
+			require.Equal(t, os.FileMode(0o640), info.Mode().Perm())
+		})
+	}
+}
+
+func TestRawPagePrefixAndUnoutlinedRangeFallback(t *testing.T) {
+	for _, test := range []struct{ name, before, incoming, want string }{
+		{
+			"page properties",
+			"title:: Day\n- 08:00 Before\n- 10:00 Later\n",
+			"tags:: capture\n- 09:00 New\n",
+			"title:: Day\ntags:: capture\n- 08:00 Before\n- 09:00 New\n- 10:00 Later\n",
+		},
+		{
+			"unoutlined range fallback",
+			"- 10:00 Existing\n",
+			"Introduction\n\n- One\n\n---\n\n- Two",
+			"- 10:00 Existing\nIntroduction\n\n- One\n\n---\n\n- Two",
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			graph, _ := testutils.NewMarkdownGraph(t, "")
+			date := time.Date(2026, 10, 16, 0, 0, 0, 0, time.UTC)
+			path, err := graph.JournalPath(date)
+			require.NoError(t, err)
+			require.NoError(t, os.WriteFile(path, []byte(test.before), 0o600))
+			_, err = internal.AppendRawMarkdownToJournal(graph, date, test.incoming)
+			require.NoError(t, err)
+			got, err := os.ReadFile(path)
+			require.NoError(t, err)
+			require.Equal(t, test.want, string(got))
+		})
+	}
+}
+
+func TestRawUnsafeJoinsLeaveJournalUnchanged(t *testing.T) {
+	for _, test := range []struct{ name, before, incoming string }{
+		{"indented root becomes child", "- 08:00 Before\n- 10:00 Later\n", "  - 09:00 New\n"},
+		{"existing root becomes child", "  - 10:00 Later\n", "- 09:00 New\n"},
+		{"unsupported source ranges", "- 10:00 Existing\n", "- One\n\n---\n\n- Two"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			graph, _ := testutils.NewMarkdownGraph(t, "")
+			date := time.Date(2026, 10, 16, 0, 0, 0, 0, time.UTC)
+			path, err := graph.JournalPath(date)
+			require.NoError(t, err)
+			require.NoError(t, os.WriteFile(path, []byte(test.before), 0o600))
+			_, err = internal.AppendRawMarkdownToJournal(graph, date, test.incoming)
+			require.Error(t, err)
+			got, err := os.ReadFile(path)
+			require.NoError(t, err)
+			require.Equal(t, test.before, string(got))
+		})
+	}
+}

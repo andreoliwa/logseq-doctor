@@ -36,11 +36,20 @@ func NewContentCmd(deps *ContentDependencies) *cobra.Command {
 
 	command := &cobra.Command{ //nolint:exhaustruct_v5
 		Use:   "content",
-		Short: "Append raw Markdown content to Logseq",
-		Long: `Append raw Markdown content to Logseq.
+		Short: "Insert raw Markdown content into a Logseq journal",
+		Long: `Insert raw Markdown content into a Logseq journal from stdin.
 
-Pipe your content via stdin.
-For now, it will be appended at the end of the current journal page.`,
+Explicit root bullets are placed independently before the first later timed
+sibling. Equal times retain arrival order; untimed roots append. Children and
+supporting lines stay with their root. Ref-only anchors use their first timed
+direct child and remain one unit. Existing and incoming source bytes are retained,
+adding only needed insertion separators. Times and statuses are not normalized.
+Unoutlined text keeps raw append behavior. Empty input is a no-op.
+Unsafe joins that would change root ownership fail without changing the journal.
+
+Examples:
+  printf '%s\n' '- 09:00 Call' '- 11:00 Review' | lqd content --journal 2026-10-16
+  echo 'Raw note' | lqd content`,
 		RunE: func(command *cobra.Command, _ []string) error {
 			date, err := ParseDateFromJournalFlag(journal, deps.TimeNow)
 			if err != nil {
