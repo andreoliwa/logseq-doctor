@@ -22,6 +22,10 @@ This project is still in alpha, so it's very rough on the edges (documentation a
 
 - [Status Bar](features/status-bar.md) - macOS menu bar app showing live DOING task count
 - [Dashboard](features/dashboard.md) - web UI for browsing, filtering, and reordering tasks
+- [Tidy up](features/tidy-up.md) - clean Markdown and normalize leading times
+- [Add and update tasks](features/task-add.md) - normalize times and place tasks in sibling timelines
+- [Raw journal content](features/content.md) - insert root batches while retaining source bytes
+- [Markdown content](features/md.md) - place notes and timed updates within page or parent siblings
 
 ## Installation
 
