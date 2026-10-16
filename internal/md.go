@@ -30,7 +30,7 @@ type InsertMarkdownOptions struct {
 // If Key is provided, it searches for an existing block containing that key (case-insensitive)
 // and updates it. Otherwise, creates a new block.
 // If ParentText is provided, it searches for the first block containing that text
-// and inserts the content as a child block. Otherwise, appends to the end.
+// and inserts the content among its direct children. Timed content uses sibling chronology.
 func InsertMarkdown(opts *InsertMarkdownOptions) error {
 	if strings.TrimSpace(opts.Content) == "" {
 		return nil
@@ -68,6 +68,8 @@ func InsertMarkdown(opts *InsertMarkdownOptions) error {
 		if err != nil {
 			return fmt.Errorf("error updating block: %w", err)
 		}
+
+		logseqext.RepositionBlock(existingBlock)
 	} else {
 		err = addContent(targetPage, parentBlock, opts.Content)
 		if err != nil {
@@ -187,25 +189,21 @@ func addContent(page logseq.Page, parentBlock *content.Block, contentText string
 		return nil
 	}
 
-	// Parse the content as markdown to handle multi-line text properly
-	parsedBlock, err := logseq.ParseBlock(trimmedContent)
-	if err != nil {
+	// The parser distinguishes explicit root outlines from a single block with
+	// supporting paragraphs and child blocks. Never flatten the latter.
+	parsedBlock, _, outlined, err := logseq.ParseSource(trimmedContent)
+	// Source boundaries are unnecessary for a single block. A parsed result
+	// remains usable when only range mapping failed on unoutlined input.
+	if err != nil && (outlined || parsedBlock == nil) {
 		return fmt.Errorf("error parsing content as markdown: %w", err)
 	}
 
-	if len(parsedBlock.Children()) > 0 {
-		newBlock := content.NewBlock()
-
-		children := parsedBlock.Children()
-		for _, child := range children {
-			newBlock.AddChild(child)
+	if outlined {
+		for _, block := range parsedBlock.Blocks() {
+			logseqext.PlaceBlock(page, parentBlock, block)
 		}
-
-		if parentBlock != nil {
-			parentBlock.AddChild(newBlock)
-		} else {
-			page.AddBlock(newBlock)
-		}
+	} else if len(parsedBlock.Children()) > 0 {
+		logseqext.PlaceBlock(page, parentBlock, parsedBlock)
 	}
 
 	return nil

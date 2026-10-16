@@ -18,6 +18,37 @@ type MdDependencies struct {
 	TimeNow   func() time.Time
 }
 
+const mdHelp = `Add Markdown content to Logseq using the DOM.
+
+Pipe Markdown via stdin to a named page or today's journal (or --journal DATE).
+
+Explicit root bullets are placed independently without a wrapper. Unbulleted input
+stays one block, with its supporting paragraphs and children attached.
+
+Timed blocks go before the first strictly later sibling; equal times retain arrival
+order, untimed blocks append, and existing siblings are not sorted. Time spelling,
+formatting and supplied task statuses are retained, without generating TODO markers.
+A ref-only sibling uses its first timed direct child as its time, not later descendants.
+
+With --parent, compare only the matched parent's direct children; if no parent matches,
+fall back to page roots.
+
+With --key, update one matching block (case-insensitive).
+Timed key updates move that same block among its actual siblings, retaining its parent,
+properties, children and logbook; untimed updates stay in place. Key updates keep the
+single-block content-update contract rather than importing a root batch.
+
+This command uses structured Markdown serialization, not raw byte preservation.
+
+Examples:
+  echo "New task" | lqd md
+  echo "9h00 Meeting notes" | lqd md --page "Work"
+  printf -- '- 09:00 Call\n- 11:00 Review\n' | lqd md --journal 2026-10-16
+  echo "Child task" | lqd md --parent "Project A"
+  echo "Another task" | lqd md --parent "meeting notes"
+  echo "10:00 Updated content" | lqd md --key "unique identifier"
+  echo "Update work item" | lqd md --page "Projects" --key "feature-123"`
+
 // NewMdCmd creates a new md command with the specified dependencies.
 // If deps is nil, it uses default implementations.
 func NewMdCmd(deps *MdDependencies) *cobra.Command {
@@ -35,22 +66,7 @@ func NewMdCmd(deps *MdDependencies) *cobra.Command {
 	cmd := &cobra.Command{ //nolint:exhaustruct_v5
 		Use:   "md",
 		Short: "Add Markdown content to Logseq using the DOM",
-		Long: `Add Markdown content to Logseq using the DOM.
-
-Pipe your Markdown content via stdin.
-The content will be added to the specified page or to today's journal by default.
-If --key is provided, searches for an existing block containing that key (case-insensitive)
-and updates it. Otherwise, creates a new block.
-If --parent is provided, the content will be added as a child block under the first block
-containing the specified text. Otherwise, it will be appended at the end of the page.
-
-Examples:
-  echo "New task" | lqd md
-  echo "Meeting notes" | lqd md --page "Work"
-  echo "Child task" | lqd md --parent "Project A"
-  echo "Another task" | lqd md --parent "meeting notes"
-  echo "Updated content" | lqd md --key "unique identifier"
-  echo "Update work item" | lqd md --page "Projects" --key "feature-123"`,
+		Long:  mdHelp,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			graphPath := os.Getenv("LOGSEQ_GRAPH_PATH")
 			stdin := deps.ReadStdin()

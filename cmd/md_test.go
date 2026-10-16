@@ -1,6 +1,9 @@
 package cmd_test
 
 import (
+	"github.com/andreoliwa/logseq-doctor/internal/testutils"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -307,5 +310,52 @@ func runMdCommandTest(t *testing.T, test mdTestCase, graphPath string, frozenTim
 	} else {
 		require.NoError(t, err)
 		verifySuccessCase(t, test, graphPath, mockGraph, captures)
+	}
+}
+
+func TestMdCommandChronologicalTargets(t *testing.T) {
+	for _, target := range []string{"page", "journal", "parent", "key"} {
+		t.Run(target, func(t *testing.T) {
+			before := "- 10:00 Existing\n"
+			input := "- **9h00** First\n- 11:00 Last"
+			want := "- **9h00** First\n- 10:00 Existing\n- 11:00 Last"
+			args := []string{"--page", "timeline"}
+
+			if target == "parent" {
+				before = "- Project\n\t- 10:00 Existing\n"
+				want = "- Project\n\t- **9h00** First\n\t- 10:00 Existing\n\t- 11:00 Last"
+
+				args = append(args, "--parent", "Project")
+			}
+
+			if target == "key" {
+				before = "- 10:00 Existing\n- DOING 11:00 key\n"
+				input = "DOING 9h00 key"
+				want = "- DOING 9h00 key\n- 10:00 Existing"
+
+				args = append(args, "--key", "key")
+			}
+
+			graph, path := testutils.NewMarkdownGraph(t, before)
+			if target == "journal" {
+				path = filepath.Join(filepath.Dir(filepath.Dir(path)), "journals", "2026_10_16.md")
+				require.NoError(t, os.WriteFile(path, []byte(before), 0o600))
+
+				args = []string{"--journal", "2026-10-16"}
+			}
+
+			command := cmd.NewMdCmd(&cmd.MdDependencies{
+				InsertFn:  internal.InsertMarkdown,
+				OpenGraph: func(string) *logseq.Graph { return graph },
+				ReadStdin: func() string { return input },
+				TimeNow:   func() time.Time { return time.Date(2026, 10, 16, 0, 0, 0, 0, time.UTC) },
+			})
+			command.SetArgs(args)
+			require.NoError(t, command.Execute())
+
+			actual, err := os.ReadFile(path)
+			require.NoError(t, err)
+			require.Equal(t, want, string(actual))
+		})
 	}
 }

@@ -163,8 +163,177 @@ func TestInsertMarkdownToPage(t *testing.T) {
 	}
 }
 
+// These fixtures catch wrapping explicit roots, flattening support content, and
+// applying chronology outside the selected sibling list.
+func TestMarkdownChronologicalCreation(t *testing.T) {
+	for _, test := range []struct {
+		name, before, input, parent, want string
+	}{
+		{
+			name: "batch evolves with equal times and untimed roots",
+			before: "- 10:00 Existing\n" +
+				"- 11:00 Later\n",
+			input: "- **9h00** First\n" +
+				"  - 12:00 Child\n" +
+				"- 10h00 Equal one\n" +
+				"- *10.00* Equal two\n" +
+				"- Notes\n" +
+				"  - 08:00 Group child\n",
+			parent: "",
+			want: "- **9h00** First\n" +
+				"\t- 12:00 Child\n" +
+				"- 10:00 Existing\n" +
+				"- 10h00 Equal one\n" +
+				"- *10.00* Equal two\n" +
+				"- 11:00 Later\n" +
+				"- Notes\n" +
+				"\t- 08:00 Group child\n",
+		},
+		{
+			name:   "single block keeps paragraphs and child",
+			before: "- 10:00 Existing\n",
+			input: "9h00 Call\n" +
+				"\n" +
+				"Details\n" +
+				"\n" +
+				"- 12:00 Child",
+			parent: "",
+			want: "- 9h00 Call\n" +
+				"\n" +
+				"  Details\n" +
+				"\n" +
+				"\t- 12:00 Child\n" +
+				"- 10:00 Existing\n",
+		},
+		{
+			name:   "unbulleted thematic keeps single-block semantics",
+			before: "- 10:00 Existing\n",
+			input:  "9h00 Call\n\n- One\n\n---\n\n- Two",
+			want:   "- 9h00 Call\n\n\t- One\n\t- ---\n\t- Two\n- 10:00 Existing\n",
+		},
+		{
+			name: "parent scopes batch",
+			before: "- 08:00 Outside\n" +
+				"- Project\n" +
+				"  - 10:00 Existing\n" +
+				"- 12:00 Outside\n",
+			input: "- 9h00 First\n" +
+				"- 11:00 Last",
+			parent: "Project",
+			want: "- 08:00 Outside\n" +
+				"- Project\n" +
+				"\t- 9h00 First\n" +
+				"\t- 10:00 Existing\n" +
+				"\t- 11:00 Last\n" +
+				"- 12:00 Outside\n",
+		},
+		{
+			name:   "missing parent falls back to roots",
+			before: "- 10:00 Existing\n",
+			input:  "9h00 First",
+			parent: "Missing",
+			want: "- 9h00 First\n" +
+				"- 10:00 Existing\n",
+		},
+		{
+			name: "ref unit uses first child",
+			before: "- ((12345678-1234-1234-1234-123456789abc))\n" +
+				"  collapsed:: true\n" +
+				"  - 12:00 First\n" +
+				"  - 12:20 Second\n" +
+				"- 12:27 Later\n",
+			input:  "12h10 Incoming",
+			parent: "",
+			want: "- ((12345678-1234-1234-1234-123456789abc))\n" +
+				"  collapsed:: true\n" +
+				"\t- 12:00 First\n" +
+				"\t- 12:20 Second\n" +
+				"- 12h10 Incoming\n" +
+				"- 12:27 Later\n",
+		},
+		{
+			name:   "supplied status properties and logbook survive",
+			before: "- 10:00 Existing\n",
+			input: "- DOING **9h00** Work\n" +
+				"  collapsed:: true\n" +
+				"  :LOGBOOK:\n" +
+				"  CLOCK: [2026-10-16 Fri 09:00:00]\n" +
+				"  :END:\n",
+			parent: "",
+			want: "- DOING **9h00** Work\n" +
+				"  collapsed:: true\n" +
+				"  :LOGBOOK:\n" +
+				"  CLOCK: [2026-10-16 Fri 09:00:00]\n" +
+				"  :END:\n" +
+				"- 10:00 Existing\n",
+		},
+		{
+			name: "disorder remains and untimed appends",
+			before: "- 11:00 First\n" +
+				"- 09:00 Second\n",
+			input: "- 10:00 Incoming\n" +
+				"- Untimed",
+			parent: "",
+			want: "- 10:00 Incoming\n" +
+				"- 11:00 First\n" +
+				"- 09:00 Second\n" +
+				"- Untimed\n",
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			graph, path := testutils.NewMarkdownGraph(t, test.before)
+			require.NoError(t, internal.InsertMarkdown(&internal.InsertMarkdownOptions{
+				Graph: graph, Page: "timeline", Content: test.input, ParentText: test.parent,
+			}))
+
+			actual, err := os.ReadFile(path)
+			require.NoError(t, err)
+			require.Equal(t, strings.TrimSuffix(test.want, "\n"), string(actual))
+		})
+	}
+}
+
 func TestMarkdownTimedKeyUpdate(t *testing.T) {
 	for _, test := range []struct{ name, input, want string }{
+		{
+			name:  "move earlier",
+			input: "DOING **8h30** key",
+			want: "- DOING **8h30** key\n" +
+				"  id:: 12345678-1234-1234-1234-123456789abc\n" +
+				"  custom:: keep\n" +
+				"  :LOGBOOK:\n" +
+				"  CLOCK: [2026-10-16 Fri 10:00:00]\n" +
+				"  :END:\n" +
+				"\t- Child\n" +
+				"- 09:00 First\n" +
+				"- 11:00 Last\n",
+		},
+		{
+			name:  "move later",
+			input: "DOING *12.00* key",
+			want: "- 09:00 First\n" +
+				"- 11:00 Last\n" +
+				"- DOING *12.00* key\n" +
+				"  id:: 12345678-1234-1234-1234-123456789abc\n" +
+				"  custom:: keep\n" +
+				"  :LOGBOOK:\n" +
+				"  CLOCK: [2026-10-16 Fri 10:00:00]\n" +
+				"  :END:\n" +
+				"\t- Child\n",
+		},
+		{
+			name:  "equal excludes self",
+			input: "DOING 11h00 key",
+			want: "- 09:00 First\n" +
+				"- 11:00 Last\n" +
+				"- DOING 11h00 key\n" +
+				"  id:: 12345678-1234-1234-1234-123456789abc\n" +
+				"  custom:: keep\n" +
+				"  :LOGBOOK:\n" +
+				"  CLOCK: [2026-10-16 Fri 10:00:00]\n" +
+				"  :END:\n" +
+				"\t- Child\n",
+		},
 		{
 			name:  "untimed retains position",
 			input: "DOING key",
@@ -203,6 +372,20 @@ func TestMarkdownTimedKeyUpdate(t *testing.T) {
 			})
 		}
 	}
+}
+
+func TestMarkdownInvalidOutlineLeavesPageUnchanged(t *testing.T) {
+	const original = "- 10:00 Existing\n"
+
+	graph, path := testutils.NewMarkdownGraph(t, original)
+	err := internal.InsertMarkdown(&internal.InsertMarkdownOptions{
+		Graph: graph, Page: "timeline", Content: "- One\n\n---\n\n- Two",
+	})
+	require.Error(t, err)
+
+	actual, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.Equal(t, original, string(actual))
 }
 
 func TestMarkdownWhitespaceKeyUpdateDoesNotMoveExistingTime(t *testing.T) {
