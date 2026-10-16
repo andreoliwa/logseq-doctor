@@ -74,7 +74,7 @@ func TidyUpOneFile(graph *logseq.Graph, path string, policy config.ForbiddenCont
 
 	for _, f := range []func(logseq.Page) ChangedPage{
 		func(page logseq.Page) ChangedPage { return CheckForbiddenReferences(page, policy) },
-		CheckRunningTasks, RemoveDoubleSpaces, RemoveEmptyBullets,
+		CheckRunningTasks, RemoveDoubleSpaces, RemoveEmptyBullets, NormalizeLeadingTimes,
 	} {
 		result := f(page)
 		if result.Msg != "" {
@@ -320,4 +320,23 @@ func RemoveEmptyBullets(page logseq.Page) ChangedPage {
 	}
 
 	return ChangedPage{"", false}
+}
+
+// NormalizeLeadingTimes normalizes each block's first-line time independently.
+func NormalizeLeadingTimes(page logseq.Page) ChangedPage {
+	count := 0
+
+	page.Blocks().FindDeep(func(block *content.Block) bool {
+		if content.NormalizeLeadingTime(block) {
+			count++
+		}
+
+		return false
+	})
+
+	if count == 0 {
+		return ChangedPage{Msg: "", Changed: false}
+	}
+
+	return ChangedPage{Msg: fmt.Sprintf("%d leading times normalized", count), Changed: true}
 }

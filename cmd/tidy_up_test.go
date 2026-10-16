@@ -3,10 +3,15 @@ package cmd_test
 import (
 	"bytes"
 	"errors"
+	"os"
+
 	"testing"
 
 	"github.com/andreoliwa/logseq-doctor/cmd"
+	"github.com/andreoliwa/logseq-doctor/internal"
 	"github.com/andreoliwa/logseq-doctor/internal/config"
+	"github.com/andreoliwa/logseq-doctor/internal/testutils"
+
 	"github.com/andreoliwa/logseq-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -87,4 +92,24 @@ func TestNewTidyUpCmdReturnsErrorForForbiddenContent(t *testing.T) {
 	require.Error(t, err)
 	require.ErrorContains(t, err, "forbidden content")
 	assert.Empty(t, stderr.String())
+}
+
+func TestTidyUpCommandNormalizesTimesAndReportsChange(t *testing.T) {
+	graph, path := testutils.NewMarkdownGraph(t, "- **9h00 Meeting**")
+	newCommand := func() error {
+		command := cmd.NewTidyUpCmd(&cmd.TidyUpDependencies{
+			OpenGraphFromPath: func(string) *logseq.Graph { return graph },
+			LoadPolicy:        func() (config.ForbiddenContentPolicy, error) { return config.ForbiddenContentPolicy{}, nil },
+			TidyUpOneFile:     internal.TidyUpOneFile,
+		})
+		command.SetArgs([]string{path})
+
+		return command.Execute()
+	}
+	require.ErrorContains(t, newCommand(), "tidy-up found forbidden content")
+
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.Equal(t, "- 09:00 **Meeting**", string(data))
+	require.NoError(t, newCommand())
 }

@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/andreoliwa/logseq-doctor/internal"
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
@@ -13,6 +14,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/content"
+
 	"github.com/stretchr/testify/assert"
 	"gotest.tools/v3/golden"
 )
@@ -156,4 +159,64 @@ func TestRemoveEmptyBullets(t *testing.T) {
 
 	valid := setupPage(t, "valid")
 	assert.Equal(t, internal.ChangedPage{"", false}, internal.RemoveEmptyBullets(valid))
+}
+
+func TestNormalizeLeadingTimes(t *testing.T) {
+	graph := testutils.NewStubGraph(t, "stub-graph")
+	transaction := graph.NewTransaction()
+	page, err := transaction.OpenPage("timecodes")
+	require.NoError(t, err)
+	root, err := logseq.ParseBlock("- **9h00 Meeting**\n" +
+		"  id:: 12345678-1234-1234-1234-123456789abc\n" +
+		"  custom:: keep\n" +
+		"  10h00 continuation\n" +
+		"  - TODO [#A] *10;05* Follow-up\n" +
+		"- 25:00 Invalid\n" +
+		"- Meet at 9h00\n" +
+		"- `9h00` Code\n" +
+		"- [9h00](url)")
+	require.NoError(t, err)
+
+	for _, block := range root.Blocks() {
+		page.AddBlock(block)
+	}
+
+	result := internal.NormalizeLeadingTimes(page)
+	require.True(t, result.Changed)
+	require.Equal(t, "2 leading times normalized", result.Msg)
+
+	first, err := logseq.AsString(page.Blocks()[0])
+	require.NoError(t, err)
+	require.Contains(t, first, "09:00 **Meeting**")
+	require.Contains(t, first, "10h00 continuation")
+	require.Contains(t, first, content.TaskStringTodo+" [#A] 10:05 Follow-up")
+	require.Contains(t, first, "custom:: keep")
+	require.Equal(t, internal.ChangedPage{}, internal.NormalizeLeadingTimes(page))
+}
+
+func TestTidyUpTimeNormalizationSavesOnlyChanges(t *testing.T) {
+	graph := testutils.NewStubGraph(t, "stub-graph")
+	transaction := graph.NewTransaction()
+	page, err := transaction.OpenPage("timecodes")
+	require.NoError(t, err)
+	block, err := logseq.ParseBlock("9h00 Meeting\n10h00 continuation")
+	require.NoError(t, err)
+	page.AddBlock(block)
+	require.NoError(t, transaction.Save())
+
+	journalPath, err := graph.JournalPath(time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC))
+	require.NoError(t, err)
+
+	path := filepath.Join(filepath.Dir(filepath.Dir(journalPath)), "pages", "timecodes.md")
+	require.Equal(t, 1, internal.TidyUpOneFile(graph, path, config.ForbiddenContentPolicy{}))
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.Equal(t, "- 09:00 Meeting\n  10h00 continuation", string(data))
+	// An old timestamp makes an unwanted second save observable without sleeps.
+	old := time.Unix(1000000000, 0)
+	require.NoError(t, os.Chtimes(path, old, old))
+	require.Equal(t, 0, internal.TidyUpOneFile(graph, path, config.ForbiddenContentPolicy{}))
+	info, err := os.Stat(path)
+	require.NoError(t, err)
+	require.Equal(t, old, info.ModTime())
 }

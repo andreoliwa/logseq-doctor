@@ -47,7 +47,9 @@ func NewTidyUpCmd(deps *TidyUpDependencies) *cobra.Command {
 
 - Check forbidden references and configured URL and text strings
 - Check running tasks (DOING)
-- Check double spaces`,
+- Check double spaces
+- Normalize leading first-line times to plain hh:mm, including nested blocks
+  (for example, **9h00 Meeting** becomes 09:00 **Meeting**)`,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			policy, err := deps.LoadPolicy()
