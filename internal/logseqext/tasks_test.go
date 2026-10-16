@@ -3,12 +3,18 @@ package logseqext_test
 import (
 	"os"
 	"path/filepath"
+	"strings"
+
 	"testing"
 	"time"
 
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
+	logseq "github.com/andreoliwa/logseq-go"
+
+	"github.com/andreoliwa/logseq-go/content"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -301,7 +307,7 @@ func TestAddOrUpdateTaskByKey(t *testing.T) {
 			blockText:    "",
 			key:          "week",
 			expectedFile: "update-doing-task",
-			frozenTime: &doingTime,
+			frozenTime:   &doingTime,
 		},
 		{
 			name:         "update task with key in a link",
@@ -348,4 +354,228 @@ func TestAddOrUpdateTaskByKey(t *testing.T) {
 			testutils.AssertGoldenPages(t, graph, "stub-graph", []string{test.expectedFile})
 		})
 	}
+}
+
+func TestTimedTaskInsertion(t *testing.T) {
+	const ref = "((12345678-1234-1234-1234-123456789abc))"
+
+	todo := content.TaskStringTodo
+	for _, test := range []struct{ name, input, description, parent, output string }{
+		{
+			"notes and tasks",
+			"- 09:00 Breakfast\n- " +
+				todo + " 11:00 Review",
+			"**10h00** Call",
+			"",
+			"- 09:00 Breakfast\n- " +
+				todo + " 10:00 Call\n- " +
+				todo + " 11:00 Review",
+		},
+		{
+			"equal and untimed",
+			"- 10:00 First\n- Notes\n- 10:00 Second\n- 11:00 Later",
+			"10:00 Call",
+			"",
+			"- 10:00 First\n- Notes\n- 10:00 Second\n- " +
+				todo + " 10:00 Call\n- 11:00 Later",
+		},
+		{
+			"untimed keeps position",
+			"- 09:00 First\n- Notes\n- 11:00 Later",
+			"10:00 Call",
+			"",
+			"- 09:00 First\n- Notes\n- " +
+				todo + " 10:00 Call\n- 11:00 Later",
+		},
+		{"no later anchor", "- 11:00 First\n- Notes", "12:00 Call", "", "- 11:00 First\n- Notes\n- " + todo + " 12:00 Call"},
+		{
+			"disorder",
+			"- 11:00 First\n- 09:00 Earlier\n- 12:00 Last",
+			"10:00 Call",
+			"",
+			"- " +
+				todo + " 10:00 Call\n- 11:00 First\n- 09:00 Earlier\n- 12:00 Last",
+		},
+		{"untimed appends", "- 11:00 First\n- Notes", "Buy milk", "", "- 11:00 First\n- Notes\n- " + todo + " Buy milk"},
+		{"invalid appends", "- 11:00 First", "25:00 Invalid", "", "- 11:00 First\n- " + todo + " 25:00 Invalid"},
+		{
+			"formatted description and untouched anchor",
+			"- **11h00** Review",
+			"**9h00 Call**",
+			"",
+			"- " +
+				todo + " 09:00 **Call**\n- **11h00** Review",
+		},
+		{
+			"parent scope",
+			"- 08:00 Outside\n- Parent\n\t- 09:00 First\n\t- 11:00 Last\n- 09:30 Outside",
+			"10:00 Call",
+			"Parent",
+			"- 08:00 Outside\n- Parent\n\t- 09:00 First\n\t- " +
+				todo + " 10:00 Call\n\t- 11:00 Last\n- 09:30 Outside",
+		},
+		{"missing parent", "- 11:00 Last", "10:00 Call", "Missing", "- " + todo + " 10:00 Call\n- 11:00 Last"},
+		{
+			"ref anchors outer timeline",
+			"- " +
+				todo + " 11:25 Review\n- " +
+				ref + "\n\t- 12:06 Child\n- " +
+				content.TaskStringDone + " 12:27 Lunch",
+			"12:00 Call",
+			"",
+			"- " +
+				todo + " 11:25 Review\n- " +
+				todo + " 12:00 Call\n- " +
+				ref + "\n\t- 12:06 Child\n- " +
+				content.TaskStringDone + " 12:27 Lunch",
+		},
+		{
+			"ref is indivisible",
+			"- 11:25 Earlier\n- " +
+				ref + "\n\t- 12:00 First\n\t- 12:20 Second\n- 12:27 Later",
+			"12:10 Call",
+			"",
+			"- 11:25 Earlier\n- " +
+				ref + "\n\t- 12:00 First\n\t- 12:20 Second\n- " +
+				todo + " 12:10 Call\n- 12:27 Later",
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			graph, path := testutils.NewMarkdownGraph(t, test.input)
+			require.NoError(t, logseqext.AddTask(&logseqext.AddTaskOptions{
+				Graph: graph, Page: "timeline",
+				Name: test.description, BlockText: test.parent,
+			}))
+
+			data, err := os.ReadFile(path)
+			require.NoError(t, err)
+			require.Equal(t, test.output, string(data))
+		})
+	}
+}
+
+func TestTimedKeyUpdates(t *testing.T) {
+	todo := content.TaskStringTodo
+	for _, test := range []struct{ name, input, description, output string }{
+		{
+			"earlier to first",
+			"- 10:00 First\n- " +
+				todo + " 11:00 key\n- 12:00 Last",
+			"*9h30 key*",
+			"- " +
+				todo + " 09:30 *key*\n- 10:00 First\n- 12:00 Last",
+		},
+		{
+			"later to last",
+			"- " +
+				todo + " 09:00 key\n- 10:00 First\n- Notes\n- 12:00 Last",
+			"13:00 key",
+			"- 10:00 First\n- Notes\n- 12:00 Last\n- " +
+				todo + " 13:00 key",
+		},
+		{
+			"equal",
+			"- " +
+				todo + " 09:00 key\n- 10:00 First\n- 10:00 Second\n- 12:00 Last",
+			"10:00 key",
+			"- 10:00 First\n- 10:00 Second\n- " +
+				todo + " 10:00 key\n- 12:00 Last",
+		},
+		{
+			"same position",
+			"- 09:00 First\n- " +
+				todo + " 10:00 key\n- 12:00 Last",
+			"**10h00** key",
+			"- 09:00 First\n- " +
+				todo + " 10:00 key\n- 12:00 Last",
+		},
+		{
+			"remove time in place",
+			"- 09:00 First\n- " +
+				todo + " 10:00 key\n- 12:00 Last",
+			"Buy milk key",
+			"- 09:00 First\n- " +
+				todo + " Buy milk key\n- 12:00 Last",
+		},
+		{
+			"nested recursive lookup",
+			"- 08:00 Outside\n- Parent\n\t- 10:00 First\n\t- " +
+				todo + " 11:00 key\n\t- 12:00 Last\n- 14:00 Outside",
+			"09:30 key",
+			"- 08:00 Outside\n- Parent\n\t- " +
+				todo + " 09:30 key\n\t- 10:00 First\n\t- 12:00 Last\n- 14:00 Outside",
+		},
+		{"single task self excluded", "- " + todo + " 11:00 key", "09:30 key", "- " + todo + " 09:30 key"},
+		{
+			"anchor not normalized",
+			"- **10h00** First\n- " +
+				todo + " 11:00 key",
+			"09:30 key",
+			"- " +
+				todo + " 09:30 key\n- **10h00** First",
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			graph, path := testutils.NewMarkdownGraph(t, test.input)
+			require.NoError(t, logseqext.AddTask(&logseqext.AddTaskOptions{
+				Graph: graph, Page: "timeline",
+				Key: "KEY", Name: test.description,
+			}))
+
+			data, err := os.ReadFile(path)
+			require.NoError(t, err)
+			require.Equal(t, test.output, string(data))
+		})
+	}
+}
+
+func TestTimedKeyUpdateRetainsMetadata(t *testing.T) {
+	const blockID = "12345678-1234-1234-1234-123456789abc"
+
+	input := "- 10:00 First\n- " +
+		content.TaskStringTodo + " 11:00 key\n  id:: " +
+		blockID + "\n" +
+		"  custom:: keep\n" +
+		"  :LOGBOOK:\n" +
+		"  CLOCK: [2025-01-01 Wed 09:00:00]--[2025-01-01 Wed 10:00:00] =>  01:00:00\n" +
+		"  :END:\n" +
+		"\t- Child [link](https://example.com)\n" +
+		"- 12:00 Last"
+	graph, path := testutils.NewMarkdownGraph(t, input)
+	before, err := graph.OpenPage("timeline")
+	require.NoError(t, err)
+	original, err := logseq.AsString(before.Blocks()[1])
+	require.NoError(t, err)
+	require.NoError(t, logseqext.AddTask(&logseqext.AddTaskOptions{
+		Graph: graph, Page: "timeline",
+		Key: "key", Name: "*9h30* key",
+	}))
+	after, err := graph.OpenPage("timeline")
+	require.NoError(t, err)
+
+	actual, err := logseq.AsString(after.Blocks()[0])
+	require.NoError(t, err)
+	require.Equal(t, strings.Replace(original, "11:00 key", "09:30 key", 1), actual)
+	require.Contains(t, actual, "id:: "+blockID)
+
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.Contains(t, string(data), "custom:: keep")
+	require.Contains(t, string(data), "CLOCK:")
+	require.Contains(t, string(data), "Child [link](https://example.com)")
+}
+
+func TestKeyUpdatePreservesWholeNewDescription(t *testing.T) {
+	graph, path := testutils.NewMarkdownGraph(t, "- "+content.TaskStringTodo+" 11:00 key\n\t- Existing child")
+	require.NoError(t, logseqext.AddTask(&logseqext.AddTaskOptions{
+		Graph: graph, Page: "timeline", Key: "key",
+		Name: "**9h00** key\n\nNew paragraph with **detail**",
+	}))
+
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+
+	expected := "- " + content.TaskStringTodo + " 09:00 key\n\n" +
+		"  New paragraph with **detail**\n\t- Existing child"
+	require.Equal(t, expected, string(data))
 }

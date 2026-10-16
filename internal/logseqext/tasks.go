@@ -1,12 +1,15 @@
 package logseqext
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	logseq "github.com/andreoliwa/logseq-go"
 	"github.com/andreoliwa/logseq-go/content"
 )
+
+var errInvalidTaskDescription = errors.New("task description must begin with a paragraph")
 
 // AddTaskOptions contains options for adding a task to Logseq.
 type AddTaskOptions struct {
@@ -58,15 +61,9 @@ func AddTask(opts *AddTaskOptions) error {
 			return fmt.Errorf("error updating task: %w", err)
 		}
 	} else {
-		newBlockTask := content.NewBlock(content.NewParagraph(
-			content.NewTaskMarker(content.TaskStatusTodo),
-			content.NewText(opts.Name),
-		))
-
-		if parentBlock != nil {
-			parentBlock.AddChild(newBlockTask)
-		} else {
-			targetPage.AddBlock(newBlockTask)
+		err = addNewTask(targetPage, parentBlock, opts.Name)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -84,10 +81,24 @@ func updateExistingTask(existingTaskMarker *content.TaskMarker, opts *AddTaskOpt
 		existingTaskMarker.SetTimeNow(opts.TimeNow)
 	}
 
-	return updateTaskBackToTodo(existingTaskMarker, opts.Name)
+	err := updateTaskBackToTodo(existingTaskMarker, opts.Name)
+	if err != nil {
+		return err
+	}
+
+	RepositionBlock(existingTaskMarker.ParentBlock())
+
+	return nil
 }
 
 func updateTaskBackToTodo(taskMarker *content.TaskMarker, newName string) error {
+	description, parseErr := logseq.ParseBlock(content.TaskStringTodo + " " + newName)
+	if parseErr != nil {
+		return fmt.Errorf("parse task description: %w", parseErr)
+	}
+
+	content.NormalizeLeadingTime(description)
+
 	_, err := taskMarker.WithStatus(content.TaskStatusTodo)
 	if err != nil {
 		return fmt.Errorf("failed to update task status: %w", err)
@@ -98,31 +109,46 @@ func updateTaskBackToTodo(taskMarker *content.TaskMarker, newName string) error 
 		return nil
 	}
 
-	// Remove all children after the task marker and replace with the new name
-	// First, collect all children after the task marker to remove them
-	var nodesToRemove []content.Node
-
-	foundTaskMarker := false
-
-	for node := paragraph.FirstChild(); node != nil; node = node.NextSibling() {
-		if node == taskMarker {
-			foundTaskMarker = true
-
-			continue
-		}
-
-		if foundTaskMarker {
-			nodesToRemove = append(nodesToRemove, node)
-		}
+	// Replace only inline content after the retained task marker. Save the next
+	// node before removal, which clears its sibling links.
+	for node := taskMarker.NextSibling(); node != nil; {
+		next := node.NextSibling()
+		paragraph.RemoveChild(node)
+		node = next
 	}
 
-	// Remove the collected nodes
-	for _, node := range nodesToRemove {
-		node.RemoveSelf()
+	// Add parsed description nodes after the retained task marker.
+	replacement, ok := description.FirstChild().(*content.Paragraph)
+	if !ok {
+		return errInvalidTaskDescription
 	}
 
-	// Add the new name text after the task marker
-	paragraph.AddChild(content.NewText(newName))
+	for _, node := range replacement.Children()[1:] {
+		paragraph.AddChild(node)
+	}
+
+	// Keep every supplied description paragraph without replacing the block's
+	// existing metadata, logbook or child blocks.
+	block := taskMarker.ParentBlock()
+
+	var after content.Node = paragraph
+	for _, node := range description.Children()[1:] {
+		block.InsertChildAfter(node, after)
+		after = node
+	}
+
+	return nil
+}
+
+func addNewTask(page logseq.Page, parent *content.Block, name string) error {
+	block, err := logseq.ParseBlock(content.TaskStringTodo + " " + name)
+	if err != nil {
+		return fmt.Errorf("parse task description: %w", err)
+	}
+
+	content.NormalizeLeadingTime(block)
+
+	PlaceBlock(page, parent, block)
 
 	return nil
 }

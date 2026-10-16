@@ -1,12 +1,17 @@
 package cmd_test
 
 import (
+	"os"
+
 	"testing"
 	"time"
 
 	"github.com/andreoliwa/logseq-doctor/cmd"
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
+	"github.com/andreoliwa/logseq-doctor/internal/testutils"
 	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/content"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -310,4 +315,54 @@ func TestTaskAddCommand_RequiresArgument(t *testing.T) {
 	// Should fail because MinimumNArgs(1) is set
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "requires at least 1 arg(s)")
+}
+
+func TestTaskAddTimedDescriptionsUseSelectedScope(t *testing.T) {
+	for _, test := range []struct {
+		name    string
+		flags   []string
+		nested  bool
+		journal bool
+	}{
+		{"page", []string{"--page", "timeline"}, false, false},
+		{"parent", []string{"--page", "timeline", "--parent", "Parent"}, true, false},
+		{"journal", []string{"--journal", "2025-01-04"}, false, true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			graph, pagePath := testutils.NewMarkdownGraph(t, "- Parent\n\t- 11:00 Child\n- 11:00 Later")
+			date := time.Date(2025, 1, 4, 0, 0, 0, 0, time.UTC)
+			path := pagePath
+
+			if test.journal {
+				var err error
+
+				path, err = graph.JournalPath(date)
+				require.NoError(t, err)
+				require.NoError(t, os.WriteFile(path, []byte("- 11:00 Later"), 0o600))
+			}
+
+			command := cmd.NewTaskAddCmd(&cmd.TaskAddDependencies{
+				AddTaskFn: logseqext.AddTask,
+				OpenGraph: func(string) *logseq.Graph { return graph },
+				TimeNow:   func() time.Time { return date },
+			})
+			command.SetArgs(append([]string{"**9h00 Call**"}, test.flags...))
+			require.NoError(t, command.Execute())
+
+			data, err := os.ReadFile(path)
+			require.NoError(t, err)
+
+			actual := string(data)
+			require.Contains(t, actual, content.TaskStringTodo+" 09:00 **Call**")
+
+			switch {
+			case test.nested:
+				require.Equal(t, "- Parent\n\t- "+content.TaskStringTodo+" 09:00 **Call**\n\t- 11:00 Child\n- 11:00 Later", actual)
+			case test.journal:
+				require.Equal(t, "- "+content.TaskStringTodo+" 09:00 **Call**\n- 11:00 Later", actual)
+			case true:
+				require.Equal(t, "- Parent\n\t- 11:00 Child\n- "+content.TaskStringTodo+" 09:00 **Call**\n- 11:00 Later", actual)
+			}
+		})
+	}
 }

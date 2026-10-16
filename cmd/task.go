@@ -42,7 +42,7 @@ func NewTaskCmd() *cobra.Command {
 
 // NewTaskAddCmd creates a new task add subcommand with the specified dependencies.
 // If deps is nil, it uses default implementations.
-func NewTaskAddCmd(deps *TaskAddDependencies) *cobra.Command {
+func NewTaskAddCmd(deps *TaskAddDependencies) *cobra.Command { //nolint:funlen // Keep help with the handler.
 	if deps == nil {
 		deps = &TaskAddDependencies{
 			AddTaskFn: logseqext.AddTask,
@@ -62,12 +62,23 @@ The task will be added to the specified page or to today's journal by default.
 If --key is provided, searches for an existing task containing that key (case-insensitive)
 and updates it. Otherwise, creates a new task.
 
+Leading times are normalized to plain hh:mm (for example, **9h00** becomes 09:00).
+
+Timed tasks go before the first strictly later sibling; existing siblings are not sorted.
+A ref-only sibling uses its first timed direct child, not deeper descendants.
+
+Timed key updates move within their current siblings; untimed updates stay in place.
+
+Untimed new tasks append. No current-clock time is generated.
+
 Examples:
   lqd task add "Review pull request"
   lqd task add "Call client" --page "Work"
   lqd task add "Buy groceries" --journal "2024-12-25"
   lqd task add "Water plants in living room" --key "water plants"
-  lqd task add "Meeting notes" --parent "Project A"`,
+  lqd task add "Meeting notes" --parent "Project A"
+  lqd task add "**9h00** Meeting" --page "Work"
+  lqd task add "09:30 Review pull request" --key "review pull request"`,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
 			graphPath := os.Getenv("LOGSEQ_GRAPH_PATH")
