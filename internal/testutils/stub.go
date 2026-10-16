@@ -1,6 +1,9 @@
 package testutils
 
 import (
+	"context"
+	"os"
+
 	"path/filepath"
 	"strings"
 	"testing"
@@ -98,4 +101,31 @@ func RelativeTime() time.Time {
 	elapsed := time.Since(testStartTime)
 
 	return baselineTime.Add(elapsed)
+}
+
+// NewMarkdownGraph creates an isolated graph with one page for mutation tests.
+func NewMarkdownGraph(t *testing.T, markdown string) (*logseq.Graph, string) {
+	t.Helper()
+
+	const (
+		pagesDir      = "pages"
+		journalsDir   = "journals"
+		directoryMode = 0o750
+		fileMode      = 0o600
+	)
+
+	root := t.TempDir()
+	for _, directory := range []string{"logseq", pagesDir, journalsDir} {
+		require.NoError(t, os.MkdirAll(filepath.Join(root, directory), directoryMode))
+	}
+
+	require.NoError(t, os.WriteFile(filepath.Join(root, "logseq", "config.edn"), []byte("{}"), fileMode))
+	path := filepath.Join(root, pagesDir, "timeline.md")
+	require.NoError(t, os.WriteFile(path, []byte(markdown), fileMode))
+
+	graph, err := logseq.Open(context.Background(), root)
+	require.NoError(t, err)
+	t.Cleanup(func() { require.NoError(t, graph.Close()) })
+
+	return graph, path
 }
