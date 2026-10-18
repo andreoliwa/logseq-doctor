@@ -7,6 +7,10 @@ format: github
 # Include unexported symbols (internal packages)
 includeUnexported: true
 
+# Test-only packages have no source API to document.
+excludeDirs:
+  - ./internal/buildhooks
+
 # Output file pattern
 output: "docs/reference/go/{{.Dir}}/README.md"
 
