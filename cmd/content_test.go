@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/andreoliwa/logseq-doctor/cmd"
-	logseq "github.com/andreoliwa/logseq-go"
+	logseq "github.com/andreoliwa/logseq-go/v2"
 	"github.com/stretchr/testify/require"
 )
 

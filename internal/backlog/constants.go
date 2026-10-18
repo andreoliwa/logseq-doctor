@@ -3,7 +3,7 @@ package backlog
 import (
 	"strings"
 
-	"github.com/andreoliwa/logseq-go/content"
+	"github.com/andreoliwa/logseq-go/v2/content"
 )
 
 // Header represents a backlog section divider.

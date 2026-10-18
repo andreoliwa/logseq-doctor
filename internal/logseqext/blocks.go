@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	logseq "github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
+	logseq "github.com/andreoliwa/logseq-go/v2"
+	"github.com/andreoliwa/logseq-go/v2/content"
 )
 
 // ErrNoParagraph is returned when SetPriority is called on a block with no paragraph or heading.
@@ -175,7 +175,7 @@ func SetTaskCanceled(block *content.Block, date ...time.Time) error {
 	if taskMarker == nil {
 		replaceHeadingTaskKeyword(block, content.TaskStatusCanceled.String())
 	} else {
-		_, err := taskMarker.WithStatus(content.TaskStatusCanceled)
+		_, err := taskMarker.TransitionTo(content.TaskStatusCanceled)
 		if err != nil {
 			return fmt.Errorf("failed to change task status to canceled: %w", err)
 		}
@@ -201,7 +201,7 @@ func SetTaskWaiting(block *content.Block) error {
 		return nil
 	}
 
-	_, err := taskMarker.WithStatus(content.TaskStatusWaiting)
+	_, err := taskMarker.TransitionTo(content.TaskStatusWaiting)
 	if err != nil {
 		return fmt.Errorf("failed to change task status to waiting: %w", err)
 	}
@@ -219,7 +219,7 @@ func SetTaskTodo(block *content.Block) error {
 		return nil
 	}
 
-	_, err := taskMarker.WithStatus(content.TaskStatusTodo)
+	_, err := taskMarker.TransitionTo(content.TaskStatusTodo)
 	if err != nil {
 		return fmt.Errorf("failed to change task status to todo: %w", err)
 	}
@@ -228,10 +228,10 @@ func SetTaskTodo(block *content.Block) error {
 }
 
 // SetPriority sets or replaces the priority marker ([#A]/[#B]/[#C]) on a block.
-// If a Priority node exists, it is updated in place. Otherwise, a new Priority node
+// If a TaskPriority node exists, it is updated in place. Otherwise, a new TaskPriority node
 // is inserted after the TaskMarker (or at the start of the first paragraph or heading).
-func SetPriority(block *content.Block, priority content.PriorityValue) error {
-	var existingPriority *content.Priority
+func SetPriority(block *content.Block, priority content.Priority) error {
+	var existingPriority *content.TaskPriority
 
 	var taskMarker *content.TaskMarker
 
@@ -247,7 +247,7 @@ func SetPriority(block *content.Block, priority content.PriorityValue) error {
 			if firstContainer == nil {
 				firstContainer = typedNode
 			}
-		case *content.Priority:
+		case *content.TaskPriority:
 			existingPriority = typedNode
 		case *content.TaskMarker:
 			taskMarker = typedNode
@@ -271,10 +271,10 @@ func SetPriority(block *content.Block, priority content.PriorityValue) error {
 	return insertPriority(content.NewPriority(priority), taskMarker, firstContainer)
 }
 
-// insertPriority places a new Priority node after the TaskMarker (or task keyword text) in the container.
+// insertPriority places a new TaskPriority node after the TaskMarker (or task keyword text) in the container.
 // Falls back to prepending when no task anchor is found.
 func insertPriority(
-	newPriority *content.Priority, taskMarker *content.TaskMarker, container content.HasChildren,
+	newPriority *content.TaskPriority, taskMarker *content.TaskMarker, container content.HasChildren,
 ) error {
 	if taskMarker != nil {
 		// Use the TaskMarker's own parent, not container,
@@ -314,9 +314,9 @@ func insertPriority(
 var priorityRegex = regexp.MustCompile(`\[#([ABC])\]`)
 
 // ParsePriorityFromContent extracts a priority value from a Logseq API content string.
-// It looks for [#A], [#B], or [#C] patterns and returns the corresponding PriorityValue.
+// It looks for [#A], [#B], or [#C] patterns and returns the corresponding Priority.
 // Returns PriorityNone if no priority marker is found.
-func ParsePriorityFromContent(contentStr string) content.PriorityValue {
+func ParsePriorityFromContent(contentStr string) content.Priority {
 	match := priorityRegex.FindStringSubmatch(contentStr)
 	if len(match) < 2 { //nolint:mnd
 		return content.PriorityNone
@@ -369,7 +369,7 @@ func OpenGraphFromPath(path string) *logseq.Graph {
 
 	ctx := context.Background()
 
-	graph, err := logseq.Open(ctx, path)
+	graph, err := logseq.Open(ctx, path, logseq.WithPreserveOutput())
 	if err != nil {
 		log.Fatalf("error opening graph: %v", err)
 	}

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
-	"github.com/andreoliwa/logseq-go/content"
+	"github.com/andreoliwa/logseq-go/v2/content"
 	"github.com/stretchr/testify/require"
 )
 

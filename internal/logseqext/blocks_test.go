@@ -6,8 +6,8 @@ import (
 
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
-	logseq "github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
+	logseq "github.com/andreoliwa/logseq-go/v2"
+	"github.com/andreoliwa/logseq-go/v2/content"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -210,10 +210,10 @@ func TestSetPriority_InsertAfterTaskMarker(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verify priority was inserted
-	var priority *content.Priority
+	var priority *content.TaskPriority
 
 	block.Content().FindDeep(func(node content.Node) bool {
-		if p, ok := node.(*content.Priority); ok {
+		if p, ok := node.(*content.TaskPriority); ok {
 			priority = p
 
 			return true
@@ -236,10 +236,10 @@ func TestSetPriority_ReplaceExisting(t *testing.T) {
 	err := logseqext.SetPriority(block, content.PriorityLow)
 	require.NoError(t, err)
 
-	var priority *content.Priority
+	var priority *content.TaskPriority
 
 	block.Content().FindDeep(func(node content.Node) bool {
-		if p, ok := node.(*content.Priority); ok {
+		if p, ok := node.(*content.TaskPriority); ok {
 			priority = p
 
 			return true
@@ -260,10 +260,10 @@ func TestSetPriority_PlainBlock(t *testing.T) {
 	err := logseqext.SetPriority(block, content.PriorityMedium)
 	require.NoError(t, err)
 
-	var priority *content.Priority
+	var priority *content.TaskPriority
 
 	block.Content().FindDeep(func(node content.Node) bool {
-		if p, ok := node.(*content.Priority); ok {
+		if p, ok := node.(*content.TaskPriority); ok {
 			priority = p
 
 			return true
@@ -304,10 +304,10 @@ func TestSetPriority_HeadingBlock_ReplaceExisting(t *testing.T) {
 	err := logseqext.SetPriority(block, content.PriorityLow)
 	require.NoError(t, err)
 
-	var priority *content.Priority
+	var priority *content.TaskPriority
 
 	block.Content().FindDeep(func(node content.Node) bool {
-		if p, ok := node.(*content.Priority); ok {
+		if p, ok := node.(*content.TaskPriority); ok {
 			priority = p
 
 			return true
@@ -323,7 +323,7 @@ func TestParsePriorityFromContent(t *testing.T) {
 	tests := []struct {
 		name     string
 		content  string
-		expected content.PriorityValue
+		expected content.Priority
 	}{
 		{"high", "TODO [#A] High priority task", content.PriorityHigh},
 		{"medium", "TODO [#B] Medium priority task", content.PriorityMedium},
@@ -340,4 +340,17 @@ func TestParsePriorityFromContent(t *testing.T) {
 			assert.Equal(t, tt.expected, result)
 		})
 	}
+}
+
+func TestOpenGraphFromPathSelectsPreservation(t *testing.T) {
+	source, _ := testutils.NewMarkdownGraph(t, "- _word_")
+	graph := logseqext.OpenGraphFromPath(source.Directory())
+
+	t.Cleanup(func() { require.NoError(t, graph.Close()) })
+
+	block, err := logseq.ParseBlock("_word_")
+	require.NoError(t, err)
+	actual, err := graph.AsString(block)
+	require.NoError(t, err)
+	require.Equal(t, "_word_", actual)
 }

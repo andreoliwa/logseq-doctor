@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	logseq "github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
+	logseq "github.com/andreoliwa/logseq-go/v2"
+	"github.com/andreoliwa/logseq-go/v2/content"
 	"github.com/fatih/color"
 
 	"github.com/andreoliwa/logseq-doctor/internal"
@@ -562,11 +562,11 @@ func nextChildHasPin(node content.Node) bool {
 
 // taskSortKey holds the fields used to sort tasks in the Triaged section.
 type taskSortKey struct {
-	priority    content.PriorityValue // PriorityNone=0 sorts FIRST (unprioritized at top)
-	createdDate time.Time             // oldest first
-	firstLine   string                // alphabetical tiebreaker
-	id          logseqapi.TaskUUID    // UUID, guaranteed unique final tiebreaker
-	block       *content.Block        // reference to the block for reordering
+	priority    content.Priority   // PriorityNone=0 sorts FIRST (unprioritized at top)
+	createdDate time.Time          // oldest first
+	firstLine   string             // alphabetical tiebreaker
+	id          logseqapi.TaskUUID // UUID, guaranteed unique final tiebreaker
+	block       *content.Block     // reference to the block for reordering
 }
 
 // sortTriagedSection sorts children of the Triaged divider by priority, date, name, and ID.

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	logseq "github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
+	logseq "github.com/andreoliwa/logseq-go/v2"
+	"github.com/andreoliwa/logseq-go/v2/content"
 	tparse "github.com/karrick/tparse/v2"
 
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
@@ -195,7 +195,7 @@ type Action struct {
 	Name         string
 	SetsGroomed  bool
 	RequiresFile bool
-	Priority     content.PriorityValue
+	Priority     content.Priority
 }
 
 // groomActions maps single-letter inputs to their corresponding actions.
@@ -413,7 +413,7 @@ func applyFocusAction(
 // and adds a reference to the Triaged section of the backlog page (if the task has a backlog).
 func applyPriorityAction(
 	transaction *logseq.Transaction, block *content.Block,
-	groomedDate, uuid string, priority content.PriorityValue, opts *WriteOpts,
+	groomedDate, uuid string, priority content.Priority, opts *WriteOpts,
 ) error {
 	priorityErr := logseqext.SetPriority(block, priority)
 	if priorityErr != nil {

@@ -3,8 +3,8 @@ package logseqext
 import (
 	"strings"
 
-	logseq "github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
+	logseq "github.com/andreoliwa/logseq-go/v2"
+	"github.com/andreoliwa/logseq-go/v2/content"
 )
 
 // LogseqFinder provides methods for searching within a Logseq graph.

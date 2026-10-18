@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/golden"

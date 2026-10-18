@@ -288,7 +288,13 @@ func TestMarkdownChronologicalCreation(t *testing.T) {
 
 			actual, err := os.ReadFile(path)
 			require.NoError(t, err)
-			require.Equal(t, strings.TrimSuffix(test.want, "\n"), string(actual))
+
+			want := strings.TrimSuffix(test.want, "\n")
+			if strings.HasSuffix(test.before, "\n") {
+				want += "\n"
+			}
+
+			require.Equal(t, want, string(actual))
 		})
 	}
 }
@@ -368,7 +374,7 @@ func TestMarkdownTimedKeyUpdate(t *testing.T) {
 
 				actual, err := os.ReadFile(path)
 				require.NoError(t, err)
-				require.Equal(t, strings.TrimSuffix(want, "\n"), string(actual))
+				require.Equal(t, want, string(actual))
 			})
 		}
 	}

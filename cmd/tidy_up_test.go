@@ -12,7 +12,7 @@ import (
 	"github.com/andreoliwa/logseq-doctor/internal/config"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
 
-	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

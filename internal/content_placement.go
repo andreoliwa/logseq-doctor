@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
-	logseq "github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
+	logseq "github.com/andreoliwa/logseq-go/v2"
+	"github.com/andreoliwa/logseq-go/v2/content"
 )
 
 var (

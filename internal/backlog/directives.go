@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	logseq "github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
+	logseq "github.com/andreoliwa/logseq-go/v2"
+	"github.com/andreoliwa/logseq-go/v2/content"
 	"github.com/fatih/color"
 
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
@@ -25,9 +25,9 @@ const (
 type blockDirective struct {
 	UUID          string
 	Kind          directiveKind
-	Priority      content.PriorityValue // only for directivePriority; PriorityNone for other kinds
-	DirectiveNode content.Node          // the TaskMarker or Priority node to remove after apply
-	BacklogBlock  *content.Block        // the block on the backlog page containing the BlockRef
+	Priority      content.Priority // only for directivePriority; PriorityNone for other kinds
+	DirectiveNode content.Node     // the TaskMarker or Priority node to remove after apply
+	BacklogBlock  *content.Block   // the block on the backlog page containing the BlockRef
 }
 
 // detectDirectives inspects all preceding siblings of the BlockRef in its parent Paragraph.
@@ -80,7 +80,7 @@ func detectDirectives(blockRef *content.BlockRef) []blockDirective {
 			default:
 				return found
 			}
-		case *content.Priority:
+		case *content.TaskPriority:
 			found = append(found, blockDirective{
 				UUID:          blockRef.ID,
 				Kind:          directivePriority,

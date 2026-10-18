@@ -9,7 +9,7 @@ import (
 
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-doctor/internal/backlog"
-	logseq "github.com/andreoliwa/logseq-go"
+	logseq "github.com/andreoliwa/logseq-go/v2"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/golden"
 )

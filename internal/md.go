@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
+	"github.com/andreoliwa/logseq-go/v2"
+	"github.com/andreoliwa/logseq-go/v2/content"
 
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 )

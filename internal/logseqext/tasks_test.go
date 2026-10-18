@@ -11,9 +11,9 @@ import (
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/internal/testutils"
-	logseq "github.com/andreoliwa/logseq-go"
+	logseq "github.com/andreoliwa/logseq-go/v2"
 
-	"github.com/andreoliwa/logseq-go/content"
+	"github.com/andreoliwa/logseq-go/v2/content"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -544,7 +544,7 @@ func TestTimedKeyUpdateRetainsMetadata(t *testing.T) {
 	graph, path := testutils.NewMarkdownGraph(t, input)
 	before, err := graph.OpenPage("timeline")
 	require.NoError(t, err)
-	original, err := logseq.AsString(before.Blocks()[1])
+	original, err := logseq.AsMarkdownWithOptions(before.Blocks()[1], logseq.WithPreservedMarkdown())
 	require.NoError(t, err)
 	require.NoError(t, logseqext.AddTask(&logseqext.AddTaskOptions{
 		Graph: graph, Page: "timeline",
@@ -553,7 +553,7 @@ func TestTimedKeyUpdateRetainsMetadata(t *testing.T) {
 	after, err := graph.OpenPage("timeline")
 	require.NoError(t, err)
 
-	actual, err := logseq.AsString(after.Blocks()[0])
+	actual, err := logseq.AsMarkdownWithOptions(after.Blocks()[0], logseq.WithPreservedMarkdown())
 	require.NoError(t, err)
 	require.Equal(t, strings.Replace(original, "11:00 key", "09:30 key", 1), actual)
 	require.Contains(t, actual, "id:: "+blockID)

@@ -3,7 +3,7 @@ package pocketbase
 import (
 	"time"
 
-	"github.com/andreoliwa/logseq-go/content"
+	"github.com/andreoliwa/logseq-go/v2/content"
 )
 
 // taskStatusValues are the task status values stored in the PocketBase select field.

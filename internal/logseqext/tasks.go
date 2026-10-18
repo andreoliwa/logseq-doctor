@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	logseq "github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
+	logseq "github.com/andreoliwa/logseq-go/v2"
+	"github.com/andreoliwa/logseq-go/v2/content"
 )
 
 var errInvalidTaskDescription = errors.New("task description must begin with a paragraph")
@@ -99,7 +99,7 @@ func updateTaskBackToTodo(taskMarker *content.TaskMarker, newName string) error 
 
 	content.NormalizeLeadingTime(description)
 
-	_, err := taskMarker.WithStatus(content.TaskStatusTodo)
+	_, err := taskMarker.TransitionTo(content.TaskStatusTodo)
 	if err != nil {
 		return fmt.Errorf("failed to update task status: %w", err)
 	}

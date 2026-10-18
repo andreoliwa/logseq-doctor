@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
-	logseq "github.com/andreoliwa/logseq-go"
+	logseq "github.com/andreoliwa/logseq-go/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -40,7 +40,7 @@ func TestSyncDoingTasks(t *testing.T) {
 	require.NoError(t, err)
 
 	expected := "- ((11111111-1111-1111-1111-111111111111))\n" +
-		"- Existing note\n\t- ((22222222-2222-2222-2222-222222222222))"
+		"- Existing note\n\t- ((22222222-2222-2222-2222-222222222222))\n"
 	assert.Equal(t, expected, string(contents))
 
 	before := string(contents)
@@ -114,7 +114,7 @@ func TestSyncDoingTasksAssignsID(t *testing.T) {
 
 	taskID := regexp.MustCompile(`id:: ([0-9a-f-]+)`).FindStringSubmatch(string(taskContents))
 	require.Len(t, taskID, 2)
-	assert.Equal(t, "- DOING Task without an ID\n  id:: "+taskID[1], string(taskContents))
+	assert.Equal(t, "- DOING Task without an ID\n  id:: "+taskID[1]+"\n", string(taskContents))
 
 	doingContents, err := os.ReadFile(filepath.Join(pagesDir, "DOING.md"))
 	require.NoError(t, err)
@@ -137,7 +137,7 @@ func newTestGraph(t *testing.T) (string, string) {
 func openTestGraph(t *testing.T, graphPath string) *logseq.Graph {
 	t.Helper()
 
-	graph, err := logseq.Open(context.Background(), graphPath)
+	graph, err := logseq.Open(context.Background(), graphPath, logseq.WithPreserveOutput())
 	require.NoError(t, err)
 	t.Cleanup(func() { require.NoError(t, graph.Close()) })
 

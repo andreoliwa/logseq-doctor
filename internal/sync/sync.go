@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andreoliwa/logseq-go/content"
+	"github.com/andreoliwa/logseq-go/v2/content"
 
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
 	"github.com/andreoliwa/logseq-doctor/internal/backlog"
@@ -167,9 +167,9 @@ func extractRankFields(rank *RankInfo) (string, int, int, int) {
 	return rank.BacklogName, rank.BacklogIndex, rank.Section, rank.Rank
 }
 
-// priorityLetter converts a PriorityValue to its single-letter string ("A", "B", "C")
+// priorityLetter converts a Priority to its single-letter string ("A", "B", "C")
 // or empty string for PriorityNone. Used to store priority as a text field in PocketBase.
-func priorityLetter(p content.PriorityValue) string {
+func priorityLetter(p content.Priority) string {
 	switch p {
 	case content.PriorityHigh:
 		return "A"

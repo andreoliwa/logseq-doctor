@@ -13,7 +13,7 @@ import (
 	"github.com/andreoliwa/logseq-doctor/internal/backlog"
 	"github.com/andreoliwa/logseq-doctor/internal/groom"
 	"github.com/andreoliwa/logseq-doctor/internal/pocketbase"
-	logseq "github.com/andreoliwa/logseq-go"
+	logseq "github.com/andreoliwa/logseq-go/v2"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 )

@@ -15,8 +15,8 @@ import (
 	"time"
 
 	"fyne.io/systray"
-	logseq "github.com/andreoliwa/logseq-go"
-	"github.com/andreoliwa/logseq-go/content"
+	logseq "github.com/andreoliwa/logseq-go/v2"
+	"github.com/andreoliwa/logseq-go/v2/content"
 
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 )
@@ -37,7 +37,7 @@ func countDoing(graphPath string) int {
 		return 0
 	}
 
-	graph, err := logseq.Open(context.Background(), graphPath)
+	graph, err := logseq.Open(context.Background(), graphPath, logseq.WithPreserveOutput())
 	if err != nil {
 		return 0
 	}

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	logseqapi "github.com/andreoliwa/logseq-doctor/internal/api"
-	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/v2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"gotest.tools/v3/fs"
@@ -123,7 +123,7 @@ func NewMarkdownGraph(t *testing.T, markdown string) (*logseq.Graph, string) {
 	path := filepath.Join(root, pagesDir, "timeline.md")
 	require.NoError(t, os.WriteFile(path, []byte(markdown), fileMode))
 
-	graph, err := logseq.Open(context.Background(), root)
+	graph, err := logseq.Open(context.Background(), root, logseq.WithPreserveOutput())
 	require.NoError(t, err)
 	t.Cleanup(func() { require.NoError(t, graph.Close()) })
 

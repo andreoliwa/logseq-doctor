@@ -3,7 +3,7 @@ package logseqext
 import (
 	"strings"
 
-	"github.com/andreoliwa/logseq-go/content"
+	"github.com/andreoliwa/logseq-go/v2/content"
 )
 
 // EffectiveTime returns a block's leading time, or the first timed direct

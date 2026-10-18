@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/andreoliwa/logseq-go/content"
+import "github.com/andreoliwa/logseq-go/v2/content"
 
 // IsAncestor checks if ancestor is an ancestor of block by traversing up the parent chain.
 // Returns true if ancestor is found in the parent hierarchy of block, false otherwise.

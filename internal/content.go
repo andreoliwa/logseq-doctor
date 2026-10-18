@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/v2"
 	"github.com/google/uuid"
 )
 

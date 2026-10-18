@@ -11,7 +11,7 @@ import (
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
 	"github.com/andreoliwa/logseq-doctor/internal/pocketbase"
 	lqdsync "github.com/andreoliwa/logseq-doctor/internal/sync"
-	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/v2"
 	"github.com/spf13/cobra"
 )
 

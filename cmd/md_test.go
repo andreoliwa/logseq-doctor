@@ -9,7 +9,7 @@ import (
 
 	"github.com/andreoliwa/logseq-doctor/cmd"
 	"github.com/andreoliwa/logseq-doctor/internal"
-	"github.com/andreoliwa/logseq-go"
+	"github.com/andreoliwa/logseq-go/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -355,7 +355,7 @@ func TestMdCommandChronologicalTargets(t *testing.T) {
 
 			actual, err := os.ReadFile(path)
 			require.NoError(t, err)
-			require.Equal(t, want, string(actual))
+			require.Equal(t, want+"\n", string(actual))
 		})
 	}
 }
