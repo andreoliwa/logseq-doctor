@@ -10,7 +10,7 @@ upgrade: # Upgrade all dependencies
 	go mod tidy
 .PHONY: upgrade
 
-build: # Build the Go binary (and lqd-statusbar on macOS)
+build: check-upstream # Build the Go binary (and lqd-statusbar on macOS)
 	go mod tidy
 	go build ./cmd/lqd
 	if [ "$$(uname)" = "Darwin" ]; then go build ./cmd/lqd-statusbar; fi
@@ -67,3 +67,11 @@ docs: # Generate Go API docs and build the MkDocs site
 	gomarkdoc --output docs/reference/go.md ./...
 	mkdocs build
 .PHONY: docs
+
+LOGSEQ_GO_DIR ?= $(CURDIR)/../logseq-go
+check-upstream: # Ask the sibling library to report upstream changes
+	@if [ -n "$$CI" ]; then :; \
+	elif [ -f "$(LOGSEQ_GO_DIR)/Makefile" ]; then \
+		$(MAKE) --no-print-directory -s -C "$(LOGSEQ_GO_DIR)" check-upstream || printf '%s\n' 'warning: library upstream check failed; continuing build'; \
+	else printf '%s\n' 'warning: library checkout unavailable; skipping upstream check'; fi
+.PHONY: check-upstream

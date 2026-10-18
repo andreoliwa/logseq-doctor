@@ -134,3 +134,18 @@ Please note that this project is released with a Contributor Code of Conduct. By
 ## Questions?
 
 Feel free to [open an issue](https://github.com/andreoliwa/logseq-doctor/issues) if you have any questions about contributing!
+
+## Library upstream notices
+
+Normal `make build` asks the sibling logseq-go checkout to run its
+`check-upstream` target. `LOGSEQ_GO_DIR` overrides the sibling location and can
+contain spaces. The library owns the 24-hour cache interval; set
+`UPSTREAM_CHECK_INTERVAL_SECONDS=0` to force its lookup. Missing checkouts,
+tools, cache access or lookup failures warn without blocking the build. CI
+skips the check. `make install` inherits the build prerequisite, while plain
+`go build` has no notification hook.
+
+The library target uses Python 3 and curl and can also run manually with
+`make -C /absolute/path/to/logseq-go check-upstream`. It prints a comparison link
+without merging or reviewing anything. No scheduler or desktop notification
+service is installed.
