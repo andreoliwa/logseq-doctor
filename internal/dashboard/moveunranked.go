@@ -70,6 +70,10 @@ func collectBlocksToMove(page logseq.Page, uuidSet map[string]bool) []*content.B
 	var toMove []*content.Block
 
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		if isSectionHeaderBlock(block) {
 			// Tasks under a section header (e.g. 🆕 New tasks) are descendant blocks.
 			block.Children().FindDeep(func(n content.Node) bool {
