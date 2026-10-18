@@ -116,6 +116,10 @@ func ExtractBlockRefUUIDs(page logseq.Page) []string {
 	var uuids []string
 
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		block.Children().FindDeep(func(n content.Node) bool {
 			if ref, ok := n.(*content.BlockRef); ok {
 				uuids = append(uuids, ref.ID)
@@ -144,10 +148,12 @@ type SectionedUUID struct {
 // The ranked area is defined as top-level blocks that are NOT section-header
 // blocks and NOT descendants of any section-header block.
 func ExtractSectionedBlockRefUUIDs(page logseq.Page, unrankedSectionTexts []string) []SectionedUUID {
+	bulletBlocks := page.Blocks().Filter(func(block *content.Block) bool { return !block.IsPreBlock() })
+
 	// First pass: find all section-header blocks.
 	sectionHeaders := make(map[*content.Block]bool)
 
-	for _, block := range page.Blocks() {
+	for _, block := range bulletBlocks {
 		text := BlockContentText(block)
 		for _, headerText := range unrankedSectionTexts {
 			if strings.Contains(strings.ToLower(text), strings.ToLower(headerText)) {
@@ -161,7 +167,7 @@ func ExtractSectionedBlockRefUUIDs(page logseq.Page, unrankedSectionTexts []stri
 	// Second pass: classify each ref.
 	var result []SectionedUUID
 
-	for _, block := range page.Blocks() {
+	for _, block := range bulletBlocks {
 		if sectionHeaders[block] {
 			// This is a divider block itself — collect refs under it as unranked.
 			block.Children().FindDeep(func(n content.Node) bool {

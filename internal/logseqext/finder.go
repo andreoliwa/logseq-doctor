@@ -33,6 +33,10 @@ func (f logseqFinderImpl) FindFirstQuery(pageTitle string) string {
 	}
 
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		block.Children().FindDeep(func(n content.Node) bool {
 			if q, ok := n.(*content.Query); ok {
 				query = q.Query
@@ -103,6 +107,10 @@ func FindBlockContainingText(page logseq.Page, searchText string) *content.Block
 	searchTextLower := strings.ToLower(searchText)
 
 	return page.Blocks().FindDeep(func(block *content.Block) bool {
+		if block.IsPreBlock() {
+			return false
+		}
+
 		textNode := block.Content().FindDeep(func(node content.Node) bool {
 			return containsTextCaseInsensitive(node, searchTextLower)
 		})
@@ -123,6 +131,10 @@ func FindBlockByKey(page logseq.Page, parentBlock *content.Block, key string) *c
 	keyLower := strings.ToLower(key)
 
 	predicate := func(block *content.Block) bool {
+		if block.IsPreBlock() {
+			return false
+		}
+
 		// Check if the key is in the immediate content of this block (not in nested blocks)
 		textNode := block.Content().FindDeep(func(node content.Node) bool {
 			return containsTextCaseInsensitive(node, keyLower)
@@ -150,6 +162,10 @@ func FindTaskMarkerByKey(page logseq.Page, parentBlock *content.Block, key strin
 	keyLower := strings.ToLower(key)
 
 	predicate := func(block *content.Block) bool {
+		if block.IsPreBlock() {
+			return false
+		}
+
 		// Check if this block has a task marker in its immediate content (not in nested blocks)
 		hasTaskMarker := false
 

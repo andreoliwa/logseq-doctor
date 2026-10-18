@@ -66,6 +66,10 @@ func BlockProperties(block *content.Block) *content.Properties {
 // only checks the first child — task blocks have a paragraph first, then properties.
 func FindBlockByIDProperty(page logseq.Page, uuid string) *content.Block {
 	return page.Blocks().FindDeep(func(block *content.Block) bool {
+		if block.IsPreBlock() {
+			return false
+		}
+
 		return blockHasIDProperty(block, uuid)
 	})
 }

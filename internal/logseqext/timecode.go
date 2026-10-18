@@ -64,7 +64,7 @@ func laterTimeAnchor(block *content.Block, siblings content.BlockList) *content.
 	}
 
 	for _, sibling := range siblings {
-		if sibling == block {
+		if sibling == block || sibling.IsPreBlock() {
 			continue
 		}
 
