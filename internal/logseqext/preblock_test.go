@@ -3,6 +3,7 @@ package logseqext_test
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/andreoliwa/logseq-doctor/internal/logseqext"
@@ -80,4 +81,17 @@ func TestLaterTimeAnchorSkipsPagePrefix(t *testing.T) {
 	bullet, err := logseq.ParseBlock("11:00 bullet")
 	require.NoError(t, err)
 	require.Same(t, bullet, logseqext.LaterTimeAnchor(incoming, content.BlockList{preblock, bullet}))
+}
+
+func TestCollectDoingTasksSkipsPagePrefix(t *testing.T) {
+	graph, _ := preblockPage(t, "DOING metadata-only", "- DOING bullet\n")
+	path := filepath.Join(graph.Directory(), "pages/Example.md")
+	count, err := logseqext.SyncDoingTasksInFiles(graph, []string{path})
+	require.NoError(t, err)
+	require.Equal(t, 1, count)
+
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.NotContains(t, strings.SplitN(string(data), "- DOING bullet", 2)[0], "id::")
+	require.Contains(t, string(data), "- DOING bullet\n  id::")
 }

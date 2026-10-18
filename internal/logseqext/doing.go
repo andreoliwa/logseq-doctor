@@ -164,6 +164,10 @@ func findDoingTasksInFiles(graph *logseq.Graph, paths []string) ([]doingTask, er
 
 func collectDoingTasks(blocks content.BlockList, path string, parentLocation []int, tasks *[]doingTask) {
 	for index, block := range blocks {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		location := append(append([]int{}, parentLocation...), index)
 		if blockIsDoing(block) {
 			*tasks = append(*tasks, doingTask{
@@ -203,6 +207,10 @@ func pageBlockRefs(graph *logseq.Graph, pageTitle string) (map[string]struct{}, 
 	refs := make(map[string]struct{})
 
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		block.Children().FindDeep(func(node content.Node) bool {
 			if ref, ok := node.(*content.BlockRef); ok {
 				refs[ref.ID] = struct{}{}
