@@ -124,6 +124,10 @@ func CheckForbiddenReferences(page logseq.Page, policy config.ForbiddenContentPo
 	all := make([]string, 0)
 
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		block.Children().FindDeep(func(node content.Node) bool {
 			reference, forbidden := forbiddenReference(node, policy)
 			if forbidden {
@@ -201,6 +205,10 @@ func CheckRunningTasks(page logseq.Page) ChangedPage {
 	all := make([]string, 0)
 
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		block.Children().FindDeep(func(n content.Node) bool {
 			if task, ok := n.(*content.TaskMarker); ok {
 				if task.Status == content.TaskStatusDoing || task.Status == content.TaskStatusInProgress {
@@ -228,6 +236,10 @@ func RemoveDoubleSpaces(page logseq.Page) ChangedPage { //nolint:cyclop
 	fixed := false
 
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		block.Children().FindDeep(func(node content.Node) bool {
 			var oldValue string
 
@@ -296,6 +308,10 @@ func RemoveEmptyBullets(page logseq.Page) ChangedPage {
 	//    They have different signatures: node content.Node, block *content.Block
 	//  - Use generics for this interface or create 2 interfaces?
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		if block.FirstChild() == nil {
 			block.RemoveSelf()
 
@@ -327,6 +343,10 @@ func NormalizeLeadingTimes(page logseq.Page) ChangedPage {
 	count := 0
 
 	page.Blocks().FindDeep(func(block *content.Block) bool {
+		if block.IsPreBlock() {
+			return false
+		}
+
 		if content.NormalizeLeadingTime(block) {
 			count++
 		}
