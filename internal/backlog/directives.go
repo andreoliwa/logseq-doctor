@@ -50,7 +50,8 @@ func detectDirectives(blockRef *content.BlockRef) []blockDirective {
 	for prev := blockRef.PreviousSibling(); prev != nil; prev = prev.PreviousSibling() {
 		switch node := prev.(type) {
 		case *content.TaskMarker:
-			//exhaustive:ignore only directive statuses are handled
+			// Only directive statuses are handled.
+			//exhaustive:ignore
 			switch node.Status {
 			case content.TaskStatusCanceled, content.TaskStatusCancelled:
 				found = append(found, blockDirective{
