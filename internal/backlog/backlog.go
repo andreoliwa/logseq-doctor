@@ -162,6 +162,10 @@ func blockRefsFromPages(page logseq.Page) *set.Set[string] {
 	existingRefs := set.NewSet[string]()
 
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		block.Children().FindDeep(func(n content.Node) bool {
 			if ref, ok := n.(*content.BlockRef); ok {
 				existingRefs.Add(ref.ID)

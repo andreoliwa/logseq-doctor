@@ -112,6 +112,10 @@ func NormalizeHeaderText(page logseq.Page) bool {
 	changed := false
 
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		block.Children().FindDeep(func(node content.Node) bool {
 			text, ok := node.(*content.Text)
 			if !ok {
@@ -174,6 +178,10 @@ func collectScheduledRefs(page logseq.Page, state *pageState) {
 	var scheduledBlock *content.Block
 
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		block.Children().FindDeep(func(node content.Node) bool {
 			if text, ok := node.(*content.Text); ok {
 				if HeaderScheduled.Matches(text.Value) {
@@ -206,6 +214,10 @@ func collectScheduledRefs(page logseq.Page, state *pageState) {
 // section divider and record all block-ref UUIDs that are descendants of it.
 func collectTriagedRefs(page logseq.Page, state *pageState) {
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		block.Children().FindDeep(func(node content.Node) bool {
 			if text, ok := node.(*content.Text); ok {
 				if HeaderTriaged.Matches(text.Value) {
@@ -240,8 +252,12 @@ func processAllBlocks(
 	page logseq.Page, state *pageState,
 	obsoleteBlockRefs, overdueBlockRefs, futureScheduledBlockRefs *set.Set[string],
 ) {
-	for i, block := range page.Blocks() {
-		if i == 0 {
+	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
+		if state.firstBlock == nil {
 			state.firstBlock = block
 		}
 
@@ -680,6 +696,10 @@ func AddBlockRefToFocusPage(transaction *logseq.Transaction, focusPageTitle, uui
 // FindFirstSectionDivider finds the first block whose text matches a known section header.
 func FindFirstSectionDivider(page logseq.Page) *content.Block {
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		blockText := logseqext.BlockContentText(block)
 
 		for _, header := range focusSectionHeaders {
@@ -724,6 +744,10 @@ func BlockRefExistsUnder(parent *content.Block, uuid logseqapi.TaskUUID) bool {
 // are not part of the regular area. Since we walk only top-level blocks, child refs are never seen.
 func RemoveBlockRefFromRegularArea(page logseq.Page, uuid logseqapi.TaskUUID) {
 	for _, block := range page.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		blockText := logseqext.BlockContentText(block)
 
 		isDivider := false

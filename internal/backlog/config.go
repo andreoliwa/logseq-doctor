@@ -44,6 +44,10 @@ func (p *pageConfigReader) ReadConfig() (*Config, error) { //nolint:cyclop,funle
 	var backlogs []SingleBacklogConfig
 
 	for _, block := range configPage.Blocks() {
+		if block.IsPreBlock() {
+			continue
+		}
+
 		var inputPages []string
 
 		firstRegularPage := ""
