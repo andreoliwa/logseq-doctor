@@ -1077,6 +1077,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#library-upstream-notices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Library upstream notices
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1296,6 +1307,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#library-upstream-notices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Library upstream notices
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1481,6 +1503,18 @@
 <p>Please note that this project is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms.</p>
 <h2 id="questions">Questions?<a class="headerlink" href="#questions" title="Permanent link">¶</a></h2>
 <p>Feel free to <a href="https://github.com/andreoliwa/logseq-doctor/issues">open an issue</a> if you have any questions about contributing!</p>
+<h2 id="library-upstream-notices">Library upstream notices<a class="headerlink" href="#library-upstream-notices" title="Permanent link">¶</a></h2>
+<p>Normal <code>make build</code> asks the sibling logseq-go checkout to run its
+<code>check-upstream</code> target. <code>LOGSEQ_GO_DIR</code> overrides the sibling location and can
+contain spaces. The library owns the 24-hour cache interval; set
+<code>UPSTREAM_CHECK_INTERVAL_SECONDS=0</code> to force its lookup. Missing checkouts,
+tools, cache access or lookup failures warn without blocking the build. CI
+skips the check. <code>make install</code> inherits the build prerequisite, while plain
+<code>go build</code> has no notification hook.</p>
+<p>The library target uses Python 3 and curl and can also run manually with
+<code>make -C /absolute/path/to/logseq-go check-upstream</code>. It prints a comparison link
+without merging or reviewing anything. No scheduler or desktop notification
+service is installed.</p>
 
 
 
